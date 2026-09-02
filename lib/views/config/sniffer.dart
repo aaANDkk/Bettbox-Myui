@@ -335,7 +335,6 @@ class _SnifferPortDialogState extends State<_SnifferPortDialog> {
             TextField(
               controller: _portsController,
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
                 labelText: appLocalizations.snifferPorts,
                 hintText: '443, 8443',
               ),

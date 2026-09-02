@@ -758,7 +758,6 @@ class _SecretDialogState extends ConsumerState<_SecretDialog> {
           child: TextFormField(
             controller: _controller,
             decoration: InputDecoration(
-              border: const OutlineInputBorder(),
               labelText: appLocalizations.controlSecret,
               hintText: appLocalizations.controlSecretDesc,
             ),
@@ -910,11 +909,12 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
         autovalidateMode: AutovalidateMode.onUserInteraction,
         key: _formKey,
         child: Padding(
-          padding: EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.fromLTRB(4, 8, 4, 16),
           child: AnimatedSize(
             duration: midDuration,
             curve: Curves.easeOutQuad,
             alignment: Alignment.topCenter,
+            clipBehavior: Clip.none,
             child: Column(
               spacing: 24,
               children: [
@@ -927,7 +927,6 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
                     _handleUpdate();
                   },
                   decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
                     labelText: appLocalizations.mixedPort,
                   ),
                   validator: (value) {
@@ -972,7 +971,6 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
                       _handleUpdate();
                     },
                     decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
                       labelText: appLocalizations.port,
                     ),
                     validator: (value) {
@@ -1012,7 +1010,6 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
                       _handleUpdate();
                     },
                     decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
                       labelText: appLocalizations.socksPort,
                     ),
                     validator: (value) {
@@ -1056,7 +1053,6 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
                       _handleUpdate();
                     },
                     decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
                       labelText: appLocalizations.redirPort,
                     ),
                     validator: (value) {
@@ -1100,7 +1096,6 @@ class _PortDialogState extends ConsumerState<_PortDialog> {
                       _handleUpdate();
                     },
                     decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
                       labelText: appLocalizations.tproxyPort,
                     ),
                     validator: (value) {

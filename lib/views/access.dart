@@ -11,6 +11,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 // Force refresh icon flag
 final forceRefreshIconProvider = StateProvider<bool>((ref) => false);
@@ -562,7 +563,12 @@ class _AccessViewState extends ConsumerState<AccessView>
                     future: _completer.future,
                     builder: (_, snapshot) {
                       if (snapshot.connectionState != ConnectionState.done) {
-                        return Center(child: CircularProgressIndicator());
+                        return Center(
+                          child: SpinKitFadingCircle(
+                            color: context.colorScheme.primary,
+                            size: 36,
+                          ),
+                        );
                       }
                       if (_packageListPermissionDenied) {
                         return _buildPackageListPermissionDeniedView();
@@ -691,12 +697,18 @@ class PackageListItem extends ConsumerWidget {
           ),
           title: EmojiText(
             package.label,
-            style: const TextStyle(overflow: TextOverflow.ellipsis),
+            style: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              color: context.colorScheme.onSurface,
+            ),
             maxLines: 1,
           ),
           subtitle: Text(
             package.packageName,
-            style: const TextStyle(overflow: TextOverflow.ellipsis),
+            style: TextStyle(
+              overflow: TextOverflow.ellipsis,
+              color: context.colorScheme.onSurface,
+            ),
             maxLines: 1,
           ),
           delegate: CheckboxDelegate(value: value, onChanged: onChanged),

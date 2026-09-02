@@ -13,6 +13,7 @@ import 'package:bett_box/widgets/list.dart';
 import 'package:bett_box/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
 class BackupAndRecovery extends ConsumerWidget {
@@ -203,11 +204,11 @@ class BackupAndRecovery extends ConsumerWidget {
                           child: FadeThroughBox(
                             child:
                                 snapshot.connectionState != ConnectionState.done
-                                ? const SizedBox(
-                                    width: 12,
-                                    height: 12,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1,
+                                ? SizedBox.square(
+                                    dimension: 12,
+                                    child: SpinKitFadingCircle(
+                                      color: context.colorScheme.primary,
+                                      size: 12,
                                     ),
                                   )
                                 : Container(
@@ -415,7 +416,6 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
               minLines: 1,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.link),
-                border: const OutlineInputBorder(),
                 labelText: appLocalizations.address,
                 helperText: appLocalizations.addressHelp,
               ),
@@ -430,7 +430,6 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
               controller: userController,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.account_circle),
-                border: const OutlineInputBorder(),
                 labelText: appLocalizations.account,
               ),
               validator: (String? value) {
@@ -448,7 +447,6 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
                   obscureText: obscure,
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.password),
-                    border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       icon: Icon(
                         obscure ? Icons.visibility : Icons.visibility_off,
