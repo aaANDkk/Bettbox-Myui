@@ -7,8 +7,8 @@ on:
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
-  IS_PRERELEASE: ${{ contains(github.ref_name, 'pre') }}
-  SHOULD_RELEASE: ${{ !contains(github.ref, '-') || contains(github.ref_name, 'pre') }}
+  IS_PRERELEASE: ${{ contains(github.ref_name, 'pre') || contains(github.ref_name, 'test') }}
+  SHOULD_RELEASE: true
   GRADLE_OPTS: -Dorg.gradle.vfs.watch=false
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SENTRY_BACKEND: none
@@ -72,6 +72,17 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
+      - name: Free disk space (Android)
+        if: matrix.platform == 'android'
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/swift
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /tmp/* || true
+          sudo apt-get clean
+          df -h -B1G | grep -E 'Filesystem|/dev/root|overlay|/'
+
       - name: Setup Rust (Windows)
         if: matrix.platform == 'windows'
         uses: dtolnay/rust-toolchain@stable
@@ -101,10 +112,17 @@ jobs:
       - name: Setup Keystore (Android)
         if: matrix.platform == 'android'
         run: |
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
-          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
+          if [ -n "${{ secrets.KEYSTORE }}" ]; then
+            echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
+            echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
+            echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
+            echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
+          elif [ -f "android/app/keystore.jks" ]; then
+            echo "Using persistent release keystore from repository."
+            echo "keyAlias=bettbox" >> android/local.properties
+            echo "storePassword=bettboxpassword" >> android/local.properties
+            echo "keyPassword=bettboxpassword" >> android/local.properties
+          fi
           
       - name: Setup Java (Android)
         if: matrix.platform == 'android'
@@ -174,9 +192,12 @@ jobs:
         shell: bash
         run: |
           cd core
+          export GOPROXY="https://proxy.golang.org,https://goproxy.io,direct"
           SING_TUN_VERSION=$(grep -E 'github\.com/metacubex/sing-tun\s+v[^[:space:]]+' go.mod | awk '{print $2}')
           echo "Detected sing-tun version: ${SING_TUN_VERSION}"
-          go mod download github.com/metacubex/sing-tun@${SING_TUN_VERSION}
+          for i in {1..5}; do
+            go mod download github.com/metacubex/sing-tun@${SING_TUN_VERSION} && break || (echo "Retry $i..." && sleep 3)
+          done
           MOD_CACHE=$(go env GOMODCACHE | tr '\\' '/')
           FILE="${MOD_CACHE}/github.com/metacubex/sing-tun@${SING_TUN_VERSION}/tun_windows.go"
           echo "Patching ${FILE}"
@@ -448,16 +469,17 @@ jobs:
 
       - name: Generate release.md
         run: |
-          printf '%s\n' "- Fixes and improvements" "- Recommended version update" > release.md
-
-      - name: Patch release.md
-        run: |
-          version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          base_version=$(echo "$version" | sed 's/-pre[0-9]*//')
-          if [ "${{ env.IS_PRERELEASE }}" == "true" ]; then
-            sed -e "s|BASE_VERSION|$base_version|g" -e "s|VERSION|$version|g" ./.github/release_template_pre.md >> release.md
+          PREV_TAG=$(git describe --tags --abbrev=0 "${{ github.ref_name }}^" 2>/dev/null || true)
+          if [ -n "$PREV_TAG" ]; then
+            echo "## 更新内容 / What's Changed" > release.md
+            echo "" >> release.md
+            git log "${PREV_TAG}..${{ github.ref_name }}" --pretty=format:"* %s (%h)" --no-merges >> release.md || true
+            echo "" >> release.md
           else
-            sed -e "s|BASE_VERSION|$base_version|g" -e "s|VERSION|$version|g" ./.github/release_template.md >> release.md
+            echo "## 更新内容 / What's Changed" > release.md
+            echo "" >> release.md
+            printf '%s\n' "* Fixes and improvements" "* Recommended version update" >> release.md
+            echo "" >> release.md
           fi
 
       - name: Release
@@ -467,3 +489,4 @@ jobs:
           files: ./dist/*
           body_path: './release.md'
           prerelease: ${{ env.IS_PRERELEASE == 'true' }}
+          generate_release_notes: true
