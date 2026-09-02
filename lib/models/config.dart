@@ -56,7 +56,6 @@ const List<DashboardWidget> defaultDashboardWidgets = [
   DashboardWidget.trafficUsage,
   DashboardWidget.memoryInfo,
   DashboardWidget.connectionsCount,
-  DashboardWidget.startButton,
 ];
 
 const List<DashboardWidget> defaultAndroidDashboardWidgets = [
@@ -66,7 +65,6 @@ const List<DashboardWidget> defaultAndroidDashboardWidgets = [
   DashboardWidget.networkDetection,
   DashboardWidget.connectionsCount,
   DashboardWidget.memoryInfo,
-  DashboardWidget.startButton,
 ];
 
 List<DashboardWidget> dashboardWidgetsSafeFromJson(

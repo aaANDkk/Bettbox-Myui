@@ -2659,6 +2659,56 @@ class AppLocalizations {
     );
   }
 
+  /// `Start Running`
+    /// `No usage data`
+  String get noUsageData {
+    return Intl.message(
+      'No usage data',
+      name: 'noUsageData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Local File`
+  String get localFile {
+    return Intl.message(
+      'Local File',
+      name: 'localFile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expired`
+  String get expired {
+    return Intl.message(
+      'Expired',
+      name: 'expired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last edited`
+  String get lastEdit {
+    return Intl.message(
+      'Last edited',
+      name: 'lastEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+String get startRunning {
+    return Intl.message(
+      'Start',
+      name: 'startRunning',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Start`
   String get start {
     return Intl.message('Start', name: 'start', desc: '', args: []);

@@ -331,10 +331,7 @@ enum DashboardWidget {
   ntpOverride(GridItem(crossAxisCellCount: 4, child: NtpOverride())),
   providersInfo(GridItem(crossAxisCellCount: 4, child: ProvidersInfo())),
   fcmStatus(GridItem(crossAxisCellCount: 4, child: FcmStatus())),
-  onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel())),
-  startButton(
-    GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
-  );
+  onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel()));
 
   final GridItem widget;
   final List<SupportPlatform> platforms;

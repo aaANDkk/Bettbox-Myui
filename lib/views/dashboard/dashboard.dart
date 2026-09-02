@@ -11,6 +11,8 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'widgets/start_fab.dart';
+
 final customDashboardTitleProvider =
     StateNotifierProvider<CustomDashboardTitleNotifier, String?>((ref) {
       return CustomDashboardTitleNotifier();
@@ -227,6 +229,14 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       title:
           ref.watch(customDashboardTitleProvider) ?? appLocalizations.dashboard,
       actions: _buildActions(),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(
+          bottom: isMobileView
+              ? getFloatingBottomBarFABReserveHeight(context)
+              : 0,
+        ),
+        child: const StartFab(),
+      ),
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -447,7 +457,6 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
           decoration: InputDecoration(
             hintText: 'Have fun with Bettbox',
             errorText: _errorText,
-            border: const OutlineInputBorder(),
           ),
           onChanged: _validate,
         ),

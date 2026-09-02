@@ -142,7 +142,7 @@ class OutboundModeV2 extends StatelessWidget {
                   horizontal: 10,
                   vertical: 9,
                 ),
-                thumbRadius: const Radius.circular(12),
+                thumbRadius: const Radius.circular(13),
                 groupValue: mode,
                 onValueChanged: (value) {
                   if (value == null) {

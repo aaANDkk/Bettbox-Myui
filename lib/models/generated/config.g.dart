@@ -108,7 +108,6 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.providersInfo: 'providersInfo',
   DashboardWidget.fcmStatus: 'fcmStatus',
   DashboardWidget.onlinePanel: 'onlinePanel',
-  DashboardWidget.startButton: 'startButton',
 };
 
 _AccessControl _$AccessControlFromJson(Map<String, dynamic> json) =>
