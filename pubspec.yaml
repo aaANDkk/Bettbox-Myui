@@ -103,9 +103,9 @@ flutter:
     - family: JetBrainsMono
       fonts:
         - asset: assets/fonts/JetBrainsMono-Regular.ttf
-    - family: Twemoji
+    - family: OpenMoji
       fonts:
-        - asset: assets/fonts/Twemoji.Mozilla.ttf
+        - asset: assets/fonts/openmoji.ttf
     - family: Icons
       fonts:
         - asset: assets/fonts/Icons.ttf

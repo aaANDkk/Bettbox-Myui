@@ -85,8 +85,8 @@ class EmojiText extends StatelessWidget {
           text: match.group(0),
           style: effectiveStyle.merge(
             TextStyle(
-              fontFamily: FontFamily.twEmoji.value,
-              fontFamilyFallback: [FontFamily.twEmoji.value],
+              fontFamily: FontFamily.openMoji.value,
+              fontFamilyFallback: [FontFamily.openMoji.value],
             ),
           ),
         ),

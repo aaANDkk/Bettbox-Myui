@@ -145,6 +145,10 @@ class AboutView extends StatelessWidget {
         avatar: 'assets/images/avatars/wfion.png',
         name: 'wfion',
       ),
+      const Contributor(
+        avatar: 'assets/images/avatars/aaANDkk.png',
+        name: 'aaANDkk',
+      ),
     ]..shuffle();
     return generateSection(
       separated: false,
