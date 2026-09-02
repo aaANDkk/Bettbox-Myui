@@ -28,7 +28,7 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
   static final Map<String, File?> _moduleFileCache = {};
   static final Map<String, bool> _moduleSvgValidCache = {};
   static final Map<String, DateTime> _moduleFailureCache = {};
-  static const _maxCacheEntries = 80;
+  static const _maxCacheEntries = 200;
   static const _failureCooldownSeconds = 10;
 
   String _moduleCacheKey(int cacheSize) {
@@ -63,13 +63,15 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     final cacheSize = (widget.size * devicePixelRatio).ceil();
     final key = _moduleCacheKey(cacheSize);
 
-    final cachedFile = _moduleFileCache[key] ?? _findCachedFileForSrc(widget.src);
-    final syncHit = cachedFile != null;
+    final exactFile = _moduleFileCache[key];
+    final fallbackFile = exactFile ?? _findCachedFileForSrc(widget.src);
 
-    if (syncHit) {
+    if (exactFile != null) {
       _cachedSrc = widget.src;
       _cachedSize = cacheSize;
-      _file = cachedFile;
+      _file = exactFile;
+    } else if (fallbackFile != null) {
+      _file = fallbackFile;
     }
     _init(cacheSize);
   }
@@ -90,12 +92,19 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     if (src.isSvg) {
       return _moduleFileCache['svg|$src'];
     }
+    File? bestMatch;
+    var bestSize = -1;
     for (final entry in _moduleFileCache.entries) {
       if (entry.key.startsWith('bmp|$src|') && entry.value != null) {
-        return entry.value;
+        final parts = entry.key.split('|');
+        final size = parts.length > 2 ? int.tryParse(parts[2]) ?? 0 : 0;
+        if (size > bestSize) {
+          bestSize = size;
+          bestMatch = entry.value;
+        }
       }
     }
-    return null;
+    return bestMatch;
   }
 
   @override
@@ -321,6 +330,7 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
         gaplessPlayback: true,
         cacheWidth: cacheSize,
         cacheHeight: cacheSize,
+        filterQuality: FilterQuality.medium,
         errorBuilder: (_, error, _) {
           return _defaultIcon();
         },
@@ -388,6 +398,7 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
       return Image.file(
         _file!,
         gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
         errorBuilder: (_, _, _) {
           _moduleFileCache.remove(mKey);
           _moduleFailureCache.remove(mKey);

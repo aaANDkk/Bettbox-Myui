@@ -22,6 +22,12 @@ class CommonPopupRoute<T> extends PopupRoute<T> {
   bool get barrierDismissible => true;
 
   @override
+  Duration get transitionDuration => const Duration(milliseconds: 250);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 150);
+
+  @override
   Widget buildPage(
     BuildContext context,
     Animation<double> animation,
@@ -37,11 +43,10 @@ class CommonPopupRoute<T> extends PopupRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    final align = Alignment.topRight;
-    final animationValue = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeIn,
-    ).value;
+    const align = Alignment.topRight;
+    final fade = animation.drive(CurveTween(curve: Curves.easeOut));
+    final scale = animation.drive(CurveTween(curve: Curves.easeOutBack));
+
     return SafeArea(
       child: ValueListenableBuilder(
         valueListenable: offsetNotifier,
@@ -56,29 +61,22 @@ class CommonPopupRoute<T> extends PopupRoute<T> {
             ),
           );
         },
-        child: AnimatedBuilder(
-          animation: animation,
-          builder: (_, Widget? child) {
-            return Opacity(
-              opacity: 0.1 + 0.9 * animationValue,
-              child: Transform.scale(
-                alignment: align,
-                scale: 0.7 + 0.3 * animationValue,
-                child: Transform.translate(
-                  offset: Offset(0, -10) * (1 - animationValue),
-                  child: child!,
-                ),
+        child: FadeTransition(
+          opacity: fade,
+          child: ScaleTransition(
+            alignment: align,
+            scale: scale,
+            child: SlideTransition(
+              position: scale.drive(
+                Tween(begin: const Offset(0, -0.02), end: Offset.zero),
               ),
-            );
-          },
-          child: builder(context),
+              child: builder(context),
+            ),
+          ),
         ),
       ),
     );
   }
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 150);
 }
 
 class PopupController extends ValueNotifier<bool> {
@@ -97,13 +95,15 @@ typedef PopupOpen = Function({Offset offset});
 
 class CommonPopupBox extends StatefulWidget {
   final Widget Function(PopupOpen open) targetBuilder;
-  final Widget popup;
+  final Widget? popup;
+  final WidgetBuilder? popupBuilder;
 
   const CommonPopupBox({
     super.key,
     required this.targetBuilder,
-    required this.popup,
-  });
+    this.popup,
+    this.popupBuilder,
+  }) : assert(popup != null || popupBuilder != null);
 
   @override
   State<CommonPopupBox> createState() => _CommonPopupBoxState();
@@ -123,7 +123,10 @@ class _CommonPopupBoxState extends State<CommonPopupBox> {
           CommonPopupRoute(
             barrierLabel: utils.id,
             builder: (BuildContext context) {
-              return widget.popup;
+              if (widget.popupBuilder != null) {
+                return widget.popupBuilder!(context);
+              }
+              return widget.popup!;
             },
             offsetNotifier: _targetOffsetValueNotifier,
           ),
@@ -173,7 +176,7 @@ class OverflowAwareLayoutDelegate extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final safeOffset = Offset(16, 16);
+    const safeOffset = Offset(16, 16);
     double x = (offset.dx - childSize.width).clamp(
       0,
       size.width - safeOffset.dx - childSize.width,
@@ -260,8 +263,8 @@ class CommonPopupMenu extends StatelessWidget {
           elevation: 12,
           color: context.colorScheme.surfaceContainer,
           clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(25),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

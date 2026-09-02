@@ -57,8 +57,10 @@ Future<T?> showSheet<T>({
     true => showModalBottomSheet<T>(
       context: context,
       isScrollControlled: props.isScrollControlled,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       builder: (_) {
-        return SafeArea(child: builder(context, SheetType.bottomSheet));
+        return builder(context, SheetType.bottomSheet);
       },
       showDragHandle: false,
       useSafeArea: props.useSafeArea,
@@ -132,30 +134,35 @@ class AdaptiveSheetScaffold extends StatelessWidget {
       ]),
     );
     final content = bottomSheet
-        ? Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28.0)),
+        ? Material(
+            color: backgroundColor,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(35.0),
+              ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 4,
-                    width: 32,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: context.colorScheme.onSurfaceVariant,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 4,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(2),
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-                appBar,
-                Flexible(flex: 1, child: body),
-              ],
+                  appBar,
+                  Flexible(flex: 1, child: body),
+                ],
+              ),
             ),
           )
         : CommonScaffold(

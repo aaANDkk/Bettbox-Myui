@@ -41,6 +41,10 @@ class CommonDialog extends ConsumerWidget {
               Navigator.of(context).pop();
             },
       child: AlertDialog(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(35),
+        ),
         title: EmojiText(title),
         actions: actions,
         contentPadding: padding,
@@ -51,7 +55,12 @@ class CommonDialog extends ConsumerWidget {
             maxWidth: 300,
           ),
           width: size.width - 40,
-          child: !overrideScroll ? SingleChildScrollView(child: child) : child,
+          child: !overrideScroll
+              ? SingleChildScrollView(
+                  clipBehavior: Clip.hardEdge,
+                  child: child,
+                )
+              : child,
         ),
       ),
     );
@@ -67,12 +76,17 @@ class CommonModal extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
     return Center(
-      child: Container(
+      child: SizedBox(
         width: size.width * 0.85,
         height: size.height * 0.85,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-        clipBehavior: Clip.antiAlias,
-        child: child,
+        child: Material(
+          type: MaterialType.transparency,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(35),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: child,
+        ),
       ),
     );
   }

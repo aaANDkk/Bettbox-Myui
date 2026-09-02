@@ -11,6 +11,7 @@ import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -245,28 +246,28 @@ class ApplicationState extends ConsumerState<Application>
                   primaryColor: themeProps.primaryColor,
                 ),
                 fontFamily: fontFamily,
-                floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                floatingActionButtonTheme: FloatingActionButtonThemeData(
+                  shape: RoundedSuperellipseBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
                 ),
                 dialogTheme: DialogThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                  shape: RoundedSuperellipseBorder(
+                    borderRadius: BorderRadius.circular(35),
                   ),
                 ),
                 bottomSheetTheme: const BottomSheetThemeData(
-                  shape: RoundedRectangleBorder(
+                  shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(28),
+                      top: Radius.circular(35),
                     ),
                   ),
                   clipBehavior: Clip.antiAlias,
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
-                  shape: RoundedRectangleBorder(
+                  shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
@@ -279,10 +280,10 @@ class ApplicationState extends ConsumerState<Application>
                   space: 1,
                 ),
                 inputDecorationTheme: InputDecorationTheme(
-                  border: const OutlineInputBorder(
+                  border: const SuperellipseInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: SuperellipseInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(18)),
                     borderSide: BorderSide(
                       color: _getAppColorScheme(
@@ -291,7 +292,7 @@ class ApplicationState extends ConsumerState<Application>
                       ).outlineVariant.withValues(alpha: 0.6),
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: SuperellipseInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(18)),
                     borderSide: BorderSide(
                       color: _getAppColorScheme(
@@ -303,7 +304,7 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 chipTheme: ChipThemeData(
-                  shape: const RoundedRectangleBorder(
+                  shape: const RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                   side: BorderSide(
@@ -318,6 +319,10 @@ class ApplicationState extends ConsumerState<Application>
                     color: Colors.black87,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                  ),
                 ),
               ),
               darkTheme: ThemeData(
@@ -328,28 +333,28 @@ class ApplicationState extends ConsumerState<Application>
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
                 fontFamily: fontFamily,
-                floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                floatingActionButtonTheme: FloatingActionButtonThemeData(
+                  shape: RoundedSuperellipseBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
                 ),
                 dialogTheme: DialogThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                  shape: RoundedSuperellipseBorder(
+                    borderRadius: BorderRadius.circular(35),
                   ),
                 ),
                 bottomSheetTheme: const BottomSheetThemeData(
-                  shape: RoundedRectangleBorder(
+                  shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(28),
+                      top: Radius.circular(35),
                     ),
                   ),
                   clipBehavior: Clip.antiAlias,
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
-                  shape: RoundedRectangleBorder(
+                  shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
@@ -366,10 +371,10 @@ class ApplicationState extends ConsumerState<Application>
                   space: 1,
                 ),
                 inputDecorationTheme: InputDecorationTheme(
-                  border: const OutlineInputBorder(
+                  border: const SuperellipseInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(18)),
                   ),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: SuperellipseInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(18)),
                     borderSide: BorderSide(
                       color:
@@ -382,7 +387,7 @@ class ApplicationState extends ConsumerState<Application>
                               .withValues(alpha: 0.45),
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
+                  focusedBorder: SuperellipseInputBorder(
                     borderRadius: const BorderRadius.all(Radius.circular(18)),
                     borderSide: BorderSide(
                       color: _getAppColorScheme(
@@ -394,7 +399,7 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 chipTheme: ChipThemeData(
-                  shape: const RoundedRectangleBorder(
+                  shape: const RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                   side: BorderSide(
@@ -410,8 +415,12 @@ class ApplicationState extends ConsumerState<Application>
                 ),
                 tooltipTheme: const TooltipThemeData(
                   decoration: BoxDecoration(
-                    color: Colors.black87,
+                    color: Color(0xFF2C2C2C),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
                   ),
                 ),
               ),

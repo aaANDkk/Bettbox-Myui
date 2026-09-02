@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/common.dart';
 import 'package:bett_box/state.dart';
@@ -60,20 +62,12 @@ class OptionsDialog<T> extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: value == option
-                            ? SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: EmojiText(
-                                  textBuilder(option),
-                                  style: context.textTheme.bodyMedium,
-                                ),
-                              )
-                            : EmojiText(
-                                textBuilder(option),
-                                style: context.textTheme.bodyMedium,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
+                        child: EmojiText(
+                          textBuilder(option),
+                          style: context.textTheme.bodyMedium,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
                     ],
                   ),
@@ -237,7 +231,6 @@ class _InputDialogState extends State<InputDialog> {
                 _handleUpdate();
               },
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
                 suffixText: suffixText,
                 hintText: widget.hintText,
                 labelText: widget.labelText,
@@ -586,7 +579,6 @@ class _AddDialogState extends State<AddDialog> {
                 minLines: 1,
                 controller: keyController,
                 decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
                   labelText: keyField!.label,
                 ),
                 validator: (String? value) {
@@ -608,7 +600,6 @@ class _AddDialogState extends State<AddDialog> {
               minLines: 1,
               controller: valueController,
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
                 labelText: valueField.label,
               ),
               validator: (String? value) {
@@ -649,5 +640,128 @@ class _InputItem extends StatelessWidget {
         child: child,
       ),
     );
+  }
+}
+
+class SuperellipseInputBorder extends OutlineInputBorder {
+  const SuperellipseInputBorder({
+    super.borderSide = const BorderSide(),
+    super.borderRadius = const BorderRadius.all(Radius.circular(18)),
+    super.gapPadding = 4.0,
+  });
+
+  @override
+  SuperellipseInputBorder copyWith({
+    BorderSide? borderSide,
+    BorderRadius? borderRadius,
+    double? gapPadding,
+  }) {
+    return SuperellipseInputBorder(
+      borderSide: borderSide ?? this.borderSide,
+      borderRadius: borderRadius ?? this.borderRadius,
+      gapPadding: gapPadding ?? this.gapPadding,
+    );
+  }
+
+  @override
+  SuperellipseInputBorder scale(double t) {
+    return SuperellipseInputBorder(
+      borderSide: borderSide.scale(t),
+      borderRadius: borderRadius * t,
+      gapPadding: gapPadding * t,
+    );
+  }
+
+  @override
+  ShapeBorder? lerpFrom(ShapeBorder? a, double t) {
+    if (a is OutlineInputBorder) {
+      return SuperellipseInputBorder(
+        borderSide: BorderSide.lerp(a.borderSide, borderSide, t),
+        borderRadius: BorderRadius.lerp(a.borderRadius, borderRadius, t)!,
+        gapPadding: a.gapPadding,
+      );
+    }
+    return super.lerpFrom(a, t);
+  }
+
+  @override
+  ShapeBorder? lerpTo(ShapeBorder? b, double t) {
+    if (b is OutlineInputBorder) {
+      return SuperellipseInputBorder(
+        borderSide: BorderSide.lerp(borderSide, b.borderSide, t),
+        borderRadius: BorderRadius.lerp(borderRadius, b.borderRadius, t)!,
+        gapPadding: b.gapPadding,
+      );
+    }
+    return super.lerpTo(b, t);
+  }
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
+    return RoundedSuperellipseBorder(
+      borderRadius: borderRadius,
+      side: borderSide,
+    ).getInnerPath(rect, textDirection: textDirection);
+  }
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    return RoundedSuperellipseBorder(
+      borderRadius: borderRadius,
+      side: borderSide,
+    ).getOuterPath(rect, textDirection: textDirection);
+  }
+
+  @override
+  void paint(
+    Canvas canvas,
+    Rect rect, {
+    double? gapStart,
+    double gapExtent = 0.0,
+    double gapPercentage = 0.0,
+    TextDirection? textDirection,
+  }) {
+    if (borderSide.style == BorderStyle.none || borderSide.width == 0.0) {
+      return;
+    }
+
+    final paint = Paint()
+      ..color = borderSide.color
+      ..strokeWidth = borderSide.width
+      ..style = PaintingStyle.stroke;
+
+    final border = RoundedSuperellipseBorder(
+      borderRadius: borderRadius,
+      side: borderSide,
+    );
+    final outerPath = border.getOuterPath(rect);
+
+    if (gapStart == null || gapExtent <= 0.0 || gapPercentage <= 0.0) {
+      canvas.drawPath(outerPath, paint);
+      return;
+    }
+
+    final double extent = gapExtent * gapPercentage.clamp(0.0, 1.0);
+    final double gapLeft;
+    final double gapRight;
+    if (textDirection == TextDirection.rtl) {
+      gapLeft = (gapStart - extent - gapPadding).clamp(rect.left, rect.right);
+      gapRight = (gapStart + gapPadding).clamp(rect.left, rect.right);
+    } else {
+      gapLeft = (gapStart - gapPadding).clamp(rect.left, rect.right);
+      gapRight = (gapStart + extent + gapPadding).clamp(rect.left, rect.right);
+    }
+
+    final gapRect = Rect.fromLTRB(
+      gapLeft,
+      rect.top - borderSide.width - 4.0,
+      gapRight,
+      rect.top + borderSide.width + 4.0,
+    );
+
+    canvas.save();
+    canvas.clipRect(gapRect, clipOp: ui.ClipOp.difference);
+    canvas.drawPath(outerPath, paint);
+    canvas.restore();
   }
 }

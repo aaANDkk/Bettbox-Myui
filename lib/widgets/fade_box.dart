@@ -76,8 +76,13 @@ class FadeScaleBox extends StatelessWidget {
 
 class FadeScaleEnterBox extends StatefulWidget {
   final Widget child;
+  final bool animate;
 
-  const FadeScaleEnterBox({super.key, required this.child});
+  const FadeScaleEnterBox({
+    super.key,
+    required this.child,
+    this.animate = true,
+  });
 
   @override
   State<FadeScaleEnterBox> createState() => _FadeScaleEnterBoxState();
@@ -91,12 +96,32 @@ class _FadeScaleEnterBoxState extends State<FadeScaleEnterBox>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: commonDuration);
+    _controller = AnimationController(
+      vsync: this,
+      duration: commonDuration,
+      value: widget.animate ? 0.0 : 1.0,
+    );
     _animation = Tween<double>(
       begin: 0,
       end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-    _controller.forward();
+    if (widget.animate) {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant FadeScaleEnterBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.child.key != widget.child.key) {
+      if (widget.animate) {
+        _controller.forward(from: 0);
+      } else {
+        _controller.value = 1.0;
+      }
+    } else if (!oldWidget.animate && widget.animate) {
+      _controller.forward(from: 0);
+    }
   }
 
   @override
@@ -110,6 +135,9 @@ class _FadeScaleEnterBoxState extends State<FadeScaleEnterBox>
     return AnimatedBuilder(
       animation: _controller.view,
       builder: (_, child) {
+        if (_controller.value >= 1.0) {
+          return child!;
+        }
         return FadeScaleEnterTransition(animation: _animation, child: child!);
       },
       child: widget.child,
@@ -141,6 +169,98 @@ class FadeScaleEnterTransition extends StatelessWidget {
       opacity: _fadeInTransition.animate(animation),
       child: ScaleTransition(
         scale: _scaleInTransition.animate(animation),
+        child: child,
+      ),
+    );
+  }
+}
+
+const _defaultSlideDistance = 24.0;
+
+class FadeSlideEnterBox extends StatefulWidget {
+  final Duration delay;
+  final double distance;
+  final Widget child;
+
+  const FadeSlideEnterBox({
+    super.key,
+    this.delay = Duration.zero,
+    this.distance = _defaultSlideDistance,
+    required this.child,
+  });
+
+  @override
+  State<FadeSlideEnterBox> createState() => _FadeSlideEnterBoxState();
+}
+
+class _FadeSlideEnterBoxState extends State<FadeSlideEnterBox>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    final total = commonDuration + widget.delay;
+    _controller = AnimationController(vsync: this, duration: total);
+    final start = widget.delay.inMicroseconds / total.inMicroseconds;
+    _animation = start == 0
+        ? _controller.view
+        : _controller.drive(CurveTween(curve: Interval(start, 1)));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeSlideEnterTransition(
+      animation: _animation,
+      distance: widget.distance,
+      child: widget.child,
+    );
+  }
+}
+
+class FadeSlideEnterTransition extends StatelessWidget {
+  const FadeSlideEnterTransition({
+    super.key,
+    required this.animation,
+    this.distance = _defaultSlideDistance,
+    this.child,
+  });
+
+  final Animation<double> animation;
+  final double distance;
+  final Widget? child;
+
+  static final Animatable<double> _fadeInTransition = CurveTween(
+    curve: const Interval(0.0, 0.25),
+  );
+  static final Animatable<double> _slideInCurve = CurveTween(
+    curve: Easing.emphasizedDecelerate,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final slide = Tween<double>(
+      begin: -distance,
+      end: 0,
+    ).chain(_slideInCurve).animate(animation);
+    return FadeTransition(
+      opacity: _fadeInTransition.animate(animation),
+      child: AnimatedBuilder(
+        animation: slide,
+        builder: (_, child) {
+          return Transform.translate(
+            offset: Offset(0, slide.value),
+            child: child,
+          );
+        },
         child: child,
       ),
     );

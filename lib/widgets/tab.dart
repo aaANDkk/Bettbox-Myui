@@ -379,8 +379,10 @@ class _CommonTabBarState<T extends Object> extends State<CommonTabBar<T>>
       child: Container(
         clipBehavior: Clip.antiAlias,
         padding: widget.padding.resolve(Directionality.of(context)),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(_kCornerRadius),
+        decoration: ShapeDecoration(
+          shape: const RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
           color: widget.backgroundColor,
         ),
         child: AnimatedBuilder(
@@ -1110,22 +1112,17 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
   }
 
   void _paintThumb(PaintingContext context, Offset offset, Rect thumbRect) {
-    // const List<BoxShadow> thumbShadow = <BoxShadow>[
-    //   BoxShadow(color: Color(0x1F000000), offset: Offset(0, 3), blurRadius: 8),
-    //   BoxShadow(color: Color(0x0A000000), offset: Offset(0, 3), blurRadius: 1),
-    // ];
+    final rect = thumbRect.shift(offset);
+    final path = RoundedSuperellipseBorder(
+      borderRadius: BorderRadius.all(thumbRadius),
+    ).getOuterPath(rect);
 
-    final RRect thumbRRect = RRect.fromRectAndRadius(
-      thumbRect.shift(offset),
-      thumbRadius,
-    );
-
-    context.canvas.drawRRect(
-      thumbRRect.inflate(0.5),
+    context.canvas.drawPath(
+      path,
       Paint()..color = const Color(0x0A000000),
     );
 
-    context.canvas.drawRRect(thumbRRect, Paint()..color = thumbColor);
+    context.canvas.drawPath(path, Paint()..color = thumbColor);
   }
 
   @override
