@@ -1,3 +1,17 @@
-# Bettbox 正式版本发布
-**如遇问题请提交 issue [反馈](https://github.com/appshubcc/Bettbox/issues/new?template=bug_report.yml)。**
+# Bettbox-Myui 正式版本发布 (v1.19.0)
 
+## 📌 更新内容 / What's Changed
+1. 同步上游更新（基于 Bettbox v1.19.0 官方最新代码）
+2. 启动按钮改为常驻右下角悬浮按钮（FAB），计时宽度恒定防抖
+3. 调整悬浮按钮阴影与层次感，优化视觉微质感
+4. 全局调整各界面超椭圆大圆角与布局体系
+5. 修改右上角按钮气泡弹窗弹性展开动效（Curves.easeOutBack）
+6. 新增代理策略组交错阶梯瀑布流展开动画与组头纯圆操作按钮
+7. 优化图标内存缓存与抗锯齿渲染，尝试解决策略组图标变糊的问题
+8. 全局 Emoji 矢量表情系统更改为 OpenMoji 并对齐国旗渲染
+9. 修改配置一级界面保持 Bettbox 新 UI 统一风格
+10. 配置页卡片统一大小与槽位高度，实现多卡片跨行绝对高度对齐
+11. 调整配置页卡片内部布局为三行绝对对称美学结构
+12. 全站旋转加载与更新动画统一改为「环影隐渐」（SpinKitFadingCircle）
+
+**如遇问题请提交 issue [反馈](https://github.com/aaANDkk/Bettbox_Myui/issues)。**

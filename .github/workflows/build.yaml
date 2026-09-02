@@ -469,11 +469,11 @@ jobs:
 
       - name: Generate release.md
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 "${{ github.ref_name }}^" 2>/dev/null || true)
-          if [ -n "$PREV_TAG" ]; then
-            echo "## 更新内容 / What's Changed" > release.md
+          if [ -f "./.github/release_template.md" ] && [ "${{ env.IS_PRERELEASE }}" != "true" ]; then
+            cat ./.github/release_template.md > release.md
             echo "" >> release.md
-            git log "${PREV_TAG}..${{ github.ref_name }}" --pretty=format:"* %s (%h)" --no-merges >> release.md || true
+          elif [ -f "./.github/release_template_pre.md" ] && [ "${{ env.IS_PRERELEASE }}" == "true" ]; then
+            cat ./.github/release_template_pre.md > release.md
             echo "" >> release.md
           else
             echo "## 更新内容 / What's Changed" > release.md
