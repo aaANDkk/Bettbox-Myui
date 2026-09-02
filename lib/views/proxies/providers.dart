@@ -12,6 +12,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 typedef UpdatingMap = Map<String, bool>;
 
@@ -318,6 +319,7 @@ class ProviderItem extends StatelessWidget {
             runSpacing: 6,
             spacing: 12,
             runAlignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               CommonChip(
                 avatar: const Icon(Icons.upload),
@@ -330,20 +332,20 @@ class ProviderItem extends StatelessWidget {
                 onPressed: () => _handleViewProviderContent(context),
               ),
               if (provider.vehicleType == 'HTTP')
-                provider.isUpdating
-                    ? SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: const Padding(
-                          padding: EdgeInsets.all(2),
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    : CommonChip(
-                        avatar: const Icon(Icons.sync),
-                        label: appLocalizations.sync,
-                        onPressed: _handleUpdateProvider,
-                      ),
+                CommonChip(
+                  avatar: provider.isUpdating
+                      ? SizedBox.square(
+                          dimension: 16,
+                          child: SpinKitFadingCircle(
+                            color: context.colorScheme.primary,
+                            size: 16,
+                          ),
+                        )
+                      : const Icon(Icons.sync),
+                  label: appLocalizations.sync,
+                  onPressed:
+                      provider.isUpdating ? null : _handleUpdateProvider,
+                ),
             ],
           ),
           const SizedBox(height: 4),

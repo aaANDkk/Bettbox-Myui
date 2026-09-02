@@ -122,7 +122,6 @@ class _NodeExclusionDialogState extends ConsumerState<_NodeExclusionDialog> {
             TextFormField(
               controller: _controller,
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
                 labelText: appLocalizations.nodeExclusion,
                 hintText: appLocalizations.nodeExclusionPlaceholder,
               ),

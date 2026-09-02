@@ -94,7 +94,10 @@ class ProxyCard extends StatelessWidget {
               height: measure.labelSmallHeight,
               width: measure.labelSmallHeight,
               child: delayAnimation == DelayAnimationType.none
-                  ? const CircularProgressIndicator(strokeWidth: 2)
+                  ? SpinKitFadingCircle(
+                      color: context.colorScheme.primary,
+                      size: measure.labelSmallHeight,
+                    )
                   : _buildDelayAnimation(
                       delayAnimation,
                       measure.labelSmallHeight,

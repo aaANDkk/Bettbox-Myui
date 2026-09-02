@@ -8,6 +8,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path/path.dart' hide context;
 
 @immutable
@@ -108,10 +109,12 @@ class _ResourcesViewState extends ConsumerState<ResourcesView> {
           builder: (_, isUpdating, _) {
             return IconButton(
               icon: isUpdating
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                  ? SizedBox.square(
+                      dimension: 20,
+                      child: SpinKitFadingCircle(
+                        color: context.colorScheme.primary,
+                        size: 20,
+                      ),
                     )
                   : const Icon(Icons.sync),
               onPressed: isUpdating ? null : _handleSyncAll,
@@ -234,6 +237,7 @@ class _GeoDataListItemState extends State<GeoDataListItem> {
                 runSpacing: 6,
                 spacing: 12,
                 runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   CommonChip(
                     avatar: const Icon(Icons.edit),
@@ -242,33 +246,27 @@ class _GeoDataListItemState extends State<GeoDataListItem> {
                       _updateUrl(url, ref);
                     },
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        child: ValueListenableBuilder(
-                          valueListenable: isUpdating,
-                          builder: (_, isUpdating, _) {
-                            return isUpdating
-                                ? SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(2),
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  )
-                                : CommonChip(
-                                    avatar: const Icon(Icons.sync),
-                                    label: appLocalizations.sync,
-                                    onPressed: () {
-                                      _handleUpdateGeoDataItem();
-                                    },
-                                  );
-                          },
-                        ),
-                      ),
-                    ],
+                  ValueListenableBuilder<bool>(
+                    valueListenable: isUpdating,
+                    builder: (_, isUpdatingValue, _) {
+                      return CommonChip(
+                        avatar: isUpdatingValue
+                            ? SizedBox.square(
+                                dimension: 16,
+                                child: SpinKitFadingCircle(
+                                  color: context.colorScheme.primary,
+                                  size: 16,
+                                ),
+                              )
+                            : const Icon(Icons.sync),
+                        label: appLocalizations.sync,
+                        onPressed: isUpdatingValue
+                            ? null
+                            : () {
+                                _handleUpdateGeoDataItem();
+                              },
+                      );
+                    },
                   ),
                 ],
               ),
@@ -387,7 +385,7 @@ class _UpdateGeoUrlFormDialogState extends State<UpdateGeoUrlFormDialog> {
             maxLines: 5,
             minLines: 1,
             controller: urlController,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
+            decoration: const InputDecoration(),
           ),
         ],
       ),

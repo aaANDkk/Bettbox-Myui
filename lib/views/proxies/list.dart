@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -6,9 +9,14 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'card.dart';
 import 'common.dart';
+
+const _staggerRowStepMs = 26;
+const _staggerColStepMs = 8;
+const _cardDuration = Duration(milliseconds: 320);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -55,44 +63,46 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
   ConsumerState<_ProxyGroupsList> createState() => _ProxyGroupsListState();
 }
 
-abstract class _FlatItem {
-  double getHeight(double headerHeight, double itemHeight);
-}
-
-class _HeaderItem extends _FlatItem {
-  final Group group;
-  _HeaderItem(this.group);
-
-  @override
-  double getHeight(double headerHeight, double itemHeight) => headerHeight;
-}
-
-class _SpacingItem extends _FlatItem {
-  final double height;
-  _SpacingItem(this.height);
-
-  @override
-  double getHeight(double headerHeight, double itemHeight) => height;
-}
-
-class _RowItem extends _FlatItem {
-  final Group group;
-  final List<Proxy> proxies;
-  _RowItem(this.group, this.proxies);
-
-  @override
-  double getHeight(double headerHeight, double itemHeight) => itemHeight + 8.0;
-}
-
 class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   final ScrollController _scrollController = ScrollController();
+  String? _enterGroupName;
+  Timer? _enterTimer;
+
+  @override
+  void dispose() {
+    _enterTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  int _calculateMaxVisibleRows() {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final rowHeight = getItemHeight(widget.cardType) + 8.0;
+    return (screenHeight / rowHeight).ceil() + 2;
+  }
+
+  void _startEnterAnimated(String groupName) {
+    _enterTimer?.cancel();
+    _enterGroupName = groupName;
+    const enterWindow = Duration(milliseconds: 600);
+    _enterTimer = Timer(enterWindow, () {
+      if (mounted) {
+        setState(() {
+          _enterGroupName = null;
+        });
+      }
+    });
+  }
 
   void _handleToggle(String groupName) {
     final tempUnfoldSet = Set<String>.from(widget.currentUnfoldSet);
     if (tempUnfoldSet.contains(groupName)) {
       tempUnfoldSet.remove(groupName);
+      _enterTimer?.cancel();
+      _enterGroupName = null;
     } else {
       tempUnfoldSet.add(groupName);
+      _startEnterAnimated(groupName);
     }
     globalState.appController.updateCurrentUnfoldSet(tempUnfoldSet);
   }
@@ -113,36 +123,33 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         .getSafeValue('');
     if (selectedName.isEmpty) return;
 
-    final headerHeight = _getHeaderHeight();
-    final itemHeight = getItemHeight(widget.cardType);
-
-    final tempFlatItems = _buildFlatItems();
-    var targetIndex = -1;
-    for (var i = 0; i < tempFlatItems.length; i++) {
-      final item = tempFlatItems[i];
-      if (item is _HeaderItem && item.group.name == groupName) {
-        targetIndex = i;
-        break;
-      }
-    }
-    if (targetIndex < 0) return;
+    const headerHeight = 72.0;
+    final rowHeight = getItemHeight(widget.cardType) + 8.0;
 
     var targetOffset = 0.0;
-    for (var i = 0; i < targetIndex; i++) {
-      targetOffset += tempFlatItems[i].getHeight(headerHeight, itemHeight);
-    }
-
-    final group = widget.groups.firstWhere((g) => g.name == groupName);
-    final sortedProxies = globalState.appController.getSortProxies(
-      proxies: group.all,
-      sortType: widget.sortType,
-      testUrl: group.testUrl,
-    );
-    final proxyIndex = sortedProxies.indexWhere((p) => p.name == selectedName);
-    if (proxyIndex >= 0) {
-      final rowIndex = proxyIndex ~/ widget.columns;
-      targetOffset += headerHeight + 8.0;
-      targetOffset += rowIndex * (itemHeight + 8.0);
+    for (final group in widget.groups) {
+      if (group.name == groupName) {
+        final sortedProxies = globalState.appController.getSortProxies(
+          proxies: group.all,
+          sortType: widget.sortType,
+          testUrl: group.testUrl,
+        );
+        final proxyIndex =
+            sortedProxies.indexWhere((p) => p.name == selectedName);
+        if (proxyIndex >= 0) {
+          final rowIndex = proxyIndex ~/ widget.columns;
+          if (rowIndex > 1) {
+            targetOffset += (rowIndex - 1) * rowHeight;
+          }
+        }
+        break;
+      }
+      targetOffset += headerHeight;
+      if (widget.currentUnfoldSet.contains(group.name)) {
+        final rowCount =
+            (group.all.length + widget.columns - 1) ~/ widget.columns;
+        targetOffset += rowCount * rowHeight;
+      }
     }
 
     _scrollController.animateTo(
@@ -152,114 +159,230 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     );
   }
 
-  List<_FlatItem> _buildFlatItems() {
-    final flatItems = <_FlatItem>[];
-    for (final group in widget.groups) {
-      flatItems.add(_HeaderItem(group));
-      flatItems.add(_SpacingItem(8.0));
+  Widget _buildGroup(
+    BuildContext context, {
+    required Group group,
+    required bool isExpand,
+    required bool enterAnimated,
+    required int columns,
+    required ProxyCardType cardType,
+    required int maxVisibleRows,
+  }) {
+    final sortedProxies = isExpand
+        ? globalState.appController.getSortProxies(
+            proxies: group.all,
+            sortType: widget.sortType,
+            testUrl: group.testUrl,
+          )
+        : const <Proxy>[];
 
-      final isExpand = widget.currentUnfoldSet.contains(group.name);
-      if (isExpand) {
-        final sortedProxies = globalState.appController.getSortProxies(
-          proxies: group.all,
-          sortType: widget.sortType,
-          testUrl: group.testUrl,
-        );
-
-        for (var i = 0; i < sortedProxies.length; i += widget.columns) {
-          final end = (i + widget.columns < sortedProxies.length)
-              ? i + widget.columns
-              : sortedProxies.length;
-          final chunk = sortedProxies.sublist(i, end);
-          flatItems.add(_RowItem(group, chunk));
-        }
+    final rows = <List<Proxy>>[];
+    if (isExpand) {
+      for (var i = 0; i < sortedProxies.length; i += columns) {
+        final end = (i + columns < sortedProxies.length)
+            ? i + columns
+            : sortedProxies.length;
+        rows.add(sortedProxies.sublist(i, end));
       }
     }
-    return flatItems;
-  }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+            child: SizedBox(
+              height: 64.0,
+              child: _GroupHeader(
+                key: ValueKey('header_${group.name}'),
+                group: group,
+                isExpand: isExpand,
+                enterAnimated: enterAnimated,
+                onToggle: () => _handleToggle(group.name),
+                cardType: cardType,
+                columns: columns,
+                onScrollToSelected: () => _scrollToSelected(group.name),
+              ),
+            ),
+          ),
+        ),
+        if (isExpand)
+          _GroupProxyListSliver(
+            key: ValueKey('expanded_group_${group.name}'),
+            group: group,
+            rows: rows,
+            columns: columns,
+            cardType: cardType,
+            maxVisibleRows: maxVisibleRows,
+            enterAnimated: enterAnimated,
+          ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isMobileView = ref.watch(isMobileViewProvider);
-    final flatItems = _buildFlatItems();
-    final headerHeight = _getHeaderHeight();
-    final itemHeight = getItemHeight(widget.cardType);
+    final maxVisibleRows = _calculateMaxVisibleRows();
 
     return CommonScrollBar(
       controller: _scrollController,
-      child: ListView.builder(
+      child: CustomScrollView(
         key: const PageStorageKey<String>('proxies_list'),
         controller: _scrollController,
-        padding: EdgeInsets.all(16).copyWith(
-          bottom:
-              (globalState.isAndroidTV ? 48.0 : 16.0) +
-              (isMobileView ? getFloatingBottomBarReserveHeight(context) : 0),
-        ),
-        itemCount: flatItems.length,
-        itemExtentBuilder: (index, _) {
-          return flatItems[index].getHeight(headerHeight, itemHeight);
-        },
-        itemBuilder: (context, index) {
-          final item = flatItems[index];
-          if (item is _HeaderItem) {
-            final isExpand = widget.currentUnfoldSet.contains(item.group.name);
-            return _GroupHeader(
-              key: ValueKey('header_${item.group.name}'),
-              group: item.group,
-              isExpand: isExpand,
-              onToggle: () => _handleToggle(item.group.name),
-              cardType: widget.cardType,
+        slivers: [
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 16),
+          ),
+          for (final group in widget.groups)
+            _buildGroup(
+              context,
+              group: group,
+              isExpand: widget.currentUnfoldSet.contains(group.name),
+              enterAnimated: _enterGroupName == group.name,
               columns: widget.columns,
-              onScrollToSelected: () => _scrollToSelected(item.group.name),
-            );
-          } else if (item is _SpacingItem) {
-            return SizedBox(height: item.height);
-          } else if (item is _RowItem) {
-            final cardWidgets = <Widget>[];
-            for (var i = 0; i < widget.columns; i++) {
-              if (i < item.proxies.length) {
-                final proxy = item.proxies[i];
-                cardWidgets.add(
-                  Expanded(
-                    child: ProxyCard(
-                      key: ValueKey('${item.group.name}.${proxy.name}'),
-                      proxy: proxy,
-                      groupName: item.group.name,
-                      type: widget.cardType,
-                      groupType: item.group.type,
-                      testUrl: item.group.testUrl,
-                    ),
-                  ),
-                );
-              } else {
-                cardWidgets.add(const Expanded(child: SizedBox()));
-              }
-            }
+              cardType: widget.cardType,
+              maxVisibleRows: maxVisibleRows,
+            ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: (globalState.isAndroidTV ? 48.0 : 16.0) +
+                  (isMobileView
+                      ? getFloatingBottomBarReserveHeight(context)
+                      : 0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-            final rowChildren = <Widget>[];
-            for (var i = 0; i < cardWidgets.length; i++) {
-              rowChildren.add(cardWidgets[i]);
-              if (i < cardWidgets.length - 1) {
-                rowChildren.add(const SizedBox(width: 8));
-              }
-            }
+class _GroupProxyListSliver extends StatefulWidget {
+  final Group group;
+  final List<List<Proxy>> rows;
+  final int columns;
+  final ProxyCardType cardType;
+  final int maxVisibleRows;
+  final bool enterAnimated;
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: SizedBox(
-                height: itemHeight,
-                child: Row(children: rowChildren),
+  const _GroupProxyListSliver({
+    super.key,
+    required this.group,
+    required this.rows,
+    required this.columns,
+    required this.cardType,
+    required this.maxVisibleRows,
+    this.enterAnimated = true,
+  });
+
+  @override
+  State<_GroupProxyListSliver> createState() => _GroupProxyListSliverState();
+}
+
+class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool _isAnimationCompleted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final maxDelayMs =
+        widget.maxVisibleRows * _staggerRowStepMs +
+        widget.columns * _staggerColStepMs;
+    final totalWindow = _cardDuration + Duration(milliseconds: maxDelayMs);
+    _controller = AnimationController(vsync: this, duration: totalWindow);
+    if (widget.enterAnimated) {
+      _controller.addStatusListener((status) {
+        if (status == AnimationStatus.completed && mounted) {
+          setState(() {
+            _isAnimationCompleted = true;
+          });
+        }
+      });
+      _controller.forward();
+    } else {
+      _isAnimationCompleted = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildProxyRow(BuildContext context, int rowIndex) {
+    final proxies = widget.rows[rowIndex];
+    final groupName = widget.group.name;
+    final totalWindowMs = _controller.duration!.inMilliseconds;
+    final cardWidgets = <Widget>[];
+
+    for (var i = 0; i < widget.columns; i++) {
+      if (i < proxies.length) {
+        final proxy = proxies[i];
+        final card = ProxyCard(
+          key: ValueKey('$groupName.${proxy.name}'),
+          proxy: proxy,
+          groupName: groupName,
+          type: widget.cardType,
+          groupType: widget.group.type,
+          testUrl: widget.group.testUrl,
+        );
+        if (_isAnimationCompleted || rowIndex >= widget.maxVisibleRows) {
+          cardWidgets.add(Expanded(child: card));
+        } else {
+          final delayMs = rowIndex * _staggerRowStepMs + i * _staggerColStepMs;
+          final start = delayMs / totalWindowMs;
+          final end = (delayMs + _cardDuration.inMilliseconds) / totalWindowMs;
+          final itemAnimation = CurvedAnimation(
+            parent: _controller,
+            curve: Interval(
+              start.clamp(0.0, 1.0),
+              end.clamp(0.0, 1.0),
+              curve: Curves.linear,
+            ),
+          );
+          cardWidgets.add(
+            Expanded(
+              child: FadeSlideEnterTransition(
+                animation: itemAnimation,
+                distance: 18.0,
+                child: card,
               ),
-            );
-          }
-          return const SizedBox();
-        },
+            ),
+          );
+        }
+      } else {
+        cardWidgets.add(const Expanded(child: SizedBox()));
+      }
+    }
+
+    final rowChildren = <Widget>[];
+    for (var i = 0; i < cardWidgets.length; i++) {
+      rowChildren.add(cardWidgets[i]);
+      if (i < cardWidgets.length - 1) {
+        rowChildren.add(const SizedBox(width: 8));
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+      child: SizedBox(
+        height: getItemHeight(widget.cardType),
+        child: Row(children: rowChildren),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverFixedExtentList(
+      itemExtent: getItemHeight(widget.cardType) + 8.0,
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => _buildProxyRow(context, index),
+        childCount: widget.rows.length,
       ),
     );
   }
@@ -268,6 +391,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 class _GroupHeader extends ConsumerWidget {
   final Group group;
   final bool isExpand;
+  final bool enterAnimated;
   final VoidCallback onToggle;
   final ProxyCardType cardType;
   final int columns;
@@ -277,11 +401,49 @@ class _GroupHeader extends ConsumerWidget {
     super.key,
     required this.group,
     required this.isExpand,
+    this.enterAnimated = false,
     required this.onToggle,
     required this.cardType,
     required this.columns,
     this.onScrollToSelected,
   });
+
+  static final _circleButtonStyle = IconButton.styleFrom(
+    shape: const CircleBorder(),
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    padding: const EdgeInsets.all(2),
+    fixedSize: const Size(32, 32),
+    minimumSize: const Size(32, 32),
+  );
+
+  static final _circleFilledTonalStyle = IconButton.styleFrom(
+    shape: const CircleBorder(),
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    padding: const EdgeInsets.all(2),
+    fixedSize: const Size(32, 32),
+    minimumSize: const Size(32, 32),
+  );
+
+  Widget _buildActionScale({
+    required Widget child,
+    required String key,
+  }) {
+    if (!enterAnimated) return child;
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(key),
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.fastOutSlowIn,
+      builder: (_, scale, c) {
+        return Transform.scale(
+          scale: scale,
+          alignment: Alignment.center,
+          child: c,
+        );
+      },
+      child: child,
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -298,11 +460,11 @@ class _GroupHeader extends ConsumerWidget {
     );
 
     return CommonCard(
-      radius: 16,
+      radius: 20,
       type: CommonCardType.filled,
       onPressed: onToggle,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
             _buildIcon(context, iconStyle, icon),
@@ -345,45 +507,54 @@ class _GroupHeader extends ConsumerWidget {
               ),
             ),
             if (isExpand) ...[
-              IconButton(
-                visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.adjust),
-                onPressed: onScrollToSelected,
-                tooltip: appLocalizations.locate,
+              _buildActionScale(
+                key: 'locate_${group.name}',
+                child: IconButton(
+                  key: ValueKey('locate_${group.name}'),
+                  style: _circleButtonStyle,
+                  iconSize: 19,
+                  icon: const Icon(Icons.adjust),
+                  onPressed: onScrollToSelected,
+                  tooltip: appLocalizations.locate,
+                ),
               ),
-              AnimatedBuilder(
-                animation: delayTestCoordinator,
-                builder: (_, _) {
-                  final isTestingThisGroup = delayTestCoordinator
-                      .isTestingGroup(group.name);
-                  return IconButton(
-                    visualDensity: VisualDensity.compact,
-                    icon: isTestingThisGroup
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.network_ping),
-                    onPressed: delayTestCoordinator.isTesting
-                        ? null
-                        : () => _delayTest(context),
-                    tooltip: appLocalizations.startTest,
-                  );
-                },
+              const SizedBox(width: 2),
+              _buildActionScale(
+                key: 'delay_${group.name}',
+                child: AnimatedBuilder(
+                  key: ValueKey('delay_test_${group.name}'),
+                  animation: delayTestCoordinator,
+                  builder: (_, _) {
+                    final isTestingThisGroup = delayTestCoordinator
+                        .isTestingGroup(group.name);
+                    return IconButton(
+                      style: _circleButtonStyle,
+                      iconSize: 20,
+                      icon: isTestingThisGroup
+                          ? SizedBox.square(
+                              dimension: 18,
+                              child: SpinKitFadingCircle(
+                                color: context.colorScheme.primary,
+                                size: 18,
+                              ),
+                            )
+                          : const Icon(Icons.network_ping),
+                      onPressed: delayTestCoordinator.isTesting
+                          ? null
+                          : () => _delayTest(context),
+                      tooltip: appLocalizations.startTest,
+                    );
+                  },
+                ),
               ),
+              const SizedBox(width: 6),
             ],
             IconButton.filledTonal(
-              visualDensity: VisualDensity.compact,
+              key: ValueKey('expand_${group.name}'),
+              style: _circleFilledTonalStyle,
+              iconSize: 24,
               icon: CommonExpandIcon(expand: isExpand),
               onPressed: onToggle,
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.focused)) {
-                    return context.colorScheme.primary.withValues(alpha: 0.2);
-                  }
-                  return null;
-                }),
-              ),
             ),
           ],
         ),

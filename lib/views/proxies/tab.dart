@@ -577,22 +577,53 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
       builder: (_, child) {
         final showLoading = _isTesting && _controller.isCompleted;
         final contentScale = showLoading ? 0.0 : _scale.value;
+        final isDark =
+            Theme.of(context).colorScheme.brightness == Brightness.dark;
         return Stack(
+          clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
-            FloatingActionButton.extended(
-              heroTag: null,
-              onPressed:
-                  delayTestCoordinator.isTesting || widget.groupName.isEmpty
-                  ? null
-                  : _healthcheck,
-              icon: Transform.scale(
-                scale: contentScale,
-                child: const Icon(Icons.network_ping),
+            DecoratedBox(
+              decoration: ShapeDecoration(
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.35 : 0.14,
+                    ),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.20 : 0.06,
+                    ),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-              label: Transform.scale(
-                scale: contentScale,
-                child: Text(appLocalizations.startTest),
+              child: FloatingActionButton.extended(
+                elevation: 0,
+                hoverElevation: 0,
+                highlightElevation: 0,
+                focusElevation: 0,
+                clipBehavior: Clip.none,
+                heroTag: null,
+                onPressed:
+                    delayTestCoordinator.isTesting || widget.groupName.isEmpty
+                    ? null
+                    : _healthcheck,
+                icon: Transform.scale(
+                  scale: contentScale,
+                  child: const Icon(Icons.network_ping),
+                ),
+                label: Transform.scale(
+                  scale: contentScale,
+                  child: Text(appLocalizations.startTest),
+                ),
               ),
             ),
             if (showLoading)
