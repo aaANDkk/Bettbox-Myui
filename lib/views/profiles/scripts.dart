@@ -180,7 +180,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                 margin: EdgeInsets.symmetric(vertical: 6),
                 child: CommonCard(
                   type: CommonCardType.filled,
-                  radius: 16,
+                  radius: 20,
                   child: ListItem(
                     padding: const EdgeInsets.only(left: 12, right: 12),
                     title: EmojiText(script.label),

@@ -291,7 +291,6 @@ class EditProfileViewState extends State<EditProfileView> {
           textInputAction: TextInputAction.next,
           controller: labelController,
           decoration: InputDecoration(
-            border: const OutlineInputBorder(),
             labelText: appLocalizations.name,
           ),
           validator: (String? value) {
@@ -312,7 +311,6 @@ class EditProfileViewState extends State<EditProfileView> {
             maxLines: 5,
             minLines: 1,
             decoration: InputDecoration(
-              border: const OutlineInputBorder(),
               labelText: appLocalizations.url,
             ),
             onEditingComplete: widget.isNew
@@ -337,7 +335,6 @@ class EditProfileViewState extends State<EditProfileView> {
             maxLines: 1,
             minLines: 1,
             decoration: InputDecoration(
-              border: const OutlineInputBorder(),
               labelText: appLocalizations.ageSecretKeyOptional,
               hintText: 'AGE-SECRET-KEY-...',
               suffixIcon: IconButton(
@@ -376,7 +373,6 @@ class EditProfileViewState extends State<EditProfileView> {
               textInputAction: TextInputAction.next,
               controller: autoUpdateDurationController,
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
                 labelText: appLocalizations.autoUpdateInterval,
               ),
               validator: (String? value) {
@@ -446,11 +442,45 @@ class EditProfileViewState extends State<EditProfileView> {
       },
       child: FloatLayout(
         floatingWidget: FloatWrapper(
-          child: FloatingActionButton.extended(
-            heroTag: null,
-            onPressed: _handleConfirm,
-            label: Text(appLocalizations.save),
-            icon: const Icon(Icons.save),
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              shadows: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: Theme.of(context).colorScheme.brightness ==
+                            Brightness.dark
+                        ? 0.35
+                        : 0.14,
+                  ),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: Theme.of(context).colorScheme.brightness ==
+                            Brightness.dark
+                        ? 0.20
+                        : 0.06,
+                  ),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: FloatingActionButton.extended(
+              elevation: 0,
+              hoverElevation: 0,
+              highlightElevation: 0,
+              focusElevation: 0,
+              clipBehavior: Clip.none,
+              heroTag: null,
+              onPressed: _handleConfirm,
+              label: Text(appLocalizations.save),
+              icon: const Icon(Icons.save),
+            ),
           ),
         ),
         child: Form(
@@ -605,7 +635,6 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
           TextField(
             controller: _privateKeyController,
             decoration: InputDecoration(
-              border: const OutlineInputBorder(),
               floatingLabelBehavior: FloatingLabelBehavior.always,
               labelText: appLocalizations.agePrivateKeyLabel,
               suffixIcon: IconButton(
@@ -626,7 +655,6 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
             controller: _publicKeyController,
             readOnly: true,
             decoration: InputDecoration(
-              border: const OutlineInputBorder(),
               floatingLabelBehavior: FloatingLabelBehavior.always,
               labelText: appLocalizations.agePublicKeyLabel,
               helperText: _helperText,
