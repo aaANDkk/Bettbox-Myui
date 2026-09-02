@@ -206,6 +206,8 @@ class Request {
     return [
       if (ipInfoToken.isNotEmpty)
         'https://api.ipinfo.io/lite/me?token=$ipInfoToken',
+      isZh ? 'http://ip-api.com/json?lang=zh-CN' : 'http://ip-api.com/json',
+      'https://api.ip.sb/geoip',
       isZh ? 'https://api.myip.la/cn?json' : 'https://api.myip.la/en?json',
     ];
   }

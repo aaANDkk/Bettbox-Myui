@@ -276,10 +276,7 @@ DashboardState dashboardState(Ref ref) {
     ),
   );
   final viewWidth = ref.watch(viewWidthProvider);
-  final widgets = dashboardWidgets.contains(DashboardWidget.startButton)
-      ? dashboardWidgets
-      : [...dashboardWidgets, DashboardWidget.startButton];
-  return DashboardState(dashboardWidgets: widgets, viewWidth: viewWidth);
+  return DashboardState(dashboardWidgets: dashboardWidgets, viewWidth: viewWidth);
 }
 
 @riverpod

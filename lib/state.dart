@@ -1114,6 +1114,7 @@ class DetectionState {
   static DetectionState? _instance;
   bool? _preIsStart;
   int _requestId = 0;
+  int? _currentCheckRequestId;
   CancelToken? _cancelToken;
   bool _isIpMasked = false;
   IpInfo? _rawIpInfo;

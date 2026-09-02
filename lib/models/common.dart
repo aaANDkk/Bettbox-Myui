@@ -502,8 +502,12 @@ class IpInfo {
         );
       }
     }
-    // ip-api.com 格式: {"status":"success", "country":"...", "countryCode":"...", "regionName":"...", "city":"...", "isp":"...", "org":"...", "as":"...", "query":"..."}
-    if (json['query'] != null || json['countryCode'] != null) {
+    // ip-api.com / api.ip.sb 格式: {"status":"success", "country":"...", "countryCode":"...", "regionName":"...", "city":"...", "isp":"...", "org":"...", "as":"...", "query":"..."}
+    // api.ip.sb 格式: {"ip":"...", "country_code":"...", "country":"...", "region":"...", "city":"...", "isp":"...", "asn":201217, "asn_organization":"...", "continent_code":"..."}
+    if (json['query'] != null ||
+        json['countryCode'] != null ||
+        json['asn_organization'] != null ||
+        (json['country_code'] != null && json['isp'] != null)) {
       final ip = (json['query'] ?? json['ip'])?.toString() ?? '';
       final countryCode =
           (json['countryCode'] ?? json['country_code'])?.toString() ?? '';
@@ -512,18 +516,21 @@ class IpInfo {
           (json['regionName'] ?? json['region'] ?? json['province'])?.toString();
       final city = json['city']?.toString();
       final isp = json['isp']?.toString();
-      final org = json['org']?.toString();
+      final org = (json['org'] ?? json['asn_organization'] ?? json['organization'])?.toString();
       final asName = org?.isNotEmpty == true
           ? org
           : (json['as_name']?.toString());
 
-      // 仅取最前面的 AS 号 (例如: "AS37963 Hangzhou Alibaba..." -> "AS37963")
+      // 仅取最前面的 AS 号 (例如: "AS37963 Hangzhou Alibaba..." -> "AS37963" 或 201217 -> "AS201217")
       final rawAs = (json['as'] ?? json['asn'])?.toString() ?? '';
       final asnMatch =
-          RegExp(r'^(AS\d+)', caseSensitive: false).firstMatch(rawAs.trim());
+          RegExp(r'^(?:AS)?(\d+)', caseSensitive: false).firstMatch(rawAs.trim());
       final asn = asnMatch != null
-          ? asnMatch.group(1)!.toUpperCase()
+          ? 'AS${asnMatch.group(1)}'
           : (rawAs.isNotEmpty ? rawAs.trim().split(' ').first : null);
+      final continent = json['continent']?.toString();
+      final continentCode =
+          (json['continent_code'] ?? json['continentCode'])?.toString();
 
       if (ip.isNotEmpty) {
         return IpInfo(
@@ -535,6 +542,8 @@ class IpInfo {
           isp: isp,
           asName: asName,
           asn: asn,
+          continent: continent,
+          continentCode: continentCode,
         );
       }
     }

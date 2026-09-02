@@ -240,34 +240,15 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
               ),
             ),
           ),
-          // 2. 国家 / 地区（twEmoji 国旗 + 国家名 · 国家代码）
+          // 2. 国家 / 地区（EmojiText 精准基线对齐）
           if (countryText.isNotEmpty || flagEmoji.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.flag_outlined),
               title: Text(appLocalizations.countryOrRegion),
-              subtitle: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (flagEmoji.isNotEmpty) ...[
-                    Text(
-                      flagEmoji,
-                      style: TextStyle(
-                        fontFamily: FontFamily.twEmoji.value,
-                        fontFamilyFallback: [
-                          FontFamily.twEmoji.value,
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-                  Flexible(
-                    child: Text(
-                      countryText,
-                      style: context.textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
+              subtitle: EmojiText(
+                flagEmoji.isNotEmpty ? '$flagEmoji $countryText' : countryText,
+                style: context.textTheme.bodyMedium,
               ),
             ),
           // 3. 省份 / 城市
