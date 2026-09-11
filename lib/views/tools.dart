@@ -600,6 +600,16 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         ),
       ),
       _SearchItem(
+        title: appLocalizations.notificationHighPriority,
+        subtitle: appLocalizations.notificationHighPriorityDesc,
+        category: otherSettingsCategory,
+        onTap: (context, _) => _pushPage(
+          context,
+          appLocalizations.otherSettings,
+          const OtherSettingView(),
+        ),
+      ),
+      _SearchItem(
         title: appLocalizations.networkSpeedNotification,
         subtitle: appLocalizations.networkSpeedNotificationDesc,
         category: otherSettingsCategory,

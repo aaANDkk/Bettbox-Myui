@@ -10,6 +10,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/providers/state.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,17 +41,17 @@ class ThemeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final brightness = ref.watch(currentBrightnessProvider);
-    final locale = ref.watch(
-      appSettingProvider.select((state) => state.locale),
+    final useHarmonyFont = ref.watch(
+      themeSettingProvider.select((state) => state.useHarmonyFont),
     );
-    final shouldShowHarmonyFont =
-        locale?.startsWith('zh') == true || locale?.startsWith('en') == true;
 
     final toggleItems = [
-      if (shouldShowHarmonyFont) _HarmonyFontItem(),
       if (system.isAndroid) const _DarkIconItem(),
       if (system.isWindows) _TrayIconInvertItem(),
       _TextScaleFactorItem(),
+      const _CustomFontItem(),
+      if (useHarmonyFont) const _SelectCustomFontItem(),
+      const _EmojiStyleItem(),
     ];
 
     final items = [
@@ -439,41 +440,253 @@ class _PrueBlackItem extends ConsumerWidget {
   }
 }
 
-class _HarmonyFontItem extends ConsumerWidget {
-  const _HarmonyFontItem();
+class _CustomFontItem extends ConsumerWidget {
+  const _CustomFontItem();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final useHarmonyFont = ref.watch(
       themeSettingProvider.select((state) => state.useHarmonyFont),
     );
-    return ListItem.switchItem(
-      leading: Icon(Icons.font_download_outlined),
-      horizontalTitleGap: 12,
-      title: Text(
-        appLocalizations.harmonyFont,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-          color: context.colorScheme.onSurfaceVariant,
-        ),
-      ),
-      subtitle: Text(
-        appLocalizations.harmonyFontDesc,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
-        ),
-      ),
-      delegate: SwitchDelegate(
-        value: useHarmonyFont,
-        onChanged: (value) {
-          ref
-              .read(themeSettingProvider.notifier)
-              .updateState((state) => state.copyWith(useHarmonyFont: value));
-        },
-      ),
+
+    return ValueListenableBuilder<String?>(
+      valueListenable: FontManager.fontFamilyNotifier,
+      builder: (context, _, _) {
+        final fontName = FontManager.customFontName;
+        final String subtitle;
+        if (useHarmonyFont) {
+          subtitle = fontName?.isNotEmpty == true
+              ? '${appLocalizations.customFontApplied}: $fontName'
+              : appLocalizations.selectCustomFontDesc;
+        } else {
+          subtitle = appLocalizations.harmonyFontDesc;
+        }
+
+        return ListItem.switchItem(
+          leading: const Icon(Icons.font_download_outlined),
+          horizontalTitleGap: 12,
+          title: Text(
+            appLocalizations.harmonyFont,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          subtitle: Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
+            ),
+          ),
+          delegate: SwitchDelegate(
+            value: useHarmonyFont,
+            onChanged: (value) async {
+              if (value) {
+                final hasFile = await FontManager.hasFontFile();
+                if (hasFile) {
+                  final loaded = await FontManager.ensureLoaded();
+                  if (loaded) {
+                    ref.read(themeSettingProvider.notifier).updateState(
+                      (state) => state.copyWith(useHarmonyFont: true),
+                    );
+                  } else {
+                    final picked = await FontManager.pickAndApplyFont(context);
+                    if (picked) {
+                      ref.read(themeSettingProvider.notifier).updateState(
+                        (state) => state.copyWith(useHarmonyFont: true),
+                      );
+                    }
+                  }
+                } else {
+                  final picked = await FontManager.pickAndApplyFont(context);
+                  if (picked) {
+                    ref.read(themeSettingProvider.notifier).updateState(
+                      (state) => state.copyWith(useHarmonyFont: true),
+                    );
+                  }
+                }
+              } else {
+                ref.read(themeSettingProvider.notifier).updateState(
+                  (state) => state.copyWith(useHarmonyFont: false),
+                );
+                FontManager.disableFont();
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }
 
+class _SelectCustomFontItem extends ConsumerWidget {
+  const _SelectCustomFontItem();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ValueListenableBuilder<String?>(
+      valueListenable: FontManager.fontFamilyNotifier,
+      builder: (context, _, _) {
+        final fontName = FontManager.customFontName;
+        return ListItem(
+          leading: const Icon(Icons.folder_open_outlined),
+          horizontalTitleGap: 12,
+          title: Text(
+            appLocalizations.selectCustomFont,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          subtitle: Text(
+            fontName?.isNotEmpty == true
+                ? fontName!
+                : appLocalizations.selectCustomFontDesc,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
+            ),
+          ),
+          onTap: () async {
+            final picked = await FontManager.pickAndApplyFont(context);
+            if (picked) {
+              ref.read(themeSettingProvider.notifier).updateState(
+                (state) => state.copyWith(useHarmonyFont: true),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+}
+
+class _EmojiStyleItem extends StatelessWidget {
+  const _EmojiStyleItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<EmojiStyle>(
+      valueListenable: EmojiManager.emojiStyleNotifier,
+      builder: (context, currentStyle, _) {
+        return ListItem(
+          leading: const Icon(Icons.sentiment_satisfied_alt_outlined),
+          horizontalTitleGap: 12,
+          title: Text(
+            appLocalizations.emojiStyle,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          subtitle: Text(
+            currentStyle.label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
+            ),
+          ),
+          onTap: () {
+            globalState.showCommonDialog(
+              child: const _EmojiStyleDialog(),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _EmojiStyleDialog extends StatelessWidget {
+  const _EmojiStyleDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<EmojiStyle>(
+      valueListenable: EmojiManager.emojiStyleNotifier,
+      builder: (context, currentStyle, _) {
+        return CommonDialog(
+          title: appLocalizations.emojiStyle,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final style in EmojiStyle.values)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () async {
+                      await EmojiManager.setStyle(style);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            currentStyle == style
+                                ? Icons.check_circle_rounded
+                                : Icons.circle_outlined,
+                            size: 21,
+                            color: currentStyle == style
+                                ? context.colorScheme.primary
+                                : context.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  style.label,
+                                  style: context.textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    for (final emoji in const [
+                                      '🪷',
+                                      '🫧',
+                                      '😋',
+                                      '🐸',
+                                      '🇨🇳',
+                                      '🇬🇧',
+                                      '🇩🇪',
+                                      '🇺🇸',
+                                    ])
+                                      SizedBox(
+                                        width: 25,
+                                        height: 22,
+                                        child: Center(
+                                          child: Text(
+                                            emoji,
+                                            style: TextStyle(
+                                              fontFamily: style.family,
+                                              fontSize: 15,
+                                              height: 1.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
 
 class _DarkIconItem extends ConsumerWidget {
   const _DarkIconItem();
@@ -583,7 +796,7 @@ class _TextScaleFactorItem extends ConsumerWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,

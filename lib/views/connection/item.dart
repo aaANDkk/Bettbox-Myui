@@ -7,6 +7,7 @@ import 'package:bett_box/models/models.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -489,11 +490,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final connections = ref.watch(connectionsProvider);
-    final info = connections.firstWhere(
-      (e) => e.id == trackerInfo.id,
-      orElse: () => trackerInfo,
-    );
+    final info = trackerInfo;
 
     final remoteDestParsed = _parseIpAndPort(info.metadata.remoteDestination);
 
@@ -538,22 +535,40 @@ class TrackerInfoDetailView extends ConsumerWidget {
               ? info.metadata.destinationPort
               : null,
         ),
-      _buildItem(
-        title: appLocalizations.upload,
-        desc: TrafficValue(value: info.upload).show,
+      Consumer(
+        builder: (context, ref, _) {
+          final liveInfo = ref.watch(
+            connectionsProvider.select(
+              (list) => list.firstWhereOrNull((e) => e.id == trackerInfo.id),
+            ),
+          );
+          final upload = liveInfo?.upload ?? trackerInfo.upload;
+          final download = liveInfo?.download ?? trackerInfo.download;
+          final isAlive = liveInfo != null;
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildItem(
+                title: appLocalizations.upload,
+                desc: TrafficValue(value: upload).show,
+              ),
+              _buildItem(
+                title: appLocalizations.download,
+                desc: TrafficValue(value: download).show,
+              ),
+              if (isAlive)
+                _buildItem(
+                  title: appLocalizations.realTimeSpeed,
+                  desc: Traffic(
+                    up: liveInfo.uploadSpeed,
+                    down: liveInfo.downloadSpeed,
+                  ).toString(),
+                ),
+            ],
+          );
+        },
       ),
-      _buildItem(
-        title: appLocalizations.download,
-        desc: TrafficValue(value: info.download).show,
-      ),
-      if (connections.any((e) => e.id == trackerInfo.id))
-        _buildItem(
-          title: appLocalizations.realTimeSpeed,
-          desc: Traffic(
-            up: info.uploadSpeed,
-            down: info.downloadSpeed,
-          ).toString(),
-        ),
       if (info.metadata.destinationGeoIP.isNotEmpty)
         _buildItem(
           title: appLocalizations.destinationGeoIP,

@@ -279,7 +279,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m2,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("포워딩 삭제"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox는 강력하고 유연한 Mihomo(Clash.Meta) 코어를 기반으로 개발된 사용자 친화적 프록시 클라이언트입니다. (FlClash 기반)",
+      "Bettbox는 강력하고 유연한 Mihomo(Clash.Meta) 코어를 기반으로 개발된 사용자 친화적 프록시 클라이언트입니다. 우리의 비전: Connecting AI, Accelerating Innovation - AI를 연결하고 혁신을 가속화합니다",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("목적지 주소"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage("목적지 GeoIP"),
@@ -364,6 +364,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "실험적 설정 (주의해서 사용하세요)",
     ),
     "expirationTime": MessageLookupByLibrary.simpleMessage("만료 시간"),
+    "expired": MessageLookupByLibrary.simpleMessage("만료됨"),
     "export": MessageLookupByLibrary.simpleMessage("내보내기"),
     "exportFile": MessageLookupByLibrary.simpleMessage("파일 내보내기"),
     "exportLogs": MessageLookupByLibrary.simpleMessage("로그 내보내기"),
@@ -437,10 +438,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("글로벌"),
     "go": MessageLookupByLibrary.simpleMessage("이동"),
     "goDownload": MessageLookupByLibrary.simpleMessage("다운로드 이동"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("글꼴 복구"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "표시 이상 해결을 위해 내장 글꼴 사용",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("기본 시스템 글꼴, 사용자 정의 글꼴을 로드하려면 활성화"),
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("이모지 스타일"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("앱 내에서 표시할 이모지 스타일 선택"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("수정 사항을 캐시하시겠습니까?"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("타임아웃 시간"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -502,6 +503,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "key": MessageLookupByLibrary.simpleMessage("키"),
     "language": MessageLookupByLibrary.simpleMessage("언어"),
+    "lastEdit": MessageLookupByLibrary.simpleMessage("마지막 수정"),
     "layout": MessageLookupByLibrary.simpleMessage("레이아웃"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("좌클릭"),
     "light": MessageLookupByLibrary.simpleMessage("라이트"),
@@ -510,6 +512,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("수신"),
     "local": MessageLookupByLibrary.simpleMessage("로컬"),
     "localBackupDesc": MessageLookupByLibrary.simpleMessage("로컬 파일로 데이터 백업"),
+    "localFile": MessageLookupByLibrary.simpleMessage("로컬 파일"),
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage("파일에서 데이터 복구"),
     "locate": MessageLookupByLibrary.simpleMessage("위치"),
     "log": MessageLookupByLibrary.simpleMessage("로그"),
@@ -590,6 +593,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "noResolve": MessageLookupByLibrary.simpleMessage("IP 해동 안 함"),
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage("상태를 가져올 수 없습니다"),
+    "noUsageData": MessageLookupByLibrary.simpleMessage("사용량 통계 없음"),
     "nodeExclusion": MessageLookupByLibrary.simpleMessage("노드 제외"),
     "nodeExclusionDesc": MessageLookupByLibrary.simpleMessage(
       "지정한 키워드와 일치하는 노드 제외",
@@ -601,6 +605,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "notRecommended": MessageLookupByLibrary.simpleMessage("권장하지 않음"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage(
       "현재 프록시 그룹은 선택할 수 없습니다",
+    ),
+    "notificationHighPriority": MessageLookupByLibrary.simpleMessage("높은 우선순위"),
+    "notificationHighPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "현재 알림 표시줄을 포그라운드 높은 우선순위로 조정",
+    ),
+    "notificationHighPriorityTip": MessageLookupByLibrary.simpleMessage(
+      "높은 우선순위 알림은 일부 커스텀 OS에서 백그라운드 코어 유지 문제를 완화할 수 있습니다. 현재 VPN 서비스가 정상 작동 중이라면 비활성화를 유지하는 것이 좋습니다. 활성화하시겠습니까?",
     ),
     "ntp": MessageLookupByLibrary.simpleMessage("NTP 시간 동기화"),
     "ntpDesc": MessageLookupByLibrary.simpleMessage("NTP 시간 동기화 서비스 사용"),
@@ -1020,5 +1031,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("시스템 적용"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("관리자 권한이 필요합니다"),
     "years": m14,
+      "selectCustomFont": MessageLookupByLibrary.simpleMessage("글꼴 선택 / 변경"),
+      "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("로컬 .ttf 또는 .otf 글꼴 파일을 선택하려면 탭하세요"),
+      "customFontApplied": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴이 적용되었습니다"),
+      "customFontDisabled": MessageLookupByLibrary.simpleMessage("시스템 기본 글꼴로 복원되었습니다"),
+      "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf 또는 .otf 형식의 글꼴 파일만 지원됩니다"),
   };
 }

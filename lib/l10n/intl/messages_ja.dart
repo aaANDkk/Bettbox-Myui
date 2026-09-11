@@ -269,7 +269,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m2,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("転送削除"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettboxは柔軟で強力なMihomo(Clash.Meta)カーネルを搭載した、快適性を追求したプロキシクライアントです。（FlClashベース）",
+      "Bettboxは柔軟で強力なMihomo(Clash.Meta)カーネルを搭載した、快適性を追求したプロキシクライアントです。私たちのビジョン：Connecting AI, Accelerating Innovation - AIを繋ぎ、イノベーションを加速する",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("宛先アドレス"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage("宛先GeoIP"),
@@ -354,6 +354,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "実験的設定（注意してご使用ください）",
     ),
     "expirationTime": MessageLookupByLibrary.simpleMessage("有効期限"),
+    "expired": MessageLookupByLibrary.simpleMessage("期限切れ"),
     "export": MessageLookupByLibrary.simpleMessage("エクスポート"),
     "exportFile": MessageLookupByLibrary.simpleMessage("ファイルをエクスポート"),
     "exportLogs": MessageLookupByLibrary.simpleMessage("ログをエクスポート"),
@@ -427,10 +428,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("グローバル"),
     "go": MessageLookupByLibrary.simpleMessage("移動"),
     "goDownload": MessageLookupByLibrary.simpleMessage("ダウンロードへ"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("フォント修復"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "表示異常を改善するため内蔵フォントを使用",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("カスタムフォント"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("デフォルトはシステムフォント、有効にしてカスタムフォントを読み込む"),
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("絵文字スタイル"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("アプリ内で表示する絵文字のスタイルを選択"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("変更をキャッシュしますか？"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("タイムアウト時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -490,6 +491,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "key": MessageLookupByLibrary.simpleMessage("キー"),
     "language": MessageLookupByLibrary.simpleMessage("言語"),
+    "lastEdit": MessageLookupByLibrary.simpleMessage("前回の編集"),
     "layout": MessageLookupByLibrary.simpleMessage("レイアウト"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("左クリック"),
     "light": MessageLookupByLibrary.simpleMessage("ライト"),
@@ -498,6 +500,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("リスニング"),
     "local": MessageLookupByLibrary.simpleMessage("ローカル"),
     "localBackupDesc": MessageLookupByLibrary.simpleMessage("ローカルにデータをバックアップ"),
+    "localFile": MessageLookupByLibrary.simpleMessage("ローカルファイル"),
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage("ファイルからデータを復元"),
     "locate": MessageLookupByLibrary.simpleMessage("位置"),
     "log": MessageLookupByLibrary.simpleMessage("ログ"),
@@ -543,6 +546,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
       "ボトムナビゲーション切り替え時の振動フィードバック",
     ),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage("タブアニメーション"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(
+      "モバイル表示でのみ有効",
+    ),
     "navConnections": MessageLookupByLibrary.simpleMessage("接続"),
     "navTools": MessageLookupByLibrary.simpleMessage("ツール"),
     "network": MessageLookupByLibrary.simpleMessage("ネットワーク"),
@@ -580,6 +587,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage(
       "ステータスを取得できませんでした",
     ),
+    "noUsageData": MessageLookupByLibrary.simpleMessage("使用量統計なし"),
     "nodeExclusion": MessageLookupByLibrary.simpleMessage("ノード除外"),
     "nodeExclusionDesc": MessageLookupByLibrary.simpleMessage(
       "指定キーワードに一致するノードを除外",
@@ -590,6 +598,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "none": MessageLookupByLibrary.simpleMessage("なし"),
     "notRecommended": MessageLookupByLibrary.simpleMessage("非推奨"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage("選択できないプロキシグループです"),
+    "notificationHighPriority": MessageLookupByLibrary.simpleMessage("高優先度"),
+    "notificationHighPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "現在の通知バーをフォアグラウンド高優先度に調整",
+    ),
+    "notificationHighPriorityTip": MessageLookupByLibrary.simpleMessage(
+      "高優先度の通知は、一部のカスタムOSでバックグラウンド維持の問題を緩和できます。現在VPNが正常に動作している場合は無効のままにすることをお勧めします。有効にしますか？",
+    ),
     "ntp": MessageLookupByLibrary.simpleMessage("NTP時刻同期"),
     "ntpDesc": MessageLookupByLibrary.simpleMessage("NTP時刻同期サービスを使用"),
     "ntpInterval": MessageLookupByLibrary.simpleMessage("更新間隔"),
@@ -1010,5 +1025,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("システムへ適用"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("管理者権限が必要です"),
     "years": m14,
+      "selectCustomFont": MessageLookupByLibrary.simpleMessage("フォントの選択 / 変更"),
+      "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("タップしてローカルの .ttf または .otf フォントを選択"),
+      "customFontApplied": MessageLookupByLibrary.simpleMessage("カスタムフォントを適用しました"),
+      "customFontDisabled": MessageLookupByLibrary.simpleMessage("システムデフォルトのフォントに戻しました"),
+      "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf または .otf 形式のフォントファイルのみサポートされています"),
   };
 }

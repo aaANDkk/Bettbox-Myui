@@ -213,6 +213,20 @@ class System {
       throw Exception('Failed to set process priority: ${result.stderr}');
     }
   }
+
+  Future<void> setupLinuxTunDns(bool enable) async {
+    if (!isLinux) return;
+    try {
+      const device = tunDeviceName;
+      if (enable) {
+        await Process.run('resolvectl', ['dns', device, '198.18.0.2']);
+        await Process.run('resolvectl', ['domain', device, '~.']);
+        await Process.run('resolvectl', ['default-route', device, 'true']);
+      } else {
+        await Process.run('resolvectl', ['revert', device]);
+      }
+    } catch (_) {}
+  }
 }
 
 final system = System();

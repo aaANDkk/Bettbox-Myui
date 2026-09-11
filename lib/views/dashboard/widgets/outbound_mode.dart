@@ -21,7 +21,6 @@ class OutboundMode extends StatelessWidget {
             patchClashConfigProvider.select((state) => state.mode),
           );
           return CommonCard(
-            onPressed: () {},
             info: Info(
               label: appLocalizations.outboundMode,
               iconData: Icons.call_split_sharp,
@@ -38,38 +37,59 @@ class OutboundMode extends StatelessWidget {
                       fit: FlexFit.tight,
                       child: Material(
                         color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            globalState.appController.changeMode(item);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.ap,
-                              vertical: 8.ap,
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  item == mode
-                                      ? Icons.check_circle_rounded
-                                      : Icons.circle_outlined,
-                                  size: 21,
-                                  color: item == mode
-                                      ? context.colorScheme.primary
-                                      : context.colorScheme.onSurfaceVariant
-                                            .withValues(alpha: 0.6),
-                                ),
-                                SizedBox(width: 12.ap),
-                                Expanded(
-                                  child: Text(
-                                    Intl.message(item.name),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium?.toSoftBold,
+                        child: Focus(
+                          child: Builder(
+                            builder: (context) {
+                              final isFocused = Focus.of(context).hasFocus;
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () {
+                                  globalState.appController.changeMode(item);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: isFocused && globalState.isAndroidTV
+                                        ? context.colorScheme.primary
+                                            .withValues(alpha: 0.15)
+                                        : Colors.transparent,
+                                    border: isFocused && globalState.isAndroidTV
+                                        ? Border.all(
+                                            color: context.colorScheme.primary,
+                                            width: 2,
+                                          )
+                                        : null,
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.ap,
+                                    vertical: 8.ap,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        item == mode
+                                            ? Icons.check_circle_rounded
+                                            : Icons.circle_outlined,
+                                        size: 21,
+                                        color: item == mode
+                                            ? context.colorScheme.primary
+                                            : context.colorScheme.onSurfaceVariant
+                                                  .withValues(alpha: 0.6),
+                                      ),
+                                      SizedBox(width: 12.ap),
+                                      Expanded(
+                                        child: Text(
+                                          Intl.message(item.name),
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium?.toSoftBold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -112,8 +132,79 @@ class OutboundModeV2 extends StatelessWidget {
               Mode.global => globalState.theme.darken3PrimaryContainer,
               Mode.direct => context.colorScheme.tertiaryContainer,
             };
+            if (globalState.isAndroidTV) {
+              return Container(
+                constraints: const BoxConstraints.expand(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 9,
+                ),
+                child: Row(
+                  children: [
+                    for (final item in Mode.values)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Focus(
+                            child: Builder(
+                              builder: (context) {
+                                final isFocused = Focus.of(context).hasFocus;
+                                final isSelected = item == mode;
+                                return InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () {
+                                    globalState.appController.changeMode(item);
+                                  },
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: height - 18,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? thumbColor
+                                          : (isFocused
+                                              ? context.colorScheme.primary
+                                                  .withValues(alpha: 0.12)
+                                              : Colors.transparent),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: isFocused
+                                          ? Border.all(
+                                              color:
+                                                  context.colorScheme.primary,
+                                              width: 2,
+                                            )
+                                          : Border.all(
+                                              color: Colors.transparent,
+                                              width: 2,
+                                            ),
+                                    ),
+                                    child: Text(
+                                      Intl.message(item.name),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.adjustSize(1)
+                                          .copyWith(
+                                            color: isSelected
+                                                ? _getTextColor(context, item)
+                                                : null,
+                                            fontWeight: isSelected
+                                                ? FontWeight.bold
+                                                : null,
+                                          ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }
             return Container(
-              constraints: BoxConstraints.expand(),
+              constraints: const BoxConstraints.expand(),
               child: CommonTabBar<Mode>(
                 children: Map.fromEntries(
                   Mode.values.map(

@@ -1,5 +1,6 @@
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:bett_box/enum/enum.dart';
+import 'package:bett_box/manager/manager.dart';
 import 'package:flutter/material.dart';
 
 import '../state.dart';
@@ -80,15 +81,18 @@ class EmojiText extends StatelessWidget {
           ),
         );
       }
+      final currentFamily = EmojiManager.currentFamily;
       spans.add(
         TextSpan(
           text: match.group(0),
-          style: effectiveStyle.merge(
-            TextStyle(
-              fontFamily: FontFamily.openMoji.value,
-              fontFamilyFallback: [FontFamily.openMoji.value],
-            ),
-          ),
+          style: currentFamily != null
+              ? effectiveStyle.merge(
+                  TextStyle(
+                    fontFamily: currentFamily,
+                    fontFamilyFallback: [currentFamily],
+                  ),
+                )
+              : effectiveStyle,
         ),
       );
       lastMatchEnd = match.end;
@@ -106,14 +110,18 @@ class EmojiText extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaultStyle = DefaultTextStyle.of(context).style;
 
-    return RichText(
-      textAlign: textAlign ?? TextAlign.start,
-      textScaler: MediaQuery.of(context).textScaler,
-      maxLines: maxLines,
-      overflow: overflow ?? TextOverflow.clip,
-      text: TextSpan(
-        children: _buildTextSpans(text, defaultStyle),
-      ),
+    return ValueListenableBuilder<EmojiStyle>(
+      valueListenable: EmojiManager.emojiStyleNotifier,
+      builder: (_, __, ___) {
+        return Text.rich(
+          TextSpan(
+            children: _buildTextSpans(text, defaultStyle),
+          ),
+          textAlign: textAlign ?? TextAlign.start,
+          maxLines: maxLines,
+          overflow: overflow ?? TextOverflow.clip,
+        );
+      },
     );
   }
 }

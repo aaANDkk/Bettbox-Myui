@@ -142,6 +142,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(false) bool enableHighRefreshRate,
     @Default(RecoveryStrategy.compatible) RecoveryStrategy recoveryStrategy,
     @Default(false) bool enableHighPriority,
+    @Default(true) bool isAnimateToPage,
   }) = _AppSettingProps;
 
   factory AppSettingProps.fromJson(Map<String, Object?> json) =>
@@ -226,6 +227,7 @@ abstract class VpnProps with _$VpnProps {
     @Default(false) bool storeFix,
     @Default(false) bool networkFix,
     @Default(false) bool disableQuic,
+    @Default(false) bool highPriorityNotification,
     @Default(false) bool networkSpeedNotification,
     @Default(false) bool excludeChina,
     @Default(false) bool trayEnhancement,

@@ -188,6 +188,27 @@ Future<void> delayTest(
   await delayTestCoordinator.run(groupName, runTest);
 }
 
+class GroupOffsets {
+  const GroupOffsets(this.groups, this.offsets);
+
+  static const empty = GroupOffsets(<Group>[], <double>[]);
+
+  final List<Group> groups;
+  final List<double> offsets;
+
+  bool get isEmpty => offsets.isEmpty;
+
+  double offsetOf(String groupName) {
+    final index = groups.indexWhere((group) => group.name == groupName);
+    if (index < 0 || index >= offsets.length) {
+      return 0;
+    }
+    return offsets[index];
+  }
+
+  Group? groupOf(String groupName) => groups.getGroup(groupName);
+}
+
 double getScrollToSelectedOffset({
   required String groupName,
   required List<Proxy> proxies,
@@ -203,3 +224,4 @@ double getScrollToSelectedOffset({
   final rows = (selectedIndex / columns).floor();
   return rows * getItemHeight(proxyCardType) + (rows - 1) * 8;
 }
+

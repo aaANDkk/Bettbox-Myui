@@ -4,9 +4,14 @@ import 'package:bett_box/models/models.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-void showIpDetailDialog(BuildContext context, String rawIp) {
+void showIpDetailDialog(
+  BuildContext context,
+  String rawIp, {
+  IpInfo? initialInfo,
+}) {
   var cleanIp = rawIp.trim();
   if (cleanIp.startsWith('[') && cleanIp.contains(']')) {
     cleanIp = cleanIp.substring(1, cleanIp.indexOf(']'));
@@ -20,14 +25,18 @@ void showIpDetailDialog(BuildContext context, String rawIp) {
   if (cleanIp.isEmpty) return;
 
   globalState.showCommonDialog(
-    child: _IpDetailDialog(ip: cleanIp),
+    child: _IpDetailDialog(
+      ip: cleanIp,
+    ),
   );
 }
 
 class _IpDetailDialog extends StatefulWidget {
   final String ip;
 
-  const _IpDetailDialog({required this.ip});
+  const _IpDetailDialog({
+    required this.ip,
+  });
 
   @override
   State<_IpDetailDialog> createState() => _IpDetailDialogState();
@@ -42,12 +51,18 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
   @override
   void initState() {
     super.initState();
+    _ipInfo = request.getMemoryCachedIp(widget.ip);
     _fetchIpDetail();
   }
 
   Future<void> _fetchIpDetail() async {
+    final stopwatch = Stopwatch()..start();
     final cat = utils.classifyIp(widget.ip);
     if (cat != IpCategory.public) {
+      final elapsed = stopwatch.elapsedMilliseconds;
+      if (elapsed < 200) {
+        await Future.delayed(Duration(milliseconds: 200 - elapsed));
+      }
       if (mounted) {
         setState(() {
           _category = cat;
@@ -58,6 +73,10 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
     }
 
     final res = await request.queryIpDetail(widget.ip);
+    final elapsed = stopwatch.elapsedMilliseconds;
+    if (elapsed < 200) {
+      await Future.delayed(Duration(milliseconds: 200 - elapsed));
+    }
     if (!mounted) return;
 
     if (res.isError) {
@@ -67,18 +86,46 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _category = IpCategory.lan;
           _isLoading = false;
         });
-      } else {
+      } else if (_ipInfo == null) {
         setState(() {
           _errorMessage = appLocalizations.networkErrorRetryLater;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
           _isLoading = false;
         });
       }
     } else {
       setState(() {
-        _ipInfo = res.data;
+        _ipInfo = res.data ?? _ipInfo;
         _isLoading = false;
       });
     }
+  }
+
+  void _copyIp(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: widget.ip));
+    globalState.showNotifier(appLocalizations.copySuccess);
+  }
+
+  Widget _buildIpTile(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: const Icon(Icons.location_on_outlined),
+      title: Text(appLocalizations.ipAddress),
+      subtitle: Text(
+        widget.ip,
+        style: context.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.copy_rounded, size: 18),
+        tooltip: appLocalizations.copy,
+        onPressed: () => _copyIp(context),
+      ),
+    );
   }
 
   @override
@@ -144,17 +191,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.location_on_outlined),
-            title: Text(appLocalizations.ipAddress),
-            subtitle: SelectableText(
-              widget.ip,
-              style: context.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.stacked_line_chart),
@@ -173,17 +210,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.location_on_outlined),
-            title: Text(appLocalizations.ipAddress),
-            subtitle: SelectableText(
-              widget.ip,
-              style: context.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.shuffle),
@@ -202,17 +229,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.location_on_outlined),
-            title: Text(appLocalizations.ipAddress),
-            subtitle: SelectableText(
-              widget.ip,
-              style: context.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.error_outline, color: Colors.red),
@@ -228,18 +245,8 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. IP 地址
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.location_on_outlined),
-            title: Text(appLocalizations.ipAddress),
-            subtitle: SelectableText(
-              widget.ip,
-              style: context.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          // 1. IP 地址（右侧图标复制）
+          _buildIpTile(context),
           // 2. 国家 / 地区（EmojiText 精准基线对齐）
           if (countryText.isNotEmpty || flagEmoji.isNotEmpty)
             ListTile(
@@ -287,8 +294,24 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
       );
     }
 
+    final Widget loadingWidget = Container(
+      key: const ValueKey('loading'),
+      height: 100,
+      alignment: Alignment.center,
+      child: SpinKitThreeBounce(
+        color: context.colorScheme.primary,
+        size: 24,
+      ),
+    );
+
+    final Widget detailsWidget = SingleChildScrollView(
+      key: const ValueKey('details'),
+      child: content,
+    );
+
     return CommonDialog(
       title: appLocalizations.moreIpInfo,
+      overrideScroll: true,
       actions: [
         TextButton(
           onPressed: () {
@@ -297,7 +320,23 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           child: Text(appLocalizations.confirm),
         ),
       ],
-      child: content,
+      child: AnimatedSize(
+        alignment: Alignment.topCenter,
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          reverseDuration: Duration.zero,
+          switchInCurve: Curves.easeOutCubic,
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          child: _isLoading ? loadingWidget : detailsWidget,
+        ),
+      ),
     );
   }
 }

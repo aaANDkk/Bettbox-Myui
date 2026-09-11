@@ -1072,7 +1072,12 @@ class AppController {
   Future handleClear() async {
     await preferences.clearPreferences();
     commonPrint.log('clear preferences');
-    globalState.config = Config(themeProps: defaultThemeProps);
+    globalState.config = Config(
+      themeProps: defaultThemeProps,
+      networkProps: defaultNetworkProps.copyWith(
+        systemProxy: system.isDesktop,
+      ),
+    );
   }
 
   Future<void> autoCheckUpdate() async {
@@ -1230,7 +1235,7 @@ class AppController {
   Future<void> init() async {
     FlutterError.onError = (details) {
       if (kDebugMode) {
-        commonPrint.log(details.stack.toString());
+        FlutterError.dumpErrorToConsole(details);
       }
     };
 

@@ -111,6 +111,12 @@ class Service {
     await methodChannel.invokeMethod<void>('restoreNotification');
   }
 
+  Future<bool?> setHighPriorityNotification(bool enabled) async {
+    return await methodChannel.invokeMethod<bool>('setHighPriorityNotification', {
+      'enabled': enabled,
+    });
+  }
+
   Future<bool?> reconnectIpc() => methodChannel.invokeMethod<bool>('reconnectIpc');
 }
 

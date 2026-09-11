@@ -236,6 +236,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     );
     ref.watch(appSettingProvider.select((state) => state.locale));
     return CommonScaffold(
+      resizeToAvoidBottomInset: false,
       floatingActionButton: _buildFAB(),
       actions: _buildActions(),
       title: appLocalizations.proxies,

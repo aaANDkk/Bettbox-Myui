@@ -148,14 +148,17 @@ class _StartFabState extends ConsumerState<StartFab> {
   Widget build(BuildContext context) {
     final state = ref.watch(startButtonSelectorStateProvider);
     final isRestarting = ref.watch(isRestartingCoreProvider);
+    final isSmartStopped = ref.watch(isSmartStoppedProvider);
     final showLoading = _isDisabled || isRestarting || !state.isInit;
+    final canPress = !showLoading && !isSmartStopped;
 
     return ValueListenableBuilder<int>(
       valueListenable: dashboardRefreshManager.tick1s,
       builder: (_, _, _) {
         final runTime = ref.read(runTimeProvider);
         final isStart = runTime != null;
-        final displayStart = _optimisticStart ?? isStart;
+        final displayStart =
+            isSmartStopped ? false : (_optimisticStart ?? isStart);
         final labelText = displayStart
             ? _formatRunTime(runTime)
             : appLocalizations.startRunning;
@@ -174,7 +177,8 @@ class _StartFabState extends ConsumerState<StartFab> {
         final isDark =
             Theme.of(context).colorScheme.brightness == Brightness.dark;
         return GestureDetector(
-          onLongPress: isStart && !showLoading ? _handleLongPress : null,
+          onLongPress:
+              isStart && !showLoading && !isSmartStopped ? _handleLongPress : null,
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -208,7 +212,7 @@ class _StartFabState extends ConsumerState<StartFab> {
                   focusElevation: 0,
                   clipBehavior: Clip.none,
                   heroTag: null,
-                  onPressed: showLoading
+                  onPressed: !canPress
                       ? null
                       : state.hasProfile
                           ? _handleStart

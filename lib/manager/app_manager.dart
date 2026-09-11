@@ -71,11 +71,9 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       if (prev == next) {
         return;
       }
-      if (next.a == true && next.b == true) {
-        await macOS?.updateDns(false);
-      } else {
-        await macOS?.updateDns(true);
-      }
+      final shouldSet = next.a == true && next.b == true;
+      await macOS?.updateDns(!shouldSet);
+      await system.setupLinuxTunDns(shouldSet);
     });
     ref.listenManual(currentBrightnessProvider, (prev, next) {
       if (prev == next) {

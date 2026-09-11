@@ -96,40 +96,40 @@ class _MemoryInfoState extends State<MemoryInfo> {
     );
   }
 
+  Future<void> _handleForceGC(BuildContext context) async {
+    final result = await globalState.showCommonDialog<bool>(
+      child: CommonDialog(
+        title: appLocalizations.forceGCTitle,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(false);
+            },
+            child: Text(appLocalizations.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(true);
+            },
+            child: Text(appLocalizations.confirm),
+          ),
+        ],
+        child: Text(appLocalizations.forceGCDesc),
+      ),
+    );
+
+    if (result == true) {
+      await clashCore.requestGc(forceFreeOSMemory: true);
+      globalState.showNotifier(appLocalizations.success);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        onLongPress: () async {
-          // Show confirmation dialog
-          final result = await globalState.showCommonDialog<bool>(
-            child: CommonDialog(
-              title: appLocalizations.forceGCTitle,
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop(false);
-                  },
-                  child: Text(appLocalizations.cancel),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop(true);
-                  },
-                  child: Text(appLocalizations.confirm),
-                ),
-              ],
-              child: Text(appLocalizations.forceGCDesc),
-            ),
-          );
-
-          // Execute force GC after user confirms
-          if (result == true) {
-            await clashCore.requestGc(forceFreeOSMemory: true);
-            globalState.showNotifier(appLocalizations.success);
-          }
-        },
+        onPressed: () => _handleForceGC(context),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

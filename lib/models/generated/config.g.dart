@@ -47,6 +47,7 @@ _AppSettingProps _$AppSettingPropsFromJson(Map<String, dynamic> json) =>
           ) ??
           RecoveryStrategy.compatible,
       enableHighPriority: json['enableHighPriority'] as bool? ?? false,
+      isAnimateToPage: json['isAnimateToPage'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
@@ -80,6 +81,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'enableHighRefreshRate': instance.enableHighRefreshRate,
       'recoveryStrategy': _$RecoveryStrategyEnumMap[instance.recoveryStrategy]!,
       'enableHighPriority': instance.enableHighPriority,
+      'isAnimateToPage': instance.isAnimateToPage,
     };
 
 const _$RecoveryStrategyEnumMap = {
@@ -193,6 +195,7 @@ _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
   storeFix: json['storeFix'] as bool? ?? false,
   networkFix: json['networkFix'] as bool? ?? false,
   disableQuic: json['disableQuic'] as bool? ?? false,
+  highPriorityNotification: json['highPriorityNotification'] as bool? ?? false,
   networkSpeedNotification: json['networkSpeedNotification'] as bool? ?? false,
   excludeChina: json['excludeChina'] as bool? ?? false,
   trayEnhancement: json['trayEnhancement'] as bool? ?? false,
@@ -227,6 +230,7 @@ Map<String, dynamic> _$VpnPropsToJson(_VpnProps instance) => <String, dynamic>{
   'storeFix': instance.storeFix,
   'networkFix': instance.networkFix,
   'disableQuic': instance.disableQuic,
+  'highPriorityNotification': instance.highPriorityNotification,
   'networkSpeedNotification': instance.networkSpeedNotification,
   'excludeChina': instance.excludeChina,
   'trayEnhancement': instance.trayEnhancement,

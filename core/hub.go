@@ -604,6 +604,8 @@ func handleSetupConfig(bytes []byte) string {
 		_ = setupConfig(defaultSetupParams())
 		return err.Error()
 	}
+	clearSuspendedHealthChecks()
+	clearSuspendedWireGuard()
 	err = setupConfig(params)
 	if err != nil {
 		return err.Error()
@@ -618,6 +620,8 @@ func handleSuspend(suspended bool) bool {
 	if suspended {
 		log.Infoln("[APP] Suspend mode enabled")
 		tunnel.OnSuspend()
+		pauseHealthChecks()
+		pauseWireGuard()
 
 		mihomoNtp.ReCreateNTPService("", 0, "", nil, false)
 
@@ -630,6 +634,8 @@ func handleSuspend(suspended bool) bool {
 	} else {
 		log.Infoln("[APP] Resume from suspend")
 		tunnel.OnRunning()
+		resumeHealthChecks()
+		resumeWireGuard()
 
 		runLock.Lock()
 		cfg := currentConfig

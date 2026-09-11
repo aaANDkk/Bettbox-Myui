@@ -257,21 +257,25 @@ class ProviderItem extends StatelessWidget {
 
   String _buildProviderDesc() {
     final updateTimeText = provider.updateAt.lastUpdateTimeDesc;
-    final subInfo = provider.subscriptionInfo;
-    String infoText;
-    if (subInfo == null) {
-      infoText = updateTimeText;
-    } else {
-      final trafficText = _buildTrafficInfoText(subInfo);
-      final expireText = _getExpireText(subInfo);
-      infoText = trafficText == null
-          ? '$expireText - $updateTimeText'
-          : '$trafficText · $expireText - $updateTimeText';
-    }
     final count = provider.count;
-    return count == 0
-        ? infoText
-        : '$infoText · $count${appLocalizations.entries}';
+    if (count == 0) {
+      return updateTimeText;
+    }
+    if (updateTimeText.isEmpty) {
+      return '$count${appLocalizations.entries}';
+    }
+    return '$updateTimeText · $count${appLocalizations.entries}';
+  }
+
+  String? _buildSubDetailsText() {
+    final subInfo = provider.subscriptionInfo;
+    if (subInfo == null) return null;
+    final trafficText = _buildTrafficInfoText(subInfo);
+    final expireText = _getExpireText(subInfo);
+    if (trafficText == null) {
+      return expireText;
+    }
+    return '$trafficText · $expireText';
   }
 
   String _getExpireText(SubscriptionInfo subscriptionInfo) {
@@ -303,6 +307,7 @@ class ProviderItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final subDetailsText = _buildSubDetailsText();
     return ListItem(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       title: EmojiText(provider.name),
@@ -311,9 +316,17 @@ class ProviderItem extends StatelessWidget {
         children: [
           const SizedBox(height: 4),
           Text(_buildProviderDesc()),
-          const SizedBox(height: 4),
-          if (provider.subscriptionInfo != null)
+          if (provider.subscriptionInfo != null) ...[
+            const SizedBox(height: 6),
             SubscriptionInfoView(subscriptionInfo: provider.subscriptionInfo),
+            if (subDetailsText != null)
+              Text(
+                subDetailsText,
+                style: context.textTheme.labelMedium?.toLight,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
           const SizedBox(height: 8),
           Wrap(
             runSpacing: 6,

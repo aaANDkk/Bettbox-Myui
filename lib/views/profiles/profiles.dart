@@ -166,6 +166,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
   Widget build(BuildContext context) {
     ref.watch(appSettingProvider.select((state) => state.locale));
     return CommonScaffold(
+      resizeToAvoidBottomInset: false,
       title: appLocalizations.profiles,
       floatingActionButton: _buildFAB(),
       actions: _buildActions(),
@@ -393,7 +394,7 @@ class ProfileItem extends StatelessWidget {
 
     String bottomText;
     if (hasUsageBar) {
-      bottomText = '${_getTrafficText(subscriptionInfo!)} · $updateTimeText';
+      bottomText = '${_getTrafficText(subscriptionInfo)} · $updateTimeText';
     } else if (profile.type == ProfileType.url) {
       final trafficText = subscriptionInfo != null
           ? _getTrafficText(subscriptionInfo)
@@ -421,7 +422,7 @@ class ProfileItem extends StatelessWidget {
                       color:
                           context.colorScheme.primary.withValues(alpha: 0.15),
                       child: FractionallySizedBox(
-                        widthFactor: (subscriptionInfo!.total > 0
+                        widthFactor: (subscriptionInfo.total > 0
                                 ? (subscriptionInfo.upload +
                                         subscriptionInfo.download) /
                                     subscriptionInfo.total
@@ -442,7 +443,7 @@ class ProfileItem extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       appLocalizations.noUsageData,
-                      style: context.textTheme.labelSmall?.toLight?.copyWith(
+                      style: context.textTheme.labelSmall?.toLight.copyWith(
                         height: 1.0,
                       ),
                       maxLines: 1,
@@ -479,7 +480,6 @@ class ProfileItem extends StatelessWidget {
     final totalShow = TrafficValue(value: total).show;
     return '$useShow / $totalShow';
   }
-
   Future<void> _handleExportFile(BuildContext context) async {
     final res = await globalState.appController.safeRun<bool>(
       () async {
@@ -516,6 +516,13 @@ class ProfileItem extends StatelessWidget {
         label: appLocalizations.edit,
         onPressed: () {
           _handleShowEditExtendPage(context);
+        },
+      ),
+      PopupMenuItemData(
+        icon: Icons.visibility_outlined,
+        label: appLocalizations.preview,
+        onPressed: () {
+          _handlePreviewRuntimeConfig(context);
         },
       ),
       if (profile.type == ProfileType.url) ...[
@@ -656,7 +663,7 @@ class ProfileItem extends StatelessWidget {
     return CommonCard(
       isSelected: profile.id == groupValue,
       onPressed: isTV ? null : () => onChanged(profile.id),
-      onLongPress: isTV ? null : () => _handlePreviewRuntimeConfig(context),
+      onLongPress: null,
       child: isTV ? _buildTVLayout(context) : _buildNormalLayout(context),
     );
   }

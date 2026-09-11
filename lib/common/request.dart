@@ -206,7 +206,8 @@ class Request {
     return [
       if (ipInfoToken.isNotEmpty)
         'https://api.ipinfo.io/lite/me?token=$ipInfoToken',
-      isZh ? 'http://ip-api.com/json?lang=zh-CN' : 'http://ip-api.com/json',
+      isZh ? 'http://ip-api.com/json/?lang=zh-CN' : 'http://ip-api.com/json',
+      'https://get.geojs.io/v1/ip/geo.json',
       'https://api.ip.sb/geoip',
       isZh ? 'https://api.myip.la/cn?json' : 'https://api.myip.la/en?json',
     ];
@@ -216,7 +217,6 @@ class Request {
     'https://myip.ipip.net/json',
   ];
 
-  // 备用 Cloudflare 探测源
   final List<String> _cloudflareIpInfoSources = [
     'https://ip.sb/cdn-cgi/trace',
     'https://api.ip.sb/cdn-cgi/trace',
@@ -250,7 +250,8 @@ class Request {
     );
 
     final Completer<Result<IpInfo?>> firstCompleter = Completer();
-    IpInfo? mergedInfo;
+    IpInfo? primaryInfo;
+    IpInfo? fallbackInfo;
     int completedCount = 0;
     Timer? cleanupTimer;
 
@@ -267,14 +268,17 @@ class Request {
       completedCount++;
       if (completedCount == sources.length) {
         if (!firstCompleter.isCompleted) {
-          firstCompleter.complete(Result.success(mergedInfo));
+          final res = primaryInfo ?? fallbackInfo;
+          if (res != null) onUpdate?.call(res);
+          firstCompleter.complete(Result.success(res));
         }
         cleanup();
       }
     }
 
-    for (final url in sources) {
-      final isIpInfo = url.contains('ipinfo.io');
+    for (int i = 0; i < sources.length; i++) {
+      final url = sources[i];
+      final isPrimary = i == 0;
       dio
           .get<Uint8List>(
             url,
@@ -292,22 +296,31 @@ class Request {
                 if (text.startsWith('{')) {
                   final jsonMap = json.decode(text);
                   if (jsonMap is Map<String, dynamic>) {
-                    ipInfo = IpInfo.fromJson(jsonMap);
+                    if (url.contains('ip-api.com') && jsonMap['status'] != 'success') {
+                      ipInfo = null;
+                    } else {
+                      ipInfo = IpInfo.fromJson(jsonMap);
+                    }
                   }
                 } else {
                   ipInfo = IpInfo.fromCloudflareTrace(text);
                 }
 
                 if (ipInfo != null) {
-                  mergedInfo = mergedInfo == null
-                      ? ipInfo
-                      : mergedInfo!.merge(
-                          ipInfo,
-                          otherIsAuthoritative: isIpInfo,
-                        );
-                  onUpdate?.call(mergedInfo!);
-                  if (!firstCompleter.isCompleted) {
-                    firstCompleter.complete(Result.success(mergedInfo));
+                  if (isPrimary) {
+                    primaryInfo = ipInfo;
+                    onUpdate?.call(ipInfo);
+                    if (!firstCompleter.isCompleted) {
+                      firstCompleter.complete(Result.success(ipInfo));
+                    }
+                  } else {
+                    fallbackInfo = ipInfo;
+                    if (sources.length == 1) {
+                      onUpdate?.call(ipInfo);
+                      if (!firstCompleter.isCompleted) {
+                        firstCompleter.complete(Result.success(ipInfo));
+                      }
+                    }
                   }
                 }
               } catch (_) {}
@@ -326,7 +339,7 @@ class Request {
 
     return await firstCompleter.future.timeout(
       effectiveTimeout,
-      onTimeout: () => Result.success(mergedInfo),
+      onTimeout: () => Result.success(primaryInfo ?? fallbackInfo),
     );
   }
 
@@ -423,7 +436,15 @@ class Request {
     }
   }
 
+  final Map<String, IpInfo> _memoryIpCache = {};
+
+  IpInfo? getMemoryCachedIp(String ip) {
+    final isZh = Intl.getCurrentLocale().toLowerCase().startsWith('zh');
+    return _memoryIpCache['${ip}_${isZh ? 'zh' : 'en'}'];
+  }
+
   Future<void> _saveCachedIp(String cacheKey, IpInfo ipInfo) async {
+    _memoryIpCache[cacheKey] = ipInfo;
     try {
       final prefs = await preferences.sharedPreferencesCompleter.future;
       final cacheStr = prefs?.getString(_ipCacheKey);
@@ -464,9 +485,16 @@ class Request {
     final isZh = Intl.getCurrentLocale().toLowerCase().startsWith('zh');
     final cacheKey = '${ip}_${isZh ? 'zh' : 'en'}';
 
-    // 1. 检查本地缓存并执行过期清理（有效时长7天）
+    // 0. 优先命中高频内存缓存（0 耗时）
+    final memoryCached = _memoryIpCache[cacheKey];
+    if (memoryCached != null) {
+      return Result.success(memoryCached);
+    }
+
+    // 1. 检查本地持久化缓存并执行过期清理（有效时长7天）
     final cached = await _getValidCachedIp(cacheKey);
     if (cached != null) {
+      _memoryIpCache[cacheKey] = cached;
       return Result.success(cached);
     }
 

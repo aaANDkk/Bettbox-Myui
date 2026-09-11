@@ -37,6 +37,17 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
     super.initState();
     _initConnectivityListener();
     _initNativeNetworkListener();
+    _syncSmartStopped();
+  }
+
+  void _syncSmartStopped() async {
+    if (!system.isAndroid) return;
+    try {
+      final isStopped = await service?.isSmartStopped() ?? false;
+      if (mounted) {
+        ref.read(isSmartStoppedProvider.notifier).set(isStopped);
+      }
+    } catch (_) {}
   }
 
   void _initNativeNetworkListener() {
@@ -59,7 +70,15 @@ class _SmartAutoStopManagerState extends ConsumerState<SmartAutoStopManager> {
     service?.addNativeEventCallback(_nativeEventCallback);
   }
 
-  void _onNativeNetworkChanged() {
+  void _onNativeNetworkChanged() async {
+    if (system.isAndroid) {
+      try {
+        final isStopped = await service?.isSmartStopped() ?? false;
+        if (mounted) {
+          ref.read(isSmartStoppedProvider.notifier).set(isStopped);
+        }
+      } catch (_) {}
+    }
     final vpnProps = ref.read(vpnSettingProvider);
     if (!vpnProps.smartAutoStop) return;
     _debouncedCheckCurrentNetwork();

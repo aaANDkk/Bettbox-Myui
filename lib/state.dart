@@ -24,6 +24,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'common/common.dart';
 import 'controller.dart';
+import 'manager/manager.dart';
 import 'models/models.dart';
 
 typedef UpdateTasks = List<FutureOr Function()>;
@@ -133,6 +134,9 @@ class GlobalState {
           patchClashConfig: system.isAndroid
               ? const ClashConfig(findProcessMode: FindProcessMode.always)
               : defaultClashConfig,
+          networkProps: defaultNetworkProps.copyWith(
+            systemProxy: system.isDesktop,
+          ),
           appSetting: defaultAppSettingProps.copyWith(
             showStartSwitch: _isAndroidTV ?? false,
           ),
@@ -142,6 +146,15 @@ class GlobalState {
         utils.getLocaleForString(config.appSetting.locale) ??
         utils.getSystemLocale();
     await AppLocalizations.load(locale);
+    final hasFont = await FontManager.init(
+      enabled: config.themeProps.useHarmonyFont,
+    );
+    if (!hasFont && config.themeProps.useHarmonyFont) {
+      config = config.copyWith(
+        themeProps: config.themeProps.copyWith(useHarmonyFont: false),
+      );
+    }
+    await EmojiManager.init();
   }
 
   bool get isAndroidTV => _isAndroidTV ?? false;
@@ -317,6 +330,9 @@ class GlobalState {
 
     if (system.isAndroid) {
       await service?.setQuickResponse(config.vpnProps.quickResponse);
+      await service?.setHighPriorityNotification(
+        config.vpnProps.highPriorityNotification,
+      );
     }
     await startUpdateTasks(tasks);
   }
@@ -416,23 +432,50 @@ class GlobalState {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return await showGeneralDialog<T>(
       context: context,
-      barrierColor: isDark ? const Color(0xCC000000) : const Color(0x99000000),
+      barrierColor:
+          isDark ? const Color(0x66000000) : const Color(0x33000000),
       barrierDismissible: dismissible,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      transitionDuration: const Duration(milliseconds: 250),
+      transitionDuration: const Duration(milliseconds: 260),
       pageBuilder: (context, animation, secondaryAnimation) => child,
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         final curved = CurvedAnimation(
           parent: animation,
           curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
         );
+        final opacityAnimation = CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0.0, 0.45, curve: Curves.easeOut),
+          reverseCurve: const Interval(0.55, 1.0, curve: Curves.easeIn),
+        );
+        final scaleAnimation = Tween<double>(
+          begin: 0.80,
+          end: 1.0,
+        ).animate(curved);
         return RepaintBoundary(
-          child: FadeTransition(
-            opacity: curved,
-            child: ScaleTransition(
-              scale: curved.drive(Tween<double>(begin: 0.94, end: 1.0)),
-              child: child,
-            ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              IgnorePointer(
+                child: FadeTransition(
+                  opacity: curved,
+                  child: SizedBox.expand(
+                    child: BackdropFilter(
+                      filter: commonFilter,
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
+                ),
+              ),
+              FadeTransition(
+                opacity: opacityAnimation,
+                child: ScaleTransition(
+                  scale: scaleAnimation,
+                  child: child,
+                ),
+              ),
+            ],
           ),
         );
       },

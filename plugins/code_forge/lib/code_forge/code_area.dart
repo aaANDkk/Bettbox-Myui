@@ -394,6 +394,8 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
   final _actionScrollController = ScrollController();
   final Map<String, String> _suggestionDetailsCache = {};
   final _isMac = Platform.isMacOS;
+  final _isWindows = Platform.isWindows;
+  DateTime? _lastCtrlUpTime;
   final GlobalKey _codeFieldKey = GlobalKey();
   TextInputConnection? _connection;
   StreamSubscription? _lspResponsesSubscription;
@@ -2449,23 +2451,51 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                   }
                                                 }
 
-                                                if (event is KeyDownEvent ||
-                                                    event is KeyRepeatEvent) {
-                                                  final isAltPressed =
-                                                      HardwareKeyboard
-                                                          .instance
-                                                          .isAltPressed;
-                                                  final isShiftPressed =
-                                                      HardwareKeyboard
-                                                          .instance
-                                                          .isShiftPressed;
-                                                  final isCtrlPressed =
-                                                      HardwareKeyboard
-                                                          .instance
-                                                          .isControlPressed ||
-                                                      HardwareKeyboard
-                                                          .instance
-                                                          .isMetaPressed;
+                                                 if (_isWindows && event is KeyUpEvent) {
+                                                   if (event.logicalKey ==
+                                                           LogicalKeyboardKey
+                                                               .controlLeft ||
+                                                       event.logicalKey ==
+                                                           LogicalKeyboardKey
+                                                               .controlRight ||
+                                                       event.logicalKey ==
+                                                           LogicalKeyboardKey
+                                                               .control) {
+                                                     _lastCtrlUpTime =
+                                                         DateTime.now();
+                                                   }
+                                                 }
+
+                                                 if (event is KeyDownEvent ||
+                                                     event is KeyRepeatEvent) {
+                                                   final isAltPressed =
+                                                       HardwareKeyboard
+                                                           .instance
+                                                           .isAltPressed;
+                                                   final isShiftPressed =
+                                                       HardwareKeyboard
+                                                           .instance
+                                                           .isShiftPressed;
+                                                   final isCtrlPressed =
+                                                       HardwareKeyboard
+                                                           .instance
+                                                           .isControlPressed ||
+                                                       HardwareKeyboard
+                                                           .instance
+                                                           .isMetaPressed;
+                                                   final isSyntheticWindowsPaste =
+                                                       _isWindows &&
+                                                       event.logicalKey ==
+                                                           LogicalKeyboardKey
+                                                               .keyV &&
+                                                       _lastCtrlUpTime !=
+                                                           null &&
+                                                       DateTime.now()
+                                                               .difference(
+                                                                   _lastCtrlUpTime!) <=
+                                                           const Duration(
+                                                             milliseconds: 150,
+                                                           );
                                                   if (_suggestionNotifier
                                                               .value !=
                                                           null &&
@@ -2609,7 +2639,8 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                     }
                                                   }
 
-                                                  if (isCtrlPressed) {
+                                                  if (isCtrlPressed ||
+                                                      isSyntheticWindowsPaste) {
                                                     switch (event.logicalKey) {
                                                       case LogicalKeyboardKey
                                                           .keyC:
@@ -2627,6 +2658,7 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                             .handled;
                                                       case LogicalKeyboardKey
                                                           .keyV:
+                                                        _lastCtrlUpTime = null;
                                                         if (_readOnly) {
                                                           return KeyEventResult
                                                               .handled;

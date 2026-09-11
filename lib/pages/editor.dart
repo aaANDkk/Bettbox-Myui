@@ -69,6 +69,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
   late UndoRedoController _undoController;
   late TextEditingController _titleController;
   final _focusNode = FocusNode();
+  late final FocusNode _titleFocusNode;
   late final FocusNode _saveButtonFocusNode;
   VoidCallback? _removePasteHandler;
   bool _lineWrap = false;
@@ -88,7 +89,40 @@ class _EditorPageState extends ConsumerState<EditorPage> {
   @override
   void initState() {
     super.initState();
-    _saveButtonFocusNode = FocusNode();
+    _saveButtonFocusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (!globalState.isAndroidTV || event is! KeyDownEvent) {
+          return KeyEventResult.ignored;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+          if (widget.titleEditable && !widget.readOnly && !widget.simple) {
+            _titleFocusNode.requestFocus();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
+    );
+    _titleFocusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (!globalState.isAndroidTV || event is! KeyDownEvent) {
+          return KeyEventResult.ignored;
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+          if (_titleController.selection.baseOffset >=
+                  _titleController.text.length ||
+              _titleController.text.isEmpty) {
+            _saveButtonFocusNode.requestFocus();
+            return KeyEventResult.handled;
+          }
+        }
+        if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          _saveButtonFocusNode.requestFocus();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
     _lineCount = widget.content.split('\n').length;
     _lineWrap = !widget.readOnly && !_isLineWrapDisabled;
     _controller = CodeForgeController();
@@ -136,6 +170,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
     _undoController.dispose();
     _controller.dispose();
     _titleController.dispose();
+    _titleFocusNode.dispose();
     _focusNode.dispose();
     _saveButtonFocusNode.dispose();
     super.dispose();
@@ -165,7 +200,9 @@ class _EditorPageState extends ConsumerState<EditorPage> {
     if (widget.onSave == null) return;
     if (widget.readOnly || widget.simple) return;
     if (_isLoading) return;
-    if (_controller.text == widget.content &&
+    final isNewScript = widget.title.isEmpty;
+    if (!isNewScript &&
+        _controller.text == widget.content &&
         _titleController.text == widget.title) {
       return;
     }
@@ -300,8 +337,11 @@ class _EditorPageState extends ConsumerState<EditorPage> {
 
     return CommonPopScope(
       onPop: () async {
-        if (globalState.isAndroidTV && _focusNode.hasFocus) {
+        if (globalState.isAndroidTV &&
+            (_focusNode.hasFocus || _titleFocusNode.hasFocus)) {
+          final isNewScript = widget.title.isEmpty;
           final hasChanges =
+              isNewScript ||
               _controller.text != widget.content ||
               _titleController.text != widget.title;
           final canSave =
@@ -347,8 +387,13 @@ class _EditorPageState extends ConsumerState<EditorPage> {
           child: CommonScaffold(
             appBar: AppBar(
               title: TextField(
+                focusNode: _titleFocusNode,
                 enabled: widget.titleEditable && !readOnly,
                 controller: _titleController,
+                textInputAction: TextInputAction.next,
+                onSubmitted: (_) {
+                  _saveButtonFocusNode.requestFocus();
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -365,19 +410,45 @@ class _EditorPageState extends ConsumerState<EditorPage> {
               actions: genActions([
                 if (widget.onSave != null && !readOnly)
                   _wrapTitleController(
-                    () => Focus(
-                      focusNode: _saveButtonFocusNode,
-                      child: IconButton(
-                        onPressed:
-                            !_isLoading &&
-                                (_controller.text != widget.content ||
-                                    _titleController.text != widget.title)
-                            ? () => _handleSave(context)
+                    () {
+                      final isNewScript = widget.title.isEmpty;
+                      final canSave =
+                          !_isLoading &&
+                          (isNewScript ||
+                              _controller.text != widget.content ||
+                              _titleController.text != widget.title);
+                      return IconButton(
+                        focusNode: _saveButtonFocusNode,
+                        style: globalState.isAndroidTV
+                            ? ButtonStyle(
+                                backgroundColor:
+                                    WidgetStateProperty.resolveWith((states) {
+                                      if (states.contains(
+                                        WidgetState.focused,
+                                      )) {
+                                        return context.colorScheme.primary
+                                            .withValues(alpha: 0.2);
+                                      }
+                                      return null;
+                                    }),
+                                side: WidgetStateBorderSide.resolveWith((
+                                  states,
+                                ) {
+                                  if (states.contains(WidgetState.focused)) {
+                                    return BorderSide(
+                                      color: context.colorScheme.primary,
+                                      width: 2,
+                                    );
+                                  }
+                                  return null;
+                                }),
+                              )
                             : null,
+                        onPressed: canSave ? () => _handleSave(context) : null,
                         tooltip: appLocalizations.save,
                         icon: const Icon(Icons.save_sharp),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 if (widget.supportRemoteDownload && !readOnly)
                   IconButton(

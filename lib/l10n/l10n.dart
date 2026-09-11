@@ -74,10 +74,10 @@ class AppLocalizations {
     return Intl.message('Home', name: 'dashboard', desc: '', args: []);
   }
 
-  /// `Custom Home Title`
+  /// `Custom Dashboard Title`
   String get customDashboardTitle {
     return Intl.message(
-      'Custom Home Title',
+      'Custom Dashboard Title',
       name: 'customDashboardTitle',
       desc: '',
       args: [],
@@ -464,6 +464,36 @@ class AppLocalizations {
     return Intl.message(
       'Disable QUIC to resolve specific network issues',
       name: 'disableQuicDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High Priority`
+  String get notificationHighPriority {
+    return Intl.message(
+      'High Priority',
+      name: 'notificationHighPriority',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Adjust current notification bar to foreground high priority`
+  String get notificationHighPriorityDesc {
+    return Intl.message(
+      'Adjust current notification bar to foreground high priority',
+      name: 'notificationHighPriorityDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `High-priority notifications can alleviate background core keep-alive issues on some customized systems. If your VPN service is currently running normally, it is recommended to keep this option disabled. Are you sure you want to enable it?`
+  String get notificationHighPriorityTip {
+    return Intl.message(
+      'High-priority notifications can alleviate background core keep-alive issues on some customized systems. If your VPN service is currently running normally, it is recommended to keep this option disabled. Are you sure you want to enable it?',
+      name: 'notificationHighPriorityTip',
       desc: '',
       args: [],
     );
@@ -1624,10 +1654,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Forked from FlClash: Better Experience, Out of the box`
+  /// `Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Our vision: Connecting AI, Accelerating Innovation`
   String get desc {
     return Intl.message(
-      'Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Forked from FlClash: Better Experience, Out of the box',
+      'Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Our vision: Connecting AI, Accelerating Innovation',
       name: 'desc',
       desc: '',
       args: [],
@@ -2659,8 +2689,12 @@ class AppLocalizations {
     );
   }
 
-  /// `Start Running`
-    /// `No usage data`
+  /// `Start`
+  String get start {
+    return Intl.message('Start', name: 'start', desc: '', args: []);
+  }
+
+  /// `No usage data`
   String get noUsageData {
     return Intl.message(
       'No usage data',
@@ -2672,22 +2706,12 @@ class AppLocalizations {
 
   /// `Local File`
   String get localFile {
-    return Intl.message(
-      'Local File',
-      name: 'localFile',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Local File', name: 'localFile', desc: '', args: []);
   }
 
   /// `Expired`
   String get expired {
-    return Intl.message(
-      'Expired',
-      name: 'expired',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Expired', name: 'expired', desc: '', args: []);
   }
 
   /// `Last edited`
@@ -2700,18 +2724,14 @@ class AppLocalizations {
     );
   }
 
-String get startRunning {
+  /// `Start`
+  String get startRunning {
     return Intl.message(
       'Start',
       name: 'startRunning',
       desc: '',
       args: [],
     );
-  }
-
-  /// `Start`
-  String get start {
-    return Intl.message('Start', name: 'start', desc: '', args: []);
   }
 
   /// `Stop`
@@ -4619,6 +4639,26 @@ String get startRunning {
     );
   }
 
+  /// `Tab Animation`
+  String get tabAnimation {
+    return Intl.message(
+      'Tab Animation',
+      name: 'tabAnimation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only valid in mobile view`
+  String get tabAnimationDesc {
+    return Intl.message(
+      'Only valid in mobile view',
+      name: 'tabAnimationDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Are you sure you want to save?`
   String get saveTip {
     return Intl.message(
@@ -4829,6 +4869,21 @@ String get startRunning {
     return Intl.message(
       'Use built-in font to fix display issues',
       name: 'harmonyFontDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Emoji Style`
+  String get emojiStyle {
+    return Intl.message('Emoji Style', name: 'emojiStyle', desc: '', args: []);
+  }
+
+  /// `Select the Emoji style displayed in the app`
+  String get emojiStyleDesc {
+    return Intl.message(
+      'Select the Emoji style displayed in the app',
+      name: 'emojiStyleDesc',
       desc: '',
       args: [],
     );
@@ -5657,6 +5712,31 @@ String get startRunning {
   /// `Update Time`
   String get updateTime {
     return Intl.message('Update Time', name: 'updateTime', desc: '', args: []);
+  }
+
+  /// `Select / Change Font`
+  String get selectCustomFont {
+    return Intl.message('Select / Change Font', name: 'selectCustomFont', desc: '', args: []);
+  }
+
+  /// `Tap to select a local .ttf or .otf font file`
+  String get selectCustomFontDesc {
+    return Intl.message('Tap to select a local .ttf or .otf font file', name: 'selectCustomFontDesc', desc: '', args: []);
+  }
+
+  /// `Custom font applied`
+  String get customFontApplied {
+    return Intl.message('Custom font applied', name: 'customFontApplied', desc: '', args: []);
+  }
+
+  /// `Restored to system default font`
+  String get customFontDisabled {
+    return Intl.message('Restored to system default font', name: 'customFontDisabled', desc: '', args: []);
+  }
+
+  /// `Only .ttf and .otf font formats are supported`
+  String get invalidFontFormat {
+    return Intl.message('Only .ttf and .otf font formats are supported', name: 'invalidFontFormat', desc: '', args: []);
   }
 }
 

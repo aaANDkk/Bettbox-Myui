@@ -199,11 +199,17 @@ class ApplicationState extends ConsumerState<Application>
               appSettingProvider.select((state) => state.locale),
             );
             final themeProps = ref.watch(themeSettingProvider);
-            final fontFamily = themeProps.useHarmonyFont
-                ? 'HarmonyOS_Sans'
-                : null;
 
-            return MaterialApp(
+            return ValueListenableBuilder<String?>(
+              valueListenable: FontManager.fontFamilyNotifier,
+              builder: (_, customFontFamily, _) {
+                final fontFamily = (themeProps.useHarmonyFont &&
+                        customFontFamily != null &&
+                        customFontFamily.isNotEmpty)
+                    ? customFontFamily
+                    : null;
+
+                return MaterialApp(
               debugShowCheckedModeBanner: false,
               navigatorKey: globalState.navigatorKey,
               localizationsDelegates: const [
@@ -271,6 +277,24 @@ class ApplicationState extends ConsumerState<Application>
                     borderRadius: BorderRadius.all(Radius.circular(20)),
                   ),
                 ),
+                dropdownMenuTheme: const DropdownMenuThemeData(
+                  menuStyle: MenuStyle(
+                    shape: WidgetStatePropertyAll<OutlinedBorder>(
+                      RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                    ),
+                  ),
+                ),
+                menuTheme: const MenuThemeData(
+                  style: MenuStyle(
+                    shape: WidgetStatePropertyAll<OutlinedBorder>(
+                      RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                    ),
+                  ),
+                ),
                 dividerTheme: DividerThemeData(
                   color: _getAppColorScheme(
                     brightness: Brightness.light,
@@ -314,14 +338,15 @@ class ApplicationState extends ConsumerState<Application>
                     ).outlineVariant.withValues(alpha: 0.6),
                   ),
                 ),
-                tooltipTheme: const TooltipThemeData(
-                  decoration: BoxDecoration(
+                tooltipTheme: TooltipThemeData(
+                  decoration: const BoxDecoration(
                     color: Colors.black87,
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   textStyle: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
+                    fontFamily: fontFamily,
                   ),
                 ),
               ),
@@ -356,6 +381,24 @@ class ApplicationState extends ConsumerState<Application>
                 popupMenuTheme: const PopupMenuThemeData(
                   shape: RoundedSuperellipseBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
+                dropdownMenuTheme: const DropdownMenuThemeData(
+                  menuStyle: MenuStyle(
+                    shape: WidgetStatePropertyAll<OutlinedBorder>(
+                      RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                    ),
+                  ),
+                ),
+                menuTheme: const MenuThemeData(
+                  style: MenuStyle(
+                    shape: WidgetStatePropertyAll<OutlinedBorder>(
+                      RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                    ),
                   ),
                 ),
                 dividerTheme: DividerThemeData(
@@ -413,22 +456,25 @@ class ApplicationState extends ConsumerState<Application>
                             .withValues(alpha: 0.45),
                   ),
                 ),
-                tooltipTheme: const TooltipThemeData(
-                  decoration: BoxDecoration(
+                tooltipTheme: TooltipThemeData(
+                  decoration: const BoxDecoration(
                     color: Color(0xFF2C2C2C),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   textStyle: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
+                    fontFamily: fontFamily,
                   ),
                 ),
               ),
               home: child!,
             );
           },
-          child: const HomePage(),
-        ),
+        );
+      },
+      child: const HomePage(),
+    ),
       ),
     );
   }

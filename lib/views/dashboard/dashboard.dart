@@ -114,7 +114,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       Material(
         type: MaterialType.transparency,
         shape: const CircleBorder(),
-        clipBehavior: Clip.hardEdge,
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: _handleUpdateIsEdit,
           onLongPress: () {
@@ -226,6 +226,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .toList();
     });
     return CommonScaffold(
+      resizeToAvoidBottomInset: false,
       title:
           ref.watch(customDashboardTitleProvider) ?? appLocalizations.dashboard,
       actions: _buildActions(),
@@ -529,12 +530,13 @@ class _DashboardStartSwitchState extends ConsumerState<_DashboardStartSwitch> {
   Widget build(BuildContext context) {
     final state = ref.watch(startButtonSelectorStateProvider);
     final isRestarting = ref.watch(isRestartingCoreProvider);
+    final isSmartStopped = ref.watch(isSmartStoppedProvider);
     final runTime = ref.watch(runTimeProvider);
     final isStart = runTime != null;
-    final displayStart = _optimisticStart ?? isStart;
+    final displayStart = isSmartStopped ? false : (_optimisticStart ?? isStart);
 
     final canPress =
-        state.isInit && state.hasProfile && !_isDisabled && !isRestarting;
+        state.isInit && state.hasProfile && !_isDisabled && !isRestarting && !isSmartStopped;
 
     final theme = Theme.of(context);
 

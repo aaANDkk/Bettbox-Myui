@@ -40,7 +40,14 @@ class _VpnContainerState extends ConsumerState<VpnManager> {
         networkSpeedNotification: nextProps.networkSpeedNotification,
       ) == nextProps;
       
-      if (onlySmartAutoStopChanged || onlyQuickResponseChanged || onlyNetworkSpeedChanged) {
+      final onlyHighPriorityNotificationChanged = prevProps.copyWith(
+        highPriorityNotification: nextProps.highPriorityNotification,
+      ) == nextProps;
+      
+      if (onlySmartAutoStopChanged ||
+          onlyQuickResponseChanged ||
+          onlyNetworkSpeedChanged ||
+          onlyHighPriorityNotificationChanged) {
         return; // No tip needed
       }
       

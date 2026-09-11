@@ -72,6 +72,44 @@ class InfoHeader extends StatelessWidget {
   }
 }
 
+class SmoothRoundedRectangleBorder extends RoundedRectangleBorder {
+  const SmoothRoundedRectangleBorder({
+    super.side,
+    super.borderRadius = BorderRadius.zero,
+  });
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
+    switch (side.style) {
+      case BorderStyle.none:
+        break;
+      case BorderStyle.solid:
+        final borderRect = borderRadius.resolve(textDirection).toRRect(rect);
+        if (side.width <= 0.0) {
+          canvas.drawRRect(borderRect, side.toPaint());
+        } else {
+          final strokeRect = borderRect.deflate(side.width / 2.0);
+          final paint = side.toPaint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = side.width
+            ..isAntiAlias = true;
+          canvas.drawRRect(strokeRect, paint);
+        }
+    }
+  }
+
+  @override
+  SmoothRoundedRectangleBorder copyWith({
+    BorderSide? side,
+    BorderRadiusGeometry? borderRadius,
+  }) {
+    return SmoothRoundedRectangleBorder(
+      side: side ?? this.side,
+      borderRadius: borderRadius ?? this.borderRadius,
+    );
+  }
+}
+
 class CommonCard extends StatelessWidget {
   const CommonCard({
     super.key,
@@ -227,6 +265,7 @@ class SettingsBlock extends StatelessWidget {
           InfoHeader(info: Info(label: title)),
           Card(
             color: context.colorScheme.surfaceContainer,
+            clipBehavior: Clip.antiAlias,
             child: Column(children: settings),
           ),
         ],

@@ -592,12 +592,30 @@ class BuildCommand extends Command {
 
   @override
   Future<void> run() async {
-    final mode = target == Target.android ? Mode.lib : Mode.core;
-    final String out = argResults?['out'] ?? (target.same ? 'app' : 'core');
-    final env = argResults?['env'] ?? 'pre';
-    Build.isDev = argResults?['dev'] ?? false;
+    await execute(
+      archName: argResults?['arch'],
+      out: argResults?['out'],
+      env: argResults?['env'] ?? 'pre',
+      dev: argResults?['dev'] ?? false,
+      ensure: argResults?['ensure'] ?? false,
+      compatible: argResults?['compatible'] ?? false,
+      coreHash: argResults?['core-hash'] as String?,
+    );
+  }
 
-    String? archName = argResults?['arch'];
+  Future<void> execute({
+    String? archName,
+    String? out,
+    String env = 'pre',
+    bool dev = false,
+    bool ensure = false,
+    bool compatible = false,
+    String? coreHash,
+  }) async {
+    final mode = target == Target.android ? Mode.lib : Mode.core;
+    final String actualOut = out ?? (target.same ? 'app' : 'core');
+    Build.isDev = dev;
+
     if (archName == 'auto') {
       if (target == Target.android) {
         throw '--arch auto is not supported for android; choose the device ABI explicitly';
@@ -620,10 +638,7 @@ class BuildCommand extends Command {
       throw 'Invalid arch parameter';
     }
 
-    final bool compatible = argResults?['compatible'] ?? false;
-    final bool ensure = argResults?['ensure'] ?? false;
-
-    if (ensure && out != 'app') {
+    if (ensure && actualOut != 'app') {
       if (_outputsAreFresh(arch)) {
         print('${target.name} output already exists');
         return;
@@ -637,15 +652,14 @@ class BuildCommand extends Command {
       compatible: compatible,
     );
 
-    if (out == 'core-only') {
+    if (actualOut == 'core-only') {
       return;
     }
 
-    if (out == 'helper') {
+    if (actualOut == 'helper') {
       if (target != Target.windows) {
         throw '--out helper is only supported for windows';
       }
-      final coreHash = argResults?['core-hash'] as String?;
       if (coreHash == null || coreHash.isEmpty) {
         throw '--core-hash is required when --out=helper';
       }
@@ -653,7 +667,7 @@ class BuildCommand extends Command {
       return;
     }
 
-    if (out != 'app') {
+    if (actualOut != 'app') {
       if (target == Target.windows) {
         final token = await Build.calcSha256(corePaths.first);
         await Build.buildHelper(target, token);
@@ -774,11 +788,156 @@ class BuildCommand extends Command {
   }
 }
 
+class AutoBuildCommand extends Command {
+  AutoBuildCommand() {
+    argParser.addOption(
+      'device-id',
+      help: 'Target Flutter device ID (e.g. from \${command:flutter.getSelectedDeviceId})',
+    );
+    argParser.addOption(
+      'arch',
+      help: 'Target architecture (default: auto detect based on device)',
+    );
+    argParser.addOption(
+      'out',
+      valueHelp: ['app', 'core', 'core-only', 'helper'].join(','),
+      defaultsTo: 'core',
+      help: 'Build output type',
+    );
+    argParser.addOption(
+      'core-hash',
+      help: 'SHA256 hash of the core binary when --out=helper',
+    );
+    argParser.addOption(
+      'env',
+      valueHelp: ['pre', 'stable'].join(','),
+      help: 'Build env',
+    );
+    argParser.addFlag(
+      'compatible',
+      help: 'Build with GOAMD64=v2 for broader compatibility on amd64',
+    );
+    argParser.addFlag('dev', help: 'Build debug/dev variant');
+    argParser.addFlag(
+      'ensure',
+      help: 'Skip build if output artifact already exists',
+    );
+  }
+
+  @override
+  String get description => 'Automatically detect target device and build core';
+
+  @override
+  String get name => 'auto';
+
+  @override
+  Future<void> run() async {
+    final optDeviceId = argResults?['device-id']?.toString().trim() ?? '';
+    final rawDeviceId = optDeviceId.startsWith('-') ? '' : optDeviceId;
+    final String? explicitArch = argResults?['arch'];
+
+    Target? target;
+    String? archName = explicitArch;
+
+    if (rawDeviceId == 'windows') {
+      target = Target.windows;
+      archName ??= 'auto';
+    } else if (rawDeviceId == 'macos') {
+      target = Target.macos;
+      archName ??= 'auto';
+    } else if (rawDeviceId == 'linux') {
+      target = Target.linux;
+      archName ??= 'auto';
+    } else if (rawDeviceId == 'chrome' ||
+        rawDeviceId == 'edge' ||
+        rawDeviceId == 'web-server') {
+      print('Web device "$rawDeviceId" does not require core binary. Skipping.');
+      return;
+    } else if (rawDeviceId.isEmpty) {
+      if (Platform.isWindows) {
+        target = Target.windows;
+      } else if (Platform.isMacOS) {
+        target = Target.macos;
+      } else if (Platform.isLinux) {
+        target = Target.linux;
+      } else {
+        throw 'No device specified and unable to determine host platform.';
+      }
+      archName ??= 'auto';
+    } else {
+      final res = await Process.run(
+        'flutter',
+        ['devices', '--machine'],
+        runInShell: true,
+      );
+      if (res.exitCode != 0) {
+        throw 'Failed to execute "flutter devices --machine": ${res.stderr}';
+      }
+      final jsonList = jsonDecode(res.stdout.toString()) as List<dynamic>;
+      final device = jsonList.cast<Map<String, dynamic>?>().firstWhere(
+            (d) => d?['id'] == rawDeviceId,
+            orElse: () => null,
+          );
+
+      if (device == null) {
+        throw 'Device "$rawDeviceId" not found in flutter devices list.';
+      }
+
+      final targetPlatform =
+          (device['targetPlatform'] as String? ?? '').toLowerCase();
+      if (targetPlatform.startsWith('android')) {
+        target = Target.android;
+        if (archName == null) {
+          if (targetPlatform.contains('arm64')) {
+            archName = 'arm64';
+          } else if (targetPlatform.contains('x64') ||
+              targetPlatform.contains('x86_64')) {
+            archName = 'amd64';
+          } else if (targetPlatform.contains('arm')) {
+            archName = 'arm';
+          } else {
+            throw 'Unsupported android platform architecture: $targetPlatform';
+          }
+        }
+      } else if (targetPlatform.startsWith('darwin') ||
+          targetPlatform.startsWith('macos')) {
+        target = Target.macos;
+        archName ??= 'auto';
+      } else if (targetPlatform.startsWith('windows')) {
+        target = Target.windows;
+        archName ??= 'auto';
+      } else if (targetPlatform.startsWith('linux')) {
+        target = Target.linux;
+        archName ??= 'auto';
+      } else if (targetPlatform.startsWith('web')) {
+        print(
+          'Web target platform "$targetPlatform" does not require core binary. Skipping.',
+        );
+        return;
+      } else {
+        throw 'Unknown or unsupported targetPlatform: $targetPlatform';
+      }
+    }
+
+    final cmd = BuildCommand(target: target);
+    await cmd.execute(
+      archName: archName,
+      out: argResults?['out'] ?? 'core',
+      env: argResults?['env'] ?? 'pre',
+      dev: argResults?['dev'] ?? false,
+      ensure: argResults?['ensure'] ?? false,
+      compatible: argResults?['compatible'] ?? false,
+      coreHash: argResults?['core-hash'] as String?,
+    );
+  }
+}
+
 Future<void> main(Iterable<String> args) async {
   final runner = CommandRunner('setup', 'build Application');
+  runner.addCommand(AutoBuildCommand());
   runner.addCommand(BuildCommand(target: Target.android));
   runner.addCommand(BuildCommand(target: Target.linux));
   runner.addCommand(BuildCommand(target: Target.windows));
   runner.addCommand(BuildCommand(target: Target.macos));
-  runner.run(args);
+  await runner.run(args);
 }

@@ -96,9 +96,9 @@ const presetNtpServers = [
 
 class CommonFilters {
   static final ImageFilter blur = ImageFilter.blur(
-    sigmaX: 2,
-    sigmaY: 2,
-    tileMode: TileMode.mirror,
+    sigmaX: 5,
+    sigmaY: 5,
+    tileMode: TileMode.clamp,
   );
 }
 

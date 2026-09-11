@@ -65,6 +65,8 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
 
 class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   final ScrollController _scrollController = ScrollController();
+  GroupOffsets _groupOffsets = GroupOffsets.empty;
+  double _containerHeight = 0;
   String? _enterGroupName;
   Timer? _enterTimer;
 
@@ -96,24 +98,104 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
   void _handleToggle(String groupName) {
     final tempUnfoldSet = Set<String>.from(widget.currentUnfoldSet);
-    if (tempUnfoldSet.contains(groupName)) {
+    final isExpanding = !tempUnfoldSet.contains(groupName);
+    if (isExpanding) {
+      tempUnfoldSet.add(groupName);
+      _startEnterAnimated(groupName);
+      _autoScrollToGroup(groupName);
+    } else {
       tempUnfoldSet.remove(groupName);
       _enterTimer?.cancel();
       _enterGroupName = null;
-    } else {
-      tempUnfoldSet.add(groupName);
-      _startEnterAnimated(groupName);
     }
     globalState.appController.updateCurrentUnfoldSet(tempUnfoldSet);
   }
 
-  double _getHeaderHeight() {
-    final measure = globalState.measure;
-    final contentRowHeight = [
-      40.0,
-      measure.titleMediumHeight + 4 + measure.labelMediumHeight,
-    ].reduce((a, b) => a > b ? a : b);
-    return 28.0 + contentRowHeight;
+  GroupOffsets _getGroupOffsets({
+    required List<Group> groups,
+    required int columns,
+    required Set<String> currentUnfoldSet,
+    required ProxyCardType cardType,
+  }) {
+    final offsets = <double>[];
+    final rowExtent = getItemHeight(cardType) + 8.0;
+    const headerExtent = 72.0;
+    var currentOffset = 16.0;
+    for (final group in groups) {
+      offsets.add(currentOffset);
+      currentOffset += headerExtent;
+      if (currentUnfoldSet.contains(group.name)) {
+        final rowCount = (group.all.length + columns - 1) ~/ columns;
+        currentOffset += rowCount * rowExtent;
+      }
+    }
+    return GroupOffsets(groups, offsets);
+  }
+
+  void _animateToOffset(double targetOffset) {
+    if (!mounted || !_scrollController.hasClients) return;
+    final currentOffset = _scrollController.offset;
+    final clampedTarget = targetOffset.clamp(
+      _scrollController.position.minScrollExtent,
+      _scrollController.position.maxScrollExtent,
+    );
+    final distance = (clampedTarget - currentOffset).abs();
+    if (distance < 1.0) return;
+
+    final durationMs = (240 + (distance * 0.1)).clamp(280, 400).toInt();
+    _scrollController.animateTo(
+      clampedTarget,
+      duration: Duration(milliseconds: durationMs),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _scrollToMakeVisibleWithPadding({
+    required double containerHeight,
+    required double pixels,
+    required double start,
+    required double end,
+    double padding = 16.0,
+  }) {
+    final visibleStart = pixels;
+    final visibleEnd = pixels + containerHeight;
+
+    final isElementVisible = start >= visibleStart && end <= visibleEnd;
+    if (isElementVisible) {
+      return;
+    }
+
+    double targetScrollOffset;
+
+    if (end <= visibleStart) {
+      targetScrollOffset = start - padding;
+    } else if (start >= visibleEnd) {
+      targetScrollOffset = end - containerHeight + padding;
+    } else {
+      final visibleTopPart = end - visibleStart;
+      final visibleBottomPart = visibleEnd - start;
+      if (visibleTopPart.abs() >= visibleBottomPart.abs()) {
+        targetScrollOffset = end - containerHeight + padding;
+      } else {
+        targetScrollOffset = start - padding;
+      }
+    }
+
+    _animateToOffset(targetScrollOffset);
+  }
+
+  void _autoScrollToGroup(String groupName) {
+    if (!_scrollController.hasClients || _containerHeight <= 0) return;
+    final pixels = _scrollController.position.pixels;
+    final offset = _groupOffsets.offsetOf(groupName);
+    const headerExtent = 72.0;
+    _scrollToMakeVisibleWithPadding(
+      containerHeight: _containerHeight,
+      pixels: pixels,
+      start: offset,
+      end: offset + headerExtent,
+      padding: 16.0,
+    );
   }
 
   void _scrollToSelected(String groupName) {
@@ -123,40 +205,46 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
         .getSafeValue('');
     if (selectedName.isEmpty) return;
 
-    const headerHeight = 72.0;
-    final rowHeight = getItemHeight(widget.cardType) + 8.0;
-
-    var targetOffset = 0.0;
-    for (final group in widget.groups) {
-      if (group.name == groupName) {
-        final sortedProxies = globalState.appController.getSortProxies(
-          proxies: group.all,
-          sortType: widget.sortType,
-          testUrl: group.testUrl,
-        );
-        final proxyIndex =
-            sortedProxies.indexWhere((p) => p.name == selectedName);
-        if (proxyIndex >= 0) {
-          final rowIndex = proxyIndex ~/ widget.columns;
-          if (rowIndex > 1) {
-            targetOffset += (rowIndex - 1) * rowHeight;
-          }
-        }
-        break;
-      }
-      targetOffset += headerHeight;
-      if (widget.currentUnfoldSet.contains(group.name)) {
-        final rowCount =
-            (group.all.length + widget.columns - 1) ~/ widget.columns;
-        targetOffset += rowCount * rowHeight;
-      }
+    if (_enterGroupName != null) {
+      _enterTimer?.cancel();
+      _enterGroupName = null;
     }
 
-    _scrollController.animateTo(
-      targetOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeIn,
+    final group = widget.groups.getGroup(groupName);
+    if (group == null) return;
+
+    final sortedProxies = globalState.appController.getSortProxies(
+      proxies: group.all,
+      sortType: widget.sortType,
+      testUrl: group.testUrl,
     );
+    final proxyIndex = sortedProxies.indexWhere((p) => p.name == selectedName);
+    if (proxyIndex < 0) return;
+
+    final groupOffset = _groupOffsets.offsetOf(groupName);
+    const headerExtent = 72.0;
+    final rowExtent = getItemHeight(widget.cardType) + 8.0;
+    final rowIndex = proxyIndex ~/ widget.columns;
+
+    final nodeTop = groupOffset + headerExtent + rowIndex * rowExtent;
+    final nodeBottom = nodeTop + rowExtent;
+
+    final containerHeight = _containerHeight > 0
+        ? _containerHeight
+        : MediaQuery.sizeOf(context).height;
+
+    final totalSpan = (nodeBottom + 8.0) - (groupOffset - 16.0);
+    double targetOffset;
+    if (totalSpan <= containerHeight) {
+      targetOffset = groupOffset - 16.0;
+    } else {
+      targetOffset = (nodeTop - rowExtent - 16.0).clamp(
+        groupOffset - 16.0,
+        double.infinity,
+      );
+    }
+
+    _animateToOffset(targetOffset);
   }
 
   Widget _buildGroup(
@@ -225,35 +313,48 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     final isMobileView = ref.watch(isMobileViewProvider);
     final maxVisibleRows = _calculateMaxVisibleRows();
 
-    return CommonScrollBar(
-      controller: _scrollController,
-      child: CustomScrollView(
-        key: const PageStorageKey<String>('proxies_list'),
-        controller: _scrollController,
-        slivers: [
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 16),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _containerHeight = max(constraints.maxHeight, 0);
+        _groupOffsets = _getGroupOffsets(
+          groups: widget.groups,
+          columns: widget.columns,
+          currentUnfoldSet: widget.currentUnfoldSet,
+          cardType: widget.cardType,
+        );
+
+        return CommonScrollBar(
+          controller: _scrollController,
+          child: CustomScrollView(
+            key: const PageStorageKey<String>('proxies_list'),
+            controller: _scrollController,
+            cacheExtent: 1000.0,
+            slivers: [
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 16),
+              ),
+              for (final group in widget.groups)
+                _buildGroup(
+                  context,
+                  group: group,
+                  isExpand: widget.currentUnfoldSet.contains(group.name),
+                  enterAnimated: _enterGroupName == group.name,
+                  columns: widget.columns,
+                  cardType: widget.cardType,
+                  maxVisibleRows: maxVisibleRows,
+                ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: (globalState.isAndroidTV ? 48.0 : 16.0) +
+                      (isMobileView
+                          ? getFloatingBottomBarReserveHeight(context)
+                          : 0),
+                ),
+              ),
+            ],
           ),
-          for (final group in widget.groups)
-            _buildGroup(
-              context,
-              group: group,
-              isExpand: widget.currentUnfoldSet.contains(group.name),
-              enterAnimated: _enterGroupName == group.name,
-              columns: widget.columns,
-              cardType: widget.cardType,
-              maxVisibleRows: maxVisibleRows,
-            ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: (globalState.isAndroidTV ? 48.0 : 16.0) +
-                  (isMobileView
-                      ? getFloatingBottomBarReserveHeight(context)
-                      : 0),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

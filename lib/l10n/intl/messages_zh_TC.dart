@@ -245,7 +245,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m2,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("刪除轉發"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox 基於強大靈活的 Mihomo (Clash.Meta) 代理核心，致力於更好的體驗，Forked from FlClash, Better Experience, Out of the Box",
+      "Bettbox 基於強大靈活的 Mihomo (Clash.Meta) 代理核心，致力於更好的體驗，我們的願景: Connecting AI, Accelerating Innovation - 連接AI，為創新加速",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("目標地址"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage("目標地理定位"),
@@ -318,6 +318,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "experimental": MessageLookupByLibrary.simpleMessage("Experimental"),
     "experimentalDesc": MessageLookupByLibrary.simpleMessage("實驗性配置請謹慎使用"),
     "expirationTime": MessageLookupByLibrary.simpleMessage("到期時間"),
+    "expired": MessageLookupByLibrary.simpleMessage("已到期"),
     "export": MessageLookupByLibrary.simpleMessage("匯出"),
     "exportFile": MessageLookupByLibrary.simpleMessage("匯出檔案"),
     "exportLogs": MessageLookupByLibrary.simpleMessage("匯出日誌"),
@@ -389,8 +390,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("全域"),
     "go": MessageLookupByLibrary.simpleMessage("前往"),
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下載"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("字體修復"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("使用內建字體解決顯示異常問題"),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("自訂字體"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("預設系統字體，開啟後可載入自訂字體檔案"),
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji 風格"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("選擇應用程式內顯示的 Emoji 風格"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否快取修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超時時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -444,6 +447,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "keepAliveIntervalDesc": MessageLookupByLibrary.simpleMessage("TCP 保持活動間隔"),
     "key": MessageLookupByLibrary.simpleMessage("鍵"),
     "language": MessageLookupByLibrary.simpleMessage("語言"),
+    "lastEdit": MessageLookupByLibrary.simpleMessage("上次編輯"),
     "layout": MessageLookupByLibrary.simpleMessage("版面配置"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("左鍵點擊"),
     "light": MessageLookupByLibrary.simpleMessage("淺色"),
@@ -452,6 +456,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "listen": MessageLookupByLibrary.simpleMessage("監聽"),
     "local": MessageLookupByLibrary.simpleMessage("本機"),
     "localBackupDesc": MessageLookupByLibrary.simpleMessage("備份資料到本機"),
+    "localFile": MessageLookupByLibrary.simpleMessage("本地檔案"),
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage("透過檔案還原資料"),
     "locate": MessageLookupByLibrary.simpleMessage("定位"),
     "log": MessageLookupByLibrary.simpleMessage("日誌"),
@@ -495,6 +500,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
       "底部導覽列切換震動回饋",
     ),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage("選項卡動畫"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("僅在行動視圖有效"),
     "navConnections": MessageLookupByLibrary.simpleMessage("連線"),
     "navTools": MessageLookupByLibrary.simpleMessage("更多"),
     "network": MessageLookupByLibrary.simpleMessage("網路"),
@@ -528,6 +535,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noProxyDesc": MessageLookupByLibrary.simpleMessage("請建立配置或新增有效的設定檔"),
     "noResolve": MessageLookupByLibrary.simpleMessage("不解析 IP"),
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage("未獲取到狀態"),
+    "noUsageData": MessageLookupByLibrary.simpleMessage("無用量統計"),
     "nodeExclusion": MessageLookupByLibrary.simpleMessage("節點排除"),
     "nodeExclusionDesc": MessageLookupByLibrary.simpleMessage("排除所有匹配到的節點"),
     "nodeExclusionPlaceholder": MessageLookupByLibrary.simpleMessage(
@@ -536,6 +544,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "none": MessageLookupByLibrary.simpleMessage("無"),
     "notRecommended": MessageLookupByLibrary.simpleMessage("不推薦"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage("目前的代理群組無法選取"),
+    "notificationHighPriority": MessageLookupByLibrary.simpleMessage("高優先級"),
+    "notificationHighPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "調整目前通知欄為前台高優先級",
+    ),
+    "notificationHighPriorityTip": MessageLookupByLibrary.simpleMessage(
+      "高優先級通知在有些自訂系統上可以緩解後台核心保活的問題，如果你的 VPN 服務目前運行正常，這個選項建議繼續保持關閉，確定要開啟嗎",
+    ),
     "ntp": MessageLookupByLibrary.simpleMessage("NTP"),
     "ntpDesc": MessageLookupByLibrary.simpleMessage("使用 NTP 時間服務"),
     "ntpInterval": MessageLookupByLibrary.simpleMessage("更新時間"),
@@ -916,5 +931,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("寫入系統"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("需要管理員權限"),
     "years": m14,
+      "selectCustomFont": MessageLookupByLibrary.simpleMessage("選擇 / 更換字體"),
+      "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("點擊選擇本機 .ttf 或 .otf 字體檔案"),
+      "customFontApplied": MessageLookupByLibrary.simpleMessage("已套用自訂字體"),
+      "customFontDisabled": MessageLookupByLibrary.simpleMessage("已恢復系統預設字體"),
+      "invalidFontFormat": MessageLookupByLibrary.simpleMessage("僅支援 .ttf 或 .otf 格式的字體檔案"),
   };
 }

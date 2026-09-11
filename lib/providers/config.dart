@@ -333,6 +333,17 @@ class ScriptState extends _$ScriptState with AutoDisposeNotifierMixin {
     return state.scripts.indexWhere((item) => item.label == label) != -1;
   }
 
+  String getAvailableLabel(String baseLabel) {
+    if (!isExits(baseLabel)) {
+      return baseLabel;
+    }
+    var i = 1;
+    while (isExits('$baseLabel$i')) {
+      i++;
+    }
+    return '$baseLabel$i';
+  }
+
   Future<void> syncScript(String id) async {
     final script = state.scripts.firstWhere((item) => item.id == id);
     final url = script.url;

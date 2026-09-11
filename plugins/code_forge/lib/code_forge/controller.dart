@@ -57,7 +57,7 @@ class CodeForgeController implements DeltaTextInputClient {
   String? _cachedText, _bufferLineText, _openedFile;
   String Function()? _pendingLspFullText;
   String? _lastTypedCharacter;
-  String _imeProjectionText = '', _previousValue = "";
+  String _imeProjectionText = '', _imeProjectionRawText = '', _previousValue = "";
   TextSelection? _lastSentSelection;
   TextSelection _prevSelection = const TextSelection.collapsed(offset: 0);
   TextSelection _imeProjectionSelection = const TextSelection.collapsed(
@@ -2967,7 +2967,8 @@ class CodeForgeController implements DeltaTextInputClient {
         platformBaseText,
         localUtf16Offset,
       );
-      return (projectionBaseStart + scalarLocal).clamp(0, length);
+      final rawScalarLocal = _normalizedToRawImeOffset(scalarLocal);
+      return (projectionBaseStart + rawScalarLocal).clamp(0, length);
     }
 
     TextSelection localSelToGlobal(TextSelection sel) => TextSelection(
@@ -2988,7 +2989,20 @@ class CodeForgeController implements DeltaTextInputClient {
         final isEcho =
             _lastSentSelection != null && delta.selection == _lastSentSelection;
         if (!isEcho) {
-          _selection = _localImeSelectionToGlobal(delta.selection);
+          if (isBufferActive) {
+            _flushBuffer();
+          }
+          final isImeSelectAll = _imeProjectionText.isNotEmpty &&
+              delta.selection.start == 0 &&
+              delta.selection.end >= _imeProjectionText.length &&
+              (length > _imeProjectionText.length ||
+                  _imeProjectionStartOffset > 0);
+          if (isImeSelectAll) {
+            _selection = TextSelection(baseOffset: 0, extentOffset: length);
+          } else {
+            _selection = _localImeSelectionToGlobal(delta.selection);
+          }
+          selectionOnly = true;
           _lastSentSelection = null;
         }
         _imeSelectionNeedsResync = false;
@@ -3093,12 +3107,19 @@ class CodeForgeController implements DeltaTextInputClient {
 
     _isTyping = typingDetected;
 
+    final oldProjectionStart = _imeProjectionStartOffset;
+    final oldProjectionText = _imeProjectionText;
+    final oldProjectionSelection = _imeProjectionSelection;
+
     _imeProjectionDirty = true;
 
     _maybeAcquireFocusForInput();
 
     _ensureImeProjection();
-    if (_platformValueDivergesFromProjection(textEditingDeltas)) {
+    if (_imeProjectionStartOffset != oldProjectionStart ||
+        _imeProjectionText != oldProjectionText ||
+        _imeProjectionSelection != oldProjectionSelection ||
+        _platformValueDivergesFromProjection(textEditingDeltas)) {
       _syncToConnection();
     }
 
@@ -3324,6 +3345,7 @@ class CodeForgeController implements DeltaTextInputClient {
     final documentLength = _rope.length;
     if (documentLength == 0) {
       _imeProjectionStartOffset = 0;
+      _imeProjectionRawText = '';
       _imeProjectionText = '';
       _imeProjectionSelection = const TextSelection.collapsed(offset: 0);
       _imeProjectionComposing = TextRange.empty;
@@ -3348,16 +3370,16 @@ class CodeForgeController implements DeltaTextInputClient {
       lineCount - 1,
     );
 
-    final parts = <String>[];
-    for (int line = lineStart; line <= lineEnd; line++) {
-      parts.add(getLineText(line));
-    }
-
-    var projectionText = parts.join('\n');
     var projectionStartOffset = getLineStartOffset(lineStart);
+    final int initialProjectionEnd = lineEnd + 1 < lineCount
+        ? getLineStartOffset(lineEnd + 1)
+        : documentLength;
+    var rawText =
+        _rope.substring(projectionStartOffset, initialProjectionEnd);
 
-    if (projectionText.length > _imeProjectionMaxChars) {
-      final halfWindow = _imeProjectionMaxChars ~/ 2;
+    final maxChars = selection.isCollapsed ? _imeProjectionMaxChars : 262144;
+    if (rawText.length > maxChars) {
+      final halfWindow = maxChars ~/ 2;
       final desiredStart = caretOffset - halfWindow;
       projectionStartOffset = desiredStart < 0 ? 0 : desiredStart;
       if (selectionStart < projectionStartOffset) {
@@ -3365,41 +3387,85 @@ class CodeForgeController implements DeltaTextInputClient {
       }
       final selectionTail = selectionEnd + halfWindow;
       final projectionEndOffset =
-          (projectionStartOffset + _imeProjectionMaxChars).clamp(
+          (projectionStartOffset + maxChars).clamp(
             0,
             documentLength,
           );
       if (selectionTail > projectionEndOffset) {
-        projectionStartOffset = (selectionTail - _imeProjectionMaxChars).clamp(
+        projectionStartOffset = (selectionTail - maxChars).clamp(
           0,
           documentLength,
         );
       }
-      final projectionEnd = (projectionStartOffset + _imeProjectionMaxChars)
+      final projectionEnd = (projectionStartOffset + maxChars)
           .clamp(0, documentLength);
-      projectionText = _rope.substring(projectionStartOffset, projectionEnd);
+      rawText = _rope.substring(projectionStartOffset, projectionEnd);
     }
 
-    final localBase = (selection.baseOffset - projectionStartOffset).clamp(
-      0,
-      projectionText.length,
-    );
-    final localExtent = (selection.extentOffset - projectionStartOffset).clamp(
-      0,
-      projectionText.length,
-    );
+    final normalizedText =
+        rawText.contains('\r') ? rawText.replaceAll('\r', '') : rawText;
 
     _imeProjectionStartOffset = projectionStartOffset;
-    _imeProjectionText = projectionText;
+    _imeProjectionRawText = rawText;
+    _imeProjectionText = normalizedText;
+
+    final rawLocalBase = (selection.baseOffset - projectionStartOffset).clamp(
+      0,
+      rawText.length,
+    );
+    final rawLocalExtent = (selection.extentOffset - projectionStartOffset).clamp(
+      0,
+      rawText.length,
+    );
+
+    final normLocalBase = _rawToNormalizedImeOffset(rawLocalBase);
+    final normLocalExtent = _rawToNormalizedImeOffset(rawLocalExtent);
+
     _imeProjectionSelection = TextSelection(
-      baseOffset: localBase,
-      extentOffset: localExtent,
+      baseOffset: normLocalBase,
+      extentOffset: normLocalExtent,
     );
     _imeProjectionComposing = _projectComposing(
       projectionStartOffset,
-      projectionText.length,
+      normalizedText.length,
     );
     _imeProjectionDirty = false;
+  }
+
+  int _rawToNormalizedImeOffset(int rawScalarOffset) {
+    if (rawScalarOffset <= 0) return 0;
+    if (_imeProjectionRawText.length == _imeProjectionText.length) {
+      return rawScalarOffset;
+    }
+    final runes = _imeProjectionRawText.runes;
+    int rawIdx = 0;
+    int crCount = 0;
+    for (final rune in runes) {
+      if (rawIdx >= rawScalarOffset) break;
+      if (rune == 0x0D) {
+        crCount++;
+      }
+      rawIdx++;
+    }
+    return (rawScalarOffset - crCount).clamp(0, _imeProjectionText.length);
+  }
+
+  int _normalizedToRawImeOffset(int normalizedScalarOffset) {
+    if (normalizedScalarOffset <= 0) return 0;
+    if (_imeProjectionRawText.length == _imeProjectionText.length) {
+      return normalizedScalarOffset;
+    }
+    final runes = _imeProjectionRawText.runes;
+    int rawIdx = 0;
+    int normIdx = 0;
+    for (final rune in runes) {
+      if (normIdx >= normalizedScalarOffset) break;
+      if (rune != 0x0D) {
+        normIdx++;
+      }
+      rawIdx++;
+    }
+    return rawIdx.clamp(0, _imeProjectionRawText.length);
   }
 
   int _localImeOffsetToGlobal(int localUtf16Offset) {
@@ -3408,7 +3474,8 @@ class CodeForgeController implements DeltaTextInputClient {
       _imeProjectionText,
       localUtf16Offset,
     );
-    return (_imeProjectionStartOffset + scalarLocal).clamp(0, length);
+    final rawScalarLocal = _normalizedToRawImeOffset(scalarLocal);
+    return (_imeProjectionStartOffset + rawScalarLocal).clamp(0, length);
   }
 
   TextSelection _localImeSelectionToGlobal(TextSelection localSelection) {
@@ -4362,10 +4429,14 @@ class CodeForgeController implements DeltaTextInputClient {
 
       final replaceStart =
           _imeProjectionStartOffset +
-          utf16ToScalarOffset(currentText, prefixLength);
+          _normalizedToRawImeOffset(
+            utf16ToScalarOffset(currentText, prefixLength),
+          );
       final replaceEnd =
           _imeProjectionStartOffset +
-          utf16ToScalarOffset(currentText, currentText.length - suffixLength);
+          _normalizedToRawImeOffset(
+            utf16ToScalarOffset(currentText, currentText.length - suffixLength),
+          );
       final replacement = nextText.substring(
         prefixLength,
         nextText.length - suffixLength,

@@ -2,6 +2,8 @@ export 'android_manager.dart';
 export 'app_manager.dart';
 export 'clash_manager.dart';
 export 'connectivity_manager.dart';
+export 'font_manager.dart';
+export 'emoji_manager.dart';
 export 'message_manager.dart';
 export 'proxy_manager.dart';
 export 'smart_auto_stop_manager.dart';

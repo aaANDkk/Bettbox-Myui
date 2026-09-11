@@ -458,6 +458,62 @@ class DisableQuicSection extends ConsumerWidget {
   }
 }
 
+class HighPriorityNotificationItem extends ConsumerWidget {
+  const HighPriorityNotificationItem({super.key});
+
+  Future<bool> _showConfirmDialog(BuildContext context) async {
+    final result = await globalState.showCommonDialog<bool>(
+      child: CommonDialog(
+        title: appLocalizations.notificationHighPriority,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(false);
+            },
+            child: Text(appLocalizations.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(true);
+            },
+            child: Text(appLocalizations.confirm),
+          ),
+        ],
+        child: Text(appLocalizations.notificationHighPriorityTip),
+      ),
+    );
+    return result == true;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final highPriority = ref.watch(
+      vpnSettingProvider.select((state) => state.highPriorityNotification),
+    );
+    return ListItem.switchItem(
+      title: Text(appLocalizations.notificationHighPriority),
+      subtitle: Text(appLocalizations.notificationHighPriorityDesc),
+      delegate: SwitchDelegate(
+        value: highPriority,
+        onChanged: (bool value) async {
+          if (value) {
+            final confirm = await _showConfirmDialog(context);
+            if (!confirm) return;
+          }
+          ref
+              .read(vpnSettingProvider.notifier)
+              .updateState(
+                (state) => state.copyWith(highPriorityNotification: value),
+              );
+          if (system.isAndroid) {
+            await service?.setHighPriorityNotification(value);
+          }
+        },
+      ),
+    );
+  }
+}
+
 class NetworkSpeedNotificationItem extends ConsumerWidget {
   const NetworkSpeedNotificationItem({super.key});
 
@@ -710,6 +766,7 @@ class OtherSettingView extends ConsumerWidget {
       if (system.isAndroid) const QuickResponseItem(),
       const StoreFixItem(),
       const DisableQuicSection(),
+      if (system.isAndroid) const HighPriorityNotificationItem(),
       if (system.isAndroid) const NetworkSpeedNotificationItem(),
       if (!system.isAndroid) const TraySection(),
       if (system.isWindows) const HighPriorityItem(),

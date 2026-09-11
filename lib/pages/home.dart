@@ -310,9 +310,9 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   int _currentPageIndex = 0;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    _currentPageIndex = _pageIndex;
+    _currentPageIndex = _pageIndex < 0 ? 0 : _pageIndex;
     _pageController = PageController(initialPage: _currentPageIndex);
     _pageLabelSubscription = ref.listenManual(currentPageLabelProvider, (
       prev,
@@ -356,16 +356,32 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
       FocusManager.instance.primaryFocus?.unfocus();
     }
 
-    if (ref.read(isMobileViewProvider)) {
-      if (_currentPageIndex != index) {
-        setState(() {
-          _currentPageIndex = index;
-        });
+    final isAnimateToPage = ref.read(appSettingProvider).isAnimateToPage;
+    final isMobile = ref.read(isMobileViewProvider);
+
+    _currentPageIndex = index;
+
+    if (isMobile && !isAnimateToPage) {
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(index);
       }
+      setState(() {});
       return;
     }
 
-    _pageController.jumpToPage(index);
+    if (isAnimateToPage && isMobile && !ignoreAnimateTo) {
+      if (_pageController.hasClients) {
+        await _pageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    } else {
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(index);
+      }
+    }
   }
 
   void _updatePageController() {
@@ -382,8 +398,17 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
   @override
   Widget build(BuildContext context) {
-    if (ref.watch(isMobileViewProvider)) {
-      final index = _pageIndex < 0 ? 0 : _pageIndex;
+    final isMobile = ref.watch(isMobileViewProvider);
+    final isAnimateToPage = ref.watch(
+      appSettingProvider.select((state) => state.isAnimateToPage),
+    );
+
+    if (isMobile && !isAnimateToPage) {
+      final targetIndex = (_currentPageIndex >= 0 &&
+              _currentPageIndex < widget.navigationItems.length)
+          ? _currentPageIndex
+          : (_pageIndex < 0 ? 0 : _pageIndex);
+
       return AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeOutCubic,
@@ -392,15 +417,25 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
           return FadeTransition(opacity: animation, child: child);
         },
         child: KeyedSubtree(
-          key: ValueKey(widget.navigationItems[index].label),
-          child: widget.pageBuilder(context, index),
+          key: ValueKey(widget.navigationItems[targetIndex].label),
+          child: widget.pageBuilder(context, targetIndex),
         ),
       );
     }
+
     return PageView.builder(
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: widget.navigationItems.length,
+      findChildIndexCallback: (key) {
+        if (key is! ValueKey<PageLabel>) {
+          return null;
+        }
+        final index = widget.navigationItems.indexWhere(
+          (item) => item.label == key.value,
+        );
+        return index == -1 ? null : index;
+      },
       itemBuilder: (context, index) {
         return widget.pageBuilder(context, index);
       },

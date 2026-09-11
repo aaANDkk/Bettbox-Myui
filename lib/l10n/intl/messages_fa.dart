@@ -340,7 +340,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m2,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("حذف هدایت"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox یک کلاینت پروکسی بر پایه هسته قدرتمند Mihomo (Clash.Meta) است. (برگرفته از FlClash)",
+      "Bettbox یک کلاینت پروکسی بر پایه هسته قدرتمند و انعطاف‌پذیر Mihomo (Clash.Meta) با هدف تجربه کاربری برتر است. چشم‌انداز ما: Connecting AI, Accelerating Innovation - اتصال هوش مصنوعی، شتاب‌بخشی به نوآوری",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("آدرس مقصد"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage(
@@ -435,6 +435,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "تنظیمات آزمایشی با احتیاط استفاده شود",
     ),
     "expirationTime": MessageLookupByLibrary.simpleMessage("تاریخ انقضا"),
+    "expired": MessageLookupByLibrary.simpleMessage("منقضی شده"),
     "export": MessageLookupByLibrary.simpleMessage("خروجی"),
     "exportFile": MessageLookupByLibrary.simpleMessage("خروجی فایل"),
     "exportLogs": MessageLookupByLibrary.simpleMessage(
@@ -532,10 +533,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("سراسر جهان"),
     "go": MessageLookupByLibrary.simpleMessage("رفتن"),
     "goDownload": MessageLookupByLibrary.simpleMessage("رفتن به دانلود"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("ترمیم فونت"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "استفاده از فونت داخلی برای رفع مشکلات نمایش",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("به طور پیش فرض فونت سیستم، برای بارگیری فونت سفارشی فعال کنید"),
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("سبک ایموجی"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("سبک ایموجی نمایش داده شده در برنامه را انتخاب کنید"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "آیا تغییرات ذخیره شوند؟",
     ),
@@ -617,6 +618,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "key": MessageLookupByLibrary.simpleMessage("کلید"),
     "language": MessageLookupByLibrary.simpleMessage("زبان"),
+    "lastEdit": MessageLookupByLibrary.simpleMessage("آخرین ویرایش"),
     "layout": MessageLookupByLibrary.simpleMessage("چیدمان"),
     "leftClickBehavior": MessageLookupByLibrary.simpleMessage("کلیک چپ"),
     "light": MessageLookupByLibrary.simpleMessage("روشن"),
@@ -627,6 +629,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "localBackupDesc": MessageLookupByLibrary.simpleMessage(
       "پشتیبان‌گیری داده‌ها در فایل محلی",
     ),
+    "localFile": MessageLookupByLibrary.simpleMessage("فایل محلی"),
     "localRecoveryDesc": MessageLookupByLibrary.simpleMessage(
       "بازیابی داده‌ها از فایل محلی",
     ),
@@ -735,6 +738,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noStatusAvailable": MessageLookupByLibrary.simpleMessage(
       "وضعیتی یافت نشد",
     ),
+    "noUsageData": MessageLookupByLibrary.simpleMessage("بدون آمار مصرف"),
     "nodeExclusion": MessageLookupByLibrary.simpleMessage("استثنای نودها"),
     "nodeExclusionDesc": MessageLookupByLibrary.simpleMessage(
       "حذف نودهای مطابقت یافته با عبارت",
@@ -746,6 +750,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "notRecommended": MessageLookupByLibrary.simpleMessage("توصیه نمی‌شود"),
     "notSelectedTip": MessageLookupByLibrary.simpleMessage(
       "گروه پروکسی فعلی قابل انتخاب نیست",
+    ),
+    "notificationHighPriority": MessageLookupByLibrary.simpleMessage(
+      "اولویت بالا",
+    ),
+    "notificationHighPriorityDesc": MessageLookupByLibrary.simpleMessage(
+      "تنظیم نوار اعلان به اولویت بالا در پیش‌زمینه",
+    ),
+    "notificationHighPriorityTip": MessageLookupByLibrary.simpleMessage(
+      "اعلان‌های با اولویت بالا می‌توانند مشکلات زنده نگه داشتن پس‌زمینه را در برخی سیستم‌ها کاهش دهند. اگر سرویس شما به درستی کار می‌کند، پیشنهاد می‌شود خاموش بماند. آیا فعال شود؟",
     ),
     "ntp": MessageLookupByLibrary.simpleMessage("همگام‌سازی زمان NTP"),
     "ntpDesc": MessageLookupByLibrary.simpleMessage(
@@ -1295,5 +1308,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "نیازمند دسترسی مدیریت (Admin)",
     ),
     "years": m14,
+      "selectCustomFont": MessageLookupByLibrary.simpleMessage("انتخاب / تغییر فونت"),
+      "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("برای انتخاب فایل فونت .ttf یا .otf محلی ضربه بزنید"),
+      "customFontApplied": MessageLookupByLibrary.simpleMessage("فونت سفارشی اعمال شد"),
+      "customFontDisabled": MessageLookupByLibrary.simpleMessage("به فونت پیش فرض سیستم بازیابی شد"),
+      "invalidFontFormat": MessageLookupByLibrary.simpleMessage("فقط فرمت های فونت .ttf یا .otf پشتیبانی می شوند"),
   };
 }

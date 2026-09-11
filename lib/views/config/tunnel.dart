@@ -1,6 +1,7 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/clash_config.dart';
 import 'package:bett_box/providers/config.dart';
+import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,9 +59,8 @@ class TunnelListWidget extends ConsumerWidget {
     TunnelEntry? tunnel,
     int? index,
   }) {
-    showDialog(
-      context: context,
-      builder: (context) => _TunnelDialog(
+    globalState.showCommonDialog(
+      child: _TunnelDialog(
         tunnel: tunnel,
         onSave: (newTunnel) {
           final newTunnels = List<TunnelEntry>.from(tunnels);
@@ -219,6 +219,7 @@ class TunnelListView extends ConsumerWidget {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: tunnels.isEmpty
           ? Center(child: NullStatus(label: appLocalizations.noData))
           : ListView(
@@ -237,9 +238,8 @@ class TunnelListView extends ConsumerWidget {
     WidgetRef ref,
     List<TunnelEntry> tunnels,
   ) {
-    showDialog(
-      context: context,
-      builder: (context) => _TunnelDialog(
+    globalState.showCommonDialog(
+      child: _TunnelDialog(
         tunnel: null,
         onSave: (newTunnel) {
           final newTunnels = List<TunnelEntry>.from(tunnels);

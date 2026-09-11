@@ -30,6 +30,7 @@ class CommonScaffold extends StatefulWidget {
   final AppBarEditState? editState;
   final AppBarSearchState? searchState;
   final OnKeywordsUpdateCallback? onKeywordsUpdate;
+  final bool? resizeToAvoidBottomInset;
 
   const CommonScaffold({
     super.key,
@@ -44,6 +45,7 @@ class CommonScaffold extends StatefulWidget {
     this.searchState,
     this.floatingActionButton,
     this.onKeywordsUpdate,
+    this.resizeToAvoidBottomInset,
   });
 
   @override
@@ -359,7 +361,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
       child: Scaffold(
         appBar: _buildAppBar(),
         body: body,
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset ??
+            (widget.floatingActionButton != null ? false : true),
         backgroundColor: widget.backgroundColor,
         floatingActionButton:
             widget.floatingActionButton ??
