@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter_app_packager/src/api/make_config.dart';
-import 'package:flutter_app_packager/src/api/make_error.dart';
 
 class MakeResult {
   MakeResult(
     this.config, {
     this.duration,
-  }) : artifacts = config.outputArtifacts;
+    List<FileSystemEntity>? artifacts,
+  }) : artifacts = artifacts ?? config.outputArtifacts;
 
   final MakeConfig config;
   final List<FileSystemEntity> artifacts;
@@ -30,13 +30,19 @@ class MakeResult {
 }
 
 abstract class MakeResultResolver {
-  MakeResult resolve(MakeConfig config);
+  MakeResult resolve(
+    MakeConfig config, {
+    List<FileSystemEntity>? artifacts,
+  });
 }
 
 class DefaultMakeResultResolver extends MakeResultResolver {
   @override
-  MakeResult resolve(MakeConfig config) {
-    MakeResult makeResult = MakeResult(config);
+  MakeResult resolve(
+    MakeConfig config, {
+    List<FileSystemEntity>? artifacts,
+  }) {
+    MakeResult makeResult = MakeResult(config, artifacts: artifacts);
     return makeResult;
   }
 }

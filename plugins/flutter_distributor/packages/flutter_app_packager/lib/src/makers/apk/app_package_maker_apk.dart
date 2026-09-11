@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_app_packager/src/api/app_package_maker.dart';
 
 class AppPackageMakerApk extends AppPackageMaker {
@@ -12,6 +14,7 @@ class AppPackageMakerApk extends AppPackageMaker {
 
   @override
   Future<MakeResult> make(MakeConfig config) {
+    final List<File> artifacts = [];
     for (final file in config.buildOutputFiles) {
       final splits = file.uri.pathSegments.last.split('-');
       final outputPath = config.outputFile.path;
@@ -21,11 +24,11 @@ class AppPackageMakerApk extends AppPackageMaker {
         final firstPart = outputPath.substring(0, lastDotIndex);
         final lastPart = outputPath.substring(lastDotIndex + 1);
         final output = '$firstPart-${sublist.join('-')}.${lastPart}';
-        file.copySync(output);
+        artifacts.add(file.copySync(output));
       } else {
-        file.copySync(outputPath);
+        artifacts.add(file.copySync(outputPath));
       }
     }
-    return Future.value(resultResolver.resolve(config));
+    return Future.value(resultResolver.resolve(config, artifacts: artifacts));
   }
 }

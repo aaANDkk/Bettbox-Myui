@@ -74,12 +74,20 @@ extension StringExtensionSafe on String? {
 }
 
 extension ObjectExtension on Object {
-  String get formatError {
+  String get formatError => _format(isLog: false);
+
+  String get formatErrorLog => _format(isLog: true);
+
+  String _format({required bool isLog}) {
     final errorStr = toString();
-    if (errorStr.contains('DioException [bad response]')) {
+    if (errorStr.contains('DioException [bad response]') ||
+        errorStr.contains('status code of')) {
       final match = RegExp(r'status code of (\d+)').firstMatch(errorStr);
-      if (match != null) {
-        return appLocalizations.profileImportFailed(match.group(1)!);
+      final statusCode = match?.group(1);
+      if (statusCode != null) {
+        return isLog
+            ? 'Failed to import profile. Please check your network status or try resetting the subscription link ( HTTP error code: $statusCode )'
+            : appLocalizations.profileImportFailed(statusCode);
       }
     }
     return errorStr;

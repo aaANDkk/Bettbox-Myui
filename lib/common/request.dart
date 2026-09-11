@@ -195,7 +195,7 @@ class Request {
         }
       }
     } catch (e) {
-      commonPrint.log('Check update failed: ${e.formatError}');
+      commonPrint.log('Check update failed: ${e.formatErrorLog}');
     }
     return null;
   }

@@ -26,7 +26,6 @@ abstract mixin class AppMessageListener {
 @freezed
 abstract class SetupParams with _$SetupParams {
   const factory SetupParams({
-    @JsonKey(name: 'config') required Map<String, dynamic> config,
     @JsonKey(name: 'selected-map') required Map<String, String> selectedMap,
     @JsonKey(name: 'test-url') required String testUrl,
     @JsonKey(name: 'override-test-url') @Default(true) bool overrideTestUrl,
@@ -35,15 +34,6 @@ abstract class SetupParams with _$SetupParams {
   factory SetupParams.fromJson(Map<String, dynamic> json) =>
       _$SetupParamsFromJson(json);
 }
-
-// extension SetupParamsExt on SetupParams {
-//   Map<String, dynamic> get json {
-//     final json = Map<String, dynamic>.from(config);
-//     json["selected-map"] = selectedMap;
-//     json["test-url"] = testUrl;
-//     return json;
-//   }
-// }
 
 @freezed
 abstract class UpdateParams with _$UpdateParams {

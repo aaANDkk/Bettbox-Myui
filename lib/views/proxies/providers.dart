@@ -255,36 +255,52 @@ class ProviderItem extends StatelessWidget {
     );
   }
 
+  Widget _buildTitleRow(BuildContext context) {
+    final subtitleText = provider.subscriptionInfo?.expireDesc;
+
+    return Row(
+      children: [
+        Flexible(
+          child: EmojiText(
+            provider.name,
+            style: context.textTheme.titleMedium,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (subtitleText != null && subtitleText.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(
+            '·',
+            style: context.textTheme.labelMedium?.toLight,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            subtitleText,
+            style: context.textTheme.labelMedium?.toLight,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ],
+    );
+  }
+
   String _buildProviderDesc() {
     final updateTimeText = provider.updateAt.lastUpdateTimeDesc;
-    final count = provider.count;
-    if (count == 0) {
-      return updateTimeText;
-    }
-    if (updateTimeText.isEmpty) {
-      return '$count${appLocalizations.entries}';
-    }
-    return '$updateTimeText · $count${appLocalizations.entries}';
-  }
-
-  String? _buildSubDetailsText() {
     final subInfo = provider.subscriptionInfo;
-    if (subInfo == null) return null;
     final trafficText = _buildTrafficInfoText(subInfo);
-    final expireText = _getExpireText(subInfo);
-    if (trafficText == null) {
-      return expireText;
-    }
-    return '$trafficText · $expireText';
-  }
+    final count = provider.count;
+    final countText =
+        count == 0 ? null : '$count${appLocalizations.entries}';
 
-  String _getExpireText(SubscriptionInfo subscriptionInfo) {
-    if (subscriptionInfo.expire == 0) {
-      return appLocalizations.infiniteTime;
-    }
-    return DateTime.fromMillisecondsSinceEpoch(
-      subscriptionInfo.expire * 1000,
-    ).show;
+    final parts = [
+      if (trafficText != null && trafficText.isNotEmpty) trafficText,
+      updateTimeText,
+      ?countText,
+    ];
+
+    return parts.join(' · ');
   }
 
   String? _buildTrafficInfoText(SubscriptionInfo? subscriptionInfo) {
@@ -307,10 +323,9 @@ class ProviderItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subDetailsText = _buildSubDetailsText();
     return ListItem(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      title: EmojiText(provider.name),
+      title: _buildTitleRow(context),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -319,13 +334,6 @@ class ProviderItem extends StatelessWidget {
           if (provider.subscriptionInfo != null) ...[
             const SizedBox(height: 6),
             SubscriptionInfoView(subscriptionInfo: provider.subscriptionInfo),
-            if (subDetailsText != null)
-              Text(
-                subDetailsText,
-                style: context.textTheme.labelMedium?.toLight,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
           ],
           const SizedBox(height: 8),
           Wrap(

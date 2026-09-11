@@ -9,13 +9,18 @@
 
 **Bettbox 是一款使用Mihomo(Clash Meta)内核、基于FlClash早期版本进行重构的、多平台网络调试及规则分流客户端**
 
-秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。核心特性及设计目标: 前台流畅丝滑、后台省电无感，致力于成为体验更好、以少量资源消耗即可长期稳定运行的 Mihomo 客户端
-
-我们的愿景: Connecting AI, Accelerating Innovation - 连接AI，为创新加速
+秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。核心特性及实现目标: 前台流畅高帧、后台省电无感，致力于成为体验更好、以少量资源消耗即可长期稳定运行的 Mihomo 客户端
 
 Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱可用
 
+我们的愿景: Connecting Open Source and AI，Accelerating Innovation
+
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+
+<p align="center">
+  <img src="snapshots/home.png" alt="Bettbox" />
+</p>
+
 ---
 ### ✈️ Telegram 社区交流
 
@@ -51,12 +56,12 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
 
 ### 专享68折优惠码：bettbox68
 
-**简评** : ❚ ❚  老牌小众专线，海外团队运营多年，BGP入口+广港&沪日线路，折后约17元/月或127元/年，解锁流媒体与AI，口碑优秀，适合对稳定性和延迟要求较高的用户，小技巧：别忘了使用68折优惠码，以及后台个人中心签到每日可再额外领取5-10GB流量
+**简评** : ❚ ❚  老牌小众专线，海外团队运营多年，大厂BGP入口+广港&沪日线路，折后约17元/月或127元/年，解锁流媒体与AI，延迟与口碑优秀，适合对稳定性要求较高的用户，小技巧：别忘了使用68折优惠码，以及后台个人中心签到每日可再额外领取5-10GB流量
 
 --------------------------------
 ### 低价直连  〢  [良心云](https://xn--9kqz23b19z.com/#/register?code=VTnrQYAj)  〢  [吹雪云](https://xn--9kqs1lo79d.com/#/register?code=skKMTab7)  〢  [一分](https://xn--4gqx1hgtfdmt.com/#/register?code=AuCiXprV)
 
-**简评** : ❚  大流量或资源机为主，跑路风险相对较低（也许？），888G / 1000G不限时套餐通常更有性价比，量大管饱，价格低廉，适合要求不高的用户或备用流量及大流量下载选择
+**简评** : ❚  大流量或资源机为主，跑路风险相对较低（也许大概可能），888G / 1000G不限时套餐通常更有性价比，量大管饱，价格低廉，适合要求不高的用户或备用流量及大流量下载选择
 
 ---
 ## 🛠️ 安装与下载
@@ -126,7 +131,7 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
 
 ### ☕ 赞助支持
 
-**如果您觉得这个项目对您有所帮助，可通过以下方式赞助开发或使用推荐链接：**
+**如果您觉得这个项目对您有所帮助，可通过以下方式赞助开发或使用[推荐链接](https://github.com/appshubcc/Bettbox#%EF%B8%8F-%E6%8E%A8%E8%8D%90%E6%9C%8D%E5%8A%A1)：**
 
 * TRON (TRC-20)：   <code>TCkTtZfF2WrciZLaJj3e1aqrh3zdTnCkDa</code>
 * Bitcoin： <code>bc1qu950cl6035qvllmzk6cfw3l30j2lg3cq9n6g6h</code>

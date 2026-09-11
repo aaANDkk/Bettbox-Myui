@@ -9,13 +9,18 @@
 
 **Bettbox は、Mihomo（Clash Meta）カーネルを搭載し、初期の FlClash をベースに再構築されたマルチプラットフォーム対応のネットワークデバッグ・分流クライアントです。**
 
-「Better Experience（より良い体験）」を追求し、オリジナルの洗練された UI を継承しつつ、細部のデザインや実用ロジックを深層最適化。コア機能と設計目標：「フロントエンドはぬるぬる滑らか、バックグラウンドは省電力で無感」。低リソースで長期にわたり安定動作する、より優れた Mihomo クライアントの実現に尽力しています。
-
-私たちのビジョン：Connecting AI, Accelerating Innovation - AIを繋ぎ、イノベーションを加速する
+「Better Experience（より良い体験）」を追求し、オリジナルの洗練された UI を継承しつつ、細部のデザインや実用ロジックを深層最適化。コア機能と実現目標：「フロントエンドは高フレームレートで滑らか、バックグラウンドは省電力で無感」。低リソースで長期にわたり安定動作する、より優れた Mihomo クライアントの実現に尽力しています。
 
 Bettbox：Better Experience, Out of the box - 優れた体験を、すぐに使える。
 
+私たちのビジョン：Connecting Open Source and AI, Accelerating Innovation
+
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+
+<p align="center">
+  <img src="../snapshots/home.png" alt="Bettbox" />
+</p>
+
 ---
 ### ✈️ Telegram コミュニティ
 

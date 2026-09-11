@@ -649,12 +649,12 @@ class _EmojiStyleDialog extends StatelessWidget {
                                     for (final emoji in const [
                                       '🪷',
                                       '🫧',
+                                      '🔮',
                                       '😋',
-                                      '🐸',
                                       '🇨🇳',
-                                      '🇬🇧',
-                                      '🇩🇪',
                                       '🇺🇸',
+                                      '🇬🇧',
+                                      '🇧🇷',
                                     ])
                                       SizedBox(
                                         width: 25,

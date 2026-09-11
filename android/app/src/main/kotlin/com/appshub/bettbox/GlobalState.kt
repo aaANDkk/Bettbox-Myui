@@ -1,6 +1,8 @@
 package com.appshub.bettbox
 
 import android.content.ComponentName
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.service.quicksettings.TileService
 import com.appshub.bettbox.plugins.AppPlugin
@@ -34,6 +36,7 @@ enum class RunState {
 object GlobalState {
     val runLock = ReentrantLock()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     const val NOTIFICATION_CHANNEL = "Bettbox"
     const val NOTIFICATION_CHANNEL_HIGH = "Bettbox_High"
@@ -98,7 +101,21 @@ object GlobalState {
         requestTileUpdate()
     }
 
+    private val tileRetryRunnable = Runnable {
+        BettboxTileService.refreshActive()
+        requestListeningStateSafely()
+    }
+
     fun requestTileUpdate() {
+        mainHandler.post {
+            BettboxTileService.refreshActive()
+            requestListeningStateSafely()
+            mainHandler.removeCallbacks(tileRetryRunnable)
+            mainHandler.postDelayed(tileRetryRunnable, 1000L)
+        }
+    }
+
+    private fun requestListeningStateSafely() {
         runCatching {
             val context = BettboxApplication.getAppContext()
             TileService.requestListeningState(
@@ -175,8 +192,10 @@ object GlobalState {
 
     fun handleToggle() {
         if (!acquireToggleSlot()) return
-        if (!handleStart(skipDebounce = true)) {
-            handleStop(skipDebounce = true)
+        when (currentRunState) {
+            RunState.START -> handleStop(skipDebounce = true)
+            RunState.STOP -> handleStart(skipDebounce = true)
+            RunState.PENDING -> Unit
         }
     }
 
@@ -199,7 +218,12 @@ object GlobalState {
         updateRunState(RunState.PENDING)
         startPendingTimeout()
         runLock.withLock {
-            getCurrentTilePlugin()?.handleStop()
+            val tilePlugin = getCurrentTilePlugin()
+            if (tilePlugin != null) {
+                tilePlugin.handleStop()
+            } else {
+                VpnPlugin.handleStop(force = true)
+            }
         }
     }
 

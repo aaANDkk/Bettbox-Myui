@@ -9,13 +9,18 @@
 
 **Bettbox is a cross-platform network debugging and rule-based traffic splitting client powered by the Mihomo (Clash Meta) core and refactored from an early version of FlClash.**
 
-Guided by the principle of "Better Experience", Bettbox inherits the original sleek UI while deeply refining key details and feature logic. Core features and design goals: silky-smooth animations in the foreground, zero-impact power saving in the background — dedicated to delivering a better experience as a lightweight Mihomo client that runs stably and reliably over the long term with minimal resource consumption.
-
-Our Vision: Connecting AI, Accelerating Innovation
+Guided by the principle of "Better Experience", Bettbox inherits the original sleek UI while deeply refining key details and feature logic. Core features and implementation goals: high-FPS fluid animations in the foreground, zero-impact power saving in the background — dedicated to delivering a better experience as a lightweight Mihomo client that runs stably and reliably over the long term with minimal resource consumption.
 
 Bettbox stands for: Better Experience, Out of the box.
 
+Our Vision: Connecting Open Source and AI, Accelerating Innovation
+
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+
+<p align="center">
+  <img src="../snapshots/home.png" alt="Bettbox" />
+</p>
+
 ---
 ### ✈️ Telegram Community
 
@@ -51,12 +56,12 @@ Bettbox stands for: Better Experience, Out of the box.
 
 ### Exclusive Discount Code (32% OFF): bettbox68
 
-**Review** : ❚ ❚  Established premium line operated overseas for years, BGP ingress + GZ-HK & SH-JP dedicated lines, approx. ¥17/mo or ¥127/yr after discount, unlocking streaming media & AI with excellent reputation. Ideal for users demanding high stability and low latency. Pro tip: Don't forget to use the 32% OFF discount code, and check in daily in the dashboard to claim an extra 5-10GB bonus bandwidth.
+**Review** : ❚ ❚  Established premium line operated overseas for years, Tier-1 enterprise BGP ingress + GZ-HK & SH-JP dedicated lines, approx. ¥17/mo or ¥127/yr after discount, unlocking streaming media & AI, with excellent latency and reputation. Ideal for users prioritizing high stability. Pro tip: Don't forget to use the 32% OFF discount code, and check in daily in the dashboard to claim an extra 5-10GB bonus bandwidth.
 
 --------------------------------
 ### Low-Cost Direct  〢  [Liangxin Cloud](https://xn--9kqz23b19z.com/#/register?code=VTnrQYAj)  〢  [Chuixue Cloud](https://xn--9kqs1lo79d.com/#/register?code=skKMTab7)  〢  [YiFen](https://xn--4gqx1hgtfdmt.com/#/register?code=AuCiXprV)
 
-**Review** : ❚  Mainly high-bandwidth or resource servers with relatively lower exit-scam risk (maybe?). 888GB / 1000GB non-expiring packages offer great cost-performance. Large allowance at affordable prices, ideal for budget users, backup traffic, or heavy downloading.
+**Review** : ❚  Mainly high-bandwidth or resource servers with relatively lower exit-scam risk (maybe, perhaps, probably). 888GB / 1000GB non-expiring packages offer great cost-performance. Large allowance at affordable prices, ideal for budget users, backup traffic, or heavy downloading.
 
 ---
 ## 🛠️ Installation & Downloads

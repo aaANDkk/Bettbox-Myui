@@ -9,13 +9,18 @@
 
 **Bettbox는 Mihomo(Clash Meta) 커널 기반으로 FlClash 초기 버전을 재구축한 멀티플랫폼 네트워크 디버깅 및 규칙 분류 클라이언트입니다.**
 
-"Better Experience (더 나은 경험)"라는 원칙 아래 기존의 뛰어난 UI를 계승하면서 세부 인터랙션과 기능 로직을 한층 더 최적화했습니다. 핵심 기능 및 설계 목표: 부드러운 고프레임 화면, 전력 소비 없는 백그라운드 — 적은 리소스로 장기적으로 안정적인 실행을 유지하며 더 나은 경험을 제공하는 Mihomo 클라이언트입니다.
-
-우리의 비전: Connecting AI, Accelerating Innovation - AI를 연결하고 혁신을 가속화합니다
+"Better Experience (더 나은 경험)"라는 원칙 아래 기존의 뛰어난 UI를 계승하면서 세부 인터랙션과 기능 로직을 한층 더 최적화했습니다. 핵심 기능 및 구현 목표: 부드러운 고프레임 화면, 전력 소비 없는 백그라운드 — 적은 리소스로 장기적으로 안정적인 실행을 유지하며 더 나은 경험을 제공하는 Mihomo 클라이언트입니다.
 
 Bettbox: Better Experience, Out of the box - 뛰어난 경험, 설치 즉시 사용.
 
+우리의 비전: Connecting Open Source and AI, Accelerating Innovation
+
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+
+<p align="center">
+  <img src="../snapshots/home.png" alt="Bettbox" />
+</p>
+
 ---
 ### ✈️ Telegram 커뮤니티
 

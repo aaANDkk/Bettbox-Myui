@@ -9,13 +9,18 @@
 
 **Bettbox یک کلاینت چندسکویی برای دیباگ شبکه و تقسیم ترافیک بر اساس قوانین است که با هسته Mihomo (Clash Meta) بازنویسی شده است.**
 
-با پایبندی به اصل "Better Experience"، Bettbox ضمن حفظ رابط کاربری جذاب نسخه اصلی، جزئیات و منطق برنامه را عمیقاً بهینه‌سازی کرده است. ویژگی‌های کلیدی و اهداف طراحی: انیمیشن‌های روان در فرانت‌اند و عملکرد بی‌صدا و کم‌مصرف در پس‌زمینه — کلاینتی با تجربه کاربری بهتر که با مصرف منابع اندک، عملکرد پایدار و طولانی‌مدتی را برای Mihomo ارائه می‌دهد.
-
-چشم‌انداز ما: Connecting AI, Accelerating Innovation - اتصال هوش مصنوعی، شتاب‌بخشی به نوآوری
+با پایبندی به اصل "Better Experience"، Bettbox ضمن حفظ رابط کاربری جذاب نسخه اصلی، جزئیات و منطق برنامه را عمیقاً بهینه‌سازی کرده است. ویژگی‌های کلیدی و اهداف تحقق: روانی با نرخ فریم بالا در پیش‌زمینه و عملکرد بی‌صدا و کم‌مصرف در پس‌زمینه — کلاینتی با تجربه کاربری بهتر که با مصرف منابع اندک، عملکرد پایدار و طولانی‌مدتی را برای Mihomo ارائه می‌دهد.
 
 Bettbox یعنی: Better Experience, Out of the box - تجربه برتر، آماده استفاده.
 
+چشم‌انداز ما: Connecting Open Source and AI, Accelerating Innovation
+
 [![Latest Release](https://img.shields.io/github/v/release/appshubcc/Bettbox?style=for-the-badge&logo=github&color=238636&label=Release)](https://github.com/appshubcc/Bettbox/releases/latest) [![Core](https://img.shields.io/github/v/release/MetaCubeX/mihomo?style=for-the-badge&logo=go&logoColor=white&color=8A2BE2&label=Mihomo)](https://github.com/MetaCubeX/mihomo/releases/latest)
+
+<p align="center">
+  <img src="../snapshots/home.png" alt="Bettbox" />
+</p>
+
 ---
 ### ✈️ جامعه تلگرام
 

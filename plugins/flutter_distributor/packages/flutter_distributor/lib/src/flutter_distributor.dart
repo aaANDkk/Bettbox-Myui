@@ -197,10 +197,11 @@ class FlutterDistributor {
           print(
             const JsonEncoder.withIndent('  ').convert(makeResult.toJson()),
           );
-          FileSystemEntity artifact = makeResult.artifacts.first;
-          logger.info(
-            'Successfully packaged ${artifact.path}'.brightGreen(),
-          );
+          for (final artifact in makeResult.artifacts) {
+            logger.info(
+              'Successfully packaged ${artifact.path}'.brightGreen(),
+            );
+          }
           makeResultList.add(makeResult);
         }
       }
@@ -347,14 +348,16 @@ class FlutterDistributor {
 
           if (job.publish != null || job.publishTo != null) {
             String? publishTarget = job.publishTo ?? job.publish?.target;
-            MakeResult makeResult = makeResultList.first;
-            FileSystemEntity artifact = makeResult.artifacts.first;
-            await publish(
-              artifact,
-              [publishTarget!],
-              publishArguments: job.publish?.args,
-              variables: variables,
-            );
+            for (final makeResult in makeResultList) {
+              for (final artifact in makeResult.artifacts) {
+                await publish(
+                  artifact,
+                  [publishTarget!],
+                  publishArguments: job.publish?.args,
+                  variables: variables,
+                );
+              }
+            }
           }
         }
       }

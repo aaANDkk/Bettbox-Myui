@@ -2837,7 +2837,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                       _controller
                                                           .pressDownArrowKey(
                                                             isShiftPressed:
-                                                                isShiftPressed,
+                                                                isShiftPressed ||
+                                                                    (_isMobile &&
+                                                                        !_controller
+                                                                            .selection
+                                                                            .isCollapsed),
                                                           );
 
                                                       if (_controller
@@ -2845,7 +2849,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                         _controller
                                                             .moveMultiCursorsDown(
                                                               isShiftPressed:
-                                                                  isShiftPressed,
+                                                                  isShiftPressed ||
+                                                                      (_isMobile &&
+                                                                          !_controller
+                                                                              .selection
+                                                                              .isCollapsed),
                                                             );
                                                       }
 
@@ -2858,7 +2866,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                       _controller
                                                           .pressUpArrowKey(
                                                             isShiftPressed:
-                                                                isShiftPressed,
+                                                                isShiftPressed ||
+                                                                    (_isMobile &&
+                                                                        !_controller
+                                                                            .selection
+                                                                            .isCollapsed),
                                                           );
 
                                                       if (_controller
@@ -2866,7 +2878,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                         _controller
                                                             .moveMultiCursorsUp(
                                                               isShiftPressed:
-                                                                  isShiftPressed,
+                                                                  isShiftPressed ||
+                                                                      (_isMobile &&
+                                                                          !_controller
+                                                                              .selection
+                                                                              .isCollapsed),
                                                             );
                                                       }
 
@@ -2877,7 +2893,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                     case LogicalKeyboardKey
                                                         .arrowRight:
                                                       _handleArrowRight(
-                                                        isShiftPressed,
+                                                        isShiftPressed ||
+                                                            (_isMobile &&
+                                                                !_controller
+                                                                    .selection
+                                                                    .isCollapsed),
                                                       );
                                                       _commonKeyFunctions();
                                                       return KeyEventResult
@@ -2886,7 +2906,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                     case LogicalKeyboardKey
                                                         .arrowLeft:
                                                       _handleArrowLeft(
-                                                        isShiftPressed,
+                                                        isShiftPressed ||
+                                                            (_isMobile &&
+                                                                !_controller
+                                                                    .selection
+                                                                    .isCollapsed),
                                                       );
                                                       _commonKeyFunctions();
                                                       return KeyEventResult

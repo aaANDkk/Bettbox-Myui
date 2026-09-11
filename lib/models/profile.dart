@@ -44,6 +44,21 @@ abstract class SubscriptionInfo with _$SubscriptionInfo {
   }
 }
 
+extension SubscriptionInfoExtension on SubscriptionInfo {
+  String? get expireDesc {
+    if (expire > 0) {
+      final expireDate =
+          DateTime.fromMillisecondsSinceEpoch(expire * 1000).show;
+      final isExpired =
+          expire * 1000 < DateTime.now().millisecondsSinceEpoch;
+      return isExpired
+          ? '${appLocalizations.expired} · $expireDate'
+          : expireDate;
+    }
+    return total > 0 ? appLocalizations.infiniteTime : null;
+  }
+}
+
 @freezed
 abstract class Profile with _$Profile {
   const factory Profile({

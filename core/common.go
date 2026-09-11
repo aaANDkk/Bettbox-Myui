@@ -23,6 +23,7 @@ import (
 	rp "github.com/metacubex/mihomo/rules/provider"
 	"github.com/metacubex/mihomo/tunnel"
 	"os"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"sync"
@@ -174,22 +175,13 @@ func patchSelectGroup(mapping map[string]string) {
 
 func defaultSetupParams() *SetupParams {
 	return &SetupParams{
-		Config:      config.DefaultRawConfig(),
 		TestURL:     "https://g.cn/generate_204",
 		SelectedMap: map[string]string{},
 	}
 }
 
 func readFile(path string) ([]byte, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, err
-	}
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, err
+	return os.ReadFile(path)
 }
 
 func updateConfig(params *UpdateParams) {
@@ -268,6 +260,9 @@ func updateConfig(params *UpdateParams) {
 	if params.Tun != nil {
 		general.Tun.Enable = params.Tun.Enable
 		general.Tun.AutoRoute = *params.Tun.AutoRoute
+		if params.Tun.AutoRedirect != nil {
+			general.Tun.AutoRedirect = *params.Tun.AutoRedirect
+		}
 		general.Tun.Device = *params.Tun.Device
 		general.Tun.RouteAddress = *params.Tun.RouteAddress
 		if params.Tun.RouteExcludeAddress != nil {
@@ -288,38 +283,28 @@ func setupConfig(params *SetupParams) error {
 	runLock.Lock()
 	defer runLock.Unlock()
 
-	if params.Config != nil && params.Config.ProxyGroup != nil {
-		for _, group := range params.Config.ProxyGroup {
-			if elm, ok := group["tolerance"]; ok {
-				switch v := elm.(type) {
-				case json.Number:
-					if i, err := v.Int64(); err == nil {
-						group["tolerance"] = int(i)
-					}
-				case float64:
-					group["tolerance"] = int(v)
-				case float32:
-					group["tolerance"] = int(v)
-				}
-			}
-		}
-	}
-
 	constant.DefaultTestURL = params.TestURL
-	if params.OverrideTestUrl && params.Config != nil {
-		if params.Config.ProxyGroup != nil {
-			for _, group := range params.Config.ProxyGroup {
-				group["url"] = params.TestURL
-			}
-		}
-	}
 
-	var err error
-	currentConfig, err = config.ParseRawConfig(params.Config)
+	buf, err := readFile(filepath.Join(constant.Path.HomeDir(), constant.Path.Config()))
 	if err != nil {
 		return err
 	}
-	currentRawConfig = params.Config
+	rawCfg, err := config.UnmarshalRawConfig(buf)
+	if err != nil {
+		return err
+	}
+
+	if params.OverrideTestUrl && rawCfg.ProxyGroup != nil {
+		for _, group := range rawCfg.ProxyGroup {
+			group["url"] = params.TestURL
+		}
+	}
+
+	currentConfig, err = config.ParseRawConfig(rawCfg)
+	if err != nil {
+		return err
+	}
+	currentRawConfig = rawCfg
 	hub.ApplyConfig(currentConfig)
 	patchSelectGroup(params.SelectedMap)
 	updateListeners()

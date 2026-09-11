@@ -127,7 +127,7 @@ class SuperGridState extends State<SuperGrid> with TickerProviderStateMixin {
 
     _shakeController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 120),
+      duration: const Duration(milliseconds: 125),
     );
 
     _shakeAnimation = Tween<double>(begin: -0.012, end: 0.012).animate(

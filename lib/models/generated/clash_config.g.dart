@@ -190,6 +190,7 @@ _Tun _$TunFromJson(Map<String, dynamic> json) => _Tun(
   disableIcmpForwarding: json['disable-icmp-forwarding'] as bool? ?? true,
   mtu: (json['mtu'] as num?)?.toInt() ?? 9000,
   endpointIndependentNat: json['endpoint-independent-nat'] as bool? ?? false,
+  autoRedirect: json['auto-redirect'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$TunToJson(_Tun instance) => <String, dynamic>{
@@ -204,6 +205,7 @@ Map<String, dynamic> _$TunToJson(_Tun instance) => <String, dynamic>{
   'disable-icmp-forwarding': instance.disableIcmpForwarding,
   'mtu': instance.mtu,
   'endpoint-independent-nat': instance.endpointIndependentNat,
+  'auto-redirect': instance.autoRedirect,
 };
 
 const _$TunStackEnumMap = {

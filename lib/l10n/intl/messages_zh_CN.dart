@@ -243,7 +243,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "deleteTip": m2,
     "deleteTunnel": MessageLookupByLibrary.simpleMessage("删除转发"),
     "desc": MessageLookupByLibrary.simpleMessage(
-      "Bettbox 基于强大灵活的 Mihomo (Clash.Meta) 代理内核，致力于更好的体验，我们的愿景: Connecting AI, Accelerating Innovation - 连接AI，为创新加速",
+      "Bettbox 基于强大灵活的 Mihomo (Clash.Meta) 代理内核，致力于更好的体验，我们的愿景: Connecting Open Source and AI，Accelerating Innovation",
     ),
     "destination": MessageLookupByLibrary.simpleMessage("目标地址"),
     "destinationGeoIP": MessageLookupByLibrary.simpleMessage("目标地理定位"),
@@ -316,7 +316,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "experimental": MessageLookupByLibrary.simpleMessage("Experimental"),
     "experimentalDesc": MessageLookupByLibrary.simpleMessage("实验性配置请谨慎使用"),
     "expirationTime": MessageLookupByLibrary.simpleMessage("到期时间"),
-    "expired": MessageLookupByLibrary.simpleMessage("已到期"),
+    "expired": MessageLookupByLibrary.simpleMessage("已过期"),
     "export": MessageLookupByLibrary.simpleMessage("导出"),
     "exportFile": MessageLookupByLibrary.simpleMessage("导出文件"),
     "exportLogs": MessageLookupByLibrary.simpleMessage("导出日志"),

@@ -332,30 +332,9 @@ class ProfileItem extends StatelessWidget {
   }
 
   Widget _buildTitleRow(BuildContext context) {
-    String? subtitleText;
-    if (profile.type == ProfileType.file) {
-      subtitleText = appLocalizations.localFile;
-    } else if (profile.type == ProfileType.url) {
-      final info = profile.subscriptionInfo;
-      if (info != null &&
-          (info.total > 0 ||
-              info.upload + info.download > 0 ||
-              info.expire > 0)) {
-        if (info.expire > 0 &&
-            info.expire * 1000 < DateTime.now().millisecondsSinceEpoch) {
-          subtitleText = appLocalizations.expired;
-        } else if (info.expire == 0) {
-          if (info.total > 0) {
-            subtitleText = appLocalizations.infiniteTime;
-          }
-        } else {
-          subtitleText =
-              DateTime.fromMillisecondsSinceEpoch(info.expire * 1000).show;
-        }
-      } else {
-        subtitleText = appLocalizations.expired;
-      }
-    }
+    final subtitleText = profile.type == ProfileType.file
+        ? appLocalizations.localFile
+        : profile.subscriptionInfo?.expireDesc;
 
     return Row(
       children: [

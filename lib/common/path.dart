@@ -95,6 +95,10 @@ class AppPath {
     return directory.path;
   }
 
+  Future<String> get configFilePath async {
+    return join(await homeDirPath, 'config.yaml');
+  }
+
   Future<String> get lockFilePath async {
     final directory = await dataDir.future;
     return join(directory.path, '${AppIdentity.dataDirName}.lock');

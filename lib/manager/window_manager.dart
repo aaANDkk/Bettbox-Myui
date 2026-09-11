@@ -25,6 +25,8 @@ class _WindowContainerState extends ConsumerState<WindowManager>
     with WindowListener, WindowExtListener {
   Timer? _renderToggleTimer;
   bool? _pendingRenderResume;
+  Timer? _windowGeometryTimer;
+  int _windowGeometryRevision = 0;
 
   void _scheduleRenderToggle(bool resume) {
     _pendingRenderResume = resume;
@@ -36,6 +38,42 @@ class _WindowContainerState extends ConsumerState<WindowManager>
         render?.pause();
       }
     });
+  }
+
+  void _scheduleWindowGeometryCapture() {
+    final revision = ++_windowGeometryRevision;
+    _windowGeometryTimer?.cancel();
+    _windowGeometryTimer = Timer(const Duration(milliseconds: 125), () async {
+      if (!mounted || revision != _windowGeometryRevision) return;
+      final isAbnormal = (await windowManager.isMaximized()) ||
+          (await windowManager.isFullScreen()) ||
+          (await windowManager.isMinimized());
+      if (isAbnormal) return;
+
+      final bounds = await windowManager.getBounds();
+      if (!bounds.width.isFinite ||
+          !bounds.height.isFinite ||
+          bounds.width <= 0 ||
+          bounds.height <= 0) {
+        return;
+      }
+      if (!bounds.left.isFinite || !bounds.top.isFinite) return;
+
+      ref.read(windowSettingProvider.notifier).updateState(
+            (state) => state.copyWith(
+              width: bounds.width,
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+            ),
+          );
+    });
+  }
+
+  void _invalidateWindowGeometryCapture() {
+    _windowGeometryRevision++;
+    _windowGeometryTimer?.cancel();
+    _windowGeometryTimer = null;
   }
 
   @override
@@ -75,25 +113,51 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   }
 
   @override
-  Future<void> onWindowMoved() async {
-    super.onWindowMoved();
-    final offset = await windowManager.getPosition();
-    ref
-        .read(windowSettingProvider.notifier)
-        .updateState(
-          (state) => state.copyWith(top: offset.dy, left: offset.dx),
-        );
+  void onWindowMove() {
+    super.onWindowMove();
+    _scheduleWindowGeometryCapture();
   }
 
   @override
-  Future<void> onWindowResized() async {
+  void onWindowMoved() {
+    super.onWindowMoved();
+    _scheduleWindowGeometryCapture();
+  }
+
+  @override
+  void onWindowResize() {
+    super.onWindowResize();
+    _scheduleWindowGeometryCapture();
+  }
+
+  @override
+  void onWindowResized() {
     super.onWindowResized();
-    final size = await windowManager.getSize();
-    ref
-        .read(windowSettingProvider.notifier)
-        .updateState(
-          (state) => state.copyWith(width: size.width, height: size.height),
-        );
+    _scheduleWindowGeometryCapture();
+  }
+
+  @override
+  void onWindowMaximize() {
+    _invalidateWindowGeometryCapture();
+    super.onWindowMaximize();
+  }
+
+  @override
+  void onWindowUnmaximize() {
+    super.onWindowUnmaximize();
+    _scheduleWindowGeometryCapture();
+  }
+
+  @override
+  void onWindowEnterFullScreen() {
+    _invalidateWindowGeometryCapture();
+    super.onWindowEnterFullScreen();
+  }
+
+  @override
+  void onWindowLeaveFullScreen() {
+    super.onWindowLeaveFullScreen();
+    _scheduleWindowGeometryCapture();
   }
 
   @override
@@ -125,6 +189,7 @@ class _WindowContainerState extends ConsumerState<WindowManager>
     windowManager.removeListener(this);
     windowExtManager.removeListener(this);
     _renderToggleTimer?.cancel();
+    _windowGeometryTimer?.cancel();
     super.dispose();
   }
 }

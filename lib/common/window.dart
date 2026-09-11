@@ -23,26 +23,26 @@ class Window {
     await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
     await windowManager.setAlwaysOnTop(props.isPinned);
     if (!system.isMacOS) {
-      final left = props.left ?? 0;
-      final top = props.top ?? 0;
-      final right = left + props.width;
-      final bottom = top + props.height;
-      if (left == 0 && top == 0) {
+      final left = props.left;
+      final top = props.top;
+      if (left == null || top == null || (left == 0 && top == 0)) {
         await windowManager.setAlignment(Alignment.center);
       } else {
-        final displays = await screenRetriever.getAllDisplays();
-        final isPositionValid = displays.any((display) {
-          final displayBounds = Rect.fromLTWH(
-            display.visiblePosition!.dx,
-            display.visiblePosition!.dy,
-            display.size.width,
-            display.size.height,
-          );
-          return displayBounds.contains(Offset(left, top)) ||
-              displayBounds.contains(Offset(right, bottom));
-        });
+        bool isPositionValid = false;
+        try {
+          final displays = await screenRetriever.getAllDisplays();
+          isPositionValid = displays.any((display) {
+            final pos = display.visiblePosition;
+            final size = display.visibleSize ?? display.size;
+            if (pos == null) return false;
+            return Rect.fromLTWH(pos.dx, pos.dy, size.width, size.height)
+                .contains(Offset(left, top));
+          });
+        } catch (_) {}
         if (isPositionValid) {
           await windowManager.setPosition(Offset(left, top));
+        } else {
+          await windowManager.setAlignment(Alignment.center);
         }
       }
     }

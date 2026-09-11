@@ -602,73 +602,39 @@ class BypassPrivateRouteItem extends ConsumerWidget {
     final bypassPrivateRoute = ref.watch(
       networkSettingProvider.select((state) => state.bypassPrivateRoute),
     );
-    if (!system.isDesktop) {
-      return ListItem.switchItem(
-        title: Text(appLocalizations.bypassPrivateRoute),
-        subtitle: Text(appLocalizations.bypassPrivateRouteDesc),
-        delegate: SwitchDelegate(
-          value: bypassPrivateRoute,
-          onChanged: (value) async {
-            ref
-                .read(networkSettingProvider.notifier)
-                .updateState(
-                  (state) => state.copyWith(bypassPrivateRoute: value),
-                );
-            await _handleNetworkConfigChange(ref);
-          },
-        ),
-      );
-    }
-    return InkWell(
-      onTap: () => _showEditPage(context, ref),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 8, top: 12, bottom: 12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    appLocalizations.bypassPrivateRoute,
-                    style: context.textTheme.titleMedium?.copyWith(
-                      color: context.colorScheme.onSurface,
-                    ),
-                  ),
-                  Text(
-                    appLocalizations.bypassPrivateRouteDesc,
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: context.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+    return ListItem.switchItem(
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(appLocalizations.bypassPrivateRoute),
+          if (system.isDesktop) ...[
+            const SizedBox(width: 6),
+            Tooltip(
+              message: appLocalizations.edit,
+              child: InkResponse(
+                radius: 16,
+                onTap: () => _showEditPage(context, ref),
+                child: Icon(
+                  Icons.settings_outlined,
+                  size: 18,
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Container(
-              width: 1,
-              height: 32,
-              color: context.colorScheme.outlineVariant.withValues(
-                alpha: context.colorScheme.brightness == Brightness.light
-                    ? 0.6
-                    : 0.4,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Switch(
-              value: bypassPrivateRoute,
-              onChanged: (value) async {
-                ref
-                    .read(networkSettingProvider.notifier)
-                    .updateState(
-                      (state) => state.copyWith(bypassPrivateRoute: value),
-                    );
-                await _handleNetworkConfigChange(ref);
-              },
             ),
           ],
-        ),
+        ],
+      ),
+      subtitle: Text(appLocalizations.bypassPrivateRouteDesc),
+      delegate: SwitchDelegate(
+        value: bypassPrivateRoute,
+        onChanged: (value) async {
+          ref
+              .read(networkSettingProvider.notifier)
+              .updateState(
+                (state) => state.copyWith(bypassPrivateRoute: value),
+              );
+          await _handleNetworkConfigChange(ref);
+        },
       ),
     );
   }
