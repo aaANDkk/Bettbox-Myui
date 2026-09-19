@@ -13,6 +13,12 @@ class FontManager {
   static String? get customFontFamily => fontFamilyNotifier.value;
   static bool get isLoaded => fontFamilyNotifier.value != null;
 
+  static bool _isVariableFont = false;
+  static bool get isVariableFont => _isVariableFont;
+
+  static int _fontBaseWeight = 400;
+  static int get fontBaseWeight => _fontBaseWeight;
+
   static String? _customFontName;
   static String? get customFontName => _customFontName;
 
@@ -93,17 +99,25 @@ class FontManager {
       if (!await file.exists()) {
         return false;
       }
-      final bytes = await file.readAsBytes();
-      if (bytes.isEmpty) {
+      final rawBytes = await file.readAsBytes();
+      if (rawBytes.isEmpty) {
         return false;
       }
+
+      final processed = _analyzeAndProcessFont(rawBytes);
+      _isVariableFont = processed.isVariable;
+      _fontBaseWeight = processed.baseWeight;
 
       final familyName =
           'CustomUserFont_${DateTime.now().millisecondsSinceEpoch}';
       final fontLoader = FontLoader(familyName);
       fontLoader.addFont(
         Future.value(
-          ByteData.view(bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes),
+          ByteData.view(
+            processed.bytes.buffer,
+            processed.bytes.offsetInBytes,
+            processed.bytes.lengthInBytes,
+          ),
         ),
       );
 
@@ -113,7 +127,7 @@ class FontManager {
       }
       fontFamilyNotifier.value = familyName;
       commonPrint.log(
-        'FontManager: custom font loaded ($familyName) from $filePath',
+        'FontManager: custom font loaded ($familyName) from $filePath (variable: $_isVariableFont, baseWeight: $_fontBaseWeight)',
       );
       return true;
     } catch (e, stack) {
@@ -186,6 +200,166 @@ class FontManager {
 
   /// Disables custom font, reverting to system font
   static void disableFont() {
+    _isVariableFont = false;
+    _fontBaseWeight = 400;
     fontFamilyNotifier.value = null;
   }
+
+  static int _calcTableChecksum(
+    Uint8List bytes,
+    ByteData byteData,
+    int offset,
+    int length,
+  ) {
+    int sum = 0;
+    final nLongs = (length + 3) ~/ 4;
+    for (int i = 0; i < nLongs; i++) {
+      final pos = offset + i * 4;
+      int word = 0;
+      if (pos + 4 <= bytes.length) {
+        word = byteData.getUint32(pos, Endian.big);
+      } else {
+        for (int b = 0; b < 4; b++) {
+          final p = pos + b;
+          final bVal = (p < offset + length && p < bytes.length) ? bytes[p] : 0;
+          word = (word << 8) | bVal;
+        }
+      }
+      sum = (sum + word) & 0xFFFFFFFF;
+    }
+    return sum;
+  }
+
+  static _ProcessedFontData _analyzeAndProcessFont(Uint8List rawBytes) {
+    if (rawBytes.length < 12) {
+      return _ProcessedFontData(
+        bytes: rawBytes,
+        isVariable: false,
+        baseWeight: 400,
+      );
+    }
+
+    final bytes = Uint8List.fromList(rawBytes);
+    final byteData = ByteData.view(
+      bytes.buffer,
+      bytes.offsetInBytes,
+      bytes.lengthInBytes,
+    );
+
+    final magic = byteData.getUint32(0, Endian.big);
+    final isTtc = (magic == 0x74746366); // 'ttcf'
+
+    final List<int> fontOffsets = [];
+    if (isTtc) {
+      if (bytes.length >= 12) {
+        final numFonts = byteData.getUint32(8, Endian.big);
+        for (int i = 0; i < numFonts; i++) {
+          final off = 12 + i * 4;
+          if (off + 4 <= bytes.length) {
+            fontOffsets.add(byteData.getUint32(off, Endian.big));
+          }
+        }
+      }
+    } else {
+      fontOffsets.add(0);
+    }
+
+    bool isVariable = false;
+    int originalWeight = 400;
+    bool modified = false;
+
+    for (final base in fontOffsets) {
+      if (base + 12 > bytes.length) continue;
+      final numTables = byteData.getUint16(base + 4, Endian.big);
+
+      int? os2RecOffset;
+      int? os2Offset;
+      int? os2Length;
+      int? headOffset;
+
+      for (int i = 0; i < numTables; i++) {
+        final rec = base + 12 + i * 16;
+        if (rec + 16 > bytes.length) break;
+
+        final tag = byteData.getUint32(rec, Endian.big);
+        final offset = byteData.getUint32(rec + 8, Endian.big);
+        final length = byteData.getUint32(rec + 12, Endian.big);
+
+        if (tag == 0x66766172) {
+          // 'fvar'
+          isVariable = true;
+        } else if (tag == 0x4F532F32) {
+          // 'OS/2'
+          os2RecOffset = rec;
+          os2Offset = offset;
+          os2Length = length;
+        } else if (tag == 0x68656164) {
+          // 'head'
+          headOffset = offset;
+        }
+      }
+
+      if (os2Offset != null && os2Offset + 6 <= bytes.length) {
+        final weight = byteData.getUint16(os2Offset + 4, Endian.big);
+        originalWeight = weight;
+
+        // If static font has usWeightClass > 400 (e.g. 700 bold), normalize to 400 so Skia
+        // can apply fake-bold to titles and does not force body text to be bold.
+        if (!isVariable &&
+            weight > 400 &&
+            os2RecOffset != null &&
+            os2Length != null) {
+          byteData.setUint16(os2Offset + 4, 400, Endian.big);
+
+          if (os2Offset + 64 <= bytes.length) {
+            int fsSel = byteData.getUint16(os2Offset + 62, Endian.big);
+            if ((fsSel & 0x0020) != 0) {
+              fsSel = (fsSel & ~0x0020) | 0x0040;
+              byteData.setUint16(os2Offset + 62, fsSel, Endian.big);
+            }
+          }
+
+          final newCksum = _calcTableChecksum(
+            bytes,
+            byteData,
+            os2Offset,
+            os2Length,
+          );
+          byteData.setUint32(os2RecOffset + 4, newCksum, Endian.big);
+
+          if (headOffset != null && headOffset + 12 <= bytes.length && !isTtc) {
+            byteData.setUint32(headOffset + 8, 0, Endian.big);
+            final totalCksum = _calcTableChecksum(
+              bytes,
+              byteData,
+              0,
+              bytes.length,
+            );
+            final adj = (0xB1B0AFBA - totalCksum) & 0xFFFFFFFF;
+            byteData.setUint32(headOffset + 8, adj, Endian.big);
+          }
+
+          modified = true;
+        }
+      }
+    }
+
+    return _ProcessedFontData(
+      bytes: modified ? bytes : rawBytes,
+      isVariable: isVariable,
+      baseWeight: originalWeight,
+    );
+  }
+}
+
+class _ProcessedFontData {
+  final Uint8List bytes;
+  final bool isVariable;
+  final int baseWeight;
+
+  const _ProcessedFontData({
+    required this.bytes,
+    required this.isVariable,
+    required this.baseWeight,
+  });
 }

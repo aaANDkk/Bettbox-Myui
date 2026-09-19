@@ -720,7 +720,7 @@ class _DeletableContainerState extends State<_DeletableContainer>
                         )
                       : null,
                   onPressed: _handleDel,
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(Icons.close_rounded),
                 ),
               ),
             ),

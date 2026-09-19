@@ -10,13 +10,9 @@ enum EmojiStyle {
   twEmoji(
     family: 'Twemoji',
     label: 'Twemoji',
-  ),
-  system(
-    family: null,
-    label: 'System',
   );
 
-  final String? family;
+  final String family;
   final String label;
 
   const EmojiStyle({

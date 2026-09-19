@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -21,9 +23,9 @@ class GoogleBottomNavBar extends ConsumerWidget {
 
   IconData _extractIconData(Widget iconWidget) {
     if (iconWidget is Icon) {
-      return iconWidget.icon ?? Icons.home;
+      return iconWidget.icon ?? Icons.home_rounded;
     }
-    return Icons.home;
+    return Icons.home_rounded;
   }
 
   @override
@@ -48,12 +50,10 @@ class GoogleBottomNavBar extends ConsumerWidget {
       onTabChange(index);
     }
 
+    final viewBottom = MediaQuery.viewPaddingOf(context).bottom;
     return RepaintBoundary(
-      child: SafeArea(
-        top: false,
-        left: false,
-        right: false,
-        minimum: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: EdgeInsets.only(bottom: max(viewBottom, 12.0)),
         child: Container(
           color: Colors.transparent,
           padding: const EdgeInsets.only(left: 16, right: 16, top: 8),

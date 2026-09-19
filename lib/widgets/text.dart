@@ -125,3 +125,87 @@ class EmojiText extends StatelessWidget {
     );
   }
 }
+
+class EmojiTextEditingController extends TextEditingController {
+  VoidCallback? _emojiListener;
+
+  EmojiTextEditingController({super.text}) {
+    _emojiListener = () {
+      notifyListeners();
+    };
+    EmojiManager.emojiStyleNotifier.addListener(_emojiListener!);
+  }
+
+  @override
+  void dispose() {
+    if (_emojiListener != null) {
+      EmojiManager.emojiStyleNotifier.removeListener(_emojiListener!);
+      _emojiListener = null;
+    }
+    super.dispose();
+  }
+
+  @override
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    required bool withComposing,
+  }) {
+    final effectiveStyle = style ?? DefaultTextStyle.of(context).style;
+    final currentFamily = EmojiManager.currentFamily;
+    if (currentFamily == null || text.isEmpty) {
+      return super.buildTextSpan(
+        context: context,
+        style: effectiveStyle,
+        withComposing: withComposing,
+      );
+    }
+
+    final matches = emojiRegex().allMatches(text);
+    if (matches.isEmpty) {
+      return super.buildTextSpan(
+        context: context,
+        style: effectiveStyle,
+        withComposing: withComposing,
+      );
+    }
+
+    final spans = <InlineSpan>[];
+    int lastMatchEnd = 0;
+    for (final match in matches) {
+      if (match.start > lastMatchEnd) {
+        spans.add(
+          TextSpan(
+            text: text.substring(lastMatchEnd, match.start),
+            style: effectiveStyle,
+          ),
+        );
+      }
+      spans.add(
+        TextSpan(
+          text: match.group(0),
+          style: effectiveStyle.copyWith(
+            fontFamily: currentFamily,
+            fontFamilyFallback: [
+              currentFamily,
+              if (effectiveStyle.fontFamilyFallback != null)
+                ...effectiveStyle.fontFamilyFallback!,
+            ],
+          ),
+        ),
+      );
+      lastMatchEnd = match.end;
+    }
+    if (lastMatchEnd < text.length) {
+      spans.add(
+        TextSpan(
+          text: text.substring(lastMatchEnd),
+          style: effectiveStyle,
+        ),
+      );
+    }
+
+    return TextSpan(style: effectiveStyle, children: spans);
+  }
+}
+

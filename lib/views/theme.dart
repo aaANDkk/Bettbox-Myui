@@ -103,17 +103,17 @@ class _ThemeModeItem extends ConsumerWidget {
     );
     List<ThemeModeItem> themeModeItems = [
       ThemeModeItem(
-        iconData: Icons.auto_mode,
+        iconData: Icons.auto_mode_rounded,
         label: appLocalizations.auto,
         themeMode: ThemeMode.system,
       ),
       ThemeModeItem(
-        iconData: Icons.light_mode,
+        iconData: Icons.light_mode_rounded,
         label: appLocalizations.light,
         themeMode: ThemeMode.light,
       ),
       ThemeModeItem(
-        iconData: Icons.dark_mode,
+        iconData: Icons.dark_mode_rounded,
         label: appLocalizations.dark,
         themeMode: ThemeMode.dark,
       ),
@@ -121,7 +121,7 @@ class _ThemeModeItem extends ConsumerWidget {
     return ItemCard(
       info: Info(
         label: appLocalizations.themeMode,
-        iconData: Icons.brightness_high,
+        iconData: Icons.brightness_high_rounded,
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -172,6 +172,8 @@ class _PrimaryColorItem extends ConsumerStatefulWidget {
 }
 
 class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
+  int? _removablePrimaryColor;
+
   int _calcColumns(double maxWidth) {
     return max((maxWidth / 96).ceil(), 3);
   }
@@ -192,7 +194,10 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     });
   }
 
-  Future<void> _handleDel(int color) async {
+  Future<void> _handleDel() async {
+    if (_removablePrimaryColor == null) {
+      return;
+    }
     final res = await globalState.showMessage(
       message: TextSpan(
         text: appLocalizations.deleteTip(appLocalizations.colorSchemes),
@@ -203,9 +208,9 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     }
     ref.read(themeSettingProvider.notifier).updateState((state) {
       final newPrimaryColors = List<int>.from(state.primaryColors)
-        ..remove(color);
+        ..remove(_removablePrimaryColor);
       int? newPrimaryColor = state.primaryColor;
-      if (state.primaryColor == color) {
+      if (state.primaryColor == _removablePrimaryColor) {
         if (newPrimaryColors.contains(defaultPrimaryColor)) {
           newPrimaryColor = defaultPrimaryColor;
         } else {
@@ -216,6 +221,9 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         primaryColors: newPrimaryColors,
         primaryColor: newPrimaryColor,
       );
+    });
+    setState(() {
+      _removablePrimaryColor = null;
     });
   }
 
@@ -281,74 +289,137 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     final schemeVariant = vm4.c;
     final isEquals = vm4.d;
 
-    return ItemCard(
-      info: Info(label: appLocalizations.themeColor, iconData: Icons.palette),
-      actions: genActions([
-        FilledButton(
-          style: const ButtonStyle(visualDensity: VisualDensity.compact),
-          onPressed: _handleChangeSchemeVariant,
-          child: Text(Intl.message('${schemeVariant.name}Scheme')),
-        ),
-        if (!isEquals)
-          IconButton.filledTonal(
-            iconSize: 20,
-            padding: const EdgeInsets.all(4),
-            visualDensity: VisualDensity.compact,
-            onPressed: _handleReset,
-            icon: const Icon(Icons.replay),
-          ),
-      ], space: 8),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        child: LayoutBuilder(
-          builder: (_, constraints) {
-            final columns = _calcColumns(constraints.maxWidth);
-            final itemWidth =
-                (constraints.maxWidth - (columns - 1) * 16) / columns;
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                for (final color in primaryColors)
-                  SizedBox(
-                    width: itemWidth,
-                    height: itemWidth,
-                    child: EffectGestureDetector(
-                      onLongPress: color != null
-                          ? () {
-                              _handleDel(color);
-                            }
-                          : null,
-                      child: ColorSchemeBox(
-                        isSelected: color == primaryColor,
-                        primaryColor: color != null ? Color(color) : null,
-                        onPressed: () {
-                          ref
-                              .read(themeSettingProvider.notifier)
-                              .updateState(
-                                (state) =>
-                                    state.copyWith(primaryColor: color),
-                              );
-                        },
+    return CommonPopScope(
+      onPop: () {
+        if (_removablePrimaryColor != null) {
+          setState(() {
+            _removablePrimaryColor = null;
+          });
+          return false;
+        }
+        return true;
+      },
+      child: ItemCard(
+        info: Info(label: appLocalizations.themeColor, iconData: Icons.palette_rounded),
+        actions: genActions([
+          if (_removablePrimaryColor == null)
+            FilledButton(
+              style: ButtonStyle(visualDensity: VisualDensity.compact),
+              onPressed: _handleChangeSchemeVariant,
+              child: Text(Intl.message('${schemeVariant.name}Scheme')),
+            ),
+          if (_removablePrimaryColor != null)
+            FilledButton(
+              style: ButtonStyle(visualDensity: VisualDensity.compact),
+              onPressed: () {
+                setState(() {
+                  _removablePrimaryColor = null;
+                });
+              },
+              child: Text(appLocalizations.cancel),
+            ),
+          if (_removablePrimaryColor == null && !isEquals)
+            IconButton.filledTonal(
+              iconSize: 20,
+              padding: EdgeInsets.all(4),
+              visualDensity: VisualDensity.compact,
+              onPressed: _handleReset,
+              icon: Icon(Icons.replay_rounded),
+            ),
+        ], space: 8),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: LayoutBuilder(
+            builder: (_, constraints) {
+              final columns = _calcColumns(constraints.maxWidth);
+              final itemWidth =
+                  (constraints.maxWidth - (columns - 1) * 16) / columns;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  for (final color in primaryColors)
+                    Container(
+                      clipBehavior: Clip.none,
+                      width: itemWidth,
+                      height: itemWidth,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        clipBehavior: Clip.none,
+                        children: [
+                          EffectGestureDetector(
+                            onLongPress: () {
+                              setState(() {
+                                _removablePrimaryColor = color;
+                              });
+                            },
+                            child: ColorSchemeBox(
+                              isSelected: color == primaryColor,
+                              primaryColor: color != null ? Color(color) : null,
+                              onLongPress: () {
+                                setState(() {
+                                  _removablePrimaryColor = color;
+                                });
+                              },
+                              onPressed: () {
+                                setState(() {
+                                  _removablePrimaryColor = null;
+                                });
+                                ref
+                                    .read(themeSettingProvider.notifier)
+                                    .updateState(
+                                      (state) =>
+                                          state.copyWith(primaryColor: color),
+                                    );
+                              },
+                            ),
+                          ),
+                          if (_removablePrimaryColor != null &&
+                              _removablePrimaryColor == color)
+                            Container(
+                              color: Colors.white.opacity0,
+                              padding: EdgeInsets.all(8),
+                              child: IconButton.filledTonal(
+                                style: IconButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  shape: const CircleBorder(),
+                                ),
+                                onPressed: _handleDel,
+                                padding: const EdgeInsets.all(12),
+                                iconSize: 30,
+                                icon: Icon(
+                                  color: context.colorScheme.primary,
+                                  Icons.delete_rounded,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  ),
-                Container(
-                  width: itemWidth,
-                  height: itemWidth,
-                  padding: const EdgeInsets.all(4),
-                  child: IconButton.filledTonal(
-                    onPressed: _handleAdd,
-                    iconSize: 32,
-                    icon: Icon(
-                      color: context.colorScheme.primary,
-                      Icons.add,
+                  if (_removablePrimaryColor == null)
+                    Container(
+                      width: itemWidth,
+                      height: itemWidth,
+                      padding: const EdgeInsets.all(4),
+                      child: IconButton.filledTonal(
+                        style: IconButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: const CircleBorder(),
+                        ),
+                        onPressed: _handleAdd,
+                        iconSize: 32,
+                        icon: Icon(
+                          color: context.colorScheme.primary,
+                          Icons.add_rounded,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -364,7 +435,7 @@ class _PrueBlackItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.pureBlack),
     );
     return ListItem.switchItem(
-      leading: Icon(Icons.contrast),
+      leading: Icon(Icons.contrast_rounded),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.pureBlackMode,
@@ -472,7 +543,7 @@ class _SelectCustomFontItem extends ConsumerWidget {
       builder: (context, _, _) {
         final fontName = FontManager.customFontName;
         return ListItem(
-          leading: const Icon(Icons.folder_open_outlined),
+          leading: const Icon(Icons.folder_open_rounded),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.selectCustomFont,
@@ -511,7 +582,7 @@ class _EmojiStyleItem extends StatelessWidget {
       valueListenable: EmojiManager.emojiStyleNotifier,
       builder: (context, currentStyle, _) {
         return ListItem(
-          leading: const Icon(Icons.sentiment_satisfied_alt_outlined),
+          leading: const Icon(Icons.sentiment_very_satisfied_rounded),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.emojiStyle,
@@ -568,15 +639,7 @@ class _EmojiStyleDialog extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            currentStyle == style
-                                ? Icons.check_circle_rounded
-                                : Icons.circle_outlined,
-                            size: 21,
-                            color: currentStyle == style
-                                ? context.colorScheme.primary
-                                : context.colorScheme.onSurfaceVariant.withOpacity(0.6),
-                          ),
+                          OptionRadioIcon(selected: currentStyle == style, size: 21),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
@@ -641,7 +704,7 @@ class _DarkIconItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.useDarkIcon),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.dark_mode_outlined),
+      leading: const Icon(Icons.join_left_rounded),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.darkIcon,
@@ -677,7 +740,7 @@ class _TrayIconInvertItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.invertTrayIcon),
     );
     return ListItem.switchItem(
-      leading: Icon(Icons.invert_colors),
+      leading: Icon(Icons.invert_colors_rounded),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.trayIconInvert,
@@ -719,7 +782,7 @@ class _TextScaleFactorItem extends ConsumerWidget {
         Padding(
           padding: EdgeInsets.only(bottom: 8),
           child: ListItem.switchItem(
-            leading: Icon(Icons.text_fields),
+            leading: Icon(Icons.text_fields_rounded),
             horizontalTitleGap: 12,
             title: Text(
               appLocalizations.textScale,

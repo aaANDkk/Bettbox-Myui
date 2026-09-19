@@ -89,12 +89,14 @@ class OptionsDelegate<T> extends Delegate {
   final String title;
   final T value;
   final String Function(T value) textBuilder;
+  final Widget Function(T value)? trailingBuilder;
   final Function(T? value) onChanged;
 
   const OptionsDelegate({
     required this.title,
     required this.options,
     required this.textBuilder,
+    this.trailingBuilder,
     required this.value,
     required this.onChanged,
   });
@@ -267,7 +269,7 @@ class ListItem<T> extends StatelessWidget {
       dense: dense,
       enabled: enabled,
       focusColor: context.colorScheme.primary.withValues(alpha: 0.18),
-      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(16)),
       titleTextStyle: titleTextStyle,
       subtitleTextStyle: subtitleTextStyle,
       leading: leading ?? this.leading,
@@ -375,6 +377,7 @@ class ListItem<T> extends StatelessWidget {
               title: optionsDelegate.title,
               options: optionsDelegate.options,
               textBuilder: optionsDelegate.textBuilder,
+              trailingBuilder: optionsDelegate.trailingBuilder,
               value: optionsDelegate.value,
             ),
           );
@@ -414,16 +417,12 @@ class ListItem<T> extends StatelessWidget {
             checkboxDelegate.onChanged!(!checkboxDelegate.value);
           }
         },
+        // 可多选的复选框行 → 方块勾选（规范第 7 节）。
         trailing: Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: Icon(
-            checkboxDelegate.value
-                ? Icons.check_circle_rounded
-                : Icons.circle_outlined,
-            size: 24,
-            color: checkboxDelegate.value
-                ? context.colorScheme.primary
-                : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+          child: OptionCheckIcon(
+            selected: checkboxDelegate.value,
+            onChanged: checkboxDelegate.onChanged,
           ),
         ),
       );
@@ -461,13 +460,7 @@ class ListItem<T> extends StatelessWidget {
             radioDelegate.onChanged!(radioDelegate.value);
           }
         },
-        leading: Icon(
-          isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-          size: 21,
-          color: isSelected
-              ? context.colorScheme.primary
-              : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-        ),
+        leading: OptionRadioIcon(selected: isSelected, size: 21),
         trailing: trailing,
       );
     }
@@ -496,9 +489,12 @@ class ListHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.centerLeft,
+      // 分区小标题左侧内缩 24 = 卡片外边距 16 + 额外 8，
+      // 与「更多」页面（_buildModernSection）的小标题视觉完全一致，
+      // 彻底消除标题紧贴屏幕左边缘的违和感。
       padding:
           padding ??
-          const EdgeInsets.only(left: 16, right: 8, top: 24, bottom: 8),
+          const EdgeInsets.only(left: 24, right: 8, top: 24, bottom: 8),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -558,7 +554,7 @@ class SectionContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final headerPadding = isFirst
-        ? const EdgeInsets.only(left: 16, right: 8, top: 4, bottom: 8)
+        ? const EdgeInsets.only(left: 24, right: 8, top: 8, bottom: 8)
         : null;
 
     if (plain) {
@@ -768,9 +764,9 @@ Widget generateListView(List<Widget> items) {
                 title: item.title,
                 subTitle: item.subTitle,
                 padding: const EdgeInsets.only(
-                  left: 16,
+                  left: 24,
                   right: 8,
-                  top: 4,
+                  top: 8,
                   bottom: 8,
                 ),
                 actions: item.actions,
@@ -797,3 +793,4 @@ Widget generateListView(List<Widget> items) {
     },
   );
 }
+

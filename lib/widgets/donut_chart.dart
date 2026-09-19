@@ -30,6 +30,13 @@ class DonutChartData {
   int get hashCode => _value.hashCode ^ color.hashCode;
 }
 
+/// 圆环入场动效在整个应用生命周期内只完整播放一次。
+///
+/// 首页仪表盘所在页面未开启 keepAlive（`navigation.dart` 中 `keep: false`），
+/// 切换选项卡时整个页面会被销毁并在切回时重建；若不做限制，圆环每次切回
+/// 首页都会重播入场展开动效。
+bool _hasPlayedEntryAnimation = false;
+
 class DonutChart extends StatefulWidget {
   final List<DonutChartData> data;
   final Duration duration;
@@ -68,7 +75,13 @@ class DonutChartState extends State<DonutChart> with TickerProviderStateMixin {
       parent: _entryController,
       curve: Curves.easeOutCubic,
     );
-    _entryController.forward();
+    if (_hasPlayedEntryAnimation) {
+      // 页面重建（切换选项卡后切回首页）时不重播入场动效
+      _entryController.value = 1.0;
+    } else {
+      _hasPlayedEntryAnimation = true;
+      _entryController.forward();
+    }
   }
 
   void replayEntryAnimation() {

@@ -1,6 +1,8 @@
+import 'dart:async';
+import 'dart:ui' show FontVariation;
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
-import 'dart:async';
 
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/app.dart';
@@ -56,7 +58,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
   late final ValueNotifier<AppBarState> _appBarState;
   final ValueNotifier<Widget?> _floatingActionButton = ValueNotifier(null);
   final ValueNotifier<List<String>> _keywordsNotifier = ValueNotifier([]);
-  final _textController = TextEditingController();
+  final _textController = EmojiTextEditingController();
   final _searchFocusNode = FocusNode();
 
   bool get _isSearch {
@@ -179,22 +181,32 @@ class CommonScaffoldState extends State<CommonScaffold> {
     _keywordsNotifier.value = keywords;
   }
 
-  Widget? _buildLeading() {
+  Widget? _buildLeading([bool canPop = false]) {
     if (_isEdit) {
       return IconButton(
         onPressed: _appBarState.value.editState?.onExit,
-        icon: const Icon(Icons.close),
+        icon: const Icon(Icons.close_rounded),
         tooltip: appLocalizations.cancel,
       );
     }
     if (_isSearch) {
       return IconButton(
         onPressed: _handleExitSearching,
-        icon: const Icon(Icons.arrow_back),
+        icon: const Icon(Icons.arrow_back_rounded),
         tooltip: appLocalizations.back,
       );
     }
-    return widget.leading;
+    if (widget.leading != null) {
+      return widget.leading;
+    }
+    if (canPop) {
+      return IconButton(
+        onPressed: () => Navigator.maybePop(context),
+        icon: const Icon(Icons.arrow_back_rounded),
+        tooltip: appLocalizations.back,
+      );
+    }
+    return null;
   }
 
   Widget _buildTitle(AppBarSearchState? startState) {
@@ -216,6 +228,10 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 : appLocalizations.selectedCountTitle(
                     '${_appBarState.value.editState?.editCount ?? 0}',
                   ),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontVariations: [FontVariation('wght', 700)],
+            ),
           );
   }
 
@@ -224,7 +240,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
       return genActions([
         IconButton(
           onPressed: _handleClear,
-          icon: const Icon(Icons.close),
+          icon: const Icon(Icons.close_rounded),
           tooltip: appLocalizations.clear,
         ),
       ]);
@@ -241,7 +257,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
               });
             });
           },
-          icon: const Icon(Icons.search),
+          icon: const Icon(Icons.search_rounded),
           tooltip: appLocalizations.search,
         ),
       ...actions,
@@ -289,11 +305,16 @@ class CommonScaffoldState extends State<CommonScaffold> {
           widget.appBar ??
               ValueListenableBuilder<AppBarState>(
                 valueListenable: _appBarState,
-                builder: (_, state, _) {
+                builder: (context, state, _) {
+                  final parentRoute = ModalRoute.of(context);
+                  final canPop = parentRoute?.canPop ?? false;
+                  final leading = _buildLeading(canPop);
+                  final hasLeading = leading != null || canPop;
                   return _buildAppBarWrap(
                     AppBar(
                       centerTitle: widget.centerTitle ?? false,
-                      leading: _buildLeading(),
+                      leading: leading,
+                      titleSpacing: hasLeading ? 0.0 : null,
                       title: _buildTitle(state.searchState),
                       actions: _buildActions(
                         state.searchState != null,

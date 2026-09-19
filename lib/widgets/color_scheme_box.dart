@@ -9,11 +9,13 @@ class ColorSchemeBox extends StatelessWidget {
   final Color? primaryColor;
   final bool? isSelected;
   final void Function()? onPressed;
+  final void Function()? onLongPress;
 
   const ColorSchemeBox({
     super.key,
     required this.primaryColor,
     this.onPressed,
+    this.onLongPress,
     this.isSelected,
   });
 
@@ -31,6 +33,7 @@ class ColorSchemeBox extends StatelessWidget {
                 CommonCard(
                   isSelected: isSelected,
                   onPressed: onPressed,
+                  onLongPress: onLongPress,
                   selectWidget: Container(
                     alignment: Alignment.center,
                     child: const SelectIcon(),
@@ -67,7 +70,7 @@ class ColorSchemeBox extends StatelessWidget {
                   const Positioned(
                     bottom: 4,
                     right: 4,
-                    child: Icon(Icons.colorize, size: 20),
+                    child: Icon(Icons.colorize_rounded, size: 20),
                   ),
               ],
             );

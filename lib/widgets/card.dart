@@ -8,9 +8,15 @@ import 'text.dart';
 class Info {
   final String label;
   final IconData? iconData;
+  final Widget? icon;
   final TextStyle? style;
 
-  const Info({required this.label, this.iconData, this.style});
+  const Info({
+    required this.label,
+    this.iconData,
+    this.icon,
+    this.style,
+  });
 }
 
 class InfoHeader extends StatelessWidget {
@@ -18,10 +24,16 @@ class InfoHeader extends StatelessWidget {
   final List<Widget> actions;
   final EdgeInsetsGeometry? padding;
 
+  /// 右侧操作区（actions）的高度上限。卡片表头传「一行标题」高
+  /// （`globalState.measure.titleSmallHeight`）后，按钮不再撑高整行，
+  /// 图标 / 标题 / 按钮落在同一条线上；不传则完全沿用按钮自身尺寸。
+  final double? actionsHeight;
+
   const InfoHeader({
     super.key,
     required this.info,
     this.padding,
+    this.actionsHeight,
     List<Widget>? actions,
   }) : actions = actions ?? const [];
 
@@ -30,7 +42,7 @@ class InfoHeader extends StatelessWidget {
     return Padding(
       padding: padding ?? baseInfoEdgeInsets,
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
@@ -38,7 +50,10 @@ class InfoHeader extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                if (info.iconData != null) ...[
+                if (info.icon != null) ...[
+                  info.icon!,
+                  const SizedBox(width: 8),
+                ] else if (info.iconData != null) ...[
                   Icon(
                     info.iconData,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -65,12 +80,17 @@ class InfoHeader extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [...actions],
-          ),
+          if (actions.isNotEmpty) ...[
+            const SizedBox(width: 8),
+            SizedBox(
+              height: actionsHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [...actions],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -128,6 +148,7 @@ class CommonCard extends StatelessWidget {
     this.padding,
     this.enterAnimated = false,
     this.info,
+    this.actions,
   }) : isSelected = isSelected ?? false;
 
   final bool enterAnimated;
@@ -138,6 +159,7 @@ class CommonCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets? padding;
   final Info? info;
+  final List<Widget>? actions;
   final CommonCardType type;
   final double? radius;
 
@@ -193,6 +215,7 @@ class CommonCard extends StatelessWidget {
           InfoHeader(
             padding: baseInfoEdgeInsets.copyWith(bottom: 0),
             info: info!,
+            actions: actions,
           ),
           Flexible(flex: 1, child: child),
         ],
@@ -239,6 +262,8 @@ class CommonCard extends StatelessWidget {
   }
 }
 
+/// 选中标记：色块上的勾选徽标（第 40 节曾试过换成圆环+实心点，
+/// 但在彩色色块上看不清，按需求还原为勾选徽标）。
 class SelectIcon extends StatelessWidget {
   const SelectIcon({super.key});
 
@@ -249,8 +274,79 @@ class SelectIcon extends StatelessWidget {
       shape: const CircleBorder(),
       child: Container(
         padding: const EdgeInsets.all(4),
-        child: const Icon(Icons.check, size: 16),
+        child: const Icon(Icons.check_rounded, size: 16),
       ),
+    );
+  }
+}
+
+/// 「选中 / 未选中」圆形单选指示图标（出站模式部件与各处选项弹窗共用）。
+///
+/// 用于**选中一次即结束**的单选场合（选项弹窗、单选行、只取一个值的显示设置弹窗）；
+/// **可多选**的场合用 [OptionCheckIcon]（方块勾选），见定制规范第 7 节。
+class OptionRadioIcon extends StatelessWidget {
+  final bool selected;
+
+  /// 外框边长（默认 21；圆环与实心点按比例缩放）
+  final double size;
+
+  const OptionRadioIcon({super.key, required this.selected, this.size = 21});
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = context.colorScheme.primary;
+    final idle = context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Center(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOut,
+          width: size - 2,
+          height: size - 2,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: selected ? primary : idle, width: 2),
+          ),
+          child: selected
+              ? Container(
+                  width: size * 9 / 21,
+                  height: size * 9 / 21,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primary,
+                  ),
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+}
+
+/// 「选中 / 未选中」方块勾选指示图标（**可多选**的场合使用）。
+///
+/// 与 [OptionRadioIcon] 成对，构成全站选项指示的两套体系（定制规范第 7 节）：
+/// - **选中一次即结束**的单选 → 圆形 [OptionRadioIcon]（出站模式同款）；
+/// - **可多选**（访问控制列表、连通性测试置顶平台等）→ 本组件（Bettbox 原本的方块勾选）。
+///
+/// 用 `shrinkWrap` 去掉 Checkbox 自带 48×48 的隐形点击区（整行本身就可点），
+/// 并固定 `standard` 视觉密度，避免桌面端被主题压成迷你方块。
+class OptionCheckIcon extends StatelessWidget {
+  final bool selected;
+  final ValueChanged<bool?>? onChanged;
+
+  const OptionCheckIcon({super.key, required this.selected, this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Checkbox(
+      value: selected,
+      onChanged: onChanged,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.standard,
     );
   }
 }

@@ -18,12 +18,14 @@ class OptionsDialog<T> extends StatelessWidget {
   final List<T> options;
   final T value;
   final String Function(T value) textBuilder;
+  final Widget Function(T value)? trailingBuilder;
 
   const OptionsDialog({
     super.key,
     required this.title,
     required this.options,
     required this.textBuilder,
+    this.trailingBuilder,
     required this.value,
   });
 
@@ -43,23 +45,15 @@ class OptionsDialog<T> extends StatelessWidget {
                   Navigator.of(context).pop(option);
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 12,
+                    top: 12,
+                    bottom: 12,
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        value == option
-                            ? Icons.check_circle_rounded
-                            : Icons.circle_outlined,
-                        size: 21,
-                        color: value == option
-                            ? context.colorScheme.primary
-                            : context.colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.6,
-                              ),
-                      ),
+                      OptionRadioIcon(selected: value == option, size: 21),
                       const SizedBox(width: 12),
                       Expanded(
                         child: EmojiText(
@@ -69,6 +63,10 @@ class OptionsDialog<T> extends StatelessWidget {
                           maxLines: 1,
                         ),
                       ),
+                      if (trailingBuilder != null) ...[
+                        const SizedBox(width: 8),
+                        trailingBuilder!(option),
+                      ],
                     ],
                   ),
                 ),
@@ -155,7 +153,7 @@ class _InputDialogState extends State<InputDialog> {
   @override
   void initState() {
     super.initState();
-    textController = TextEditingController(text: value);
+    textController = EmojiTextEditingController(text: value);
     if (widget.delayedFocus) {
       _focusNode = FocusNode();
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -312,11 +310,20 @@ class ListInputPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatLayout(
       floatingWidget: FloatWrapper(
-        child: FloatingActionButton(
-          onPressed: () async {
-            _handleAddOrEdit();
-          },
-          child: const Icon(Icons.add),
+        child: DecoratedBox(
+          decoration: getCommonFabDecoration(context),
+          child: FloatingActionButton(
+            elevation: 0,
+            hoverElevation: 0,
+            highlightElevation: 0,
+            focusElevation: 0,
+            clipBehavior: Clip.none,
+            heroTag: null,
+            onPressed: () async {
+              _handleAddOrEdit();
+            },
+            child: const Icon(Icons.add_rounded),
+          ),
         ),
       ),
       child: items.isEmpty
@@ -343,7 +350,7 @@ class ListInputPage extends StatelessWidget {
                             ? subtitleBuilder!(e)
                             : null,
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline),
+                          icon: const Icon(Icons.delete_outline_rounded),
                           onPressed: () {
                             _handleDelete(e);
                           },
@@ -457,11 +464,20 @@ class MapInputPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatLayout(
       floatingWidget: FloatWrapper(
-        child: FloatingActionButton(
-          onPressed: () async {
-            _handleAddOrEdit();
-          },
-          child: const Icon(Icons.add),
+        child: DecoratedBox(
+          decoration: getCommonFabDecoration(context),
+          child: FloatingActionButton(
+            elevation: 0,
+            hoverElevation: 0,
+            highlightElevation: 0,
+            focusElevation: 0,
+            clipBehavior: Clip.none,
+            heroTag: null,
+            onPressed: () async {
+              _handleAddOrEdit();
+            },
+            child: const Icon(Icons.add_rounded),
+          ),
         ),
       ),
       child: items.isEmpty
@@ -490,7 +506,7 @@ class MapInputPage extends StatelessWidget {
                             : null,
                         trailing: (canDelete == null || canDelete!(e))
                             ? IconButton(
-                                icon: const Icon(Icons.delete_outline),
+                                icon: const Icon(Icons.delete_outline_rounded),
                                 onPressed: () {
                                   _handleDelete(e);
                                 },
@@ -548,9 +564,9 @@ class _AddDialogState extends State<AddDialog> {
   void initState() {
     super.initState();
     if (keyField != null) {
-      keyController = TextEditingController(text: keyField!.value);
+      keyController = EmojiTextEditingController(text: keyField!.value);
     }
-    valueController = TextEditingController(text: valueField.value);
+    valueController = EmojiTextEditingController(text: valueField.value);
   }
 
   void _submit() {

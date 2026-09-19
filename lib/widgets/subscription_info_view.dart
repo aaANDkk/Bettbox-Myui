@@ -22,21 +22,26 @@ class SubscriptionInfoView extends StatelessWidget {
     }
 
     // Show progress bar
-    final progress = total > 0 ? use / total : 0.0;
+    final progress = (total > 0 ? use / total : 0.0).clamp(0.0, 1.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(2.5),
           child: Container(
-            height: 6,
+            height: 5,
             width: double.infinity,
-            color: context.colorScheme.primary.opacity15,
+            alignment: Alignment.centerLeft,
+            color: context.colorScheme.primary.withValues(alpha: 0.15),
             child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
               widthFactor: progress,
-              child: Container(color: context.colorScheme.primary),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              ),
             ),
           ),
         ),

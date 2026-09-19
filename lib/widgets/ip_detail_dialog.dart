@@ -1,3 +1,5 @@
+import 'dart:ui' show FontVariation;
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
@@ -27,15 +29,18 @@ void showIpDetailDialog(
   globalState.showCommonDialog(
     child: _IpDetailDialog(
       ip: cleanIp,
+      initialInfo: initialInfo,
     ),
   );
 }
 
 class _IpDetailDialog extends StatefulWidget {
   final String ip;
+  final IpInfo? initialInfo;
 
   const _IpDetailDialog({
     required this.ip,
+    this.initialInfo,
   });
 
   @override
@@ -43,7 +48,7 @@ class _IpDetailDialog extends StatefulWidget {
 }
 
 class _IpDetailDialogState extends State<_IpDetailDialog> {
-  bool _isLoading = true;
+  late bool _isLoading;
   String? _errorMessage;
   IpCategory? _category;
   IpInfo? _ipInfo;
@@ -51,18 +56,25 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
   @override
   void initState() {
     super.initState();
-    _ipInfo = request.getMemoryCachedIp(widget.ip);
-    _fetchIpDetail();
+    final cat = utils.classifyIp(widget.ip);
+    if (cat != IpCategory.public) {
+      _category = cat;
+      _isLoading = false;
+    } else {
+      final cached = widget.initialInfo ?? request.getMemoryCachedIp(widget.ip);
+      if (cached != null) {
+        _ipInfo = cached;
+        _isLoading = false;
+      } else {
+        _isLoading = true;
+        _fetchIpDetail();
+      }
+    }
   }
 
   Future<void> _fetchIpDetail() async {
-    final stopwatch = Stopwatch()..start();
     final cat = utils.classifyIp(widget.ip);
     if (cat != IpCategory.public) {
-      final elapsed = stopwatch.elapsedMilliseconds;
-      if (elapsed < 200) {
-        await Future.delayed(Duration(milliseconds: 200 - elapsed));
-      }
       if (mounted) {
         setState(() {
           _category = cat;
@@ -73,10 +85,6 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
     }
 
     final res = await request.queryIpDetail(widget.ip);
-    final elapsed = stopwatch.elapsedMilliseconds;
-    if (elapsed < 200) {
-      await Future.delayed(Duration(milliseconds: 200 - elapsed));
-    }
     if (!mounted) return;
 
     if (res.isError) {
@@ -118,6 +126,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         widget.ip,
         style: context.textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.bold,
+          fontVariations: const [FontVariation('wght', 700)],
         ),
       ),
       trailing: IconButton(
@@ -194,7 +203,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.stacked_line_chart),
+            leading: const Icon(Icons.stacked_line_chart_rounded),
             title: Text(appLocalizations.tunVirtualAddress),
             subtitle: Text(
               'TUN Virtual Network Adapter',
@@ -213,7 +222,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.shuffle),
+            leading: const Icon(Icons.shuffle_rounded),
             title: Text(appLocalizations.privateIp),
             subtitle: Text(
               'LAN / Private Network',
@@ -232,7 +241,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.error_outline, color: Colors.red),
+            leading: const Icon(Icons.error_outline_rounded, color: Colors.red),
             title: Text(
               _errorMessage!,
               style: context.textTheme.bodyMedium?.copyWith(color: Colors.red),
@@ -251,7 +260,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           if (countryText.isNotEmpty || flagEmoji.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.flag_outlined),
+              leading: const Icon(Icons.emoji_flags_rounded),
               title: Text(appLocalizations.countryOrRegion),
               subtitle: EmojiText(
                 flagEmoji.isNotEmpty ? '$flagEmoji $countryText' : countryText,
@@ -262,7 +271,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           if (provinceCity.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.location_city_outlined),
+              leading: const Icon(Icons.my_location_rounded),
               title: Text(appLocalizations.provinceAndCity),
               subtitle: Text(provinceCity),
             ),
@@ -270,7 +279,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           if (operatorText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.business_outlined),
+              leading: const Icon(Icons.business_rounded),
               title: Text(appLocalizations.operatorOrAsn),
               subtitle: Text(operatorText),
             ),
@@ -286,7 +295,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           if (domainText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.link_outlined),
+              leading: const Icon(Icons.link_rounded),
               title: Text(appLocalizations.domain),
               subtitle: Text(domainText),
             ),

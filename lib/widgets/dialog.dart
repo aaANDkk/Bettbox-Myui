@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/providers/app.dart';
 import 'package:bett_box/widgets/pop_scope.dart';
@@ -43,13 +44,29 @@ class CommonDialog extends ConsumerWidget {
               Navigator.of(context).pop();
             },
       child: AlertDialog(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(35),
+        ),
         title: titleTrailing == null
-            ? EmojiText(title)
+            ? EmojiText(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontVariations: [FontVariation('wght', 700)],
+                ),
+              )
             : Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  EmojiText(title),
+                  Expanded(
+                    child: EmojiText(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontVariations: [FontVariation('wght', 700)],
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   titleTrailing!,
                 ],
@@ -63,7 +80,12 @@ class CommonDialog extends ConsumerWidget {
             maxWidth: 300,
           ),
           width: size.width - 40,
-          child: !overrideScroll ? SingleChildScrollView(child: child) : child,
+          child: !overrideScroll
+              ? SingleChildScrollView(
+                  clipBehavior: Clip.hardEdge,
+                  child: child,
+                )
+              : child,
         ),
       ),
     );
@@ -79,12 +101,17 @@ class CommonModal extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
     return Center(
-      child: Container(
+      child: SizedBox(
         width: size.width * 0.85,
         height: size.height * 0.85,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-        clipBehavior: Clip.antiAlias,
-        child: child,
+        child: Material(
+          type: MaterialType.transparency,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(35),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: child,
+        ),
       ),
     );
   }
