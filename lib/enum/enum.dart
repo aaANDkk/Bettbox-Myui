@@ -208,6 +208,7 @@ enum HotAction { start, view, mode, proxy, tun }
 enum ProxiesIconStyle { standard, none, icon }
 
 enum FontFamily {
+  openMoji('OpenMoji'),
   twEmoji('Twemoji'),
   jetBrainsMono('JetBrainsMono'),
   icon('Icons');
@@ -305,6 +306,9 @@ enum DashboardWidget {
   outboundModeV2(GridItem(crossAxisCellCount: 8, child: OutboundModeV2())),
   outboundMode(GridItem(crossAxisCellCount: 4, child: OutboundMode())),
   trafficUsage(GridItem(crossAxisCellCount: 4, child: TrafficUsage())),
+  trafficUsageSmall(
+    GridItem(crossAxisCellCount: 4, child: TrafficUsageSmall()),
+  ),
   networkDetection(GridItem(crossAxisCellCount: 4, child: NetworkDetection())),
   tunButton(
     GridItem(crossAxisCellCount: 4, child: TUNButton()),
@@ -322,6 +326,10 @@ enum DashboardWidget {
   memoryInfo(GridItem(crossAxisCellCount: 4, child: MemoryInfo())),
   connectionsCount(GridItem(crossAxisCellCount: 4, child: ConnectionsCount())),
   ipv6Switch(GridItem(crossAxisCellCount: 4, child: Ipv6Switch())),
+  accessControlSwitch(
+    GridItem(crossAxisCellCount: 4, child: AccessControlSwitch()),
+    platforms: [SupportPlatform.Android],
+  ),
   wakelockSwitch(
     GridItem(crossAxisCellCount: 4, child: WakelockSwitch()),
     platforms: desktopPlatforms,
@@ -329,14 +337,16 @@ enum DashboardWidget {
   dnsOverride(GridItem(crossAxisCellCount: 4, child: DnsOverride())),
   snifferOverride(GridItem(crossAxisCellCount: 4, child: SnifferOverride())),
   ntpOverride(GridItem(crossAxisCellCount: 4, child: NtpOverride())),
+  scriptOverride(GridItem(crossAxisCellCount: 4, child: ScriptOverride())),
   providersInfo(GridItem(crossAxisCellCount: 4, child: ProvidersInfo())),
-  fcmStatus(GridItem(crossAxisCellCount: 4, child: FcmStatus())),
+  fcmStatus(
+    GridItem(crossAxisCellCount: 4, child: FcmStatus()),
+    platforms: [SupportPlatform.Android],
+  ),
   onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel())),
   mediaUnlock(GridItem(crossAxisCellCount: 8, child: MediaUnlock())),
   mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall())),
-  startButton(
-    GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
-  );
+  currentProfile(GridItem(crossAxisCellCount: 4, child: CurrentProfile()));
 
   final GridItem widget;
   final List<SupportPlatform> platforms;
@@ -460,13 +470,21 @@ enum ScrollPositionCacheKeys { tools, profiles, proxiesList, proxiesTabList }
 
 enum DelayAnimationType {
   none,
+  fadingCube,
+  foldingCube,
+  pumpingHeart,
+  pouringHourGlass,
+  squareCircle,
+  threeRotatingDots,
+  fourRotatingDots,
+  staggeredDotsWave,
+  dotsTriangle,
   rotatingCircle,
   pulse,
   spinningLines,
   threeInOut,
   threeBounce,
   circle,
-  fadingCircle,
   fadingFour,
   wave,
   doubleBounce,

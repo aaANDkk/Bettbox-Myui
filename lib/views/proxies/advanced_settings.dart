@@ -6,6 +6,8 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'card.dart';
+
 class ProxiesAdvancedSettings extends ConsumerWidget {
   const ProxiesAdvancedSettings({super.key});
 
@@ -154,7 +156,7 @@ class _ConcurrencyLimitItem extends ConsumerWidget {
     );
 
     return ListItem<int>.options(
-      leading: const Icon(Icons.speed),
+      leading: const Icon(Icons.traffic_rounded),
       title: Text(appLocalizations.concurrencyLimit),
       subtitle: Text(appLocalizations.concurrencyLimitDesc),
       delegate: OptionsDelegate(
@@ -215,13 +217,23 @@ class _DelayAnimationItem extends ConsumerWidget {
   String _getTextForDelayAnimation(DelayAnimationType type) {
     return switch (type) {
       DelayAnimationType.none => appLocalizations.noAnimation,
+      DelayAnimationType.fadingCube => appLocalizations.fadingCube,
+      DelayAnimationType.foldingCube => appLocalizations.foldingCube,
+      DelayAnimationType.pumpingHeart => appLocalizations.pumpingHeart,
+      DelayAnimationType.pouringHourGlass => appLocalizations.pouringHourGlass,
+      DelayAnimationType.squareCircle => appLocalizations.squareCircle,
+      DelayAnimationType.threeRotatingDots =>
+        appLocalizations.threeRotatingDots,
+      DelayAnimationType.fourRotatingDots => appLocalizations.fourRotatingDots,
+      DelayAnimationType.staggeredDotsWave =>
+        appLocalizations.staggeredDotsWave,
+      DelayAnimationType.dotsTriangle => appLocalizations.dotsTriangle,
       DelayAnimationType.rotatingCircle => appLocalizations.rotatingCircle,
       DelayAnimationType.pulse => appLocalizations.pulse,
       DelayAnimationType.spinningLines => appLocalizations.spinningLines,
       DelayAnimationType.threeInOut => appLocalizations.threeInOut,
       DelayAnimationType.threeBounce => appLocalizations.threeBounce,
       DelayAnimationType.circle => appLocalizations.circle,
-      DelayAnimationType.fadingCircle => appLocalizations.fadingCircle,
       DelayAnimationType.fadingFour => appLocalizations.fadingFour,
       DelayAnimationType.wave => appLocalizations.wave,
       DelayAnimationType.doubleBounce => appLocalizations.doubleBounce,
@@ -235,7 +247,7 @@ class _DelayAnimationItem extends ConsumerWidget {
     );
 
     return ListItem<DelayAnimationType>.options(
-      leading: const Icon(Icons.animation),
+      leading: const Icon(Icons.animation_rounded),
       title: Text(appLocalizations.delayAnimation),
       subtitle: Text(appLocalizations.delayAnimationDesc),
       delegate: OptionsDelegate(
@@ -243,6 +255,17 @@ class _DelayAnimationItem extends ConsumerWidget {
         options: DelayAnimationType.values,
         value: delayAnimation,
         textBuilder: (value) => _getTextForDelayAnimation(value),
+        trailingBuilder: (value) => SizedBox(
+          width: 24,
+          height: 24,
+          child: Center(
+            child: buildDelayAnimationWidget(
+              value,
+              size: 16.0,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
         onChanged: (value) {
           if (value != null) {
             ref.read(proxiesStyleSettingProvider.notifier).updateState(

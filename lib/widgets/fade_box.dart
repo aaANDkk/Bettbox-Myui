@@ -180,12 +180,16 @@ const _defaultSlideDistance = 24.0;
 class FadeSlideEnterBox extends StatefulWidget {
   final Duration delay;
   final double distance;
+  final Axis axis;
+  final bool reverse;
   final Widget child;
 
   const FadeSlideEnterBox({
     super.key,
     this.delay = Duration.zero,
     this.distance = _defaultSlideDistance,
+    this.axis = Axis.vertical,
+    this.reverse = false,
     required this.child,
   });
 
@@ -221,6 +225,8 @@ class _FadeSlideEnterBoxState extends State<FadeSlideEnterBox>
     return FadeSlideEnterTransition(
       animation: _animation,
       distance: widget.distance,
+      axis: widget.axis,
+      reverse: widget.reverse,
       child: widget.child,
     );
   }
@@ -231,11 +237,15 @@ class FadeSlideEnterTransition extends StatelessWidget {
     super.key,
     required this.animation,
     this.distance = _defaultSlideDistance,
+    this.axis = Axis.vertical,
+    this.reverse = false,
     this.child,
   });
 
   final Animation<double> animation;
   final double distance;
+  final Axis axis;
+  final bool reverse;
   final Widget? child;
 
   static final Animatable<double> _fadeInTransition = CurveTween(
@@ -247,20 +257,19 @@ class FadeSlideEnterTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slide = Tween<double>(
-      begin: -distance,
-      end: 0,
+    final begin = axis == Axis.horizontal
+        ? Offset(reverse ? distance : -distance, 0)
+        : Offset(0, reverse ? distance : -distance);
+    final slide = Tween<Offset>(
+      begin: begin,
+      end: Offset.zero,
     ).chain(_slideInCurve).animate(animation);
     return FadeTransition(
       opacity: _fadeInTransition.animate(animation),
       child: AnimatedBuilder(
         animation: slide,
-        builder: (_, child) {
-          return Transform.translate(
-            offset: Offset(0, slide.value),
-            child: child,
-          );
-        },
+        builder: (_, child) =>
+            Transform.translate(offset: slide.value, child: child),
         child: child,
       ),
     );

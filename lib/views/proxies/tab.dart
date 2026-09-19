@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -89,8 +90,8 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
         return IconButton(
           onPressed: _showMoreMenu,
           icon: isMobileView
-              ? const Icon(Icons.expand_more)
-              : const Icon(Icons.chevron_right),
+              ? const Icon(Icons.expand_more_rounded)
+              : const Icon(Icons.chevron_right_rounded),
         );
       },
     );
@@ -152,7 +153,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
         final isTesting = delayTestCoordinator.isTesting;
         return IconButton(
           onPressed: isTesting ? null : delayTestCurrentGroup,
-          icon: Icon(Icons.network_ping),
+          icon: Icon(Icons.network_ping_rounded),
           tooltip: appLocalizations.startTest,
         );
       },
@@ -227,6 +228,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
     if (groups.isEmpty) {
       return NullStatus(
         label: appLocalizations.nullTip(appLocalizations.proxies),
+        illustration: NullStatusIllustration.proxies,
       );
     }
     // Safety check: ensure controller matches groups count
@@ -577,34 +579,12 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
       builder: (_, child) {
         final showLoading = _isTesting && _controller.isCompleted;
         final contentScale = showLoading ? 0.0 : _scale.value;
-        final isDark =
-            Theme.of(context).colorScheme.brightness == Brightness.dark;
         return Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.center,
           children: [
             DecoratedBox(
-              decoration: ShapeDecoration(
-                shape: RoundedSuperellipseBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                shadows: [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: isDark ? 0.35 : 0.14,
-                    ),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: isDark ? 0.20 : 0.06,
-                    ),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
+              decoration: getCommonFabDecoration(context),
               child: FloatingActionButton.extended(
                 elevation: 0,
                 hoverElevation: 0,
@@ -618,11 +598,19 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
                     : _healthcheck,
                 icon: Transform.scale(
                   scale: contentScale,
-                  child: const Icon(Icons.network_ping),
+                  child: const Icon(Icons.network_ping_rounded),
                 ),
                 label: Transform.scale(
                   scale: contentScale,
-                  child: Text(appLocalizations.startTest),
+                  child: Text(
+                    appLocalizations.startTest,
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.labelLarge?.fontFamily,
+                      fontWeight: FontWeight.bold,
+                      fontVariations: const [FontVariation('wght', 700)],
+                    ),
+                  ),
                 ),
               ),
             ),
