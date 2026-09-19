@@ -360,22 +360,25 @@ class TrackerInfoDetailView extends ConsumerWidget {
   }
 
   Widget _buildChains(TrackerInfo info) {
-    final chains = Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      alignment: WrapAlignment.end,
-      children: [
-        for (final chain in info.chains)
-          CommonChip(label: chain, onPressed: () {}),
-      ],
-    );
     return ListItem(
       title: Row(
+        spacing: 16,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(appLocalizations.proxyChains),
-          Flexible(child: chains),
+          // 右侧标签流与标题保持 16px 安全间距，永不与文字发生触碰/重叠
+          Flexible(
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              alignment: WrapAlignment.end,
+              children: [
+                for (final chain in info.chains)
+                  CommonChip(label: chain, onPressed: () {}),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -389,10 +392,13 @@ class TrackerInfoDetailView extends ConsumerWidget {
   }) {
     final category = utils.classifyIp(ip);
     final IconData icon = switch (category) {
-      IpCategory.tun => Icons.stacked_line_chart,
-      IpCategory.lan => Icons.shuffle,
+      IpCategory.tun => Icons.stacked_line_chart_rounded,
+      IpCategory.lan => Icons.shuffle_rounded,
       IpCategory.public => Icons.search_rounded,
     };
+    final pillShape = RoundedSuperellipseBorder(
+      borderRadius: BorderRadius.circular(8),
+    );
 
     return ListItem(
       title: Row(
@@ -405,37 +411,48 @@ class TrackerInfoDetailView extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Material(
-                  color: context.colorScheme.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(6),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      showIpDetailDialog(context, ip);
-                    },
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            icon,
-                            size: 14,
-                            color: context.colorScheme.primary,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              ip,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colorScheme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                // 这里必须再套一层 Flexible：RenderFlex 给"非 flex 子级"的主轴约束是无界的
+                // （_constraintsForNonFlexChild → maxWidth = infinity），pill 会按固有宽度排版，
+                // 里面那层 ellipsis 完全失效 —— 长 IPv6（如远程目标）会直接冲出卡片。
+                // 成为 flex 子级后 pill 才拿到有界宽度、省略号才生效；
+                // 端口是非 flex 子级、会先被布局，所以永远完整显示，pill 只取剩余宽度。
+                Flexible(
+                  child: Material(
+                    color: context.colorScheme.primary.withValues(alpha: 0.08),
+                    shape: pillShape,
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      customBorder: pillShape,
+                      onTap: () {
+                        showIpDetailDialog(context, ip);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              icon,
+                              size: 14,
+                              color: context.colorScheme.primary,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                ip,
+                                maxLines: 1,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: context.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -444,6 +461,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
                   const SizedBox(width: 4),
                   Text(
                     ':$port',
+                    maxLines: 1,
                     style: context.textTheme.bodyMedium,
                   ),
                 ],
@@ -464,7 +482,9 @@ class TrackerInfoDetailView extends ConsumerWidget {
       title: Row(
         spacing: 16,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // 值可能换行（如主机域名）：标题竖向居中，与右侧多行内容保持同一视觉中线，
+        // 与代理链一行（Wrap 多行标签）的排版一致
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
             spacing: 4,
@@ -476,7 +496,7 @@ class TrackerInfoDetailView extends ConsumerWidget {
                   child: IconButton(
                     visualDensity: VisualDensity.compact,
                     padding: EdgeInsets.zero,
-                    icon: Icon(Icons.content_copy, size: 18),
+                    icon: Icon(Icons.content_copy_rounded, size: 18),
                     onPressed: () {},
                   ),
                 ),
@@ -494,7 +514,8 @@ class TrackerInfoDetailView extends ConsumerWidget {
 
     final remoteDestParsed = _parseIpAndPort(info.metadata.remoteDestination);
 
-    final items = [
+    // Section 1: Basic Info
+    final basicItems = <Widget>[
       _buildItem(
         title: appLocalizations.creationTime,
         desc: info.start.showFull,
@@ -509,6 +530,10 @@ class TrackerInfoDetailView extends ConsumerWidget {
         desc: info.metadata.network,
       ),
       _buildItem(title: appLocalizations.rule, desc: _getRuleText(info)),
+    ];
+
+    // Section 2: Address Info
+    final addressItems = <Widget>[
       if (info.metadata.host.isNotEmpty)
         _isIpAddress(info.metadata.host)
             ? _buildIpItem(
@@ -535,40 +560,60 @@ class TrackerInfoDetailView extends ConsumerWidget {
               ? info.metadata.destinationPort
               : null,
         ),
-      Consumer(
-        builder: (context, ref, _) {
-          final liveInfo = ref.watch(
-            connectionsProvider.select(
-              (list) => list.firstWhereOrNull((e) => e.id == trackerInfo.id),
-            ),
-          );
-          final upload = liveInfo?.upload ?? trackerInfo.upload;
-          final download = liveInfo?.download ?? trackerInfo.download;
-          final isAlive = liveInfo != null;
+      if (info.metadata.remoteDestination.isNotEmpty)
+        remoteDestParsed != null
+            ? _buildIpItem(
+                context,
+                title: appLocalizations.remoteDestination,
+                ip: remoteDestParsed.$1,
+                port: remoteDestParsed.$2,
+              )
+            : _buildItem(
+                title: appLocalizations.remoteDestination,
+                desc: info.metadata.remoteDestination,
+              ),
+    ];
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildItem(
-                title: appLocalizations.upload,
-                desc: TrafficValue(value: upload).show,
-              ),
-              _buildItem(
-                title: appLocalizations.download,
-                desc: TrafficValue(value: download).show,
-              ),
-              if (isAlive)
-                _buildItem(
-                  title: appLocalizations.realTimeSpeed,
-                  desc: Traffic(
-                    up: liveInfo.uploadSpeed,
-                    down: liveInfo.downloadSpeed,
-                  ).toString(),
-                ),
-            ],
-          );
-        },
-      ),
+    // Section 3: Traffic Info (live updating)
+    final trafficSection = Consumer(
+      builder: (context, ref, _) {
+        final liveInfo = ref.watch(
+          connectionsProvider.select(
+            (list) => list.firstWhereOrNull((e) => e.id == trackerInfo.id),
+          ),
+        );
+        final upload = liveInfo?.upload ?? trackerInfo.upload;
+        final download = liveInfo?.download ?? trackerInfo.download;
+        final isAlive = liveInfo != null;
+
+        final trafficItems = <Widget>[
+          _buildItem(
+            title: appLocalizations.upload,
+            desc: TrafficValue(value: upload).show,
+          ),
+          _buildItem(
+            title: appLocalizations.download,
+            desc: TrafficValue(value: download).show,
+          ),
+          if (isAlive)
+            _buildItem(
+              title: appLocalizations.realTimeSpeed,
+              desc: Traffic(
+                up: liveInfo.uploadSpeed,
+                down: liveInfo.downloadSpeed,
+              ).toString(),
+            ),
+        ];
+
+        return SectionContainer(
+          title: appLocalizations.traffic,
+          items: trafficItems,
+        );
+      },
+    );
+
+    // Section 4: Advanced Info（代理链合并进本分区，与 DNS 模式等放在一起）
+    final advancedItems = <Widget>[
       if (info.metadata.destinationGeoIP.isNotEmpty)
         _buildItem(
           title: appLocalizations.destinationGeoIP,
@@ -594,28 +639,34 @@ class TrackerInfoDetailView extends ConsumerWidget {
           title: appLocalizations.specialRules,
           desc: info.metadata.specialRules,
         ),
-      if (info.metadata.remoteDestination.isNotEmpty)
-        remoteDestParsed != null
-            ? _buildIpItem(
-                context,
-                title: appLocalizations.remoteDestination,
-                ip: remoteDestParsed.$1,
-                port: remoteDestParsed.$2,
-              )
-            : _buildItem(
-                title: appLocalizations.remoteDestination,
-                desc: info.metadata.remoteDestination,
-              ),
-      _buildChains(info),
+      if (info.chains.isNotEmpty) _buildChains(info),
     ];
-    return SelectionArea(
-      child: ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: 12),
-        itemCount: items.length,
-        itemBuilder: (_, index) {
-          return items[index];
-        },
+
+    final sections = <Widget>[
+      SectionContainer(
+        title: appLocalizations.basicInfo,
+        items: basicItems,
+        isFirst: true,
       ),
+      if (addressItems.isNotEmpty)
+        SectionContainer(
+          title: appLocalizations.addressInfo,
+          items: addressItems,
+        ),
+      trafficSection,
+      if (advancedItems.isNotEmpty)
+        SectionContainer(
+          title: appLocalizations.advancedInfo,
+          items: advancedItems,
+        ),
+    ];
+
+    return ListView(
+      padding: EdgeInsets.only(
+        top: 4,
+        bottom: 16 + MediaQuery.paddingOf(context).bottom,
+      ),
+      children: sections,
     );
   }
 }

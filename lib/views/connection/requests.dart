@@ -77,7 +77,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
               : null,
           onPressed: _toggleAutoScroll,
           tooltip: appLocalizations.autoScroll,
-          icon: const Icon(Icons.vertical_align_top_outlined),
+          icon: const Icon(Icons.vertical_align_top_rounded),
         ),
       ],
       searchState: AppBarSearchState(onSearch: _onSearch),
@@ -85,6 +85,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
       body: !hasRequests
           ? NullStatus(
               label: appLocalizations.nullTip(appLocalizations.requests),
+              illustration: NullStatusIllustration.requests,
             )
           : CommonScrollBar(
               trackVisibility: false,
