@@ -12,7 +12,7 @@ class ProvidersInfo extends StatelessWidget {
       child: SizedBox(
         height: getWidgetHeight(1),
         child: CommonCard(
-          info: const Info(iconData: Icons.poll_outlined, label: 'INFO'),
+          info: const Info(iconData: Icons.insert_chart_outlined_rounded, label: 'INFO'),
           onPressed: () {
             showExtend(
               context,

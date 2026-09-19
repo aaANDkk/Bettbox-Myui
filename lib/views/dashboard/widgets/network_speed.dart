@@ -6,6 +6,37 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// 浏览器测速网站地址（网络速度小部件点击后跳转）
+const speedTestUrl = 'https://ptclspeed.speedtestcustom.com';
+
+/// 点击网络速度小部件时的确认弹窗：格式与「长按内存小部件」的强制 GC 弹窗一致，
+/// 确认后才跳转浏览器测速。
+Future<void> showSpeedTestConfirm(BuildContext context) async {
+  final result = await globalState.showCommonDialog<bool>(
+    child: CommonDialog(
+      title: appLocalizations.speedTest,
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop(false);
+          },
+          child: Text(appLocalizations.cancel),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop(true);
+          },
+          child: Text(appLocalizations.confirm),
+        ),
+      ],
+      child: Text(appLocalizations.speedTestDesc),
+    ),
+  );
+  if (result == true) {
+    globalState.openUrl(speedTestUrl);
+  }
+}
+
 class NetworkSpeed extends ConsumerWidget {
   const NetworkSpeed({super.key});
 
@@ -44,52 +75,47 @@ class NetworkSpeed extends ConsumerWidget {
       height: getWidgetHeight(2),
       child: CommonCard(
         onPressed: () {
-          globalState.openUrl('https://ptclspeed.speedtestcustom.com');
+          showSpeedTestConfirm(context);
         },
         info: Info(
           label: appLocalizations.networkSpeed,
-          iconData: Icons.speed_sharp,
+          iconData: Icons.speed_rounded,
         ),
+        actions: [
+          ValueListenableBuilder<int>(
+            valueListenable: dashboardRefreshManager.tick1s,
+            builder: (_, _, _) {
+              final traffics = ref.read(trafficsProvider).list;
+              final speedText = _getLastTraffic(traffics).toSpeedText();
+              return Text(
+                speedText,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: color,
+                ),
+              );
+            },
+          ),
+        ],
         child: RepaintBoundary(
           child: ValueListenableBuilder<int>(
             valueListenable: dashboardRefreshManager.tick1s,
             builder: (_, _, _) {
               final traffics = ref.read(trafficsProvider).list;
               final points = _getPoints(traffics);
-              final speedText = _getLastTraffic(traffics).toSpeedText();
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 16,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                      ),
-                      child: RepaintBoundary(
-                        child: LineChart(
-                          gradient: true,
-                          color: primaryColor,
-                          points: points,
-                        ),
-                      ),
-                    ),
+              return Padding(
+                padding: const EdgeInsets.only(
+                  top: 16,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                ),
+                child: RepaintBoundary(
+                  child: LineChart(
+                    gradient: true,
+                    color: primaryColor,
+                    points: points,
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Transform.translate(
-                      offset: const Offset(-16, -20),
-                      child: Text(
-                        speedText,
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: color,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               );
             },
           ),

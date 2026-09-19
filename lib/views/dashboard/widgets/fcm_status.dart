@@ -80,23 +80,6 @@ class _FcmStatusState extends State<FcmStatus> {
     }
   }
 
-  Future<void> _showFcmInfoDialog(BuildContext context) async {
-    await globalState.showCommonDialog<void>(
-      child: CommonDialog(
-        title: 'FCM',
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop();
-            },
-            child: Text(appLocalizations.confirm),
-          ),
-        ],
-        child: Text(appLocalizations.fcmTip),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
@@ -107,44 +90,11 @@ class _FcmStatusState extends State<FcmStatus> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                height: globalState.measure.titleMediumHeight + 16,
+              InfoHeader(
                 padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Icon(
-                      Icons.cloud_outlined,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      flex: 1,
-                      child: TooltipText(
-                        text: Text(
-                          'FCM',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => _showFcmInfoDialog(context),
-                        icon: Icon(
-                          size: 16.ap,
-                          Icons.info_outline,
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
+                info: const Info(
+                  label: 'FCM',
+                  iconData: Icons.cloud_outlined,
                 ),
               ),
               Container(
@@ -162,8 +112,8 @@ class _FcmStatusState extends State<FcmStatus> {
                           children: [
                             Text(
                               '${status.minutes}',
-                              style: context.textTheme.bodyLarge?.toLight
-                                  .adjustSize(2),
+                              style: context.textTheme.bodyMedium?.toLight
+                                  .adjustSize(1),
                             ),
                             const SizedBox(width: 4),
                             Text(

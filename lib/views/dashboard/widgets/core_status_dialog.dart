@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
@@ -65,10 +66,11 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     return Padding(
       padding: const EdgeInsets.only(top: 14, bottom: 8),
       child: Text(
-        '[ $title ]',
+        '［ $title ］',
         style: context.textTheme.labelMedium?.copyWith(
           color: context.colorScheme.primary,
           fontWeight: FontWeight.bold,
+          fontVariations: const [FontVariation('wght', 700)],
           letterSpacing: 0.5,
         ),
       ),
@@ -193,10 +195,12 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         : '0.0';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
       child: Row(
         children: [
@@ -301,9 +305,11 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
       child: Row(
         children: [
@@ -334,6 +340,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
                   value,
                   style: context.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontVariations: const [FontVariation('wght', 700)],
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -346,12 +353,26 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     );
   }
 
+  double _getNoneChipWidth(BuildContext context) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: appLocalizations.none,
+        style: context.textTheme.labelSmall?.copyWith(fontSize: 11),
+      ),
+      textDirection: Directionality.of(context),
+    )..layout();
+    // 左右内边距各 8dp，加上左右边框各 1dp
+    return (painter.width + 16 + 2).ceilToDouble();
+  }
+
   Widget _buildGridItem(_MetricItem item, {bool isFullWidth = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
       child: Row(
         children: [
@@ -387,6 +408,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
                     item.value,
                     style: context.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontVariations: const [FontVariation('wght', 700)],
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -397,10 +419,18 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
           ),
           if (isFullWidth) ...[
             const SizedBox(width: 8),
-            Text(
-              item.value,
-              style: context.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: _getNoneChipWidth(context),
+              ),
+              child: Center(
+                child: Text(
+                  item.value,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontVariations: const [FontVariation('wght', 700)],
+                  ),
+                ),
               ),
             ),
           ],
@@ -450,13 +480,15 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       chips.add(
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: context.colorScheme.surfaceContainerHighest.withValues(
               alpha: 0.5,
             ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: context.colorScheme.outlineVariant.withValues(alpha: 0.5),
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: BorderSide(
+                color: context.colorScheme.outlineVariant.withValues(alpha: 0.5),
+              ),
             ),
           ),
           child: Text(
@@ -477,9 +509,11 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
         chips.add(
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: context.colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: Text(
               part,
@@ -496,9 +530,11 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
       child: Row(
         children: [
@@ -558,13 +594,15 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     final geodataUseText = status?.geodataUse ?? 'None';
 
     final metricItems = <_MetricItem>[
+      // 顺序与显示条件保持官方逻辑（路由规则在最前，两个「集」类指标按需出现），
+      // 仅保留本地挑选的图标
       _MetricItem(
         icon: Icons.rule_rounded,
         label: appLocalizations.rulesCount,
         value: rulesText,
       ),
       _MetricItem(
-        icon: Icons.dns_rounded,
+        icon: Icons.format_list_numbered_rounded,
         label: appLocalizations.proxiesCount,
         value: proxiesText,
       ),
@@ -575,13 +613,13 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       ),
       if ((status?.ruleProviders ?? 0) > 0)
         _MetricItem(
-          icon: Icons.library_books_rounded,
+          icon: Icons.article_rounded,
           label: appLocalizations.ruleProvidersCount,
           value: ruleProvidersText,
         ),
       if ((status?.proxyProviders ?? 0) > 0)
         _MetricItem(
-          icon: Icons.cloud_sync_rounded,
+          icon: Icons.flight_takeoff_rounded,
           label: appLocalizations.proxyProvidersCount,
           value: proxyProvidersText,
         ),
@@ -613,7 +651,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
             children: [
               Expanded(
                 child: _buildMiniStatCard(
-                  icon: Icons.alt_route_rounded,
+                  icon: Icons.swap_calls_rounded,
                   iconColor: context.colorScheme.primary,
                   label: appLocalizations.activeGoroutines,
                   value: goroutinesText,

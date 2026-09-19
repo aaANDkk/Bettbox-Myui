@@ -13,7 +13,7 @@ class Ipv6Switch extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'IPv6', iconData: Icons.filter_6_rounded),
+        info: Info(label: 'IPv6', iconData: Icons.looks_6_outlined),
         onPressed: () {
           // Open general settings
           showExtend(
@@ -47,21 +47,24 @@ class Ipv6Switch extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final ipv6 = ref.watch(
-                    patchClashConfigProvider.select((state) => state.ipv6),
-                  );
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: ipv6,
-                    onChanged: (value) {
-                      ref
-                          .read(patchClashConfigProvider.notifier)
-                          .updateState((state) => state.copyWith(ipv6: value));
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final ipv6 = ref.watch(
+                      patchClashConfigProvider.select((state) => state.ipv6),
+                    );
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: ipv6,
+                      onChanged: (value) {
+                        ref
+                            .read(patchClashConfigProvider.notifier)
+                            .updateState((state) => state.copyWith(ipv6: value));
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

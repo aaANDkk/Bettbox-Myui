@@ -34,7 +34,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.sync),
+              leading: Icon(Icons.sync_rounded),
               title: Text(appLocalizations.manualRefreshIp),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
@@ -43,7 +43,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ),
             if (isZh)
               ListTile(
-                leading: Icon(Icons.public),
+                leading: Icon(Icons.public_rounded),
                 title: Text(appLocalizations.switchToDomesticIp),
                 onTap: () {
                   Navigator.of(context, rootNavigator: true).pop();
@@ -51,7 +51,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                 },
               ),
             ListTile(
-              leading: Icon(Icons.security),
+              leading: Icon(Icons.security_rounded),
               title: Text(appLocalizations.ipPrivacyProtection),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
@@ -79,61 +79,50 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
         builder: (_, state, _) {
           final ipInfo = state.ipInfo;
           final isLoading = state.isLoading;
+          final flagStyle = Theme.of(context).textTheme.titleMedium?.toLight;
+          // 旗帜行高按「一行标题」压缩：titleMedium 的默认行高 (24) 会把表头撑高，
+          // 导致旗帜 / 标题 / 右侧按钮一起下沉。用两个实测行高求比例，随字号缩放自适应。
+          final flagLineHeight =
+              (flagStyle?.height ?? 1.5) *
+              globalState.measure.titleSmallHeight /
+              globalState.measure.titleMediumHeight;
           return CommonCard(
             onPressed: ipInfo != null ? _showMoreIpInfoDialog : () {},
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  height: globalState.measure.titleMediumHeight + 16,
+                InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      ipInfo != null
-                          ? EmojiText(
-                              _countryCodeToEmoji(ipInfo.countryCode),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.toLight,
-                            )
-                          : Icon(
-                              Icons.network_check,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        flex: 1,
-                        child: TooltipText(
-                          text: Text(
-                            appLocalizations.networkDetection,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(
-                                  color: context.colorScheme.onSurfaceVariant,
-                                ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 2),
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: _showIpClickBehaviorSettings,
-                          icon: Icon(
-                            size: 16.ap,
-                            Icons.settings_outlined,
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
+                  // 右侧设置按钮不撑高表头：图标 / 旗帜 / 标题 / 按钮同处一行标题高度
+                  actionsHeight: globalState.measure.titleSmallHeight,
+                  info: Info(
+                    label: appLocalizations.networkDetection,
+                    icon: ipInfo != null
+                        ? EmojiText(
+                            _countryCodeToEmoji(ipInfo.countryCode),
+                            // 旗帜行高按「一行标题」压缩：titleMedium 默认行高 (24)
+                            // 会把表头撑高，导致旗帜 / 标题 / 右侧按钮一起下沉
+                            style: flagStyle?.copyWith(height: flagLineHeight),
+                          )
+                        : null,
+                    iconData:
+                        ipInfo == null ? Icons.network_check_rounded : null,
                   ),
+                  actions: [
+                    SizedBox(
+                      width: 24.ap,
+                      height: 24.ap,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: _showIpClickBehaviorSettings,
+                        icon: Icon(
+                          size: 18.ap,
+                          Icons.settings_outlined,
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Container(
                   padding: baseInfoEdgeInsets.copyWith(top: 0),

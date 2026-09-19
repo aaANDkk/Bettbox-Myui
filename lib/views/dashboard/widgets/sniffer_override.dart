@@ -13,7 +13,7 @@ class SnifferOverride extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'Sniffer', iconData: Icons.radar),
+        info: Info(label: 'Sniffer', iconData: Icons.radar_rounded),
         onPressed: () {
           // Open Sniffer settings
           showExtend(
@@ -47,17 +47,20 @@ class SnifferOverride extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final override = ref.watch(overrideSnifferProvider);
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: override,
-                    onChanged: (value) {
-                      ref.read(overrideSnifferProvider.notifier).value = value;
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final override = ref.watch(overrideSnifferProvider);
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: override,
+                      onChanged: (value) {
+                        ref.read(overrideSnifferProvider.notifier).value = value;
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

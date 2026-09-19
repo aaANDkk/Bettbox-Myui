@@ -37,7 +37,7 @@ class TUNButton extends StatelessWidget {
         },
         info: Info(
           label: appLocalizations.tun,
-          iconData: Icons.stacked_line_chart,
+          iconData: Icons.stacked_line_chart_rounded,
         ),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
@@ -58,25 +58,28 @@ class TUNButton extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final enable = ref.watch(
-                    patchClashConfigProvider.select(
-                      (state) => state.tun.enable,
-                    ),
-                  );
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final enable = ref.watch(
+                      patchClashConfigProvider.select(
+                        (state) => state.tun.enable,
+                      ),
+                    );
 
-                  return Switch(
-                    value: enable,
-                    onChanged: (value) {
-                      ref
-                          .read(patchClashConfigProvider.notifier)
-                          .updateState(
-                            (state) => state.copyWith.tun(enable: value),
-                          );
-                    },
-                  );
-                },
+                    return Switch(
+                      value: enable,
+                      onChanged: (value) {
+                        ref
+                            .read(patchClashConfigProvider.notifier)
+                            .updateState(
+                              (state) => state.copyWith.tun(enable: value),
+                            );
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -112,7 +115,7 @@ class SystemProxyButton extends StatelessWidget {
         },
         info: Info(
           label: appLocalizations.systemProxy,
-          iconData: Icons.shuffle,
+          iconData: Icons.shuffle_rounded,
         ),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
@@ -133,7 +136,9 @@ class SystemProxyButton extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
                 builder: (_, ref, _) {
                   final systemProxy = ref.watch(
                     networkSettingProvider.select((state) => state.systemProxy),
@@ -151,6 +156,7 @@ class SystemProxyButton extends StatelessWidget {
                     },
                   );
                 },
+              ),
               ),
             ],
           ),
@@ -189,7 +195,7 @@ class VpnButton extends StatelessWidget {
             },
           );
         },
-        info: Info(label: 'VPN', iconData: Icons.stacked_line_chart),
+        info: Info(label: 'VPN', iconData: Icons.stacked_line_chart_rounded),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
           child: Row(
@@ -209,7 +215,9 @@ class VpnButton extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
                 builder: (_, ref, _) {
                   final enable = ref.watch(
                     vpnSettingProvider.select((state) => state.enable),
@@ -225,6 +233,7 @@ class VpnButton extends StatelessWidget {
                     },
                   );
                 },
+              ),
               ),
             ],
           ),

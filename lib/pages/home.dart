@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:bett_box/views/resident_fab.dart';
+
 typedef OnSelected = void Function(int index);
 
 class HomePage extends StatefulWidget {
@@ -118,8 +120,22 @@ class _HomePageState extends State<HomePage> {
               );
               return Stack(
                 children: [
-                  Positioned.fill(child: pageContent),
-                  Positioned(left: 0, right: 0, bottom: 0, child: navBar),
+                  Positioned.fill(child: RepaintBoundary(child: pageContent)),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: RepaintBoundary(child: navBar),
+                  ),
+                  // 与底栏伴生的常驻悬浮按钮：只在首页/代理/配置三个根页面出现
+                  Positioned(
+                    right: 16,
+                    bottom:
+                        getFloatingBottomBarFABReserveHeight(context) +
+                        16 +
+                        MediaQuery.viewPaddingOf(context).bottom,
+                    child: RepaintBoundary(child: const ResidentFab()),
+                  ),
                 ],
               );
             }
@@ -338,10 +354,7 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
     );
   }
 
-  Future<void> _toPage(
-    PageLabel pageLabel, [
-    bool ignoreAnimateTo = false,
-  ]) async {
+  Future<void> _toPage(PageLabel pageLabel) async {
     if (!mounted) {
       return;
     }
@@ -356,37 +369,27 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
       FocusManager.instance.primaryFocus?.unfocus();
     }
 
-    final isAnimateToPage = ref.read(appSettingProvider).isAnimateToPage;
     final isMobile = ref.read(isMobileViewProvider);
 
     _currentPageIndex = index;
 
-    if (isMobile && !isAnimateToPage) {
+    // 移动端：AnimatedSwitcher 淡入淡出（由 setState 驱动，不涉及 PageView 平移）；
+    // 桌面端：保持原生利落的 0ms 瞬间直切。
+    if (isMobile) {
       if (_pageController.hasClients) {
         _pageController.jumpToPage(index);
       }
       setState(() {});
       return;
     }
-
-    if (isAnimateToPage && isMobile && !ignoreAnimateTo) {
-      if (_pageController.hasClients) {
-        await _pageController.animateToPage(
-          index,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    } else {
-      if (_pageController.hasClients) {
-        _pageController.jumpToPage(index);
-      }
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(index);
     }
   }
 
   void _updatePageController() {
     final pageLabel = ref.read(currentPageLabelProvider);
-    _toPage(pageLabel, true);
+    _toPage(pageLabel);
   }
 
   @override
@@ -399,11 +402,9 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   @override
   Widget build(BuildContext context) {
     final isMobile = ref.watch(isMobileViewProvider);
-    final isAnimateToPage = ref.watch(
-      appSettingProvider.select((state) => state.isAnimateToPage),
-    );
 
-    if (isMobile && !isAnimateToPage) {
+    // 移动端：仅保留淡入淡出的基础切换动效（不再使用 PageView 水平平移动画）
+    if (isMobile) {
       final targetIndex = (_currentPageIndex >= 0 &&
               _currentPageIndex < widget.navigationItems.length)
           ? _currentPageIndex
@@ -423,6 +424,7 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
       );
     }
 
+    // 桌面端：保持原生利落的 0ms 瞬间直切
     return PageView.builder(
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),

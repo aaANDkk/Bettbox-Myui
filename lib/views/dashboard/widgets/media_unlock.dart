@@ -20,7 +20,8 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
   String _getStatusText(MediaUnlockStatus status, [MediaPlatform? platform]) {
     switch (status) {
       case MediaUnlockStatus.unlocked:
-        if (platform?.category == MediaCategory.streaming) {
+        if (platform?.category == MediaCategory.streaming ||
+            platform?.category == MediaCategory.ai) {
           return appLocalizations.mediaUnlocked;
         }
         return appLocalizations.unlocked;
@@ -40,56 +41,6 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
       case MediaUnlockStatus.unknown:
         return '-';
     }
-  }
-
-  Widget _buildLatencyBar(
-    MediaUnlockStatus status,
-    int? latency,
-    BuildContext context,
-  ) {
-    if (status == MediaUnlockStatus.testing) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(3.ap),
-        child: SizedBox(
-          height: 6.ap,
-          child: LinearProgressIndicator(
-            backgroundColor:
-                context.colorScheme.primary.withValues(alpha: 0.12),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              context.colorScheme.primary.withValues(alpha: 0.6),
-            ),
-          ),
-        ),
-      );
-    }
-
-    final double widthFactor;
-    if (latency != null && latency > 0) {
-      widthFactor = (0.10 + (latency / 1000) * 0.90).clamp(0.10, 1.0);
-    } else {
-      widthFactor = 0.0;
-    }
-
-    return Container(
-      height: 6.ap,
-      decoration: BoxDecoration(
-        color: context.colorScheme.primary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(3.ap),
-      ),
-      alignment: Alignment.centerLeft,
-      child: widthFactor > 0
-          ? FractionallySizedBox(
-              widthFactor: widthFactor,
-              heightFactor: 1.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: context.colorScheme.primary.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(3.ap),
-                ),
-              ),
-            )
-          : null,
-    );
   }
 
   Widget _buildPlatformRow(
@@ -128,24 +79,24 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
     final isError = status == MediaUnlockStatus.blocked ||
         status == MediaUnlockStatus.failed;
 
-    final iconSize = platform.iconSize;
+    final double iconSize = 16.ap;
     final Widget icon;
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
         'assets/images/platforms/${platform.name}.svg',
-        width: iconSize.width.ap,
-        height: iconSize.height.ap,
+        width: iconSize,
+        height: iconSize,
         fit: BoxFit.contain,
         colorFilter: ColorFilter.mode(
-          context.colorScheme.onSurfaceVariant,
+          context.colorScheme.onSurface,
           BlendMode.srcIn,
         ),
       );
     } else if (colorfulIcons) {
       icon = SvgPicture.asset(
         'assets/images/platforms/${platform.name}.svg',
-        width: iconSize.width.ap,
-        height: iconSize.height.ap,
+        width: iconSize,
+        height: iconSize,
         fit: BoxFit.contain,
       );
     } else {
@@ -153,8 +104,8 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
         colorFilter: monochromeColorFilter,
         child: SvgPicture.asset(
           'assets/images/platforms/${platform.name}.svg',
-          width: iconSize.width.ap,
-          height: iconSize.height.ap,
+          width: iconSize,
+          height: iconSize,
           fit: BoxFit.contain,
         ),
       );
@@ -169,7 +120,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
           SizedBox(
             width: 20.ap,
             height: 20.ap,
-            child: Center(child: icon),
+            child: Center(child: themedPlatformIcon(context, platform, icon)),
           ),
           SizedBox(width: 8.ap),
           SizedBox(
@@ -202,7 +153,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
           ),
           SizedBox(width: 10.ap),
           Expanded(
-            child: _buildLatencyBar(status, latency, context),
+            child: _LatencyBar(status: status, latency: latency),
           ),
           SizedBox(width: 10.ap),
           SizedBox(
@@ -256,59 +207,48 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
             },
             child: Column(
               children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 8.ap, 6.ap),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.link_rounded,
-                        size: 18.ap,
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          appLocalizations.mediaUnlock,
-                          style: context.textTheme.titleSmall?.copyWith(
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 24.ap,
-                        height: 24.ap,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: isWidgetLoading
-                              ? null
-                              : () => mediaUnlockState.checkPlatforms(
-                                    displayedPlatforms,
-                                    force: true,
-                                  ),
-                          icon: isWidgetLoading
-                              ? SizedBox(
-                                  width: 13.ap,
-                                  height: 13.ap,
-                                  child: SpinKitRing(
-                                    color: context.colorScheme.primary,
-                                    lineWidth: 1.5,
-                                    size: 13.ap,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.sync,
-                                  size: 16.ap,
-                                  color: context.colorScheme.onSurfaceVariant,
-                                ),
-                        ),
-                      ),
-                    ],
+                InfoHeader(
+                  padding: baseInfoEdgeInsets.copyWith(bottom: 0),
+                  // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
+                  actionsHeight: globalState.measure.titleSmallHeight,
+                  info: Info(
+                    // 卡片标题用短标题键（英文只写 Connectivity，去掉后面的 Test）；
+                    // 解锁页面标题仍用 mediaUnlock
+                    label: appLocalizations.mediaUnlockShort,
+                    iconData: Icons.link_rounded,
                   ),
+                  actions: [
+                    SizedBox(
+                      width: 24.ap,
+                      height: 24.ap,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: isWidgetLoading
+                            ? null
+                            : () => mediaUnlockState.checkPlatforms(
+                                  displayedPlatforms,
+                                  force: true,
+                                ),
+                        icon: isWidgetLoading
+                            ? SizedBox(
+                                width: 16.ap,
+                                height: 16.ap,
+                                child: SpinKitFadingCircle(
+                                  color: context.colorScheme.primary,
+                                  size: 16.ap,
+                                ),
+                              )
+                            : Icon(
+                                Icons.sync_rounded,
+                                size: 18.ap,
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.ap),
+                  padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 4.ap),
                   child: Divider(
                     height: 1,
                     thickness: 1,
@@ -319,7 +259,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 8.ap),
+                    padding: EdgeInsets.fromLTRB(16.ap, 2.ap, 16.ap, 8.ap),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -341,6 +281,151 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// 连通性测试小部件的延迟指示条。
+///
+/// 优化要点（消除「结果出来后闪现再固定」）：
+/// - 底层轨道常驻不变，测试中与出结果之间不再整体替换控件；
+/// - 测试中叠加官方 `LinearProgressIndicator` 扫描动画（曲线/时序保持原样），
+///   仅通过 `borderRadius` 让两个扫描分段的左右两端都成为圆润端帽；
+/// - 结果条宽度由 [AnimationController] 从 0（或上一次的值）平滑生长到
+///   目标宽度，而不是瞬间跳到最终宽度，彻底消除闪现感。
+class _LatencyBar extends StatefulWidget {
+  final MediaUnlockStatus status;
+  final int? latency;
+
+  const _LatencyBar({required this.status, required this.latency});
+
+  @override
+  State<_LatencyBar> createState() => _LatencyBarState();
+}
+
+class _LatencyBarState extends State<_LatencyBar>
+    with SingleTickerProviderStateMixin {
+  static const _fillDuration = Duration(milliseconds: 520);
+  static const _fadeDuration = Duration(milliseconds: 200);
+
+  late final AnimationController _controller;
+  double _from = 0.0;
+  double _to = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: _fillDuration);
+    _syncFill(animate: false);
+  }
+
+  @override
+  void didUpdateWidget(covariant _LatencyBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.status != widget.status ||
+        oldWidget.latency != widget.latency) {
+      _syncFill(animate: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  double get _targetFactor {
+    final latency = widget.latency;
+    if (latency == null || latency <= 0) {
+      return 0.0;
+    }
+    return (0.10 + (latency / 1000) * 0.90).clamp(0.10, 1.0);
+  }
+
+  /// 当前实际显示宽度比例（含缓动），动画被打断时也可平滑接管
+  double get _currentFactor {
+    final t = Curves.easeOutCubic.transform(_controller.value);
+    return (_from + (_to - _from) * t).clamp(0.0, 1.0);
+  }
+
+  void _syncFill({required bool animate}) {
+    final isTesting = widget.status == MediaUnlockStatus.testing;
+    final target = isTesting ? 0.0 : _targetFactor;
+    final begin = _currentFactor;
+    _from = begin;
+    _to = target;
+    if (!animate || begin == target) {
+      _controller.value = 1.0;
+      return;
+    }
+    _controller.forward(from: 0.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isTesting = widget.status == MediaUnlockStatus.testing;
+    final trackColor = context.colorScheme.primary.withValues(alpha: 0.12);
+    final fillColor = context.colorScheme.primary.withValues(alpha: 0.6);
+
+    // 测试中：官方扫描动画（曲线/时序完全保持原样，仅显式指定 borderRadius
+    // 让两个扫描分段的左右两端都成为圆润端帽）；出结果：按延迟平滑生长。
+    // 两者尺寸完全一致（满宽 6.ap 轨道），因此淡入淡出重叠不会产生跳变。
+    final Widget indicator = RepaintBoundary(
+      key: ValueKey<bool>(isTesting),
+      child: isTesting
+          ? LinearProgressIndicator(
+              backgroundColor: Colors.transparent,
+              valueColor: AlwaysStoppedAnimation<Color>(fillColor),
+              borderRadius: BorderRadius.circular(3.ap),
+            )
+          : AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: _currentFactor,
+                    heightFactor: 1.0,
+                    // 填充条自身保持 3.ap 圆角：右端为圆润端帽而非直角
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: fillColor,
+                        borderRadius: BorderRadius.circular(3.ap),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+
+    return SizedBox(
+      height: 6.ap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3.ap),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ColoredBox(color: trackColor),
+            AnimatedSwitcher(
+              duration: _fadeDuration,
+              reverseDuration: _fadeDuration,
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ...previousChildren,
+                    if (currentChild != null) currentChild,
+                  ],
+                );
+              },
+              child: indicator,
+            ),
+          ],
+        ),
       ),
     );
   }

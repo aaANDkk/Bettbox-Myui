@@ -106,7 +106,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   onPressed: () {
                     _showAddWidgetsModal();
                   },
-                  icon: Icon(Icons.add_circle),
+                  icon: Icon(Icons.add_circle_rounded),
                 ),
               )
             : SizedBox();
@@ -125,7 +125,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: _buildIsEdit((isEdit) {
-              return isEdit ? const Icon(Icons.save) : const Icon(Icons.edit);
+              return isEdit ? const Icon(Icons.save_rounded) : const Icon(Icons.edit_rounded);
             }),
           ),
         ),
@@ -228,16 +228,11 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
       title:
-          ref.watch(customDashboardTitleProvider) ?? appLocalizations.dashboard,
+          ref.watch(customDashboardTitleProvider) ?? '⚡️Bettbox',
       actions: _buildActions(),
-      floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: isMobileView
-              ? getFloatingBottomBarFABReserveHeight(context)
-              : 0,
-        ),
-        child: const StartFab(),
-      ),
+      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）；
+      // 非移动视图（横屏 / 桌面 / TV）保持官方位置，不要加底栏避让内边距
+      floatingActionButton: isMobileView ? null : const StartFab(),
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -382,7 +377,7 @@ class _AddedContainerState extends State<_AddedContainer> {
                 iconSize: 20,
                 padding: EdgeInsets.all(2),
                 onPressed: _handleAdd,
-                icon: Icon(Icons.add),
+                icon: Icon(Icons.add_rounded),
               ),
             ),
           ),
@@ -408,7 +403,7 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.initialValue);
+    _controller = EmojiTextEditingController(text: widget.initialValue);
   }
 
   @override

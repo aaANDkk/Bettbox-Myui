@@ -6,6 +6,8 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'network_speed.dart';
+
 class NetworkSpeedSmall extends ConsumerWidget {
   const NetworkSpeedSmall({super.key});
 
@@ -72,17 +74,14 @@ class NetworkSpeedSmall extends ConsumerWidget {
           builder: (_, _, _) {
             final traffics = ref.read(trafficsProvider).list;
             final points = _getPoints(traffics);
-            final speedText = _getSpeedText(
-              _getLastTraffic(traffics),
-              isMobile,
-            );
+            final lastTraffic = _getLastTraffic(traffics);
             return CommonCard(
               onPressed: () {
-                globalState.openUrl('https://ptclspeed.speedtestcustom.com');
+                showSpeedTestConfirm(context);
               },
               info: Info(
-                label: speedText,
-                iconData: Icons.speed_sharp,
+                label: _getSpeedText(lastTraffic, isMobile),
+                iconData: Icons.speed_rounded,
                 style: speedStyle,
               ),
               child: Padding(

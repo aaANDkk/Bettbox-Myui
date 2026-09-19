@@ -15,7 +15,7 @@ class IntranetIP extends ConsumerWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: appLocalizations.intranetIP, iconData: Icons.devices),
+        info: Info(label: appLocalizations.intranetIP, iconData: Icons.devices_rounded),
         onPressed: (localIp != null && localIp.isNotEmpty)
             ? () => showIpDetailDialog(context, localIp)
             : () {},

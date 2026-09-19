@@ -19,7 +19,7 @@ class OnlinePanel extends ConsumerWidget {
         child: CommonCard(
           info: Info(
             label: appLocalizations.onlinePanel,
-            iconData: Icons.launch,
+            iconData: Icons.launch_rounded,
           ),
           onPressed: () async {
             // Get external controller status and secret

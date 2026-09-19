@@ -33,24 +33,24 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
         : (result?.status ?? (isLoading ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown));
     final color = status.statusColor(context.colorScheme);
 
-    final iconSize = platform.iconSize;
+    final double iconSize = 16.ap;
     final Widget icon;
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
         'assets/images/platforms/${platform.name}.svg',
-        width: iconSize.width.ap,
-        height: iconSize.height.ap,
+        width: iconSize,
+        height: iconSize,
         fit: BoxFit.contain,
         colorFilter: ColorFilter.mode(
-          context.colorScheme.onSurfaceVariant,
+          context.colorScheme.onSurface,
           BlendMode.srcIn,
         ),
       );
     } else if (colorfulIcons) {
       icon = SvgPicture.asset(
         'assets/images/platforms/${platform.name}.svg',
-        width: iconSize.width.ap,
-        height: iconSize.height.ap,
+        width: iconSize,
+        height: iconSize,
         fit: BoxFit.contain,
       );
     } else {
@@ -58,8 +58,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
         colorFilter: monochromeColorFilter,
         child: SvgPicture.asset(
           'assets/images/platforms/${platform.name}.svg',
-          width: iconSize.width.ap,
-          height: iconSize.height.ap,
+          width: iconSize,
+          height: iconSize,
           fit: BoxFit.contain,
         ),
       );
@@ -74,7 +74,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
           SizedBox(
             width: 20.ap,
             height: 20.ap,
-            child: Center(child: icon),
+            child: Center(child: themedPlatformIcon(context, platform, icon)),
           ),
           SizedBox(width: 8.ap),
           Expanded(
@@ -91,16 +91,16 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
           ),
           SizedBox(width: 8.ap),
           SizedBox(
-            width: 12.ap,
-            height: 12.ap,
+            // 与表头右侧检测按钮同一 24 槽位，圆点才会和按钮严格对齐（原来 12 槽位会偏右 6px）
+            width: 24.ap,
+            height: 24.ap,
             child: Center(
               child: status == MediaUnlockStatus.testing
                   ? SizedBox(
                       width: 10.ap,
                       height: 10.ap,
-                      child: SpinKitRing(
+                      child: SpinKitFadingCircle(
                         color: context.colorScheme.primary,
-                        lineWidth: 1.5,
                         size: 10.ap,
                       ),
                     )
@@ -148,59 +148,47 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
             },
             child: Column(
               children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 8.ap, 6.ap),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.link_rounded,
-                        size: 18.ap,
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          appLocalizations.mediaUnlock,
-                          style: context.textTheme.titleSmall?.copyWith(
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 24.ap,
-                        height: 24.ap,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: isWidgetLoading
-                              ? null
-                              : () => mediaUnlockState.checkPlatforms(
-                                    displayedPlatforms,
-                                    force: true,
-                                  ),
-                          icon: isWidgetLoading
-                              ? SizedBox(
-                                  width: 13.ap,
-                                  height: 13.ap,
-                                  child: SpinKitRing(
-                                    color: context.colorScheme.primary,
-                                    lineWidth: 1.5,
-                                    size: 13.ap,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.sync,
-                                  size: 16.ap,
-                                  color: context.colorScheme.onSurfaceVariant,
-                                ),
-                        ),
-                      ),
-                    ],
+                InfoHeader(
+                  padding: baseInfoEdgeInsets.copyWith(bottom: 0),
+                  // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
+                  actionsHeight: globalState.measure.titleSmallHeight,
+                  info: Info(
+                    // 与连通性测试大卡一致：短标题键（英文 Connectivity）
+                    label: appLocalizations.mediaUnlockShort,
+                    iconData: Icons.link_rounded,
                   ),
+                  actions: [
+                    SizedBox(
+                      width: 24.ap,
+                      height: 24.ap,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: isWidgetLoading
+                            ? null
+                            : () => mediaUnlockState.checkPlatforms(
+                                  displayedPlatforms,
+                                  force: true,
+                                ),
+                        icon: isWidgetLoading
+                            ? SizedBox(
+                                width: 16.ap,
+                                height: 16.ap,
+                                child: SpinKitFadingCircle(
+                                  color: context.colorScheme.primary,
+                                  size: 16.ap,
+                                ),
+                              )
+                            : Icon(
+                                Icons.sync_rounded,
+                                size: 18.ap,
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.ap),
+                  padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 4.ap),
                   child: Divider(
                     height: 1,
                     thickness: 1,
@@ -211,7 +199,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.ap, 6.ap, 16.ap, 8.ap),
+                    padding: EdgeInsets.fromLTRB(16.ap, 2.ap, 16.ap, 8.ap),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

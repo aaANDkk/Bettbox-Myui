@@ -13,7 +13,7 @@ class NtpOverride extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'NTP', iconData: Icons.access_time),
+        info: Info(label: 'NTP', iconData: Icons.access_time_rounded),
         onPressed: () {
           // Open NTP settings
           showExtend(
@@ -47,17 +47,20 @@ class NtpOverride extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final override = ref.watch(overrideNtpProvider);
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: override,
-                    onChanged: (value) {
-                      ref.read(overrideNtpProvider.notifier).value = value;
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final override = ref.watch(overrideNtpProvider);
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: override,
+                      onChanged: (value) {
+                        ref.read(overrideNtpProvider.notifier).value = value;
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

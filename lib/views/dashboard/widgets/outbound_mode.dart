@@ -16,97 +16,96 @@ class OutboundMode extends StatelessWidget {
     return SizedBox(
       height: height,
       child: Consumer(
-        builder: (_, ref, _) {
-          final mode = ref.watch(
-            patchClashConfigProvider.select((state) => state.mode),
-          );
-          return CommonCard(
-            info: Info(
-              label: appLocalizations.outboundMode,
-              iconData: Icons.call_split_sharp,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 16),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (final item in Mode.values)
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Focus(
-                          child: Builder(
-                            builder: (context) {
-                              final isFocused = Focus.of(context).hasFocus;
-                              return InkWell(
-                                borderRadius: BorderRadius.circular(10),
-                                onTap: () {
-                                  globalState.appController.changeMode(item);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: isFocused && globalState.isAndroidTV
-                                        ? context.colorScheme.primary
-                                            .withValues(alpha: 0.15)
-                                        : Colors.transparent,
-                                    border: isFocused && globalState.isAndroidTV
-                                        ? Border.all(
-                                            color: context.colorScheme.primary,
-                                            width: 2,
-                                          )
-                                        : null,
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16.ap,
-                                    vertical: 8.ap,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        item == mode
-                                            ? Icons.check_circle_rounded
-                                            : Icons.circle_outlined,
-                                        size: 21,
-                                        color: item == mode
-                                            ? context.colorScheme.primary
-                                            : context.colorScheme.onSurfaceVariant
-                                                  .withValues(alpha: 0.6),
-                                      ),
-                                      SizedBox(width: 12.ap),
-                                      Expanded(
-                                        child: Text(
-                                          Intl.message(item.name),
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.bodyMedium?.toSoftBold,
+          builder: (_, ref, _) {
+            final mode = ref.watch(
+              patchClashConfigProvider.select((state) => state.mode),
+            );
+            return CommonCard(
+              info: Info(
+                label: appLocalizations.outboundMode,
+                iconData: Icons.call_split_rounded,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (final item in Mode.values)
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Focus(
+                            child: Builder(
+                              builder: (context) {
+                                final isFocused = Focus.of(context).hasFocus;
+                                return InkWell(
+                                  borderRadius: BorderRadius.circular(10),
+                                  onTap: () {
+                                    globalState.appController.changeMode(item);
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: isFocused && globalState.isAndroidTV
+                                          ? context.colorScheme.primary
+                                              .withValues(alpha: 0.15)
+                                          : Colors.transparent,
+                                      border: isFocused && globalState.isAndroidTV
+                                          ? Border.all(
+                                              color: context.colorScheme.primary,
+                                              width: 2,
+                                            )
+                                          : null,
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16.ap,
+                                      vertical: 8.ap,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        // FlClash 出站模式同款单选圆点（圆环 + 选中实心），
+                                        // 占位与原来的 Icon 一致（21×21），不改动任何布局
+                                        OptionRadioIcon(
+                                          selected: item == mode,
                                         ),
-                                      ),
-                                    ],
+                                        SizedBox(width: 12.ap),
+                                        Expanded(
+                                          child: Text(
+                                            Intl.message(item.name),
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium?.toSoftBold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        ),
     );
   }
 }
 
+/// FlClash 出站模式左侧的单选圆点（圆环 + 选中时实心圆点）。
+///
+/// 外框 21×21，与原来 `Icon(size: 21)` 完全等大，因此不改变任何布局尺寸；
+/// 圆环 2 宽、选中时中心 9×9 实心，视觉与 FlClash 的 Material Radio 一致。
+
 class OutboundModeV2 extends StatelessWidget {
   const OutboundModeV2({super.key});
-
   Color _getTextColor(BuildContext context, Mode mode) {
     return switch (mode) {
       Mode.rule => context.colorScheme.onSecondaryContainer,

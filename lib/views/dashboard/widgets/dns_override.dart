@@ -46,7 +46,7 @@ class DnsOverride extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'DNS', iconData: Icons.dns),
+        info: Info(label: 'DNS', iconData: Icons.dns_rounded),
         onPressed: () {
           // Open DNS settings
           showExtend(
@@ -84,17 +84,20 @@ class DnsOverride extends StatelessWidget {
                   ),
                 ),
               ),
-              Consumer(
-                builder: (_, ref, _) {
-                  final override = ref.watch(overrideDnsProvider);
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: override,
-                    onChanged: (value) {
-                      ref.read(overrideDnsProvider.notifier).value = value;
-                    },
-                  );
-                },
+              Transform.translate(
+                offset: const Offset(0, -3),
+                child: Consumer(
+                  builder: (_, ref, _) {
+                    final override = ref.watch(overrideDnsProvider);
+                    return Switch(
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      value: override,
+                      onChanged: (value) {
+                        ref.read(overrideDnsProvider.notifier).value = value;
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
