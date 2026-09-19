@@ -23,6 +23,7 @@ class AppStateManager extends ConsumerStatefulWidget {
 class _AppStateManagerState extends ConsumerState<AppStateManager>
     with WidgetsBindingObserver {
   bool _isRefreshActive = false;
+  bool _wasPaused = false;
   Timer? _dashboardRefreshDebounceTimer;
   Timer? _missedUpdateCheckTimer;
   DateTime? _lastMissedUpdateCheck;
@@ -160,6 +161,11 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      _wasPaused = true;
+    }
+
     final isBackgroundState =
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
@@ -180,12 +186,16 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
         globalState.appController.updateGroupsDebounce();
       }
 
-      final hasDetection = ref
-          .read(dashboardStateProvider)
-          .dashboardWidgets
-          .contains(DashboardWidget.networkDetection);
-      if (hasDetection) {
-        detectionState.tryStartCheck();
+      if (_wasPaused) {
+        _wasPaused = false;
+        final hasDetection = ref
+            .read(dashboardStateProvider)
+            .dashboardWidgets
+            .contains(DashboardWidget.networkDetection);
+        if (hasDetection) {
+          detectionState.tryStartCheck();
+        }
+        mediaUnlockState.tryStartCheck();
       }
     }
     if (state == AppLifecycleState.resumed && system.isAndroid) {
@@ -194,11 +204,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       SystemChrome.setSystemUIOverlayStyle(
         globalState.appState.systemUiOverlayStyle,
       );
-    }
-    if (state == AppLifecycleState.inactive) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        detectionState.tryStartCheck();
-      });
     }
     _updateDashboardRefreshState();
   }

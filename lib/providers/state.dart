@@ -12,6 +12,13 @@ import 'config.dart';
 
 part 'generated/state.g.dart';
 
+/// 常驻悬浮按钮在代理页要触发的「测速当前策略组」动作：
+/// 代理页挂载时注册、销毁后自动失效，宿主按钮直接取用，避免复制页面业务逻辑。
+final residentProxyTestProvider = StateProvider<void Function()?>(
+  (ref) => null,
+);
+
+
 List<Group> getVisibleGroups({
   required Mode mode,
   required List<Group> groups,

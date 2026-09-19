@@ -116,7 +116,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
               : null,
           onPressed: _toggleAutoScroll,
           tooltip: appLocalizations.autoScroll,
-          icon: const Icon(Icons.vertical_align_top_outlined),
+          icon: const Icon(Icons.vertical_align_top_rounded),
         ),
         Tooltip(
           message: appLocalizations.export,
@@ -135,7 +135,10 @@ class _LogsViewState extends ConsumerState<LogsView> {
       searchState: AppBarSearchState(onSearch: _onSearch),
       title: appLocalizations.logs,
       body: !hasLogs
-          ? NullStatus(label: appLocalizations.nullTip(appLocalizations.logs))
+          ? NullStatus(
+              label: appLocalizations.nullTip(appLocalizations.logs),
+              illustration: NullStatusIllustration.logs,
+            )
           : ScrollToEndBox(
               onCancelToEnd: _cancelAutoScroll,
               controller: _scrollController,

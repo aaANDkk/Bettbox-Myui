@@ -26,20 +26,7 @@ class ProfilesView extends ConsumerStatefulWidget {
 class _ProfilesViewState extends ConsumerState<ProfilesView> {
   Function? applyConfigDebounce;
 
-  void _handleShowAddExtendPage() {
-    showExtend(
-      globalState.navigatorKey.currentState!.context,
-      builder: (_, type) {
-        return AdaptiveSheetScaffold(
-          type: type,
-          body: AddProfileView(
-            context: globalState.navigatorKey.currentState!.context,
-          ),
-          title: appLocalizations.add,
-        );
-      },
-    );
-  }
+  void _handleShowAddExtendPage() => showAddProfileExtend();
 
   Future<void> _updateProfiles() async {
     final profiles = globalState.config.profiles;
@@ -74,7 +61,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         onPressed: () {
           _updateProfiles();
         },
-        icon: const Icon(Icons.sync),
+        icon: const Icon(Icons.sync_rounded),
         tooltip: appLocalizations.syncAll,
       ),
       IconButton(
@@ -93,7 +80,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               scriptStateProvider.select((state) => state.realId != null),
             );
             return Icon(
-              Icons.functions,
+              Icons.functions_rounded,
               color: isScriptMode ? context.colorScheme.primary : null,
             );
           },
@@ -110,15 +97,18 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           );
         },
         tooltip: appLocalizations.sort,
-        icon: const Icon(Icons.sort),
+        icon: const Icon(Icons.sort_rounded),
         iconSize: 26,
       ),
     ];
   }
 
-  Widget _buildFAB() {
+  Widget? _buildFAB() {
     final isMobileView = ref.watch(isMobileViewProvider);
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    // 竖屏下改由全局常驻悬浮按钮承担，页面自身不再显示（避免双按钮）
+    if (isMobileView) {
+      return null;
+    }
     return Padding(
       padding: EdgeInsets.only(
         bottom: isMobileView
@@ -126,27 +116,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
             : 0,
       ),
       child: DecoratedBox(
-        decoration: ShapeDecoration(
-          shape: RoundedSuperellipseBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          shadows: [
-            BoxShadow(
-              color: Colors.black.withValues(
-                alpha: isDark ? 0.35 : 0.14,
-              ),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(
-                alpha: isDark ? 0.20 : 0.06,
-              ),
-              blurRadius: 4,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
+        decoration: getCommonFabDecoration(context),
         child: FloatingActionButton.extended(
           elevation: 0,
           hoverElevation: 0,
@@ -155,8 +125,15 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           clipBehavior: Clip.none,
           heroTag: null,
           onPressed: _handleShowAddExtendPage,
-          icon: const Icon(Icons.add),
-          label: Text(appLocalizations.addProfile),
+          icon: const Icon(Icons.add_rounded),
+          label: Text(
+            appLocalizations.addProfile,
+            style: TextStyle(
+              fontFamily: Theme.of(context).textTheme.labelLarge?.fontFamily,
+              fontWeight: FontWeight.bold,
+              fontVariations: const [FontVariation('wght', 700)],
+            ),
+          ),
         ),
       ),
     );
@@ -177,7 +154,10 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           );
           final isMobileView = ref.watch(isMobileViewProvider);
           if (profilesSelectorState.profiles.isEmpty) {
-            return NullStatus(label: appLocalizations.nullProfileDesc);
+            return NullStatus(
+              label: appLocalizations.nullProfileDesc,
+              illustration: NullStatusIllustration.profile,
+            );
           }
           final columns = profilesSelectorState.profiles.length <
                   profilesSelectorState.columns
@@ -313,7 +293,7 @@ class ProfileItem extends StatelessWidget {
           type: type,
           actions: [
             IconButton(
-              icon: const Icon(Icons.security),
+              icon: const Icon(Icons.security_rounded),
               tooltip: appLocalizations.ageKeyGenerateTitle,
               onPressed: () {
                 editKey.currentState?.showAgeKeyGenerator();
@@ -506,7 +486,7 @@ class ProfileItem extends StatelessWidget {
       ),
       if (profile.type == ProfileType.url) ...[
         PopupMenuItemData(
-          icon: Icons.sync_alt_sharp,
+          icon: Icons.sync_rounded,
           label: appLocalizations.sync,
           onPressed: () {
             updateProfile();
@@ -582,7 +562,7 @@ class ProfileItem extends StatelessWidget {
                       open();
                     },
                     tooltip: appLocalizations.more,
-                    icon: const Icon(Icons.more_vert, size: 20),
+                    icon: const Icon(Icons.more_vert_rounded, size: 20),
                   );
                 },
               ),
@@ -630,7 +610,7 @@ class ProfileItem extends StatelessWidget {
         ),
         IconButton(
           onPressed: () => _showTVMenu(context),
-          icon: const Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert_rounded),
         ),
       ],
     );
@@ -705,7 +685,7 @@ class _ReorderableProfilesSheetState extends State<ReorderableProfilesSheet> {
             Navigator.of(context).pop();
             globalState.appController.setProfiles(profiles);
           },
-          icon: Icon(Icons.save),
+          icon: Icon(Icons.save_rounded),
         ),
       ],
       body: ReorderableListView.builder(
@@ -735,7 +715,7 @@ class _ReorderableProfilesSheetState extends State<ReorderableProfilesSheet> {
                 title: EmojiText(profile.label ?? profile.id),
                 trailing: ReorderableDragStartListener(
                   index: index,
-                  child: const Icon(Icons.drag_handle),
+                  child: const Icon(Icons.drag_handle_rounded),
                 ),
               ),
             ),

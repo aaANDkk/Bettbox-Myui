@@ -30,8 +30,6 @@ _AppSettingProps _$AppSettingPropsFromJson(
   mediaUnlockRefreshOnNodeChange:
       json['mediaUnlockRefreshOnNodeChange'] as bool? ?? true,
   mediaUnlockColorfulIcons: json['mediaUnlockColorfulIcons'] as bool? ?? true,
-  mediaUnlockRefreshByCategory:
-      json['mediaUnlockRefreshByCategory'] as bool? ?? true,
   onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? true,
   autoLaunch: json['autoLaunch'] as bool? ?? false,
   silentLaunch: json['silentLaunch'] as bool? ?? false,
@@ -57,6 +55,7 @@ _AppSettingProps _$AppSettingPropsFromJson(
       ) ??
       RecoveryStrategy.compatible,
   enableHighPriority: json['enableHighPriority'] as bool? ?? false,
+  isAnimateToPage: json['isAnimateToPage'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
@@ -77,7 +76,6 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'mediaUnlockExtraDetails': instance.mediaUnlockExtraDetails,
       'mediaUnlockRefreshOnNodeChange': instance.mediaUnlockRefreshOnNodeChange,
       'mediaUnlockColorfulIcons': instance.mediaUnlockColorfulIcons,
-      'mediaUnlockRefreshByCategory': instance.mediaUnlockRefreshByCategory,
       'onlyStatisticsProxy': instance.onlyStatisticsProxy,
       'autoLaunch': instance.autoLaunch,
       'silentLaunch': instance.silentLaunch,
@@ -97,6 +95,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'enableHighRefreshRate': instance.enableHighRefreshRate,
       'recoveryStrategy': _$RecoveryStrategyEnumMap[instance.recoveryStrategy]!,
       'enableHighPriority': instance.enableHighPriority,
+      'isAnimateToPage': instance.isAnimateToPage,
     };
 
 const _$RecoveryStrategyEnumMap = {
@@ -110,6 +109,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.outboundModeV2: 'outboundModeV2',
   DashboardWidget.outboundMode: 'outboundMode',
   DashboardWidget.trafficUsage: 'trafficUsage',
+  DashboardWidget.trafficUsageSmall: 'trafficUsageSmall',
   DashboardWidget.networkDetection: 'networkDetection',
   DashboardWidget.tunButton: 'tunButton',
   DashboardWidget.vpnButton: 'vpnButton',
@@ -118,16 +118,18 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.memoryInfo: 'memoryInfo',
   DashboardWidget.connectionsCount: 'connectionsCount',
   DashboardWidget.ipv6Switch: 'ipv6Switch',
+  DashboardWidget.accessControlSwitch: 'accessControlSwitch',
   DashboardWidget.wakelockSwitch: 'wakelockSwitch',
   DashboardWidget.dnsOverride: 'dnsOverride',
   DashboardWidget.snifferOverride: 'snifferOverride',
   DashboardWidget.ntpOverride: 'ntpOverride',
+  DashboardWidget.scriptOverride: 'scriptOverride',
   DashboardWidget.providersInfo: 'providersInfo',
   DashboardWidget.fcmStatus: 'fcmStatus',
   DashboardWidget.onlinePanel: 'onlinePanel',
   DashboardWidget.mediaUnlock: 'mediaUnlock',
   DashboardWidget.mediaUnlockSmall: 'mediaUnlockSmall',
-  DashboardWidget.startButton: 'startButton',
+  DashboardWidget.currentProfile: 'currentProfile',
 };
 
 const _$MediaPlatformEnumMap = {
@@ -421,13 +423,21 @@ const _$ProxyCardTypeEnumMap = {
 
 const _$DelayAnimationTypeEnumMap = {
   DelayAnimationType.none: 'none',
+  DelayAnimationType.fadingCube: 'fadingCube',
+  DelayAnimationType.foldingCube: 'foldingCube',
+  DelayAnimationType.pumpingHeart: 'pumpingHeart',
+  DelayAnimationType.pouringHourGlass: 'pouringHourGlass',
+  DelayAnimationType.squareCircle: 'squareCircle',
+  DelayAnimationType.threeRotatingDots: 'threeRotatingDots',
+  DelayAnimationType.fourRotatingDots: 'fourRotatingDots',
+  DelayAnimationType.staggeredDotsWave: 'staggeredDotsWave',
+  DelayAnimationType.dotsTriangle: 'dotsTriangle',
   DelayAnimationType.rotatingCircle: 'rotatingCircle',
   DelayAnimationType.pulse: 'pulse',
   DelayAnimationType.spinningLines: 'spinningLines',
   DelayAnimationType.threeInOut: 'threeInOut',
   DelayAnimationType.threeBounce: 'threeBounce',
   DelayAnimationType.circle: 'circle',
-  DelayAnimationType.fadingCircle: 'fadingCircle',
   DelayAnimationType.fadingFour: 'fadingFour',
   DelayAnimationType.wave: 'wave',
   DelayAnimationType.doubleBounce: 'doubleBounce',

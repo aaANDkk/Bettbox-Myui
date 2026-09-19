@@ -28,6 +28,7 @@ class ProxiesListView extends ConsumerWidget {
     if (state.groups.isEmpty) {
       return NullStatus(
         label: appLocalizations.nullTip(appLocalizations.proxies),
+        illustration: NullStatusIllustration.proxies,
       );
     }
 
@@ -614,7 +615,7 @@ class _GroupHeader extends ConsumerWidget {
                   key: ValueKey('locate_${group.name}'),
                   style: _circleButtonStyle,
                   iconSize: 19,
-                  icon: const Icon(Icons.adjust),
+                  icon: const Icon(Icons.adjust_rounded),
                   onPressed: onScrollToSelected,
                   tooltip: appLocalizations.locate,
                 ),
@@ -639,7 +640,7 @@ class _GroupHeader extends ConsumerWidget {
                                 size: 18,
                               ),
                             )
-                          : const Icon(Icons.network_ping),
+                          : const Icon(Icons.network_ping_rounded),
                       onPressed: delayTestCoordinator.isTesting
                           ? null
                           : () => _delayTest(context),
@@ -673,8 +674,10 @@ class _GroupHeader extends ConsumerWidget {
         height: iconSize,
         alignment: Alignment.center,
         padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+        decoration: ShapeDecoration(
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           color: context.colorScheme.secondaryContainer,
         ),
         clipBehavior: Clip.antiAlias,

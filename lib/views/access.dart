@@ -60,49 +60,17 @@ class _AccessViewState extends ConsumerState<AccessView>
   }
 
   Widget _buildPackageListPermissionDeniedView() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.apps_outlined,
-              size: 72,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              appLocalizations.packageListPermissionDenied,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              appLocalizations.packageListPermissionRequired,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                FilledButton.tonalIcon(
-                  onPressed: () async {
-                    _requestedPackageListPermission = true;
-                    await app.requestPackageListPermission();
-                  },
-                  icon: const Icon(Icons.settings),
-                  label: Text(appLocalizations.openSettings),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return NullStatus(
+      label: appLocalizations.packageListPermissionDenied,
+      description: appLocalizations.packageListPermissionRequired,
+      illustration: NullStatusIllustration.permission,
+      action: FilledButton.tonalIcon(
+        onPressed: () async {
+          _requestedPackageListPermission = true;
+          await app.requestPackageListPermission();
+        },
+        icon: const Icon(Icons.settings_rounded),
+        label: Text(appLocalizations.openSettings),
       ),
     );
   }
@@ -268,7 +236,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           }
         });
       },
-      icon: const Icon(Icons.search),
+      icon: const Icon(Icons.search_rounded),
     );
   }
 
@@ -303,7 +271,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           });
         }
       },
-      icon: const Icon(Icons.sync),
+      icon: const Icon(Icons.sync_rounded),
     );
   }
 
@@ -334,8 +302,8 @@ class _AccessViewState extends ConsumerState<AccessView>
         });
       },
       icon: isSelectedAll
-          ? const Icon(Icons.deselect)
-          : const Icon(Icons.select_all),
+          ? const Icon(Icons.deselect_rounded)
+          : const Icon(Icons.select_all_rounded),
     );
   }
 
@@ -381,7 +349,7 @@ class _AccessViewState extends ConsumerState<AccessView>
             return AdaptiveSheetScaffold(
               type: type,
               body: AccessControlPanel(),
-              title: appLocalizations.proxiesSetting,
+              title: appLocalizations.accessControlSetting,
             );
           },
         );
@@ -389,7 +357,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _intelligentSelected();
         }
       },
-      icon: const Icon(Icons.tune),
+      icon: const Icon(Icons.build_circle_outlined),
     );
   }
 
@@ -432,9 +400,12 @@ class _AccessViewState extends ConsumerState<AccessView>
     final currentList = accessControl.currentList;
     final packageNameList = packages.map((e) => e.packageName).toList();
     final valueList = currentList.intersection(packageNameList);
-    final describe = accessControlMode == AccessControlMode.acceptSelected
-        ? '${appLocalizations.accessControlAllowDesc} (${appLocalizations.whitelistMode})'
-        : '${appLocalizations.accessControlNotAllowDesc} (${appLocalizations.blacklistMode})';
+    final modeText = accessControlMode == AccessControlMode.acceptSelected
+        ? appLocalizations.whitelistMode
+        : appLocalizations.blacklistMode;
+    final modeDesc = accessControlMode == AccessControlMode.acceptSelected
+        ? appLocalizations.accessControlAllowDesc
+        : appLocalizations.accessControlNotAllowDesc;
 
     return Column(
       mainAxisSize: MainAxisSize.max,
@@ -530,7 +501,42 @@ class _AccessViewState extends ConsumerState<AccessView>
                                         ],
                                       ),
                                     ),
-                                    Flexible(child: Text(describe)),
+                                     Flexible(
+                                       child: InkWell(
+                                         borderRadius: BorderRadius.circular(4),
+                                         onTap: () {
+                                           globalState.showMessage(
+                                             title: modeText,
+                                             message: TextSpan(text: modeDesc),
+                                             cancelable: false,
+                                           );
+                                         },
+                                         child: Row(
+                                           mainAxisSize: MainAxisSize.min,
+                                           children: [
+                                             Text(
+                                               modeText,
+                                               style: Theme.of(context)
+                                                   .textTheme
+                                                   .bodyMedium
+                                                   ?.copyWith(
+                                                     color: Theme.of(context)
+                                                         .colorScheme
+                                                         .onSurfaceVariant,
+                                                   ),
+                                             ),
+                                             const SizedBox(width: 4),
+                                             Icon(
+                                               Icons.info_outline_rounded,
+                                               size: 15,
+                                               color: Theme.of(context)
+                                                   .colorScheme
+                                                   .onSurfaceVariant,
+                                             ),
+                                           ],
+                                         ),
+                                       ),
+                                     ),
                                   ],
                                 ),
                               ),
@@ -574,7 +580,10 @@ class _AccessViewState extends ConsumerState<AccessView>
                         return _buildPackageListPermissionDeniedView();
                       }
                       return packages.isEmpty
-                          ? NullStatus(label: appLocalizations.noData)
+                          ? NullStatus(
+                              label: appLocalizations.noData,
+                              illustration: NullStatusIllustration.apps,
+                            )
                           : CommonScrollBar(
                               controller: _controller,
                               child: ListView.separated(
@@ -724,7 +733,7 @@ class PackageListItem extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
-        Icons.apps,
+        Icons.apps_rounded,
         size: 24,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
@@ -752,7 +761,7 @@ class AccessControlSearchDelegate extends SearchDelegate {
           }
           query = '';
         },
-        icon: const Icon(Icons.clear),
+        icon: const Icon(Icons.clear_rounded),
       ),
       const SizedBox(width: 8),
     ];
@@ -764,7 +773,7 @@ class AccessControlSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-      icon: const Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back_rounded),
     );
   }
 
@@ -829,6 +838,13 @@ class AccessControlSearchDelegate extends SearchDelegate {
                   )
                   .toList();
 
+        if (queryPackages.isEmpty) {
+          return NullStatus(
+            label: appLocalizations.noData,
+            illustration: NullStatusIllustration.search,
+          );
+        }
+
         final isAccessControl = vm3.b;
         final currentList = vm3.c;
         final packageNameList = packages.map((e) => e.packageName).toList();
@@ -878,8 +894,8 @@ class AccessControlPanel extends ConsumerStatefulWidget {
 class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
   IconData _getIconWithAccessControlMode(AccessControlMode mode) {
     return switch (mode) {
-      AccessControlMode.acceptSelected => Icons.adjust_outlined,
-      AccessControlMode.rejectSelected => Icons.block_outlined,
+      AccessControlMode.acceptSelected => Icons.check_circle_outline_rounded,
+      AccessControlMode.rejectSelected => Icons.block_rounded,
     };
   }
 
@@ -900,9 +916,9 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   IconData _getIconWithProxiesSortType(AccessSortType type) {
     return switch (type) {
-      AccessSortType.none => Icons.sort,
-      AccessSortType.installTime => Icons.install_mobile,
-      AccessSortType.updateTime => Icons.update,
+      AccessSortType.none => Icons.align_horizontal_left_rounded,
+      AccessSortType.installTime => Icons.install_mobile_rounded,
+      AccessSortType.updateTime => Icons.update_rounded,
     };
   }
 
@@ -1104,19 +1120,19 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
             spacing: 16,
             children: [
               CommonChip(
-                avatar: const Icon(Icons.auto_awesome),
+                avatar: const Icon(Icons.auto_awesome_rounded),
                 label: appLocalizations.intelligentSelected,
                 onPressed: () {
                   Navigator.of(context).pop(1);
                 },
               ),
               CommonChip(
-                avatar: const Icon(Icons.paste),
+                avatar: const Icon(Icons.paste_rounded),
                 label: appLocalizations.clipboardImport,
                 onPressed: _pasteToClipboard,
               ),
               CommonChip(
-                avatar: const Icon(Icons.content_copy),
+                avatar: const Icon(Icons.content_copy_rounded),
                 label: appLocalizations.clipboardExport,
                 onPressed: _copyToClipboard,
               ),

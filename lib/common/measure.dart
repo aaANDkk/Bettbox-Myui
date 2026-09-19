@@ -81,4 +81,13 @@ class Measure {
       ).height,
     );
   }
+
+  double get titleSmallHeight {
+    return _measureMap.updateCacheValue(
+      'titleSmallHeight',
+      () => computeTextSize(
+        Text('X', style: context.textTheme.titleSmall),
+      ).height,
+    );
+  }
 }

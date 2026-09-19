@@ -465,6 +465,8 @@ class Tray {
         globalState.appController.startWakelockAutoRecovery();
       }
       globalState.updateWakelockState(!currentEnabled);
+      // 与首页小部件保持一致：记忆开关状态，下次启动自动恢复
+      await preferences.setWakelockEnabled(!currentEnabled);
       await globalState.appController.updateTray();
     } catch (e) {
       commonPrint.log('WakeLock toggle error: $e');

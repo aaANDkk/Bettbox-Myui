@@ -8,6 +8,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'edit_profile.dart';
 
+/// 打开「添加配置」弹层：配置页悬浮按钮与全局常驻悬浮按钮共用同一个入口。
+void showAddProfileExtend() {
+  final context = globalState.navigatorKey.currentState!.context;
+  showExtend(
+    context,
+    builder: (_, type) {
+      return AdaptiveSheetScaffold(
+        type: type,
+        body: AddProfileView(context: context),
+        title: appLocalizations.add,
+      );
+    },
+  );
+}
+
 class AddProfileView extends StatelessWidget {
   final BuildContext context;
 
@@ -30,7 +45,7 @@ class AddProfileView extends StatelessWidget {
           type: type,
           actions: [
             IconButton(
-              icon: const Icon(Icons.security),
+              icon: const Icon(Icons.security_rounded),
               tooltip: appLocalizations.ageKeyGenerateTitle,
               onPressed: () {
                 editKey.currentState?.showAgeKeyGenerator();
@@ -108,7 +123,7 @@ class AddProfileView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListItem(
-                leading: const Icon(Icons.qr_code_sharp),
+                leading: const Icon(Icons.qr_code_rounded),
                 title: Text(appLocalizations.qrcode),
                 subtitle: Text(appLocalizations.qrcodeDesc),
                 onTap: _toScan,
@@ -123,7 +138,7 @@ class AddProfileView extends StatelessWidget {
                 endIndent: 16,
               ),
               ListItem(
-                leading: const Icon(Icons.content_paste),
+                leading: const Icon(Icons.content_paste_rounded),
                 title: Text(appLocalizations.clipboard),
                 subtitle: Text(appLocalizations.clipboardDesc),
                 onTap: _handleAddProfileFromClipboard,
@@ -138,10 +153,10 @@ class AddProfileView extends StatelessWidget {
                 endIndent: 16,
               ),
               ListItem(
-                leading: const Icon(Icons.upload_file_sharp),
-                title: Text(appLocalizations.file),
-                subtitle: Text(appLocalizations.fileDesc),
-                onTap: _handleAddProfileFormFile,
+                leading: const Icon(Icons.cloud_download_rounded),
+                title: Text(appLocalizations.url),
+                subtitle: Text(appLocalizations.urlDesc),
+                onTap: _toAdd,
               ),
               Divider(
                 height: 1,
@@ -153,10 +168,10 @@ class AddProfileView extends StatelessWidget {
                 endIndent: 16,
               ),
               ListItem(
-                leading: const Icon(Icons.cloud_download_sharp),
-                title: Text(appLocalizations.url),
-                subtitle: Text(appLocalizations.urlDesc),
-                onTap: _toAdd,
+                leading: const Icon(Icons.file_open_rounded),
+                title: Text(appLocalizations.file),
+                subtitle: Text(appLocalizations.fileDesc),
+                onTap: _handleAddProfileFormFile,
               ),
             ],
           ),

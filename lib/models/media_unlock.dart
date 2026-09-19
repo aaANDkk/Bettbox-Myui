@@ -10,6 +10,45 @@ const monochromeColorFilter = ColorFilter.matrix(<double>[
 const mediaUnlockGreen = Color(0xFF10B981);
 const mediaUnlockOrange = Color(0xFFF59E0B);
 
+/// 深色模式下把双色素材映射到主题色系：暗部 → `onSurface`、亮部 → `surface`，
+/// 与其余单色图标同色系，不会出现纯白/纯黑那种突兀感。
+ColorFilter themedInvertFilter(ColorScheme colorScheme) {
+  final fg = colorScheme.onSurface;
+  final bg = colorScheme.surface;
+  const lr = 0.2126, lg = 0.7152, lb = 0.0722;
+  List<double> row(double f, double b) => <double>[
+        lr * (b - f) / 255,
+        lg * (b - f) / 255,
+        lb * (b - f) / 255,
+        0,
+        f,
+      ];
+  return ColorFilter.matrix(<double>[
+    ...row(fg.r * 255, bg.r * 255),
+    ...row(fg.g * 255, bg.g * 255),
+    ...row(fg.b * 255, bg.b * 255),
+    0, 0, 0, 1, 0,
+  ]);
+}
+
+/// 双色素材（如 OKX 黑底白标记徽标）没法靠单色着色适配：
+/// 浅色模式保持原样，深色模式按主题色系做一次亮度反色（黑底变主题前景色、
+/// 白标记变卡片底色），与其它图标观感一致。
+Widget themedPlatformIcon(
+  BuildContext context,
+  MediaPlatform platform,
+  Widget icon,
+) {
+  final theme = Theme.of(context);
+  if (!platform.invertOnDark || theme.brightness != Brightness.dark) {
+    return icon;
+  }
+  return ColorFiltered(
+    colorFilter: themedInvertFilter(theme.colorScheme),
+    child: icon,
+  );
+}
+
 enum MediaCategory {
   ai,
   streaming,
@@ -28,7 +67,6 @@ enum MediaPlatform {
   openrouter,
   poe,
   suno,
-  cloudflare,
   perplexity,
   netflix,
   disney,
@@ -57,6 +95,7 @@ enum MediaPlatform {
   wikipedia,
   apple,
   onetrust,
+  cloudflare,
   gitlab,
   npm,
   cdnjs,
@@ -82,7 +121,6 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.openrouter ||
         MediaPlatform.poe ||
         MediaPlatform.suno ||
-        MediaPlatform.cloudflare ||
         MediaPlatform.perplexity =>
           MediaCategory.ai,
         MediaPlatform.netflix ||
@@ -115,6 +153,7 @@ extension MediaPlatformExt on MediaPlatform {
         MediaPlatform.wikipedia ||
         MediaPlatform.apple ||
         MediaPlatform.onetrust ||
+        MediaPlatform.cloudflare ||
         MediaPlatform.gitlab ||
         MediaPlatform.npm ||
         MediaPlatform.cdnjs ||
@@ -188,15 +227,33 @@ extension MediaPlatformExt on MediaPlatform {
       };
 
   bool get isMonochrome => switch (this) {
+        MediaPlatform.openai ||
+        MediaPlatform.suno ||
         MediaPlatform.github ||
         MediaPlatform.wikipedia ||
         MediaPlatform.apple ||
-        MediaPlatform.x ||
+        MediaPlatform.tiktok ||
         MediaPlatform.medium ||
         MediaPlatform.grok ||
+        MediaPlatform.unpkg ||
+        // 品牌本身是黑/白单色素材：跟随主题着色，浅色模式黑、深色模式白
+        MediaPlatform.ubisoft ||
         MediaPlatform.epic =>
           true,
         _ => false,
+      };
+
+  /// 深色模式下整体反色的素材，见 [themedPlatformIcon]；单色黑素材请用 [isMonochrome]。
+  ///
+  /// crypto 分类默认整体反色（这类标记多为黑/深色，深色背景下要反色才看得清），
+  /// 但彩色品牌徽标例外：反色会破坏品牌色，因此显式排除。
+  bool get invertOnDark => switch (this) {
+        MediaPlatform.coinbase ||
+        MediaPlatform.phantom ||
+        MediaPlatform.kraken => false,
+        // E-Hentai 是深红色单色标记，深色背景下偏暗，单独加入反色
+        MediaPlatform.ehentai => true,
+        _ => category == MediaCategory.crypto,
       };
 
   bool get pinColoBadge => this == MediaPlatform.telegram;

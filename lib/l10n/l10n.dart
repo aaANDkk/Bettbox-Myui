@@ -109,6 +109,11 @@ class AppLocalizations {
     return Intl.message('Profiles', name: 'profiles', desc: '', args: []);
   }
 
+  /// `Profile`
+  String get currentProfile {
+    return Intl.message('Profile', name: 'currentProfile', desc: '', args: []);
+  }
+
   /// `Tools`
   String get tools {
     return Intl.message('Tools', name: 'tools', desc: '', args: []);
@@ -164,15 +169,16 @@ class AppLocalizations {
     );
   }
 
-  /// `Traffic Usage`
+  /// `Traffic`
   String get trafficUsage {
     return Intl.message(
-      'Traffic Usage',
+      'Traffic',
       name: 'trafficUsage',
       desc: '',
       args: [],
     );
   }
+
 
   /// `Core Info`
   String get coreInfo {
@@ -184,6 +190,21 @@ class AppLocalizations {
     return Intl.message(
       'Network Speed',
       name: 'networkSpeed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Speed Test`
+  String get speedTest {
+    return Intl.message('Speed Test', name: 'speedTest', desc: '', args: []);
+  }
+
+  /// `You will be taken to a browser speed test site.`
+  String get speedTestDesc {
+    return Intl.message(
+      'You will be taken to a browser speed test site.',
+      name: 'speedTestDesc',
       desc: '',
       args: [],
     );
@@ -1524,6 +1545,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Access Control Settings`
+  String get accessControlSetting {
+    return Intl.message(
+      'Access Control Settings',
+      name: 'accessControlSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Access`
+  String get accessControlShort {
+    return Intl.message(
+      'Access',
+      name: 'accessControlShort',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Only route selected apps through VPN`
   String get accessControlAllowDesc {
     return Intl.message(
@@ -1902,6 +1943,16 @@ class AppLocalizations {
   /// `Unknown`
   String get unknown {
     return Intl.message('Unknown', name: 'unknown', desc: '', args: []);
+  }
+
+  /// `Null`
+  String get notAcquired {
+    return Intl.message(
+      'Null',
+      name: 'notAcquired',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `GeoData`
@@ -2716,7 +2767,22 @@ class AppLocalizations {
 
   /// `Last edited`
   String get lastEdit {
-    return Intl.message('Last edited', name: 'lastEdit', desc: '', args: []);
+    return Intl.message(
+      'Last edited',
+      name: 'lastEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start`
+  String get startRunning {
+    return Intl.message(
+      'Start',
+      name: 'startRunning',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Stop`
@@ -4624,6 +4690,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Tab Animation`
+  String get tabAnimation {
+    return Intl.message(
+      'Tab Animation',
+      name: 'tabAnimation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Only valid in mobile view`
+  String get tabAnimationDesc {
+    return Intl.message(
+      'Only valid in mobile view',
+      name: 'tabAnimationDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Are you sure you want to save?`
   String get saveTip {
     return Intl.message(
@@ -4826,14 +4912,29 @@ class AppLocalizations {
 
   /// `Font Fix`
   String get harmonyFont {
-    return Intl.message('Font Fix', name: 'harmonyFont', desc: '', args: []);
+    return Intl.message('Custom Font', name: 'harmonyFont', desc: '', args: []);
   }
 
   /// `Use built-in font to fix display issues`
   String get harmonyFontDesc {
     return Intl.message(
-      'Use built-in font to fix display issues',
+      'Use system font by default, enable to customize your favorite font',
       name: 'harmonyFontDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Emoji Style`
+  String get emojiStyle {
+    return Intl.message('Emoji Style', name: 'emojiStyle', desc: '', args: []);
+  }
+
+  /// `Select the Emoji style displayed in the app`
+  String get emojiStyleDesc {
+    return Intl.message(
+      'Select the Emoji style displayed in the app',
+      name: 'emojiStyleDesc',
       desc: '',
       args: [],
     );
@@ -5479,6 +5580,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Style Settings`
+  String get styleSetting {
+    return Intl.message(
+      'Style Settings',
+      name: 'styleSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Comment`
   String get blockComment {
     return Intl.message('Comment', name: 'blockComment', desc: '', args: []);
@@ -5664,6 +5775,36 @@ class AppLocalizations {
     return Intl.message('Update Time', name: 'updateTime', desc: '', args: []);
   }
 
+  /// `Select / Change Font`
+  String get selectCustomFont {
+    return Intl.message('Select / Change Font', name: 'selectCustomFont', desc: '', args: []);
+  }
+
+  /// `Tap to select a local .ttf or .otf font file`
+  String get selectCustomFontDesc {
+    return Intl.message('Tap to select a local .ttf or .otf font file', name: 'selectCustomFontDesc', desc: '', args: []);
+  }
+
+  /// `Custom font applied`
+  String get customFontApplied {
+    return Intl.message('Custom font applied', name: 'customFontApplied', desc: '', args: []);
+  }
+
+  /// `Restored to system default font`
+  String get customFontDisabled {
+    return Intl.message('Restored to system default font', name: 'customFontDisabled', desc: '', args: []);
+  }
+
+  /// `Only .ttf and .otf font formats are supported`
+  String get invalidFontFormat {
+    return Intl.message('Only .ttf and .otf font formats are supported', name: 'invalidFontFormat', desc: '', args: []);
+  }
+
+  /// `Zoom`
+  String get zoom {
+    return Intl.message('Zoom', name: 'zoom', desc: '', args: []);
+  }
+
   /// `Core Status`
   String get coreStatus {
     return Intl.message('Core Status', name: 'coreStatus', desc: '', args: []);
@@ -5771,7 +5912,12 @@ class AppLocalizations {
 
   /// `{count}`
   String itemsCount(Object count) {
-    return Intl.message('$count', name: 'itemsCount', desc: '', args: [count]);
+    return Intl.message(
+      '$count',
+      name: 'itemsCount',
+      desc: '',
+      args: [count],
+    );
   }
 
   /// `Connectivity Test`
@@ -5779,6 +5925,16 @@ class AppLocalizations {
     return Intl.message(
       'Connectivity Test',
       name: 'mediaUnlock',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connectivity`
+  String get mediaUnlockShort {
+    return Intl.message(
+      'Connectivity',
+      name: 'mediaUnlockShort',
       desc: '',
       args: [],
     );
@@ -5839,16 +5995,6 @@ class AppLocalizations {
     return Intl.message(
       'Show colored icons by default',
       name: 'mediaUnlockColorfulIcons',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Partially refresh based on current category`
-  String get mediaUnlockRefreshByCategory {
-    return Intl.message(
-      'Partially refresh based on current category',
-      name: 'mediaUnlockRefreshByCategory',
       desc: '',
       args: [],
     );
@@ -5982,6 +6128,131 @@ class AppLocalizations {
   /// `Flagged`
   String get flagged {
     return Intl.message('Flagged', name: 'flagged', desc: '', args: []);
+  }
+
+  /// `Fading Cube`
+  String get fadingCube {
+    return Intl.message(
+      'Fading Cube',
+      name: 'fadingCube',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Folding Cube`
+  String get foldingCube {
+    return Intl.message(
+      'Folding Cube',
+      name: 'foldingCube',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pumping Heart`
+  String get pumpingHeart {
+    return Intl.message(
+      'Pumping Heart',
+      name: 'pumpingHeart',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pouring Hour Glass`
+  String get pouringHourGlass {
+    return Intl.message(
+      'Pouring Hour Glass',
+      name: 'pouringHourGlass',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Square Circle`
+  String get squareCircle {
+    return Intl.message(
+      'Square Circle',
+      name: 'squareCircle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Three Rotating Dots`
+  String get threeRotatingDots {
+    return Intl.message(
+      'Three Rotating Dots',
+      name: 'threeRotatingDots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Four Rotating Dots`
+  String get fourRotatingDots {
+    return Intl.message(
+      'Four Rotating Dots',
+      name: 'fourRotatingDots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Staggered Dots Wave`
+  String get staggeredDotsWave {
+    return Intl.message(
+      'Staggered Dots Wave',
+      name: 'staggeredDotsWave',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dots Triangle`
+  String get dotsTriangle {
+    return Intl.message(
+      'Dots Triangle',
+      name: 'dotsTriangle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `General`
+  String get basicInfo {
+    return Intl.message(
+      'General',
+      name: 'basicInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Address`
+  String get addressInfo {
+    return Intl.message(
+      'Address',
+      name: 'addressInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Traffic`
+  String get traffic {
+    return Intl.message('Traffic', name: 'traffic', desc: '', args: []);
+  }
+
+  /// `Advanced`
+  String get advancedInfo {
+    return Intl.message(
+      'Advanced',
+      name: 'advancedInfo',
+      desc: '',
+      args: [],
+    );
   }
 }
 

@@ -291,8 +291,12 @@ class Request {
     final locale = Intl.getCurrentLocale().toLowerCase();
     final isZh = locale.startsWith('zh');
     return [
+      if (ipInfoToken.isNotEmpty)
+        'https://api.ipinfo.io/lite/me?token=$ipInfoToken',
       isZh ? 'http://ip-api.com/json/?lang=zh-CN' : 'http://ip-api.com/json',
       'https://get.geojs.io/v1/ip/geo.json',
+      'https://api.ip.sb/geoip',
+      isZh ? 'https://api.myip.la/cn?json' : 'https://api.myip.la/en?json',
     ];
   }
 
@@ -481,35 +485,14 @@ class Request {
     );
   }
 
+  static const _ipCacheKey = 'ip_detail_cache';
   static const _cacheDuration = Duration(days: 30);
-
-  Future<File> _getIpCacheFile() async {
-    final filePath = await appPath.ipCacheFilePath;
-    final file = File(filePath);
-    if (!file.parent.existsSync()) {
-      await file.parent.create(recursive: true);
-    }
-    return file;
-  }
-
-  Future<void> _writeIpCacheFile(File file, Map<String, dynamic> entries) async {
-    try {
-      final tempFile = File('${file.path}.tmp');
-      await tempFile.writeAsString(json.encode(entries), flush: true);
-      if (await file.exists()) {
-        await file.delete();
-      }
-      await tempFile.rename(file.path);
-    } catch (_) {}
-  }
 
   Future<IpInfo?> _getValidCachedIp(String cacheKey) async {
     try {
-      final file = await _getIpCacheFile();
-      if (!await file.exists()) return null;
-
-      final cacheStr = await file.readAsString();
-      if (cacheStr.isEmpty) return null;
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      final cacheStr = prefs?.getString(_ipCacheKey);
+      if (cacheStr == null || cacheStr.isEmpty) return null;
 
       final dynamic decoded = json.decode(cacheStr);
       if (decoded is! Map) return null;
@@ -522,6 +505,7 @@ class Request {
       final validEntries = <String, dynamic>{};
       IpInfo? matchedIpInfo;
 
+      // 仅在用户查询时，主动检查并清理所有过期的缓存
       for (final entry in rawMap.entries) {
         final val = entry.value;
         if (val is Map) {
@@ -542,8 +526,9 @@ class Request {
         }
       }
 
+      // 如果有过期的数据被剔除，保存清理后的缓存
       if (hasExpired) {
-        await _writeIpCacheFile(file, validEntries);
+        await prefs?.setString(_ipCacheKey, json.encode(validEntries));
       }
 
       return matchedIpInfo;
@@ -552,22 +537,58 @@ class Request {
     }
   }
 
-  Future<void> _saveCachedIp(String cacheKey, IpInfo ipInfo) async {
+  final Map<String, IpInfo> _memoryIpCache = {};
+
+  Future<void> preloadIpCache() async {
     try {
-      final file = await _getIpCacheFile();
-      Map<String, dynamic> rawMap = {};
-      if (await file.exists()) {
-        final cacheStr = await file.readAsString();
-        if (cacheStr.isNotEmpty) {
-          try {
-            rawMap = Map<String, dynamic>.from(json.decode(cacheStr) as Map);
-          } catch (_) {}
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      final cacheStr = prefs?.getString(_ipCacheKey);
+      if (cacheStr == null || cacheStr.isEmpty) return;
+
+      final dynamic decoded = json.decode(cacheStr);
+      if (decoded is! Map) return;
+
+      final rawMap = Map<String, dynamic>.from(decoded);
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final maxAgeMs = _cacheDuration.inMilliseconds;
+
+      for (final entry in rawMap.entries) {
+        final val = entry.value;
+        if (val is Map) {
+          final valMap = Map<String, dynamic>.from(val);
+          final timestamp = valMap['timestamp'] as num?;
+          if (timestamp != null && (now - timestamp) < maxAgeMs) {
+            if (valMap['data'] is Map) {
+              try {
+                _memoryIpCache[entry.key] = IpInfo.fromJson(
+                  Map<String, dynamic>.from(valMap['data'] as Map),
+                );
+              } catch (_) {}
+            }
+          }
         }
       }
+    } catch (_) {}
+  }
+
+  IpInfo? getMemoryCachedIp(String ip) {
+    final isZh = Intl.getCurrentLocale().toLowerCase().startsWith('zh');
+    return _memoryIpCache['${ip}_${isZh ? 'zh' : 'en'}'];
+  }
+
+  Future<void> _saveCachedIp(String cacheKey, IpInfo ipInfo) async {
+    _memoryIpCache[cacheKey] = ipInfo;
+    try {
+      final prefs = await preferences.sharedPreferencesCompleter.future;
+      final cacheStr = prefs?.getString(_ipCacheKey);
+      final rawMap = (cacheStr != null && cacheStr.isNotEmpty)
+          ? Map<String, dynamic>.from(json.decode(cacheStr) as Map)
+          : <String, dynamic>{};
 
       final now = DateTime.now().millisecondsSinceEpoch;
       final maxAgeMs = _cacheDuration.inMilliseconds;
 
+      // 清理已过期数据，并插入新数据
       final validEntries = <String, dynamic>{};
       for (final entry in rawMap.entries) {
         final val = entry.value;
@@ -582,7 +603,7 @@ class Request {
 
       validEntries[cacheKey] = {'timestamp': now, 'data': ipInfo.toJson()};
 
-      await _writeIpCacheFile(file, validEntries);
+      await prefs?.setString(_ipCacheKey, json.encode(validEntries));
     } catch (_) {}
   }
 
@@ -594,8 +615,16 @@ class Request {
     final isZh = Intl.getCurrentLocale().toLowerCase().startsWith('zh');
     final cacheKey = '${ip}_${isZh ? 'zh' : 'en'}';
 
+    // 0. 优先命中高频内存缓存（0 耗时）
+    final memoryCached = _memoryIpCache[cacheKey];
+    if (memoryCached != null) {
+      return Result.success(memoryCached);
+    }
+
+    // 1. 检查本地持久化缓存并执行过期清理（有效时长7天）
     final cached = await _getValidCachedIp(cacheKey);
     if (cached != null) {
+      _memoryIpCache[cacheKey] = cached;
       return Result.success(cached);
     }
 

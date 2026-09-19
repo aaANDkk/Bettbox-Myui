@@ -6,6 +6,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 
 @immutable
 class Contributor {
@@ -39,26 +40,26 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Github Releases',
-            icon: Icons.star,
+            icon: Icons.star_rounded,
             onTap: () =>
-                globalState.openUrl('https://github.com/appshubcc/Bettbox'),
+                globalState.openUrl('https://github.com/$repository'),
           ),
           right: _LinkGridTile(
             title: appLocalizations.checkUpdate,
-            icon: Icons.refresh,
+            icon: Icons.refresh_rounded,
             onTap: () => _checkUpdate(context),
           ),
         ),
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Telegram Group',
-            icon: Icons.launch,
+            icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://telegram.me/appshub_chat'),
           ),
           right: _LinkGridTile(
             title: 'Channel',
-            icon: Icons.launch,
+            icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://telegram.me/appshub_channel'),
           ),
@@ -66,13 +67,13 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'FlClash',
-            icon: Icons.launch,
+            icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://github.com/chen08209/FlClash'),
           ),
           right: _LinkGridTile(
             title: 'Mihomo',
-            icon: Icons.launch,
+            icon: Icons.launch_rounded,
             onTap: () =>
                 globalState.openUrl('https://github.com/MetaCubeX/mihomo'),
           ),
@@ -186,8 +187,10 @@ class AboutView extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(12),
-                        child: Image.asset(
-                          'assets/images/icon.png',
+                        child: SvgPicture.asset(
+                          context.colorScheme.brightness == Brightness.dark
+                              ? 'assets/images/splash_icon_dark.svg'
+                              : 'assets/images/splash_icon_light.svg',
                           width: 48,
                           height: 48,
                         ),
@@ -225,10 +228,10 @@ class AboutView extends StatelessWidget {
               appLocalizations.desc,
               style: Theme.of(context).textTheme.bodySmall,
             ),
+            const SizedBox(height: 5),
           ],
         ),
       ),
-      const SizedBox(height: 12),
       ..._buildContributorsSection(),
       ..._buildMoreSection(context),
     ];

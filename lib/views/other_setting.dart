@@ -693,7 +693,7 @@ class _TrayClickBehaviorDialogState extends State<_TrayClickBehaviorDialog> {
     ),
     ButtonSegment(
       value: TrayClickBehavior.showMenu,
-      icon: const Icon(Icons.menu),
+      icon: const Icon(Icons.menu_rounded),
       label: Text(appLocalizations.showMenu),
     ),
   ];

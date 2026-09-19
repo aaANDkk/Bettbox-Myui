@@ -119,6 +119,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリのアクセス制御"),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "アクセス制御設定",
+    ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("アクセス制御"),
     "appDesc": MessageLookupByLibrary.simpleMessage("アプリ設定を管理"),
     "application": MessageLookupByLibrary.simpleMessage("アプリケーション"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage("アプリ設定の変更"),
@@ -256,6 +260,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("クラッシュテスト"),
     "create": MessageLookupByLibrary.simpleMessage("作成"),
     "creationTime": MessageLookupByLibrary.simpleMessage("作成日時"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("現在のプロファイル"),
     "custom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("カスタムタイトル"),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("カスタムルール"),
@@ -380,7 +385,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("外部リンク"),
     "externalResources": MessageLookupByLibrary.simpleMessage("外部リソース"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("フェードサークル"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("フェードフォースクエア"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage("FakeIPフィルターモード"),
     "fakeIpFilterModeDesc": MessageLookupByLibrary.simpleMessage(
@@ -444,10 +448,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("グローバル"),
     "go": MessageLookupByLibrary.simpleMessage("移動"),
     "goDownload": MessageLookupByLibrary.simpleMessage("ダウンロードへ"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("フォント修復"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "表示異常を改善するため内蔵フォントを使用",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("カスタムフォント"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("デフォルトはシステムフォント、有効にして好みのフォントを適用"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("変更をキャッシュしますか？"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("タイムアウト時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -535,6 +537,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IPを再取得"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("接続性テスト"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("接続性テスト"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "既定でカラーアイコンを表示",
     ),
@@ -546,9 +549,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage("その他の設定"),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "ウィジェットに常駐表示する最大4項目を選択できます",
-    ),
-    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
-      "現在のカテゴリに基づいて部分更新",
     ),
     "mediaUnlockRefreshOnNodeChange": MessageLookupByLibrary.simpleMessage(
       "ノード変更時に自動更新",
@@ -606,6 +606,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP、CIDR または Gateway:IP/CIDR",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("通信速度"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("速度テスト"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "既定のブラウザでオンライン速度テストサービスを開きます。続行しますか？",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("速度通知"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "通知バーに通信速度とサブスク情報を表示",
@@ -883,6 +887,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "show": MessageLookupByLibrary.simpleMessage("表示"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("非表示項目を表示"),
     "showMenu": MessageLookupByLibrary.simpleMessage("メニューを開く"),
+    "styleSetting": MessageLookupByLibrary.simpleMessage("スタイル設定"),
     "showPanel": MessageLookupByLibrary.simpleMessage("ウィンドウを表示"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("単独スイッチ表示"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1029,6 +1034,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "ハンドシェイク等の追加レイテンシを除外",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("不明"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("未取得"),
     "unlocked": MessageLookupByLibrary.simpleMessage("完了"),
     "unnamed": MessageLookupByLibrary.simpleMessage("無題"),
     "unpin": MessageLookupByLibrary.simpleMessage("固定解除"),
@@ -1069,5 +1075,30 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("システムへ適用"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("管理者権限が必要です"),
     "years": m15,
+  
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("絵文字スタイル"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("アプリ内で表示する絵文字のスタイルを選択"),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
+    "startRunning": MessageLookupByLibrary.simpleMessage("開始"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage("フォントの選択 / 変更"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("タップしてローカルの .ttf または .otf フォントを選択"),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage("カスタムフォントを適用しました"),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage("システムデフォルトのフォントに戻しました"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf または .otf 形式のフォントファイルのみサポートされています"),
+    "fadingCube": MessageLookupByLibrary.simpleMessage("フェージングキューブ"),
+    "foldingCube": MessageLookupByLibrary.simpleMessage("折りたたみキューブ"),
+    "pumpingHeart": MessageLookupByLibrary.simpleMessage("心拍パルス"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("流れる砂時計"),
+    "squareCircle": MessageLookupByLibrary.simpleMessage("四角から円"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("3点回転"),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("4点回転"),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("スタッガードウェーブ"),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage("ドット三角"),
+    "zoom": MessageLookupByLibrary.simpleMessage("ズーム"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("基本情報"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("アドレス情報"),
+    "traffic": MessageLookupByLibrary.simpleMessage("トラフィック"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("詳細情報"),
   };
 }

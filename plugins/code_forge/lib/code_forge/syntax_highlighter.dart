@@ -9,12 +9,12 @@ import '../LSP/lsp.dart';
 
 final List<String> _kEmojiFontFallback =
     defaultTargetPlatform == TargetPlatform.windows
-        ? const ['Twemoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Roboto']
+        ? const ['OpenMoji', 'Twemoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Roboto']
         : defaultTargetPlatform == TargetPlatform.linux
-            ? const ['Twemoji', 'Noto Color Emoji', 'Roboto']
+            ? const ['OpenMoji', 'Twemoji', 'Noto Color Emoji', 'Roboto']
             : defaultTargetPlatform == TargetPlatform.android
-                ? const ['Noto Color Emoji', 'Twemoji', 'Roboto']
-                : const ['Apple Color Emoji', 'Twemoji', 'Roboto'];
+                ? const ['OpenMoji', 'Twemoji', 'Noto Color Emoji', 'Roboto']
+                : const ['OpenMoji', 'Apple Color Emoji', 'Twemoji', 'Roboto'];
 
 class SemanticWordSpan {
   final int startChar;
@@ -53,6 +53,8 @@ class SyntaxHighlighter {
   final TextStyle? baseTextStyle;
   final String? languageId;
   final String Function(int)? getLineText;
+  final String? emojiFamily;
+  final RegExp? emojiRegex;
   final Map<int, HighlightedLine> _grammarCache = {}, _mergedCache = {};
   final Map<int, List<SemanticWordSpan>> _lineSemanticSpans = {};
   final Map<String, TextSpan?> _lineSpanCache = {};
@@ -80,6 +82,8 @@ class SyntaxHighlighter {
     this.languageId,
     this.extraLanguages = const [],
     this.getLineText,
+    this.emojiFamily,
+    this.emojiRegex,
   }) {
     _langId = language.hashCode.toString();
     _resolvedTheme = _buildResolvedTheme(editorTheme);
@@ -878,6 +882,36 @@ class SyntaxHighlighter {
     return TextSpan(style: baseTextStyle, children: children);
   }
 
+  void _addTextWithEmoji(
+    ui.ParagraphBuilder builder,
+    String text,
+    double fontSize,
+  ) {
+    if (emojiFamily == null || emojiRegex == null || !emojiRegex!.hasMatch(text)) {
+      builder.addText(text);
+      return;
+    }
+    int lastEnd = 0;
+    for (final match in emojiRegex!.allMatches(text)) {
+      if (match.start > lastEnd) {
+        builder.addText(text.substring(lastEnd, match.start));
+      }
+      builder.pushStyle(
+        ui.TextStyle(
+          fontSize: fontSize,
+          fontFamily: emojiFamily,
+          fontFamilyFallback: [emojiFamily!, ..._kEmojiFontFallback],
+        ),
+      );
+      builder.addText(match.group(0)!);
+      builder.pop();
+      lastEnd = match.end;
+    }
+    if (lastEnd < text.length) {
+      builder.addText(text.substring(lastEnd));
+    }
+  }
+
   ui.Paragraph buildHighlightedParagraph(
     int lineIndex,
     String lineText,
@@ -892,7 +926,11 @@ class SyntaxHighlighter {
     if (span == null || lineText.isEmpty) {
       final style = _getUiTextStyle(null, fontSize, fontFamily);
       builder.pushStyle(style);
-      builder.addText(lineText.isEmpty ? ' ' : lineText);
+      _addTextWithEmoji(
+        builder,
+        lineText.isEmpty ? ' ' : lineText,
+        fontSize,
+      );
       final p = builder.build();
       p.layout(ui.ParagraphConstraints(width: width ?? double.infinity));
       return p;
@@ -915,7 +953,7 @@ class SyntaxHighlighter {
     builder.pushStyle(style);
 
     if (span.text != null) {
-      builder.addText(span.text!);
+      _addTextWithEmoji(builder, span.text!, fontSize);
     }
 
     if (span.children != null) {
@@ -935,12 +973,18 @@ class SyntaxHighlighter {
     String? fontFamily,
   ) {
     final baseStyle = style ?? baseTextStyle ?? editorTheme['root'];
+    final fallback = [
+      if (emojiFamily != null) emojiFamily!,
+      if (baseStyle?.fontFamilyFallback != null)
+        ...baseStyle!.fontFamilyFallback!,
+      ..._kEmojiFontFallback,
+    ];
 
     return ui.TextStyle(
       color: baseStyle?.color ?? editorTheme['root']?.color ?? Colors.black,
       fontSize: fontSize,
       fontFamily: fontFamily,
-      fontFamilyFallback: _kEmojiFontFallback,
+      fontFamilyFallback: fallback,
       fontWeight: baseStyle?.fontWeight,
       fontStyle: baseStyle?.fontStyle,
     );
@@ -953,12 +997,18 @@ class SyntaxHighlighter {
   ) {
     final themeStyle = className != null ? editorTheme[className] : null;
     final baseStyle = themeStyle ?? baseTextStyle ?? editorTheme['root'];
+    final fallback = [
+      if (emojiFamily != null) emojiFamily!,
+      if (baseStyle?.fontFamilyFallback != null)
+        ...baseStyle!.fontFamilyFallback!,
+      ..._kEmojiFontFallback,
+    ];
 
     return ui.TextStyle(
       color: baseStyle?.color ?? editorTheme['root']?.color ?? Colors.black,
       fontSize: fontSize,
       fontFamily: fontFamily,
-      fontFamilyFallback: _kEmojiFontFallback,
+      fontFamilyFallback: fallback,
       fontWeight: baseStyle?.fontWeight,
       fontStyle: baseStyle?.fontStyle,
     );

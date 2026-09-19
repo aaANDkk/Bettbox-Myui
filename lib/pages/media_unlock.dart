@@ -51,28 +51,39 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         itemBuilder: (context, index) {
           final cat = categories[index];
           final isSelected = _selectedCategory == cat;
-          return FilterChip(
-            selected: isSelected,
-            showCheckmark: false,
-            label: Text(_getCategoryLabel(cat)),
-            labelStyle: context.textTheme.labelMedium?.copyWith(
-              color: isSelected
-                  ? context.colorScheme.onPrimary
-                  : context.colorScheme.onSurfaceVariant,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          final shape = RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(12),
+          );
+          return Material(
+            color: isSelected
+                ? context.colorScheme.primary
+                : context.colorScheme.surfaceContainerHigh,
+            shape: shape,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              customBorder: shape,
+              onTap: () {
+                setState(() {
+                  _selectedCategory = cat;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                alignment: Alignment.center,
+                child: Text(
+                  _getCategoryLabel(cat),
+                  style: context.textTheme.labelMedium?.copyWith(
+                    color: isSelected
+                        ? context.colorScheme.onPrimary
+                        : context.colorScheme.onSurfaceVariant,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
             ),
-            backgroundColor: context.colorScheme.surfaceContainerHigh,
-            selectedColor: context.colorScheme.primary,
-            side: BorderSide.none,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            onSelected: (_) {
-              setState(() {
-                _selectedCategory = cat;
-              });
-            },
           );
         },
       ),
@@ -82,7 +93,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
   String _getStatusText(MediaUnlockStatus status, [MediaPlatform? platform]) {
     switch (status) {
       case MediaUnlockStatus.unlocked:
-        if (platform?.category == MediaCategory.streaming) {
+        if (platform?.category == MediaCategory.streaming ||
+            platform?.category == MediaCategory.ai) {
           return appLocalizations.mediaUnlocked;
         }
         return appLocalizations.unlocked;
@@ -130,8 +142,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
         assetPath,
-        width: iconWidth,
-        height: iconHeight,
+        width: size,
+        height: size,
         fit: BoxFit.contain,
         colorFilter: ColorFilter.mode(
           isUnlocked
@@ -145,8 +157,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     } else if (isUnlocked) {
       icon = SvgPicture.asset(
         assetPath,
-        width: iconWidth,
-        height: iconHeight,
+        width: size,
+        height: size,
         fit: BoxFit.contain,
       );
     } else {
@@ -154,8 +166,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         colorFilter: monochromeColorFilter,
         child: SvgPicture.asset(
           assetPath,
-          width: iconWidth,
-          height: iconHeight,
+          width: size,
+          height: size,
           fit: BoxFit.contain,
         ),
       );
@@ -164,7 +176,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     return SizedBox(
       width: size,
       height: size,
-      child: Center(child: icon),
+      child: Center(child: themedPlatformIcon(context, platform, icon)),
     );
   }
 
@@ -179,6 +191,29 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     globalState.showCommonDialog<void>(
       child: StatefulBuilder(
         builder: (context, setDialogState) {
+          // 整行点击与右侧方块勾选共用同一份多选逻辑：最多 4 个、至少保留 1 个。
+          void togglePinned(MediaPlatform platform) {
+            final checked = currentPinned.contains(platform);
+            if (!checked) {
+              if (currentPinned.length >= 4) {
+                globalState.showNotifier(
+                  appLocalizations.mediaUnlockSelectLimit,
+                );
+                return;
+              }
+              setDialogState(() {
+                currentPinned.add(platform);
+              });
+            } else {
+              if (currentPinned.length <= 1) {
+                return;
+              }
+              setDialogState(() {
+                currentPinned.remove(platform);
+              });
+            }
+          }
+
           return CommonDialog(
             title: appLocalizations.mediaUnlockDisplaySettings,
             titleTrailing: IconButton(
@@ -251,10 +286,10 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                               ),
                               for (final platform in MediaPlatform.values
                                   .where((p) => p.category == category))
-                                CheckboxListTile(
+                                ListTile(
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
-                                  secondary: Container(
+                                  leading: Container(
                                     width: 32,
                                     height: 32,
                                     clipBehavior: Clip.antiAlias,
@@ -273,28 +308,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                     platform.defaultName,
                                     style: context.textTheme.bodyMedium,
                                   ),
-                                  value: currentPinned.contains(platform),
-                                  onChanged: (bool? checked) {
-                                    if (checked == true) {
-                                      if (currentPinned.length >= 4) {
-                                        globalState.showNotifier(
-                                          appLocalizations
-                                              .mediaUnlockSelectLimit,
-                                        );
-                                        return;
-                                      }
-                                      setDialogState(() {
-                                        currentPinned.add(platform);
-                                      });
-                                    } else {
-                                      if (currentPinned.length <= 1) {
-                                        return;
-                                      }
-                                      setDialogState(() {
-                                        currentPinned.remove(platform);
-                                      });
-                                    }
-                                  },
+                                  // 可多选（最多 4 个）→ 方块勾选（Bettbox 原本的
+                                  // 样式）；右侧留 4，与标题栏右上角的设置按钮
+                                  // 右边线对齐（规范第 7 节）。
+                                  trailing: Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: OptionCheckIcon(
+                                      selected:
+                                          currentPinned.contains(platform),
+                                      onChanged: (_) => togglePinned(platform),
+                                    ),
+                                  ),
+                                  onTap: () => togglePinned(platform),
                                 ),
                             ],
                           ],
@@ -334,18 +359,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 globalState.appController.savePreferencesDebounce();
               }
 
-              final divider = Divider(
-                height: 1,
-                thickness: 1,
-                color: context.colorScheme.outlineVariant.withValues(
-                  alpha: context.colorScheme.brightness == Brightness.light
-                      ? 0.6
-                      : 0.45,
-                ),
-                indent: 16,
-                endIndent: 16,
-              );
-
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -360,7 +373,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       },
                     ),
                   ),
-                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockRefreshOnNodeChange),
                     delegate: SwitchDelegate(
@@ -372,7 +384,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       },
                     ),
                   ),
-                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockColorfulIcons),
                     delegate: SwitchDelegate(
@@ -380,18 +391,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       onChanged: (value) {
                         updateSetting(
                           (s) => s.copyWith(mediaUnlockColorfulIcons: value),
-                        );
-                      },
-                    ),
-                  ),
-                  divider,
-                  ListItem.switchItem(
-                    title: Text(appLocalizations.mediaUnlockRefreshByCategory),
-                    delegate: SwitchDelegate(
-                      value: setting.mediaUnlockRefreshByCategory,
-                      onChanged: (value) {
-                        updateSetting(
-                          (s) => s.copyWith(mediaUnlockRefreshByCategory: value),
                         );
                       },
                     ),
@@ -414,11 +413,13 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.colorScheme.outlineVariant.withValues(alpha: 0.3),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: context.colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
       ),
       child: Row(
@@ -528,9 +529,11 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
       key: ValueKey(platform),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(14),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
       child: Row(
         children: [
@@ -588,9 +591,11 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                             horizontal: 4,
                             vertical: 1,
                           ),
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             color: context.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(4),
+                            shape: RoundedSuperellipseBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
                           child: Text(
                             showColo,
@@ -607,9 +612,11 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                             horizontal: 4,
                             vertical: 1,
                           ),
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             color: Colors.orange.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(4),
+                            shape: RoundedSuperellipseBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
                           child: Text(
                             'WARP',
@@ -645,9 +652,12 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
+            clipBehavior: Clip.antiAlias,
+            decoration: ShapeDecoration(
               color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -656,9 +666,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                   SizedBox(
                     width: 10,
                     height: 10,
-                    child: SpinKitRing(
+                    child: SpinKitFadingCircle(
                       color: color,
-                      lineWidth: 1.2,
                       size: 10,
                     ),
                   ),
@@ -757,13 +766,8 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
   @override
   Widget build(BuildContext context) {
     final isChinese = Localizations.localeOf(context).languageCode == 'zh';
-    final (showExtraDetails, refreshByCategory) = ref.watch(
-      appSettingProvider.select(
-        (state) => (
-          state.mediaUnlockExtraDetails,
-          state.mediaUnlockRefreshByCategory,
-        ),
-      ),
+    final showExtraDetails = ref.watch(
+      appSettingProvider.select((state) => state.mediaUnlockExtraDetails),
     );
 
     return ValueListenableBuilder<MediaUnlockState>(
@@ -790,10 +794,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 .where((p) => p.category == effectiveCategory)
                 .toList();
 
-        final isCategoryLoading = refreshByCategory
-            ? mediaUnlockState.isBatchChecking(displayedPlatforms)
-            : mediaUnlockState.isBatchChecking();
-
         for (final p in displayedPlatforms) {
           final status = state.results[p]?.status;
           if (status == MediaUnlockStatus.unlocked) {
@@ -815,52 +815,40 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               onPressed: _showPinnedSettingsDialog,
             ),
             IconButton(
-              onPressed: isCategoryLoading
+              onPressed: state.isLoading
                   ? null
                   : () {
-                      mediaUnlockState.checkAll(
-                        force: true,
-                        platforms:
-                            refreshByCategory ? displayedPlatforms : null,
-                      );
+                      mediaUnlockState.checkAll(force: true);
                     },
               tooltip: appLocalizations.retry,
-              icon: isCategoryLoading
+              icon: state.isLoading
                   ? SizedBox(
                       width: 16,
                       height: 16,
-                      child: SpinKitRing(
+                      child: SpinKitFadingCircle(
                         color: context.colorScheme.primary,
-                        lineWidth: 1.5,
                         size: 16,
                       ),
                     )
-                  : const Icon(Icons.sync),
+                  : const Icon(Icons.sync_rounded),
             ),
           ],
           body: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: _buildSummaryCard(
+                  // 形参顺序以上游为准：(unlocked, blocked, other, {isStreaming})；
+                  // isStreaming 保留我们的定制（streaming 与 AI 分类都算流媒体）
                   unlockedList.length,
                   blockedList.length,
                   otherList.length,
-                  isStreaming: effectiveCategory == MediaCategory.streaming,
+                  isStreaming: effectiveCategory == MediaCategory.streaming ||
+                      effectiveCategory == MediaCategory.ai,
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 4)),
               SliverToBoxAdapter(child: _buildCategoryTabs(isChinese)),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
-              ..._buildStatusSectionSlivers(
-                title: _selectedCategory == MediaCategory.streaming
-                    ? appLocalizations.mediaUnlocked
-                    : appLocalizations.unlocked,
-                icon: Icons.check_circle_outline_rounded,
-                color: mediaUnlockGreen,
-                platforms: unlockedList,
-                state: state,
-                showExtraDetails: showExtraDetails,
-              ),
               ..._buildStatusSectionSlivers(
                 title: appLocalizations.notUnlocked,
                 icon: Icons.cancel_outlined,
@@ -874,6 +862,17 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 icon: Icons.help_outline_rounded,
                 color: mediaUnlockOrange,
                 platforms: otherList,
+                state: state,
+                showExtraDetails: showExtraDetails,
+              ),
+              ..._buildStatusSectionSlivers(
+                title: (_selectedCategory == MediaCategory.streaming ||
+                        _selectedCategory == MediaCategory.ai)
+                    ? appLocalizations.mediaUnlocked
+                    : appLocalizations.unlocked,
+                icon: Icons.check_circle_outline_rounded,
+                color: mediaUnlockGreen,
+                platforms: unlockedList,
                 state: state,
                 showExtraDetails: showExtraDetails,
               ),

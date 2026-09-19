@@ -186,6 +186,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         if (scripts.isEmpty) {
           return NullStatus(
             label: appLocalizations.nullTip(appLocalizations.script),
+            illustration: NullStatusIllustration.scripts,
           );
         }
         return CommonScrollBar(
@@ -222,13 +223,13 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             open();
                           },
                           tooltip: appLocalizations.more,
-                          icon: Icon(Icons.more_vert),
+                          icon: Icon(Icons.more_vert_rounded),
                         );
                       },
                       popup: CommonPopupMenu(
                         items: [
                           PopupMenuItemData(
-                            icon: Icons.edit,
+                            icon: Icons.edit_outlined,
                             label: appLocalizations.edit,
                             onPressed: () {
                               _handleToEditor(script: script);
@@ -236,7 +237,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                           ),
                           if (script.isCompatibleWithBettbox)
                             PopupMenuItemData(
-                              icon: Icons.tune,
+                              icon: Icons.tune_rounded,
                               label: appLocalizations.custom,
                               onPressed: () {
                                 _handleCustomOptions(script);
@@ -244,7 +245,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             ),
                           if (script.url != null && script.url!.isNotEmpty)
                             PopupMenuItemData(
-                              icon: Icons.sync,
+                              icon: Icons.sync_rounded,
                               label: appLocalizations.sync,
                               onPressed: () {
                                 _handleSyncScript(script.id);
@@ -258,7 +259,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             },
                           ),
                           PopupMenuItemData(
-                            icon: Icons.delete,
+                            icon: Icons.delete_outlined,
                             label: appLocalizations.delete,
                             onPressed: () {
                               _handleDelScript(script.label);
@@ -434,21 +435,32 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     }
   }
 
+  Widget _buildFAB() {
+    return DecoratedBox(
+      decoration: getCommonFabDecoration(context),
+      child: FloatingActionButton(
+        elevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        focusElevation: 0,
+        clipBehavior: Clip.none,
+        heroTag: null,
+        onPressed: _handleImport,
+        child: const Icon(Icons.add_rounded),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _handleImport();
-        },
-        child: Icon(Icons.add),
-      ),
+      floatingActionButton: _buildFAB(),
       actions: [
         IconButton(
           onPressed: _handleShowScriptSettings,
           tooltip: appLocalizations.settings,
-          icon: Icon(Icons.settings),
+          icon: const Icon(Icons.settings_outlined),
         ),
       ],
       body: _buildContent(),
@@ -471,7 +483,10 @@ class _ScriptSettingsSheet extends ConsumerWidget {
     return AdaptiveSheetScaffold(
       type: type,
       body: profiles.isEmpty
-          ? NullStatus(label: appLocalizations.nullProfileDesc)
+          ? NullStatus(
+              label: appLocalizations.nullProfileDesc,
+              illustration: NullStatusIllustration.profile,
+            )
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               itemCount: profiles.length,
@@ -521,21 +536,21 @@ class _ScriptImportOptionsDialog extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop(ImportOption.code);
             },
-            leading: const Icon(Icons.code),
+            leading: const Icon(Icons.code_rounded),
             title: Text(appLocalizations.importFromCode),
           ),
           ListItem(
             onTap: () {
               Navigator.of(context).pop(ImportOption.url);
             },
-            leading: const Icon(Icons.link),
+            leading: const Icon(Icons.cloud_download_rounded),
             title: Text(appLocalizations.importUrl),
           ),
           ListItem(
             onTap: () {
               Navigator.of(context).pop(ImportOption.file);
             },
-            leading: const Icon(Icons.file_open),
+            leading: const Icon(Icons.file_open_rounded),
             title: Text(appLocalizations.importFile),
           ),
         ],
@@ -662,7 +677,7 @@ class __ScriptCustomOptionsSheetState
           actions: [
             IconButton(
               onPressed: (_dirty && !_isSaving) ? _handleSave : null,
-              icon: const Icon(Icons.save),
+              icon: const Icon(Icons.save_rounded),
               tooltip: appLocalizations.save,
             ),
           ],
@@ -675,7 +690,10 @@ class __ScriptCustomOptionsSheetState
                 ),
               Expanded(
                 child: keys.isEmpty
-                    ? NullStatus(label: appLocalizations.noStatusAvailable)
+                    ? NullStatus(
+                        label: appLocalizations.noStatusAvailable,
+                        illustration: NullStatusIllustration.scripts,
+                      )
                     : RepaintBoundary(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
@@ -694,7 +712,7 @@ class __ScriptCustomOptionsSheetState
                                         const EdgeInsets.only(left: 16, right: 16),
                                     leading: _isValidIconUrl(iconUrl)
                                         ? CommonTargetIcon(src: iconUrl!, size: 24)
-                                        : const Icon(Icons.alt_route),
+                                        : const Icon(Icons.alt_route_rounded),
                                     title: Text(key),
                                     trailing: Switch(
                                       value: val,
@@ -952,7 +970,7 @@ class _GroupSwitchOptionsSheetState
           actions: [
             IconButton(
               onPressed: (_dirty && !_isSaving) ? _handleSave : null,
-              icon: const Icon(Icons.save),
+              icon: const Icon(Icons.save_rounded),
               tooltip: appLocalizations.save,
             ),
           ],
@@ -965,7 +983,10 @@ class _GroupSwitchOptionsSheetState
                 ),
               Expanded(
                 child: keys.isEmpty
-                    ? NullStatus(label: appLocalizations.noStatusAvailable)
+                    ? NullStatus(
+                        label: appLocalizations.noStatusAvailable,
+                        illustration: NullStatusIllustration.scripts,
+                      )
                     : RepaintBoundary(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(
@@ -989,7 +1010,7 @@ class _GroupSwitchOptionsSheetState
                                       left: 16,
                                       right: 16,
                                     ),
-                                    leading: const Icon(Icons.alt_route),
+                                    leading: const Icon(Icons.alt_route_rounded),
                                     title: Text(key),
                                     trailing: Switch(
                                       value: val,

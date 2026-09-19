@@ -241,29 +241,6 @@ class AutoCheckUpdateItem extends ConsumerWidget {
   }
 }
 
-class TabAnimationItem extends ConsumerWidget {
-  const TabAnimationItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isAnimateToPage = ref.watch(
-      appSettingProvider.select((state) => state.isAnimateToPage),
-    );
-    return ListItem.switchItem(
-      title: Text(appLocalizations.tabAnimation),
-      subtitle: Text(appLocalizations.tabAnimationDesc),
-      delegate: SwitchDelegate(
-        value: isAnimateToPage,
-        onChanged: (bool value) {
-          ref
-              .read(appSettingProvider.notifier)
-              .updateState((state) => state.copyWith(isAnimateToPage: value));
-        },
-      ),
-    );
-  }
-}
-
 class ApplicationSettingView extends StatelessWidget {
   const ApplicationSettingView({super.key});
 
@@ -280,7 +257,6 @@ class ApplicationSettingView extends StatelessWidget {
       ],
       const ShowStartSwitchItem(),
       if (system.isAndroid) ...[NavBarHapticFeedbackItem()],
-      const TabAnimationItem(),
       CloseConnectionsItem(),
       UsageItem(),
       AutoCheckUpdateItem(),

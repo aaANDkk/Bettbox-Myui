@@ -503,7 +503,7 @@ class BypassDomainItem extends StatelessWidget {
                       );
                 },
                 tooltip: appLocalizations.reset,
-                icon: const Icon(Icons.replay),
+                icon: const Icon(Icons.replay_rounded),
               );
             },
           ),
@@ -564,7 +564,7 @@ class BypassPrivateRouteItem extends ConsumerWidget {
                   await _handleNetworkConfigChange(ref);
                 },
                 tooltip: appLocalizations.reset,
-                icon: const Icon(Icons.replay),
+                icon: const Icon(Icons.replay_rounded),
               );
             },
           ),

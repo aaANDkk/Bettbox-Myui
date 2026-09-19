@@ -307,7 +307,10 @@ func handleCloseConnections() bool {
 
 func closeConnections() {
 	statistic.DefaultManager.Range(func(c statistic.Tracker) bool {
-		_ = c.Close()
+		err := c.Close()
+		if err != nil {
+			return false
+		}
 		return true
 	})
 }

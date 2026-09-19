@@ -105,7 +105,7 @@ class ResourcesView extends ConsumerWidget {
       title: appLocalizations.resources,
       actions: [
         IconButton(
-          icon: const Icon(Icons.replay),
+          icon: const Icon(Icons.replay_rounded),
           onPressed: () => _handleResetAll(ref),
           tooltip: appLocalizations.reset,
         ),
@@ -118,7 +118,7 @@ class ResourcesView extends ConsumerWidget {
                     size: 20,
                   ),
                 )
-              : const Icon(Icons.sync),
+              : const Icon(Icons.sync_rounded),
           onPressed: isUpdating ? null : () => _handleSyncAll(ref),
           tooltip: appLocalizations.syncAll,
         ),
@@ -275,7 +275,7 @@ class _GeoDataListItemState extends ConsumerState<GeoDataListItem> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       CommonChip(
-                        avatar: const Icon(Icons.edit),
+                        avatar: const Icon(Icons.edit_rounded),
                         label: appLocalizations.edit,
                         onPressed: isSyncing ? null : () => _updateUrl(url),
                       ),
@@ -288,7 +288,7 @@ class _GeoDataListItemState extends ConsumerState<GeoDataListItem> {
                                   size: 16,
                                 ),
                               )
-                            : const Icon(Icons.sync),
+                            : const Icon(Icons.sync_rounded),
                         label: appLocalizations.sync,
                         onPressed: isSyncing ? null : _handleUpdateGeoDataItem,
                       ),
@@ -323,7 +323,7 @@ class _UpdateGeoUrlFormDialogState extends State<UpdateGeoUrlFormDialog> {
   @override
   void initState() {
     super.initState();
-    urlController = TextEditingController(text: widget.url);
+    urlController = EmojiTextEditingController(text: widget.url);
   }
 
   Future<void> _handleReset() async {

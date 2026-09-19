@@ -331,7 +331,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       return IconButton(
                         onPressed: _updatePin,
                         icon: value
-                            ? const Icon(Icons.push_pin)
+                            ? const Icon(Icons.push_pin_rounded)
                             : const Icon(Icons.push_pin_outlined),
                       );
                     },
@@ -340,7 +340,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                     onPressed: () {
                       windowManager.minimize();
                     },
-                    icon: const Icon(Icons.remove),
+                    icon: const Icon(Icons.remove_rounded),
                   ),
                   ValueListenableBuilder(
                     valueListenable: isMaximizedNotifier,
@@ -350,8 +350,8 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                           _updateMaximized();
                         },
                         icon: value
-                            ? const Icon(Icons.filter_none, size: 20)
-                            : const Icon(Icons.crop_square),
+                            ? const Icon(Icons.filter_none_rounded, size: 20)
+                            : const Icon(Icons.crop_square_rounded),
                       );
                     },
                   ),
@@ -361,7 +361,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       globalState.appController.unBackBlock();
                       globalState.appController.handleBackOrExit();
                     },
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close_rounded),
                   ),
                 ],
               ),

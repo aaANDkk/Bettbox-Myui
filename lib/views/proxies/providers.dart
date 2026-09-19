@@ -107,7 +107,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
           IconButton(
             onPressed: _updateProviders,
             tooltip: appLocalizations.update,
-            icon: const Icon(Icons.sync),
+            icon: const Icon(Icons.sync_rounded),
           ),
         ],
         type: widget.type,
@@ -129,9 +129,9 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
                       title: section.title,
                       padding: current == 0
                           ? const EdgeInsets.only(
-                              left: 16,
+                              left: 24,
                               right: 8,
-                              top: 4,
+                              top: 8,
                               bottom: 8,
                             )
                           : null,
@@ -139,7 +139,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
                         IconButton(
                           onPressed: section.onSync,
                           tooltip: appLocalizations.update,
-                          icon: const Icon(Icons.sync),
+                          icon: const Icon(Icons.sync_rounded),
                           iconSize: 20,
                           splashRadius: 20,
                           padding: EdgeInsets.zero,
@@ -343,12 +343,12 @@ class ProviderItem extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               CommonChip(
-                avatar: const Icon(Icons.upload),
+                avatar: const Icon(Icons.upload_rounded),
                 label: appLocalizations.upload,
                 onPressed: _handleSideLoadProvider,
               ),
               CommonChip(
-                avatar: const Icon(Icons.visibility),
+                avatar: const Icon(Icons.visibility_rounded),
                 label: appLocalizations.view,
                 onPressed: () => _handleViewProviderContent(context),
               ),
@@ -362,7 +362,7 @@ class ProviderItem extends StatelessWidget {
                             size: 16,
                           ),
                         )
-                      : const Icon(Icons.sync),
+                      : const Icon(Icons.sync_rounded),
                   label: appLocalizations.sync,
                   onPressed:
                       provider.isUpdating ? null : _handleUpdateProvider,

@@ -144,6 +144,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "App Access Control",
     ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "Access Control Settings",
+    ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("Access"),
     "appDesc": MessageLookupByLibrary.simpleMessage("App-related settings"),
     "application": MessageLookupByLibrary.simpleMessage("Application"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -321,6 +325,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("Crash Test"),
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Creation Time"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("Profile"),
     "custom": MessageLookupByLibrary.simpleMessage("Custom"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Custom Dashboard Title",
@@ -473,7 +478,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "externalResources": MessageLookupByLibrary.simpleMessage(
       "External Resources",
     ),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("Fading Circle"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("Fading Four"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage(
       "FakeIP Filter Mode",
@@ -555,10 +559,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Global"),
     "go": MessageLookupByLibrary.simpleMessage("Go"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Download Now"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Font Fix"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "Use built-in font to fix display issues",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Custom Font"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("Use system font by default, enable to customize your favorite font"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Cache modifications?",
     ),
@@ -674,6 +676,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Refresh IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Maximize"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("Connectivity Test"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("Connectivity"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "Show colored icons by default",
     ),
@@ -691,9 +694,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "Select up to 4 items to pin on the widget",
-    ),
-    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
-      "Partially refresh based on current category",
     ),
     "mediaUnlockRefreshOnNodeChange": MessageLookupByLibrary.simpleMessage(
       "Auto refresh on node change",
@@ -763,6 +763,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Enter IP, CIDR or Gateway:IP/CIDR",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("Network Speed"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("Speed Test"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "The online speed test service will be opened in your default browser. Do you wish to continue?",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
       "Speed in Notification",
     ),
@@ -1112,6 +1116,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Show Hidden Items",
     ),
     "showMenu": MessageLookupByLibrary.simpleMessage("Open Menu"),
+    "styleSetting": MessageLookupByLibrary.simpleMessage("Style Settings"),
     "showPanel": MessageLookupByLibrary.simpleMessage("Show Window"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("Linkage Switch"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1189,7 +1194,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "success": MessageLookupByLibrary.simpleMessage("Success"),
     "switchLabel": MessageLookupByLibrary.simpleMessage("Switch"),
     "switchToDomesticIp": MessageLookupByLibrary.simpleMessage(
-      "Get Domestic IP",
+      "Get Direct IP",
     ),
     "sync": MessageLookupByLibrary.simpleMessage("Sync"),
     "syncAll": MessageLookupByLibrary.simpleMessage("Sync All"),
@@ -1229,7 +1234,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tools": MessageLookupByLibrary.simpleMessage("Tools"),
     "totalTraffic": MessageLookupByLibrary.simpleMessage("Total Traffic"),
     "tproxyPort": MessageLookupByLibrary.simpleMessage("Tproxy Port"),
-    "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic Usage"),
+    "trafficUsage": MessageLookupByLibrary.simpleMessage("Traffic"),
     "trayClickBehavior": MessageLookupByLibrary.simpleMessage(
       "Tray Click Behavior",
     ),
@@ -1284,6 +1289,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Exclude handshake delays from testing",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("Unknown"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("Null"),
     "unlocked": MessageLookupByLibrary.simpleMessage("Completed"),
     "unnamed": MessageLookupByLibrary.simpleMessage("Unnamed"),
     "unpin": MessageLookupByLibrary.simpleMessage("Unpin"),
@@ -1332,5 +1338,30 @@ class MessageLookup extends MessageLookupByLibrary {
       "Requires administrator privileges",
     ),
     "years": m15,
+  
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji Style"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("Select the Emoji style displayed in the app"),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage("Tab Animation"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("Only valid in mobile view"),
+    "startRunning": MessageLookupByLibrary.simpleMessage("Start"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage("Select / Change Font"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("Tap to select a local .ttf or .otf font file"),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage("Custom font applied"),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage("Restored to system default font"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("Only .ttf and .otf font formats are supported"),
+    "fadingCube": MessageLookupByLibrary.simpleMessage("Fading Cube"),
+    "foldingCube": MessageLookupByLibrary.simpleMessage("Folding Cube"),
+    "pumpingHeart": MessageLookupByLibrary.simpleMessage("Pumping Heart"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Pouring Hour Glass"),
+    "squareCircle": MessageLookupByLibrary.simpleMessage("Square Circle"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("Three Rotating"),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("Four Rotating"),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("Staggered Wave"),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage("Dots Triangle"),
+    "zoom": MessageLookupByLibrary.simpleMessage("Zoom"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("General"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("Address"),
+    "traffic": MessageLookupByLibrary.simpleMessage("Traffic"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("Advanced"),
   };
 }

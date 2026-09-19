@@ -18,7 +18,7 @@ class LogLevelItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.logLevel),
     );
     return ListItem<LogLevel>.options(
-      leading: const Icon(Icons.info_outline),
+      leading: const Icon(Icons.info_outline_rounded),
       title: Text(appLocalizations.logLevel),
       subtitle: Text(logLevel.name),
       delegate: OptionsDelegate<LogLevel>(
@@ -61,7 +61,7 @@ class _UaItemState extends ConsumerState<UaItem> {
     }
 
     return ListItem(
-      leading: const Icon(Icons.computer_outlined),
+      leading: const Icon(Icons.computer_rounded),
       title: const Text('UA'),
       subtitle: Text(isCustom ? appLocalizations.custom : appLocalizations.defaultText),
       onTap: () async {
@@ -130,13 +130,7 @@ class _UaDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    Icon(
-                      !isCustom ? Icons.check_circle_rounded : Icons.circle_outlined,
-                      size: 21,
-                      color: !isCustom
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                    ),
+                    OptionRadioIcon(selected: !isCustom, size: 21),
                     const SizedBox(width: 12),
                     Text(
                       appLocalizations.defaultText,
@@ -158,13 +152,7 @@ class _UaDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    Icon(
-                      isCustom ? Icons.check_circle_rounded : Icons.circle_outlined,
-                      size: 21,
-                      color: isCustom
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                    ),
+                    OptionRadioIcon(selected: isCustom, size: 21),
                     const SizedBox(width: 12),
                     Text(
                       appLocalizations.custom,
@@ -310,17 +298,7 @@ class _TestUrlDialog extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        isSelected
-                            ? Icons.check_circle_rounded
-                            : Icons.circle_outlined,
-                        size: 21,
-                        color: isSelected
-                            ? context.colorScheme.primary
-                            : context.colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.6,
-                              ),
-                      ),
+                      OptionRadioIcon(selected: isSelected, size: 21),
                       const SizedBox(width: 12),
                       Expanded(
                         child: isSelected
@@ -383,17 +361,7 @@ class _TestUrlDialog extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      !isPresetUrl
-                          ? Icons.check_circle_rounded
-                          : Icons.circle_outlined,
-                      size: 21,
-                      color: !isPresetUrl
-                          ? context.colorScheme.primary
-                          : context.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.6,
-                            ),
-                    ),
+                    OptionRadioIcon(selected: !isPresetUrl, size: 21),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -426,7 +394,7 @@ class PortItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.mixedPort),
     );
     return ListItem(
-      leading: const Icon(Icons.adjust_outlined),
+      leading: const Icon(Icons.hdr_strong_rounded),
       title: Text(appLocalizations.port),
       subtitle: Text('$mixedPort'),
       onTap: () {
@@ -445,7 +413,7 @@ class Ipv6Item extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.ipv6),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.filter_6_rounded),
+      leading: const Icon(Icons.looks_6_outlined),
       title: const Text('IPv6'),
       subtitle: Text(appLocalizations.ipv6Desc),
       delegate: SwitchDelegate(
@@ -469,7 +437,7 @@ class AllowLanItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.allowLan),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.device_hub),
+      leading: const Icon(Icons.device_hub_rounded),
       title: Text(appLocalizations.allowLan),
       subtitle: Text(appLocalizations.allowLanDesc),
       delegate: SwitchDelegate(
@@ -494,7 +462,7 @@ class UnifiedDelayItem extends ConsumerWidget {
     );
 
     return ListItem.switchItem(
-      leading: const Icon(Icons.compress_outlined),
+      leading: const Icon(Icons.compress_rounded),
       title: Text(appLocalizations.unifiedDelay),
       subtitle: Text(appLocalizations.unifiedDelayDesc),
       delegate: SwitchDelegate(
@@ -551,7 +519,7 @@ class TcpConcurrentItem extends ConsumerWidget {
       patchClashConfigProvider.select((state) => state.tcpConcurrent),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.double_arrow_outlined),
+      leading: const Icon(Icons.double_arrow_rounded),
       title: Text(appLocalizations.tcpConcurrent),
       subtitle: Text(appLocalizations.tcpConcurrentDesc),
       delegate: SwitchDelegate(
@@ -577,7 +545,7 @@ class GeodataLoaderItem extends ConsumerWidget {
       ),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.memory),
+      leading: const Icon(Icons.memory_rounded),
       title: Text(appLocalizations.geodataLoader),
       subtitle: Text(appLocalizations.geodataLoaderDesc),
       delegate: SwitchDelegate(
@@ -617,7 +585,7 @@ class ExternalControllerItem extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListItem.switchItem(
-          leading: const Icon(Icons.api_outlined),
+          leading: const Icon(Icons.api_rounded),
           title: Text(appLocalizations.externalController),
           subtitle: Text(appLocalizations.externalControllerDesc),
           delegate: SwitchDelegate(
@@ -660,7 +628,7 @@ class ExternalControllerItem extends ConsumerWidget {
             endIndent: 16,
           ),
           ListItem(
-            leading: const Icon(Icons.password_outlined),
+            leading: const Icon(Icons.password_rounded),
             title: Text(appLocalizations.controlSecret),
             subtitle: Text(
               secret.isEmpty ? appLocalizations.controlSecretDesc : secret,
@@ -670,7 +638,7 @@ class ExternalControllerItem extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.open_in_new),
+                        icon: const Icon(Icons.open_in_new_rounded),
                         tooltip: appLocalizations.onlinePanel,
                         onPressed: () async {
                           final uri = Uri.parse(
@@ -685,7 +653,7 @@ class ExternalControllerItem extends ConsumerWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.copy),
+                        icon: const Icon(Icons.copy_rounded),
                         tooltip: appLocalizations.copy,
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: secret));

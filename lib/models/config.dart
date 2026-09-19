@@ -46,25 +46,30 @@ const defaultWindowProps = WindowProps();
 const defaultAccessControl = AccessControl();
 final defaultThemeProps = ThemeProps(primaryColor: defaultPrimaryColor);
 
+// 首次安装的默认排版（桌面 / 通用与移动端使用同一套顺序）：
+// 连通性测试大卡 → 网络速度小卡 → 流量统计小卡 → 出站模式小扁卡 →
+// 网络检测 → 当前配置 → 脚本覆写 → 访问控制
+// （访问控制是仅 Android 部件，桌面端会被平台过滤自动剔除）
 const List<DashboardWidget> defaultDashboardWidgets = [
-  DashboardWidget.networkSpeed,
-  DashboardWidget.systemProxyButton,
-  DashboardWidget.tunButton,
+  DashboardWidget.mediaUnlock,
+  DashboardWidget.networkSpeedSmall,
+  DashboardWidget.trafficUsageSmall,
   DashboardWidget.outboundMode,
   DashboardWidget.networkDetection,
-  DashboardWidget.intranetIp,
-  DashboardWidget.trafficUsage,
-  DashboardWidget.memoryInfo,
-  DashboardWidget.connectionsCount,
+  DashboardWidget.currentProfile,
+  DashboardWidget.scriptOverride,
+  DashboardWidget.accessControlSwitch,
 ];
 
 const List<DashboardWidget> defaultAndroidDashboardWidgets = [
-  DashboardWidget.outboundModeV2,
-  DashboardWidget.networkSpeed,
-  DashboardWidget.trafficUsage,
+  DashboardWidget.mediaUnlock,
+  DashboardWidget.networkSpeedSmall,
+  DashboardWidget.trafficUsageSmall,
+  DashboardWidget.outboundMode,
   DashboardWidget.networkDetection,
-  DashboardWidget.connectionsCount,
-  DashboardWidget.memoryInfo,
+  DashboardWidget.currentProfile,
+  DashboardWidget.scriptOverride,
+  DashboardWidget.accessControlSwitch,
 ];
 
 List<DashboardWidget> dashboardWidgetsSafeFromJson(
@@ -156,7 +161,6 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(false) bool mediaUnlockExtraDetails,
     @Default(true) bool mediaUnlockRefreshOnNodeChange,
     @Default(true) bool mediaUnlockColorfulIcons,
-    @Default(true) bool mediaUnlockRefreshByCategory,
     @Default(true) bool onlyStatisticsProxy,
     @Default(false) bool autoLaunch,
     @Default(false) bool silentLaunch,

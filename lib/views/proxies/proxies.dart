@@ -52,12 +52,12 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             _proxiesTabKey.currentState?.scrollToGroupSelected();
           },
           tooltip: appLocalizations.locate,
-          icon: const Icon(Icons.adjust, weight: 1),
+          icon: const Icon(Icons.adjust_rounded, weight: 1),
         ),
       if (hasCustom)
         IconButton(
           onPressed: _handleCustomOptions,
-          icon: const Icon(Icons.tune),
+          icon: const Icon(Icons.tune_rounded),
           tooltip: appLocalizations.custom,
         ),
       CommonPopupBox(
@@ -67,14 +67,14 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               open(offset: const Offset(0, 20));
             },
             tooltip: appLocalizations.more,
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert_rounded),
           );
         },
         popup: CommonPopupMenu(
           items: [
             PopupMenuItemData(
-              icon: Icons.tune,
-              label: appLocalizations.settings,
+              icon: Icons.build_circle_outlined,
+              label: appLocalizations.styleSetting,
               onPressed: () {
                 showSheet(
                   context: context,
@@ -83,27 +83,14 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                     return AdaptiveSheetScaffold(
                       type: type,
                       body: const ProxiesSetting(),
-                      title: appLocalizations.settings,
+                      title: appLocalizations.styleSetting,
                     );
                   },
                 );
               },
             ),
-            if (_hasProviders)
-              PopupMenuItemData(
-                icon: Icons.poll_outlined,
-                label: appLocalizations.providers,
-                onPressed: () {
-                  showExtend(
-                    context,
-                    builder: (_, type) {
-                      return ProvidersView(type: type);
-                    },
-                  );
-                },
-              ),
             PopupMenuItemData(
-              icon: Icons.settings_suggest,
+              icon: Icons.settings_suggest_outlined,
               label: appLocalizations.advancedSettings,
               onPressed: () {
                 showExtend(
@@ -120,7 +107,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             ),
             if (!_isTab)
               PopupMenuItemData(
-                icon: Icons.style_outlined,
+                icon: Icons.burst_mode_outlined,
                 label: appLocalizations.iconConfiguration,
                 onPressed: () {
                   showExtend(
@@ -135,10 +122,23 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                   );
                 },
               ),
+            if (_hasProviders)
+              PopupMenuItemData(
+                icon: Icons.insert_chart_outlined_rounded,
+                label: appLocalizations.providers,
+                onPressed: () {
+                  showExtend(
+                    context,
+                    builder: (_, type) {
+                      return ProvidersView(type: type);
+                    },
+                  );
+                },
+              ),
             PopupMenuItemData(
               icon: showHiddenItems
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_unchecked,
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
               label: appLocalizations.showHiddenItems,
               onPressed: () {
                 ref
@@ -156,7 +156,12 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   }
 
   Widget? _buildFAB() {
-    if (!_isTab || globalState.isAndroidTV) return null;
+    // 竖屏下改由全局常驻悬浮按钮承担（列表模式本来就不显示）
+    if (!_isTab ||
+        globalState.isAndroidTV ||
+        ref.watch(isMobileViewProvider)) {
+      return null;
+    }
     return Consumer(
       builder: (_, ref, _) {
         final isMobileView = ref.watch(isMobileViewProvider);
@@ -201,6 +206,16 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   @override
   void initState() {
     super.initState();
+
+    // 把「测速当前策略组」注册给全局常驻悬浮按钮使用；页面销毁后 GlobalKey
+    // 取不到 state，回调自然变成空操作，无需额外清理
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(residentProxyTestProvider.notifier).state = () {
+          _proxiesTabKey.currentState?.delayTestCurrentGroup();
+        };
+      }
+    });
     ref.listenManual(providersProvider.select((state) => state.isNotEmpty), (
       prev,
       next,
@@ -242,7 +257,10 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
       title: appLocalizations.proxies,
       searchState: AppBarSearchState(onSearch: _onSearch),
       body: switch (hasGroups) {
-        false => NullStatus(label: appLocalizations.noProxy),
+        false => NullStatus(
+            label: appLocalizations.noProxy,
+            illustration: NullStatusIllustration.proxies,
+          ),
         true => switch (proxiesType) {
           ProxiesType.tab => ProxiesTabView(key: _proxiesTabKey),
           ProxiesType.list => const ProxiesListView(),

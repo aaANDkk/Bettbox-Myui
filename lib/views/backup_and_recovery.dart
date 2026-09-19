@@ -171,7 +171,7 @@ class BackupAndRecovery extends ConsumerWidget {
         items: [
           if (dav == null)
             ListItem(
-              leading: const Icon(Icons.account_box),
+              leading: const Icon(Icons.account_box_rounded),
               title: Text(appLocalizations.noInfo),
               subtitle: Text(appLocalizations.pleaseBindWebDAV),
               trailing: FilledButton.tonal(
@@ -183,7 +183,7 @@ class BackupAndRecovery extends ConsumerWidget {
             )
           else ...[
             ListItem(
-              leading: const Icon(Icons.account_box),
+              leading: const Icon(Icons.account_box_rounded),
               title: TooltipText(
                 text: Text(
                   dav.user,
@@ -415,7 +415,7 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.link),
+                prefixIcon: const Icon(Icons.link_rounded),
                 labelText: appLocalizations.address,
                 helperText: appLocalizations.addressHelp,
               ),
@@ -429,7 +429,7 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
             TextFormField(
               controller: userController,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.account_circle),
+                prefixIcon: const Icon(Icons.account_circle_rounded),
                 labelText: appLocalizations.account,
               ),
               validator: (String? value) {
@@ -446,10 +446,10 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
                   controller: passwordController,
                   obscureText: obscure,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.password),
+                    prefixIcon: const Icon(Icons.password_rounded),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscure ? Icons.visibility : Icons.visibility_off,
+                        obscure ? Icons.visibility_rounded : Icons.visibility_off_rounded,
                       ),
                       onPressed: () {
                         _obscureController.value = !obscure;

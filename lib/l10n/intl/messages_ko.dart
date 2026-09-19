@@ -123,6 +123,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("앱"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 액세스 제어"),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "액세스 제어 설정",
+    ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("액세스 제어"),
     "appDesc": MessageLookupByLibrary.simpleMessage("앱 관련 설정 관리"),
     "application": MessageLookupByLibrary.simpleMessage("애플리케이션"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage("앱 설정 변경"),
@@ -266,6 +270,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("크래시 테스트"),
     "create": MessageLookupByLibrary.simpleMessage("생성"),
     "creationTime": MessageLookupByLibrary.simpleMessage("생성 시간"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("현재 프로필"),
     "custom": MessageLookupByLibrary.simpleMessage("사용자 지정"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("사용자 지정 제목"),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("커스텀 규칙"),
@@ -390,7 +395,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("외부 링크"),
     "externalResources": MessageLookupByLibrary.simpleMessage("외부 리소스"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("페이딩 서클"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("페이딩 포 스퀘어"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage("FakeIP 필터 모드"),
     "fakeIpFilterModeDesc": MessageLookupByLibrary.simpleMessage(
@@ -454,10 +458,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("글로벌"),
     "go": MessageLookupByLibrary.simpleMessage("이동"),
     "goDownload": MessageLookupByLibrary.simpleMessage("다운로드 이동"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("글꼴 복구"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "표시 이상 해결을 위해 내장 글꼴 사용",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("기본 시스템 글꼴, 활성화하여 원하는 글꼴 적용"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("수정 사항을 캐시하시겠습니까?"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("타임아웃 시간"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -547,6 +549,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IP 다시 가져오기"),
     "maximize": MessageLookupByLibrary.simpleMessage("최대화"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("연결성 테스트"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("연결성 테스트"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "기본적으로 컬러 아이콘 표시",
     ),
@@ -558,9 +561,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage("기타 설정"),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "위젯에 고정 표시할 항목을 최대 4개 선택할 수 있습니다",
-    ),
-    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
-      "현재 카테고리를 기반으로 부분 새로고침",
     ),
     "mediaUnlockRefreshOnNodeChange": MessageLookupByLibrary.simpleMessage(
       "노드 변경 시 자동 새로고침",
@@ -616,6 +616,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP, CIDR 또는 Gateway:IP/CIDR 입력",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("네트워크 속도"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("속도 테스트"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "기본 브라우저에서 온라인 속도 측정 서비스를 엽니다. 계속하시겠습니까?",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage("속도 알림"),
     "networkSpeedNotificationDesc": MessageLookupByLibrary.simpleMessage(
       "알림 표시줄에 속도 및 구독 정보 표시",
@@ -893,6 +897,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "show": MessageLookupByLibrary.simpleMessage("표시"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("숨겨진 항목 표시"),
     "showMenu": MessageLookupByLibrary.simpleMessage("메뉴 열기"),
+    "styleSetting": MessageLookupByLibrary.simpleMessage("스타일 설정"),
     "showPanel": MessageLookupByLibrary.simpleMessage("창 표시"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("스위치 버튼 표시"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1039,6 +1044,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "핸드셰이크 등 추가 지연 시간 제외",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("알 수 없음"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("가져오지 못함"),
     "unlocked": MessageLookupByLibrary.simpleMessage("완료됨"),
     "unnamed": MessageLookupByLibrary.simpleMessage("제목 없음"),
     "unpin": MessageLookupByLibrary.simpleMessage("고정 해제"),
@@ -1079,5 +1085,30 @@ class MessageLookup extends MessageLookupByLibrary {
     "writeToSystem": MessageLookupByLibrary.simpleMessage("시스템 적용"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("관리자 권한이 필요합니다"),
     "years": m15,
+  
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("이모지 스타일"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("앱 내에서 표시할 이모지 스타일 선택"),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
+    "startRunning": MessageLookupByLibrary.simpleMessage("시작"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage("글꼴 선택 / 변경"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("로컬 .ttf 또는 .otf 글꼴 파일을 선택하려면 탭하세요"),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage("사용자 정의 글꼴이 적용되었습니다"),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage("시스템 기본 글꼴로 복원되었습니다"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf 또는 .otf 형식의 글꼴 파일만 지원됩니다"),
+    "fadingCube": MessageLookupByLibrary.simpleMessage("페이딩 큐브"),
+    "foldingCube": MessageLookupByLibrary.simpleMessage("접이식 큐브"),
+    "pumpingHeart": MessageLookupByLibrary.simpleMessage("심장 박동"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("흐르는 모래시계"),
+    "squareCircle": MessageLookupByLibrary.simpleMessage("사각 원형 변환"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("3점 회전"),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("4점 회전"),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("엇갈린 파도"),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage("삼각형 점"),
+    "zoom": MessageLookupByLibrary.simpleMessage("확대/축소"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("기본 정보"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("주소 정보"),
+    "traffic": MessageLookupByLibrary.simpleMessage("트래픽"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("고급 정보"),
   };
 }

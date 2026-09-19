@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
@@ -46,7 +47,7 @@ class EditProfileViewState extends State<EditProfileView> {
   @override
   void initState() {
     super.initState();
-    labelController = TextEditingController(text: widget.profile.label);
+    labelController = EmojiTextEditingController(text: widget.profile.label);
     urlController = TextEditingController(text: widget.profile.url);
     autoUpdate = widget.isNew ? false : widget.profile.autoUpdate;
     autoUpdateDurationController = TextEditingController(
@@ -340,8 +341,8 @@ class EditProfileViewState extends State<EditProfileView> {
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureAgeSecretKey
-                      ? Icons.visibility
-                      : Icons.visibility_off,
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
                 ),
                 onPressed: () {
                   setState(() {
@@ -411,12 +412,12 @@ class EditProfileViewState extends State<EditProfileView> {
                             spacing: 12,
                             children: [
                               CommonChip(
-                                avatar: const Icon(Icons.edit),
+                                avatar: const Icon(Icons.edit_rounded),
                                 label: appLocalizations.edit,
                                 onPressed: _editProfileFile,
                               ),
                               CommonChip(
-                                avatar: const Icon(Icons.upload),
+                                avatar: const Icon(Icons.upload_rounded),
                                 label: appLocalizations.upload,
                                 onPressed: _uploadProfileFile,
                               ),
@@ -443,33 +444,7 @@ class EditProfileViewState extends State<EditProfileView> {
       child: FloatLayout(
         floatingWidget: FloatWrapper(
           child: DecoratedBox(
-            decoration: ShapeDecoration(
-              shape: RoundedSuperellipseBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              shadows: [
-                BoxShadow(
-                  color: Colors.black.withValues(
-                    alpha: Theme.of(context).colorScheme.brightness ==
-                            Brightness.dark
-                        ? 0.35
-                        : 0.14,
-                  ),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(
-                    alpha: Theme.of(context).colorScheme.brightness ==
-                            Brightness.dark
-                        ? 0.20
-                        : 0.06,
-                  ),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
+            decoration: getCommonFabDecoration(context),
             child: FloatingActionButton.extended(
               elevation: 0,
               hoverElevation: 0,
@@ -478,8 +453,16 @@ class EditProfileViewState extends State<EditProfileView> {
               clipBehavior: Clip.none,
               heroTag: null,
               onPressed: _handleConfirm,
-              label: Text(appLocalizations.save),
-              icon: const Icon(Icons.save),
+              label: Text(
+                appLocalizations.save,
+                style: TextStyle(
+                  fontFamily:
+                      Theme.of(context).textTheme.labelLarge?.fontFamily,
+                  fontWeight: FontWeight.bold,
+                  fontVariations: const [FontVariation('wght', 700)],
+                ),
+              ),
+              icon: const Icon(Icons.save_rounded),
             ),
           ),
         ),
@@ -640,7 +623,7 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
               floatingLabelBehavior: FloatingLabelBehavior.always,
               labelText: appLocalizations.agePrivateKeyLabel,
               suffixIcon: IconButton(
-                icon: const Icon(Icons.copy),
+                icon: const Icon(Icons.copy_rounded),
                 onPressed: () => _copyToClipboard(_privateKeyController.text),
               ),
             ),
@@ -667,7 +650,7 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
                         ? TextStyle(color: context.colorScheme.primary)
                         : null),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.copy),
+                icon: const Icon(Icons.copy_rounded),
                 onPressed: () => _copyToClipboard(_publicKeyController.text),
               ),
             ),

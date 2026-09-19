@@ -1,5 +1,6 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
+import 'package:bett_box/manager/manager.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -142,7 +143,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                       title: Row(
                         spacing: 8,
                         children: [
-                          Icon(Icons.info),
+                          Icon(Icons.info_rounded),
                           Text(appLocalizations.overrideInvalidTip),
                         ],
                       ),
@@ -232,7 +233,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                         }
                         _handleSave(ref, newOverrideData);
                       },
-                      icon: Icon(Icons.save),
+                      icon: Icon(Icons.save_rounded),
                     ),
                   if (editCount == 1)
                     IconButton(
@@ -249,14 +250,14 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                         }
                         globalState.appController.handleAddOrUpdate(ref, rule);
                       },
-                      icon: Icon(Icons.edit),
+                      icon: Icon(Icons.edit_rounded),
                     ),
                   if (editCount > 0)
                     IconButton(
                       onPressed: () {
                         _handleDelete(ref);
                       },
-                      icon: Icon(Icons.delete),
+                      icon: Icon(Icons.delete_rounded),
                     ),
                 ],
                 editState: AppBarEditState(
@@ -367,7 +368,7 @@ class RuleTitle extends ConsumerWidget {
             if (!isEdit)
               IconButton.filledTonal(
                 icon: Icon(
-                  isOverrideRule ? Icons.edit_document : Icons.note_add,
+                  isOverrideRule ? Icons.edit_document : Icons.note_add_rounded,
                 ),
                 onPressed: () {
                   _handleChangeType(ref, isOverrideRule);
@@ -590,10 +591,10 @@ class AddRuleDialog extends StatefulWidget {
 
 class _AddRuleDialogState extends State<AddRuleDialog> {
   late RuleAction _ruleAction;
-  final _ruleTargetController = TextEditingController();
-  final _contentController = TextEditingController();
-  final _ruleProviderController = TextEditingController();
-  final _subRuleController = TextEditingController();
+  final _ruleTargetController = EmojiTextEditingController();
+  final _contentController = EmojiTextEditingController();
+  final _ruleProviderController = EmojiTextEditingController();
+  final _subRuleController = EmojiTextEditingController();
   bool _noResolve = false;
   bool _src = false;
   List<DropdownMenuEntry<String>> _targetItems = [];
@@ -610,10 +611,18 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
   void _initState() {
     _targetItems = [
       ...widget.snippet.proxyGroups.map(
-        (item) => DropdownMenuEntry<String>(value: item.name, label: item.name),
+        (item) => DropdownMenuEntry<String>(
+          value: item.name,
+          label: item.name,
+          labelWidget: EmojiText(item.name),
+        ),
       ),
       ...RuleTarget.values.map(
-        (item) => DropdownMenuEntry<String>(value: item.name, label: item.name),
+        (item) => DropdownMenuEntry<String>(
+          value: item.name,
+          label: item.name,
+          labelWidget: EmojiText(item.name),
+        ),
       ),
     ];
     _ruleProviderItems = [
@@ -655,6 +664,15 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
     if (oldWidget.rule != widget.rule) {
       _initState();
     }
+  }
+
+  @override
+  void dispose() {
+    _ruleTargetController.dispose();
+    _contentController.dispose();
+    _ruleProviderController.dispose();
+    _subRuleController.dispose();
+    super.dispose();
   }
 
   void _handleSubmit() {
@@ -774,13 +792,13 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                    EmojiText(
                                       _ruleProviderController.text.isEmpty
                                           ? appLocalizations.ruleProviders
                                           : _ruleProviderController.text,
                                       style: context.textTheme.bodyLarge,
                                     ),
-                                    const Icon(Icons.arrow_drop_down),
+                                    const Icon(Icons.arrow_drop_down_rounded),
                                   ],
                                 ),
                               );
@@ -790,6 +808,12 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                               menuStyle: menuStyle,
                               expandedInsets: EdgeInsets.zero,
                               controller: _ruleProviderController,
+                              textStyle: context.textTheme.bodyLarge?.copyWith(
+                                fontFamilyFallback: [
+                                  if (EmojiManager.currentFamily != null)
+                                    EmojiManager.currentFamily!,
+                                ],
+                              ),
                               label: Text(appLocalizations.ruleProviders),
                               menuHeight: 250,
                               errorText: field.errorText,
@@ -799,6 +823,12 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                         )
                       : TextFormField(
                           controller: _contentController,
+                          style: context.textTheme.bodyLarge?.copyWith(
+                            fontFamilyFallback: [
+                              if (EmojiManager.currentFamily != null)
+                                EmojiManager.currentFamily!,
+                            ],
+                          ),
                           enabled: _ruleAction != RuleAction.MATCH,
                           maxLines: 1,
                           textInputAction: TextInputAction.next,
@@ -863,13 +893,13 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
+                                    EmojiText(
                                       _subRuleController.text.isEmpty
                                           ? appLocalizations.subRule
                                           : _subRuleController.text,
                                       style: context.textTheme.bodyLarge,
                                     ),
-                                    const Icon(Icons.arrow_drop_down),
+                                    const Icon(Icons.arrow_drop_down_rounded),
                                   ],
                                 ),
                               );
@@ -881,6 +911,12 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                               enableFilter: false,
                               enableSearch: false,
                               controller: _subRuleController,
+                              textStyle: context.textTheme.bodyLarge?.copyWith(
+                                fontFamilyFallback: [
+                                  if (EmojiManager.currentFamily != null)
+                                    EmojiManager.currentFamily!,
+                                ],
+                              ),
                               label: Text(appLocalizations.subRule),
                               menuHeight: 250,
                               dropdownMenuEntries: _subRuleItems,
@@ -930,13 +966,17 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      _ruleTargetController.text.isEmpty
-                                          ? appLocalizations.ruleTarget
-                                          : _ruleTargetController.text,
-                                      style: context.textTheme.bodyLarge,
+                                    Expanded(
+                                      child: EmojiText(
+                                        _ruleTargetController.text.isEmpty
+                                            ? appLocalizations.ruleTarget
+                                            : _ruleTargetController.text,
+                                        style: context.textTheme.bodyLarge,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                    const Icon(Icons.arrow_drop_down),
+                                    const Icon(Icons.arrow_drop_down_rounded),
                                   ],
                                 ),
                               );
@@ -945,6 +985,12 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                               alignmentOffset: const Offset(0, 8),
                               menuStyle: menuStyle,
                               controller: _ruleTargetController,
+                              textStyle: context.textTheme.bodyLarge?.copyWith(
+                                fontFamilyFallback: [
+                                  if (EmojiManager.currentFamily != null)
+                                    EmojiManager.currentFamily!,
+                                ],
+                              ),
                               label: Text(appLocalizations.ruleTarget),
                               width: 200,
                               menuHeight: 250,

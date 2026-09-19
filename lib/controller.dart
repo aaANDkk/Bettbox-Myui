@@ -13,6 +13,7 @@ import 'package:bett_box/plugins/service.dart' as vpn_service;
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/dialog.dart';
+import 'package:bett_box/widgets/icon.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ import 'package:yaml/yaml.dart';
 
 import 'common/archive.dart' show restoreBackupFiles;
 import 'common/common.dart';
+import 'common/flclash_database_extractor.dart';
 import 'models/models.dart';
 import 'views/profiles/override_profile.dart';
 
@@ -961,6 +963,13 @@ class AppController {
       }
 
       _ref.read(groupsProvider.notifier).value = newGroups;
+
+      // 主动预取策略组图标：配置（YAML）中新增或更换图标后立即拉取，
+      // 不再依赖组件可见时才懒加载，也无需重启应用即可生效。
+      unawaited(
+        CommonTargetIcon.prefetchAll(newGroups.map((group) => group.icon)),
+      );
+
       _updateGroupsRetryCount = 0;
       _updateGroupsRetryTimer?.cancel();
       _updateGroupsRetryTimer = null;
@@ -999,7 +1008,7 @@ class AppController {
       ChangeProxyParams(groupName: groupName, proxyName: proxyName),
     );
     if (_ref.read(appSettingProvider).closeConnections) {
-      await clashCore.closeConnections();
+      clashCore.closeConnections();
     }
     addCheckIp();
   }
@@ -1058,6 +1067,13 @@ class AppController {
         }
       }
       stopWakelockAutoRecovery();
+      // 完全退出应用：主动释放系统亮屏锁，恢复系统默认息屏策略
+      // （偏好本身保留，下次启动按偏好自动恢复）
+      try {
+        await WakelockPlus.disable();
+      } catch (e) {
+        commonPrint.log('Failed to release wake lock on exit: $e');
+      }
       await globalState.handleBackground();
       if (system.isDesktop) {
         final prefs = await preferences.sharedPreferencesCompleter.future;
@@ -1177,12 +1193,9 @@ class AppController {
     );
     if (res == true) {
       final file = File(await appPath.sharedPreferencesPath);
-      if (await file.exists()) {
+      final isExists = await file.exists();
+      if (isExists) {
         await file.delete();
-      }
-      final configFile = File(await appPath.appConfigPath);
-      if (await configFile.exists()) {
-        await configFile.delete();
       }
     }
     await handleExit();
@@ -1286,14 +1299,21 @@ class AppController {
     }
 
     try {
-      final wakelockEnabled = await WakelockPlus.enabled;
+      // 按用户上次的偏好恢复亮屏锁（避免每次启动都要手动开启）。
+      // 完全退出应用时会主动释放系统亮屏锁，因此不会影响系统默认息屏策略。
+      final wakelockEnabled = await preferences.getWakelockEnabled();
       _ref.read(wakelockStateProvider.notifier).state = wakelockEnabled;
-
       if (wakelockEnabled) {
+        await WakelockPlus.enable();
         startWakelockAutoRecovery();
+      } else {
+        final actualEnabled = await WakelockPlus.enabled;
+        if (actualEnabled) {
+          await WakelockPlus.disable();
+        }
       }
     } catch (e) {
-      commonPrint.log('Failed to check wake lock status: $e');
+      commonPrint.log('Failed to restore wake lock status: $e');
     }
 
     await updateTray(true);
@@ -2038,35 +2058,10 @@ class AppController {
       json.decode(utf8.decode(configContent)),
     );
 
-    final recoveryStrategy = _ref.read(
-      appSettingProvider.select((state) => state.recoveryStrategy),
-    );
-    if (recoveryStrategy == RecoveryStrategy.override) {
-      await _cleanProfilesDirForOverride();
-    }
-
     await restoreBackupFiles(profiles, homeDirPath);
 
+    // Apply recovery logic
     _recovery(tempConfig, recoveryOption);
-    await savePreferences();
-  }
-
-  Future<void> _cleanProfilesDirForOverride() async {
-    try {
-      final profilesDirPath = await appPath.profilesPath;
-      final dir = Directory(profilesDirPath);
-      if (await dir.exists()) {
-        await for (final entity in dir.list(followLinks: false)) {
-          try {
-            await entity.delete(recursive: true);
-          } catch (e) {
-            commonPrint.log('Delete profile entity failed: $e');
-          }
-        }
-      }
-    } catch (e) {
-      commonPrint.log('Clean profiles dir for override failed: $e');
-    }
   }
 
   /// Restore legacy
@@ -2102,47 +2097,88 @@ class AppController {
       json.decode(utf8.decode(configContent)),
     );
 
-    final recoveryStrategy = _ref.read(
-      appSettingProvider.select((state) => state.recoveryStrategy),
-    );
-    if (recoveryStrategy == RecoveryStrategy.override) {
-      await _cleanProfilesDirForOverride();
-    }
-
     await restoreBackupFiles(profileFiles, homeDirPath);
 
+    // Extract profiles from backup
     List<Profile> profiles = [];
+    bool extractedFromDatabase = false;
 
-    if (backupConfig.profiles.isNotEmpty) {
-      profiles = backupConfig.profiles;
-    } else {
-      for (final profileFile in profileFiles) {
-        final fileName = profileFile.name.split('/').last;
-        if (fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
-          final id = fileName.replaceAll(RegExp(r'\.(yaml|yml)$'), '');
-          final label = await _extractLabelFromYaml(profileFile) ?? id;
+    // 1. Try SQLite database first (FlClash backup)
+    final dbFile = archive.files.firstWhereOrNull(
+      (file) => file.name.endsWith('database.sqlite'),
+    );
 
-          profiles.add(
-            Profile(
-              id: id,
-              label: label,
-              autoUpdateDuration: defaultUpdateDuration,
-              url: '',
-            ),
-          );
+    if (dbFile != null && dbFile.content.isNotEmpty) {
+      try {
+        // Save database temporarily
+        final tempDbPath = join(await appPath.tempPath, 'temp_flclash.db');
+        final tempDb = File(tempDbPath);
+        await tempDb.writeAsBytes(dbFile.content);
+
+        // Extract profiles from database
+        profiles = await FlClashDatabaseExtractor.extractProfiles(tempDbPath);
+        extractedFromDatabase = true;
+
+        // Clean up temp file
+        if (await tempDb.exists()) {
+          await tempDb.delete();
+        }
+
+        commonPrint.log(
+          'Extracted ${profiles.length} profiles from FlClash database',
+        );
+      } catch (e) {
+        commonPrint.log(
+          'Failed to extract from database, fallback to file names: $e',
+        );
+        profiles = [];
+        extractedFromDatabase = false;
+      }
+    }
+
+    // 2. Fallback if database extraction failed
+    if (profiles.isEmpty) {
+      // Get from config.json
+      if (backupConfig.profiles.isNotEmpty) {
+        profiles = backupConfig.profiles;
+      } else {
+        // Extract ID from profile file names (FlClash mode)
+        for (final profileFile in profileFiles) {
+          final fileName = profileFile.name.split('/').last;
+          if (fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
+            final id = fileName.replaceAll(RegExp(r'\.(yaml|yml)$'), '');
+
+            // Try to extract friendly label from YAML
+            final label = await _extractLabelFromYaml(profileFile) ?? id;
+
+            // Create basic Profile object
+            profiles.add(
+              Profile(
+                id: id,
+                label: label,
+                autoUpdateDuration: defaultUpdateDuration,
+                url: '', // Mark empty, user needs to add
+              ),
+            );
+          }
         }
       }
     }
 
+    // Create limited recovery config (subscriptions only)
     Config limitedConfig = globalState.config.copyWith(profiles: profiles);
 
+    // Android: also restore app list
     if (system.isAndroid) {
+      // FlClash uses accessControlProps instead of accessControl
       final vpnProps = backupConfig.vpnProps;
       AccessControl? accessControl;
 
+      // Try to get from vpnProps.accessControl
       try {
         accessControl = vpnProps.accessControl;
       } catch (_) {
+        // Fallback: try accessControlProps from raw JSON
         try {
           final configJson = json.decode(utf8.decode(configFile.content));
           final vpnPropsJson = configJson['vpnProps'];
@@ -2164,10 +2200,11 @@ class AppController {
       }
     }
 
+    // Apply limited recovery
     _recoveryLimited(limitedConfig, recoveryOption);
-    await savePreferences();
 
-    _showRecoveryResultMessage(profiles);
+    // Show recovery result message
+    _showRecoveryResultMessage(profiles, extractedFromDatabase);
   }
 
   /// Extract label
@@ -2207,13 +2244,19 @@ class AppController {
   }
 
   /// Show results
-  void _showRecoveryResultMessage(List<Profile> profiles) {
+  void _showRecoveryResultMessage(
+    List<Profile> profiles,
+    bool extractedFromDatabase,
+  ) {
     if (profiles.isEmpty) return;
 
     final hasEmptyUrl = profiles.any((p) => p.url.isEmpty);
 
     String message;
-    if (hasEmptyUrl) {
+    if (extractedFromDatabase) {
+      // Successfully extracted from database
+      message = 'Restored ${profiles.length} subscriptions with URLs.';
+    } else if (hasEmptyUrl) {
       // Partial recovery, missing URLs
       message =
           'Restored ${profiles.length} subscriptions.\n\n'

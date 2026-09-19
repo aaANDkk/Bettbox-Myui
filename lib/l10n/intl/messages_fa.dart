@@ -138,6 +138,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "کنترل دسترسی برنامه‌ها",
     ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "تنظیمات کنترل دسترسی",
+    ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("کنترل دسترسی"),
     "appDesc": MessageLookupByLibrary.simpleMessage("تنظیمات مربوط به برنامه"),
     "application": MessageLookupByLibrary.simpleMessage("برنامه"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -319,6 +323,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("تست خرابی"),
     "create": MessageLookupByLibrary.simpleMessage("ایجاد"),
     "creationTime": MessageLookupByLibrary.simpleMessage("زمان ایجاد"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("پروفایل فعلی"),
     "custom": MessageLookupByLibrary.simpleMessage("سفارشی"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "عنوان سفارشی",
@@ -467,7 +472,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("لینک خارجی"),
     "externalResources": MessageLookupByLibrary.simpleMessage("منابع خارجی"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("حلقه محوشونده"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("چهار دایره محوشونده"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage(
       "حالت فیلتر FakeIP",
@@ -551,10 +555,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("سراسر جهان"),
     "go": MessageLookupByLibrary.simpleMessage("رفتن"),
     "goDownload": MessageLookupByLibrary.simpleMessage("رفتن به دانلود"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("ترمیم فونت"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "استفاده از فونت داخلی برای رفع مشکلات نمایش",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "آیا تغییرات ذخیره شوند؟",
     ),
@@ -676,6 +678,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("دریافت مجدد IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("بزرگ کردن"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("تست اتصال"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("تست اتصال"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "نمایش آیکون‌های رنگی به‌صورت پیش‌فرض",
     ),
@@ -693,9 +696,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "امکان انتخاب حداکثر ۴ مورد برای پین کردن در ویجت",
-    ),
-    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
-      "تازه‌سازی جزئی بر اساس دسته‌بندی فعلی",
     ),
     "mediaUnlockRefreshOnNodeChange": MessageLookupByLibrary.simpleMessage(
       "به‌روزرسانی خودکار هنگام تغییر گره",
@@ -763,6 +763,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP یا CIDR یا Gateway:IP/CIDR",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("سرعت شبکه"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("تست سرعت"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "سرویس تست سرعت آنلاین در مرورگر پیش‌فرض باز خواهد شد. آیا مایل به ادامه هستید؟",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
       "اعلان سرعت",
     ),
@@ -1140,6 +1144,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "نمایش موارد پنهان",
     ),
     "showMenu": MessageLookupByLibrary.simpleMessage("باز کردن منو"),
+    "styleSetting": MessageLookupByLibrary.simpleMessage("تنظیمات سبک"),
     "showPanel": MessageLookupByLibrary.simpleMessage("نمایش پنجره"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("دکمه کلید سوئیچ"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1316,6 +1321,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "حذف تاخیرهای اضافی دست‌تکانی",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("نامشخص"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("دریافت نشد"),
     "unlocked": MessageLookupByLibrary.simpleMessage("تکمیل شد"),
     "unnamed": MessageLookupByLibrary.simpleMessage("بدون نام"),
     "unpin": MessageLookupByLibrary.simpleMessage("برداشتن پین"),
@@ -1368,5 +1374,30 @@ class MessageLookup extends MessageLookupByLibrary {
       "نیازمند دسترسی مدیریت (Admin)",
     ),
     "years": m15,
+  
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("سبک ایموجی"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("سبک ایموجی نمایش داده شده در برنامه را انتخاب کنید"),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
+    "startRunning": MessageLookupByLibrary.simpleMessage("شروع"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage("انتخاب / تغییر فونت"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("برای انتخاب فایل فونت .ttf یا .otf محلی ضربه بزنید"),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage("فونت سفارشی اعمال شد"),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage("به فونت پیش فرض سیستم بازیابی شد"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("فقط فرمت های فونت .ttf یا .otf پشتیبانی می شوند"),
+    "fadingCube": MessageLookupByLibrary.simpleMessage("مکعب محو شونده"),
+    "foldingCube": MessageLookupByLibrary.simpleMessage("مکعب تاشو"),
+    "pumpingHeart": MessageLookupByLibrary.simpleMessage("ضربان قلب"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("ساعت شنی روان"),
+    "squareCircle": MessageLookupByLibrary.simpleMessage("مربع به دایره"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("سه نقطه چرخان"),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("چهار نقطه چرخان"),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("موج پلکانی"),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage("مثلث نقطه‌ای"),
+    "zoom": MessageLookupByLibrary.simpleMessage("بزرگنمایی"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("اطلاعات پایه"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("اطلاعات آدرس"),
+    "traffic": MessageLookupByLibrary.simpleMessage("ترافیک"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("پیشرفته"),
   };
 }

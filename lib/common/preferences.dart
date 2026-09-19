@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:bett_box/models/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constant.dart';
-import 'path.dart';
+
 import 'print.dart';
 
 class Preferences {
@@ -41,83 +40,53 @@ class Preferences {
 
   Future<Config?> getConfig() async {
     final preferences = await sharedPreferencesCompleter.future;
-
-    Config? fileConfig;
+    final configString = preferences?.getString(configKey);
+    if (configString == null) return null;
     try {
-      final configFilePath = await appPath.appConfigPath;
-      final configFile = File(configFilePath);
-      if (await configFile.exists()) {
-        final content = await configFile.readAsString();
-        if (content.isNotEmpty) {
-          final configMap = json.decode(content);
-          fileConfig = Config.compatibleFromJson(configMap);
-        }
-      }
-    } catch (e, stackTrace) {
-      commonPrint.log('Failed to parse config from file: $e\n$stackTrace');
-    }
+      final configMap = json.decode(configString);
+      final config = Config.compatibleFromJson(configMap);
 
-    Config? prefsConfig;
-    try {
-      final configString = preferences?.getString(configKey);
-      if (configString != null && configString.isNotEmpty) {
-        final configMap = json.decode(configString);
-        prefsConfig = Config.compatibleFromJson(configMap);
+      if (preferences?.getBool('autoLaunch') != config.appSetting.autoLaunch) {
+        await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
       }
+
+      return config;
     } catch (e, stackTrace) {
       commonPrint.log('Failed to parse config from preferences: $e\n$stackTrace');
+      return null;
     }
-
-    Config? selectedConfig;
-    if (fileConfig != null && prefsConfig != null) {
-      if (fileConfig.profiles.isEmpty && prefsConfig.profiles.isNotEmpty) {
-        selectedConfig = prefsConfig;
-        await saveConfig(prefsConfig);
-      } else {
-        selectedConfig = fileConfig;
-      }
-    } else {
-      selectedConfig = fileConfig ?? prefsConfig;
-      if (selectedConfig != null && fileConfig == null) {
-        await saveConfig(selectedConfig);
-      }
-    }
-
-    if (selectedConfig != null &&
-        preferences?.getBool('autoLaunch') != selectedConfig.appSetting.autoLaunch) {
-      await preferences?.setBool('autoLaunch', selectedConfig.appSetting.autoLaunch);
-    }
-
-    return selectedConfig;
   }
 
   Future<bool> saveConfig(Config config) async {
     final preferences = await sharedPreferencesCompleter.future;
+    
     await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
+    
+    return await preferences?.setString(configKey, json.encode(config)) ??
+        false;
+  }
 
-    final jsonStr = json.encode(config);
+  /// 读取「亮屏锁」开关的上次状态（默认关闭）
+  Future<bool> getWakelockEnabled() async {
+    final preferences = await sharedPreferencesCompleter.future;
+    return preferences?.getBool(wakelockEnabledKey) ?? false;
+  }
 
-    try {
-      await preferences?.setString(configKey, jsonStr);
-    } catch (e) {
-      commonPrint.log('Failed to mirror config to preferences: $e');
-    }
+  /// 记录「亮屏锁」开关状态，重启应用后自动恢复（完全退出时仍会释放系统锁）
+  Future<void> setWakelockEnabled(bool value) async {
+    final preferences = await sharedPreferencesCompleter.future;
+    await preferences?.setBool(wakelockEnabledKey, value);
+  }
 
-    try {
-      final configFilePath = await appPath.appConfigPath;
-      final targetFile = File(configFilePath);
-      final tempFile = File('$configFilePath.tmp');
-      await tempFile.parent.create(recursive: true);
-      await tempFile.writeAsString(jsonStr, flush: true);
-      if (await targetFile.exists()) {
-        await targetFile.delete();
-      }
-      await tempFile.rename(configFilePath);
-      return true;
-    } catch (e, stackTrace) {
-      commonPrint.log('Failed to save config to file: $e\n$stackTrace');
-      return false;
-    }
+  /// 小型流量统计小部件显示上传还是下载数据（默认下载）
+  Future<bool> getTrafficUsageShowUpload() async {
+    final preferences = await sharedPreferencesCompleter.future;
+    return preferences?.getBool(trafficUsageShowUploadKey) ?? false;
+  }
+
+  Future<void> setTrafficUsageShowUpload(bool value) async {
+    final preferences = await sharedPreferencesCompleter.future;
+    await preferences?.setBool(trafficUsageShowUploadKey, value);
   }
 
   Future<void> clearClashConfig() async {
@@ -127,19 +96,7 @@ class Preferences {
 
   Future<void> clearPreferences() async {
     final sharedPreferencesIns = await sharedPreferencesCompleter.future;
-    await sharedPreferencesIns?.clear();
-    try {
-      final file = File(await appPath.appConfigPath);
-      if (await file.exists()) {
-        await file.delete();
-      }
-    } catch (_) {}
-    try {
-      final ipFile = File(await appPath.ipCacheFilePath);
-      if (await ipFile.exists()) {
-        await ipFile.delete();
-      }
-    } catch (_) {}
+    sharedPreferencesIns?.clear();
   }
 }
 

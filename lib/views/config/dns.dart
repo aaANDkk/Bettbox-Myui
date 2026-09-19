@@ -599,52 +599,15 @@ class ProxyServerNameserverItem extends StatelessWidget {
   }
 }
 
-class DirectNameserverItem extends StatelessWidget {
+class DirectNameserverItem extends ConsumerWidget {
   const DirectNameserverItem({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListItem.next(
-      title: Text(appLocalizations.directNameserver),
-      subtitle: Text(appLocalizations.directNameserverDesc),
-      delegate: NextDelegate(
-        blur: false,
-        title: appLocalizations.directNameserver,
-        widget: Consumer(
-          builder: (_, ref, _) {
-            final directNameserver = ref.watch(
-              patchClashConfigProvider.select(
-                (state) => state.dns.directNameserver,
-              ),
-            );
-            return ListInputPage(
-              title: appLocalizations.directNameserver,
-              items: directNameserver,
-              titleBuilder: (item) => Text(item),
-              onChange: (items) {
-                ref
-                    .read(patchClashConfigProvider.notifier)
-                    .updateState(
-                      (state) => state.copyWith.dns(
-                        directNameserver: List.from(items),
-                      ),
-                    );
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class DirectNameserverFollowPolicyItem extends ConsumerWidget {
-  const DirectNameserverFollowPolicyItem({super.key});
 
   @override
   Widget build(BuildContext context, ref) {
     final directNameserver = ref.watch(
-      patchClashConfigProvider.select((state) => state.dns.directNameserver),
+      patchClashConfigProvider.select(
+        (state) => state.dns.directNameserver,
+      ),
     );
     final directNameserverFollowPolicy = ref.watch(
       patchClashConfigProvider.select(
@@ -652,24 +615,69 @@ class DirectNameserverFollowPolicyItem extends ConsumerWidget {
       ),
     );
 
-    // Show only if user set direct nameserver
-    if (directNameserver.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return ListItem.switchItem(
-      title: Text(appLocalizations.directNameserverFollowPolicy),
-      delegate: SwitchDelegate(
-        value: directNameserverFollowPolicy,
-        onChanged: (bool value) async {
-          ref
-              .read(patchClashConfigProvider.notifier)
-              .updateState(
-                (state) =>
-                    state.copyWith.dns(directNameserverFollowPolicy: value),
-              );
-        },
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListItem.next(
+          title: Text(appLocalizations.directNameserver),
+          subtitle: Text(appLocalizations.directNameserverDesc),
+          delegate: NextDelegate(
+            blur: false,
+            title: appLocalizations.directNameserver,
+            widget: Consumer(
+              builder: (_, ref, _) {
+                final directNameserver = ref.watch(
+                  patchClashConfigProvider.select(
+                    (state) => state.dns.directNameserver,
+                  ),
+                );
+                return ListInputPage(
+                  title: appLocalizations.directNameserver,
+                  items: directNameserver,
+                  titleBuilder: (item) => Text(item),
+                  onChange: (items) {
+                    ref
+                        .read(patchClashConfigProvider.notifier)
+                        .updateState(
+                          (state) => state.copyWith.dns(
+                            directNameserver: List.from(items),
+                          ),
+                        );
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+        if (directNameserver.isNotEmpty) ...[
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: context.colorScheme.outlineVariant.withValues(
+              alpha:
+                  context.colorScheme.brightness == Brightness.light
+                  ? 0.6
+                  : 0.45,
+            ),
+            indent: 16,
+            endIndent: 16,
+          ),
+          ListItem.switchItem(
+            title: Text(appLocalizations.directNameserverFollowPolicy),
+            delegate: SwitchDelegate(
+              value: directNameserverFollowPolicy,
+              onChanged: (bool value) async {
+                ref
+                    .read(patchClashConfigProvider.notifier)
+                    .updateState(
+                      (state) =>
+                          state.copyWith.dns(directNameserverFollowPolicy: value),
+                    );
+              },
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -901,7 +909,6 @@ final dnsItems = <Widget>[
       FallbackItem(),
       ProxyServerNameserverItem(),
       DirectNameserverItem(),
-      DirectNameserverFollowPolicyItem(),
     ],
   ),
   ...generateSection(

@@ -46,17 +46,21 @@ const clashConfigKey = 'clash_config';
 const configKey = 'config';
 const customSidebarIconKey = 'custom_sidebar_icon';
 const customDashboardTitleKey = 'custom_dashboard_title';
+// 亮屏锁开关的用户偏好（仅记录「上次是否开启」，完全退出应用时会主动释放
+// 系统亮屏锁，不影响系统默认息屏策略，下次启动再按偏好恢复）
+const wakelockEnabledKey = 'wakelock_enabled';
+// 小型流量统计小部件显示上传还是下载（默认下载），长按小部件可切换
+const trafficUsageShowUploadKey = 'traffic_usage_show_upload';
 const double dialogCommonWidth = 300;
-const repository = 'appshubcc/Bettbox';
+const repository = 'aaANDkk/Bettbox_Myui';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;
 double getFloatingBottomBarReserveHeight(BuildContext context) {
-  final mediaQuery = MediaQuery.of(context);
   final viewBottom = max(
-    mediaQuery.viewPadding.bottom,
-    mediaQuery.padding.bottom,
+    MediaQuery.viewPaddingOf(context).bottom,
+    MediaQuery.paddingOf(context).bottom,
   );
   if (globalState.isAndroidTV) {
     return 132.0 + (viewBottom > 12 ? viewBottom - 12 : 0);
@@ -65,12 +69,36 @@ double getFloatingBottomBarReserveHeight(BuildContext context) {
 }
 
 double getFloatingBottomBarFABReserveHeight(BuildContext context) {
-  final mediaQuery = MediaQuery.of(context);
   final viewBottom = max(
-    mediaQuery.viewPadding.bottom,
-    mediaQuery.padding.bottom,
+    MediaQuery.viewPaddingOf(context).bottom,
+    MediaQuery.paddingOf(context).bottom,
   );
   return 84.0 - min(viewBottom, 12.0);
+}
+
+Decoration getCommonFabDecoration(BuildContext context) {
+  final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+  return ShapeDecoration(
+    shape: RoundedSuperellipseBorder(
+      borderRadius: BorderRadius.circular(20),
+    ),
+    shadows: [
+      BoxShadow(
+        color: Colors.black.withValues(
+          alpha: isDark ? 0.35 : 0.14,
+        ),
+        blurRadius: 14,
+        offset: const Offset(0, 4),
+      ),
+      BoxShadow(
+        color: Colors.black.withValues(
+          alpha: isDark ? 0.20 : 0.06,
+        ),
+        blurRadius: 4,
+        offset: const Offset(0, 1),
+      ),
+    ],
+  );
 }
 
 const defaultTestUrl = 'https://www.apple.com/library/test/success.html';

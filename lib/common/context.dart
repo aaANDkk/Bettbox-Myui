@@ -42,6 +42,11 @@ extension BuildContextExtension on BuildContext {
 
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
 
+  bool get disableAnimations => MediaQuery.disableAnimationsOf(this);
+
+  Duration motionDuration(Duration duration) =>
+      disableAnimations ? Duration.zero : duration;
+
   TextTheme get textTheme => Theme.of(this).textTheme;
 
   T? findLastStateOfType<T extends State>() {

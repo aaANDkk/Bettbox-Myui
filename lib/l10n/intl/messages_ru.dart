@@ -149,6 +149,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Маршрутизация приложений",
     ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
+      "Настройки маршрутизации приложений",
+    ),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage("Маршрутизация приложений"),
     "appDesc": MessageLookupByLibrary.simpleMessage("Настройки приложения"),
     "application": MessageLookupByLibrary.simpleMessage("Приложение"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -330,6 +334,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("Тест сбоя"),
     "create": MessageLookupByLibrary.simpleMessage("Создать"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Время создания"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("Текущий профиль"),
     "custom": MessageLookupByLibrary.simpleMessage("Пользовательский"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Пользовательский заголовок",
@@ -484,7 +489,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "externalResources": MessageLookupByLibrary.simpleMessage(
       "Внешние ресурсы",
     ),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("Затухающий круг"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("Затухающие точки"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage(
       "Режим фильтрации FakeIP",
@@ -574,10 +578,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Глобально"),
     "go": MessageLookupByLibrary.simpleMessage("Перейти"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Перейти к загрузке"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Исправление шрифта"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
-      "Встроенный шрифт для исправления отображения",
-    ),
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт"),
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("По умолчанию системный шрифт, включите для применения своего шрифта"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Кэшировать изменения?",
     ),
@@ -695,6 +697,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Развернуть"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "Показывать цветные значки по умолчанию",
     ),
@@ -712,9 +715,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "Можно выбрать до 4 элементов для закрепления в виджете",
-    ),
-    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
-      "Частичное обновление по текущей категории",
     ),
     "mediaUnlockRefreshOnNodeChange": MessageLookupByLibrary.simpleMessage(
       "Автообновление при смене узла",
@@ -784,6 +784,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Введите IP или CIDR, максимум 2, через запятую",
     ),
     "networkSpeed": MessageLookupByLibrary.simpleMessage("Скорость сети"),
+    "speedTest": MessageLookupByLibrary.simpleMessage("Тест скорости"),
+    "speedTestDesc": MessageLookupByLibrary.simpleMessage(
+      "В браузере по умолчанию будет открыт онлайн-сервис проверки скорости. Продолжить?",
+    ),
     "networkSpeedNotification": MessageLookupByLibrary.simpleMessage(
       "Скорость в уведомлениях",
     ),
@@ -1143,6 +1147,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "show": MessageLookupByLibrary.simpleMessage("Показать"),
     "showHiddenItems": MessageLookupByLibrary.simpleMessage("Показать скрытые"),
     "showMenu": MessageLookupByLibrary.simpleMessage("Открыть меню"),
+    "styleSetting": MessageLookupByLibrary.simpleMessage("Настройки стиля"),
     "showPanel": MessageLookupByLibrary.simpleMessage("Показать окно"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage(
       "Тумблер запуска на главной",
@@ -1337,6 +1342,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Убрать задержку рукопожатия и разбора",
     ),
     "unknown": MessageLookupByLibrary.simpleMessage("Неизвестно"),
+    "notAcquired": MessageLookupByLibrary.simpleMessage("Не получено"),
     "unlocked": MessageLookupByLibrary.simpleMessage("Завершено"),
     "unnamed": MessageLookupByLibrary.simpleMessage("Без имени"),
     "unpin": MessageLookupByLibrary.simpleMessage("Открепить"),
@@ -1389,5 +1395,30 @@ class MessageLookup extends MessageLookupByLibrary {
       "Требуются права администратора",
     ),
     "years": m15,
+  
+    "emojiStyle": MessageLookupByLibrary.simpleMessage("Стиль эмодзи"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("Выберите стиль эмодзи в приложении"),
+    "tabAnimation": MessageLookupByLibrary.simpleMessage("Анимация вкладок"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("Действует только в мобильном режиме"),
+    "startRunning": MessageLookupByLibrary.simpleMessage("Запуск"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage("Выбрать / изменить шрифт"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("Нажмите, чтобы выбрать файл шрифта .ttf или .otf"),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт применен"),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage("Восстановлен системный шрифт по умолчанию"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("Поддерживаются только файлы шрифтов .ttf или .otf"),
+    "fadingCube": MessageLookupByLibrary.simpleMessage("Угасающий куб"),
+    "foldingCube": MessageLookupByLibrary.simpleMessage("Складывающийся куб"),
+    "pumpingHeart": MessageLookupByLibrary.simpleMessage("Пульсирующее сердце"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Струящиеся песочные часы"),
+    "squareCircle": MessageLookupByLibrary.simpleMessage("Квадрат в круг"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("Три вращающиеся точки"),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("Четыре вращающиеся точки"),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("Ступенчатая волна"),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage("Точечный треугольник"),
+    "zoom": MessageLookupByLibrary.simpleMessage("Масштаб"),
+    "basicInfo": MessageLookupByLibrary.simpleMessage("Основная информация"),
+    "addressInfo": MessageLookupByLibrary.simpleMessage("Адресная информация"),
+    "traffic": MessageLookupByLibrary.simpleMessage("Трафик"),
+    "advancedInfo": MessageLookupByLibrary.simpleMessage("Дополнительно"),
   };
 }

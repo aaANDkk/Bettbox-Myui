@@ -15,13 +15,13 @@ class Navigation {
     return [
       NavigationItem(
         keep: false,
-        icon: Icon(Icons.space_dashboard),
+        icon: const Icon(Icons.dashboard_rounded),
         label: PageLabel.dashboard,
         builder: (_) =>
             DashboardView(key: const GlobalObjectKey(PageLabel.dashboard)),
       ),
       NavigationItem(
-        icon: const Icon(Icons.article),
+        icon: const Icon(Icons.explore_rounded),
         label: PageLabel.proxies,
         builder: (_) => ProviderScope(
           overrides: [queryProvider.overrideWith(() => Query())],
@@ -32,13 +32,13 @@ class Navigation {
             : [],
       ),
       NavigationItem(
-        icon: Icon(Icons.folder),
+        icon: const Icon(Icons.create_new_folder_rounded),
         label: PageLabel.profiles,
         builder: (_) =>
             ProfilesView(key: const GlobalObjectKey(PageLabel.profiles)),
       ),
       NavigationItem(
-        icon: Icon(Icons.view_timeline),
+        icon: const Icon(Icons.view_timeline_rounded),
         label: PageLabel.requests,
         builder: (_) =>
             RequestsView(key: const GlobalObjectKey(PageLabel.requests)),
@@ -46,7 +46,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.ballot),
+        icon: const Icon(Icons.ballot_rounded),
         label: PageLabel.connections,
         builder: (_) =>
             ConnectionsView(key: const GlobalObjectKey(PageLabel.connections)),
@@ -54,7 +54,7 @@ class Navigation {
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.storage),
+        icon: const Icon(Icons.storage_rounded),
         label: PageLabel.resources,
         description: 'resourcesDesc',
         builder: (_) =>
@@ -62,7 +62,7 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.functions),
+        icon: const Icon(Icons.functions_rounded),
         label: PageLabel.script,
         description: 'scriptDesc',
         builder: (_) =>
@@ -70,14 +70,14 @@ class Navigation {
         modes: [NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: const Icon(Icons.adb),
+        icon: const Icon(Icons.adb_rounded),
         label: PageLabel.logs,
         builder: (_) => LogsView(key: const GlobalObjectKey(PageLabel.logs)),
         description: 'logsDesc',
         modes: [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
-        icon: Icon(Icons.construction),
+        icon: const Icon(Icons.construction_rounded),
         label: PageLabel.tools,
         builder: (_) => ToolsView(key: const GlobalObjectKey(PageLabel.tools)),
         modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
