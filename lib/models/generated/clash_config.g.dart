@@ -212,6 +212,7 @@ const _$TunStackEnumMap = {
   TunStack.gvisor: 'gvisor',
   TunStack.system: 'system',
   TunStack.mixed: 'mixed',
+  TunStack.mips: 'mips',
 };
 
 _FallbackFilter _$FallbackFilterFromJson(
@@ -426,10 +427,10 @@ _ClashConfigSnippet _$ClashConfigSnippetFromJson(Map<String, dynamic> json) =>
       rule: json['rules'] == null ? const [] : _genRule(json['rules'] as List?),
       ruleProvider: json['rule-providers'] == null
           ? const []
-          : _genRuleProviders(json['rule-providers'] as Map<String, dynamic>),
+          : _genRuleProviders(json['rule-providers'] as Map),
       subRules: json['sub-rules'] == null
           ? const []
-          : _genSubRules(json['sub-rules'] as Map<String, dynamic>),
+          : _genSubRules(json['sub-rules'] as Map),
     );
 
 Map<String, dynamic> _$ClashConfigSnippetToJson(_ClashConfigSnippet instance) =>

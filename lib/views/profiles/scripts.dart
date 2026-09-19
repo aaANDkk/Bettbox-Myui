@@ -143,6 +143,27 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     await showScriptCustomOptions(context, ref, script: script);
   }
 
+  Future<void> _handleExportFile(Script script) async {
+    final res = await globalState.appController.safeRun<bool>(
+      () async {
+        final rawName = script.label.trim();
+        final fileName = rawName.endsWith('.js') ? rawName : '$rawName.js';
+        final value = await picker.saveFile(
+          fileName,
+          utf8.encode(script.content),
+          allowedExtensions: ['js'],
+        );
+        if (value == null) return false;
+        return true;
+      },
+      needLoading: true,
+      title: appLocalizations.tip,
+    );
+    if (res == true && mounted) {
+      context.showNotifier(appLocalizations.exportSuccess);
+    }
+  }
+
   void _handleShowScriptSettings() {
     showSheet(
       context: context,
@@ -229,6 +250,13 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                                 _handleSyncScript(script.id);
                               },
                             ),
+                          PopupMenuItemData(
+                            icon: Icons.file_copy_outlined,
+                            label: appLocalizations.exportFile,
+                            onPressed: () {
+                              _handleExportFile(script);
+                            },
+                          ),
                           PopupMenuItemData(
                             icon: Icons.delete,
                             label: appLocalizations.delete,

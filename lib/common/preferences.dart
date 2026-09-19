@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bett_box/models/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constant.dart';
-
+import 'path.dart';
 import 'print.dart';
 
 class Preferences {
@@ -40,30 +41,83 @@ class Preferences {
 
   Future<Config?> getConfig() async {
     final preferences = await sharedPreferencesCompleter.future;
-    final configString = preferences?.getString(configKey);
-    if (configString == null) return null;
+
+    Config? fileConfig;
     try {
-      final configMap = json.decode(configString);
-      final config = Config.compatibleFromJson(configMap);
-
-      if (preferences?.getBool('autoLaunch') != config.appSetting.autoLaunch) {
-        await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
+      final configFilePath = await appPath.appConfigPath;
+      final configFile = File(configFilePath);
+      if (await configFile.exists()) {
+        final content = await configFile.readAsString();
+        if (content.isNotEmpty) {
+          final configMap = json.decode(content);
+          fileConfig = Config.compatibleFromJson(configMap);
+        }
       }
+    } catch (e, stackTrace) {
+      commonPrint.log('Failed to parse config from file: $e\n$stackTrace');
+    }
 
-      return config;
+    Config? prefsConfig;
+    try {
+      final configString = preferences?.getString(configKey);
+      if (configString != null && configString.isNotEmpty) {
+        final configMap = json.decode(configString);
+        prefsConfig = Config.compatibleFromJson(configMap);
+      }
     } catch (e, stackTrace) {
       commonPrint.log('Failed to parse config from preferences: $e\n$stackTrace');
-      return null;
     }
+
+    Config? selectedConfig;
+    if (fileConfig != null && prefsConfig != null) {
+      if (fileConfig.profiles.isEmpty && prefsConfig.profiles.isNotEmpty) {
+        selectedConfig = prefsConfig;
+        await saveConfig(prefsConfig);
+      } else {
+        selectedConfig = fileConfig;
+      }
+    } else {
+      selectedConfig = fileConfig ?? prefsConfig;
+      if (selectedConfig != null && fileConfig == null) {
+        await saveConfig(selectedConfig);
+      }
+    }
+
+    if (selectedConfig != null &&
+        preferences?.getBool('autoLaunch') != selectedConfig.appSetting.autoLaunch) {
+      await preferences?.setBool('autoLaunch', selectedConfig.appSetting.autoLaunch);
+    }
+
+    return selectedConfig;
   }
 
   Future<bool> saveConfig(Config config) async {
     final preferences = await sharedPreferencesCompleter.future;
-    
     await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
-    
-    return await preferences?.setString(configKey, json.encode(config)) ??
-        false;
+
+    final jsonStr = json.encode(config);
+
+    try {
+      await preferences?.setString(configKey, jsonStr);
+    } catch (e) {
+      commonPrint.log('Failed to mirror config to preferences: $e');
+    }
+
+    try {
+      final configFilePath = await appPath.appConfigPath;
+      final targetFile = File(configFilePath);
+      final tempFile = File('$configFilePath.tmp');
+      await tempFile.parent.create(recursive: true);
+      await tempFile.writeAsString(jsonStr, flush: true);
+      if (await targetFile.exists()) {
+        await targetFile.delete();
+      }
+      await tempFile.rename(configFilePath);
+      return true;
+    } catch (e, stackTrace) {
+      commonPrint.log('Failed to save config to file: $e\n$stackTrace');
+      return false;
+    }
   }
 
   Future<void> clearClashConfig() async {
@@ -73,7 +127,19 @@ class Preferences {
 
   Future<void> clearPreferences() async {
     final sharedPreferencesIns = await sharedPreferencesCompleter.future;
-    sharedPreferencesIns?.clear();
+    await sharedPreferencesIns?.clear();
+    try {
+      final file = File(await appPath.appConfigPath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {}
+    try {
+      final ipFile = File(await appPath.ipCacheFilePath);
+      if (await ipFile.exists()) {
+        await ipFile.delete();
+      }
+    } catch (_) {}
   }
 }
 

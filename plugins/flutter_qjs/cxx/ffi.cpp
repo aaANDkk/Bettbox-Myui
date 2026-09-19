@@ -64,7 +64,13 @@ extern "C"
     data[1] = &argc;
     data[2] = argv;
     data[3] = func_data;
-    return *(JSValue *)opaque->channel(ctx, JSChannelType_METHON, data);
+    JSValue *pret = (JSValue *)opaque->channel(ctx, JSChannelType_METHON, data);
+    if (pret == nullptr) {
+      return JS_ThrowInternalError(ctx, "channel returned null");
+    }
+    JSValue ret = *pret;
+    delete pret;
+    return ret;
   }
 
   void js_promise_rejection_tracker(JSContext *ctx, JSValueConst promise,
@@ -88,6 +94,8 @@ extern "C"
   DLLEXPORT JSRuntime *jsNewRuntime(JSChannel channel, int64_t timeout)
   {
     JSRuntime *rt = JS_NewRuntime();
+    if (rt == nullptr)
+      return nullptr;
     RuntimeOpaque *opaque = new RuntimeOpaque({channel, timeout, 0});
     JS_SetRuntimeOpaque(rt, opaque);
     JS_SetHostPromiseRejectionTracker(rt, js_promise_rejection_tracker, opaque);
@@ -249,6 +257,13 @@ extern "C"
     JS_FreeValue(ctx, *v);
     if (free)
       delete v;
+  }
+
+  DLLEXPORT void jsDeleteValue(JSValue *v)
+  {
+    /* free only the C++ wrapper; the JS value reference has already been
+       consumed or transferred elsewhere (e.g. JS_DefinePropertyValue) */
+    delete v;
   }
 
   DLLEXPORT void jsFreeValueRT(JSRuntime *rt, JSValue *v, int32_t free)

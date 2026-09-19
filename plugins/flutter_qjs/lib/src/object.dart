@@ -60,7 +60,11 @@ class _DartObject extends JSRef implements JSRefLeakable {
   }
 
   static _DartObject? fromAddress(Pointer<JSRuntime> rt, int val) {
-    return runtimeOpaques[rt]?.getDartObject(val) as _DartObject?;
+    // 0 is the "no opaque" sentinel QuickJS returns for non-DartObject
+    // values; ids are never reused, so a hit must be a live _DartObject.
+    if (val == 0) return null;
+    final obj = runtimeOpaques[rt]?.getDartObject(val);
+    return obj is _DartObject ? obj : null;
   }
 
   @override
@@ -161,14 +165,15 @@ class _JSFunction extends _JSObject implements JSInvokable, _IsolateEncodable {
   invoke(List<dynamic> arguments, [dynamic thisVal]) {
     final jsRet = _invoke(arguments, thisVal);
     final ctx = _ctx!;
-    bool isException = jsIsException(jsRet) != 0;
-    if (isException) {
+    try {
+      bool isException = jsIsException(jsRet) != 0;
+      if (isException) {
+        throw _parseJSException(ctx);
+      }
+      return _jsToDart(ctx, jsRet);
+    } finally {
       jsFreeValue(ctx, jsRet);
-      throw _parseJSException(ctx);
     }
-    final ret = _jsToDart(ctx, jsRet);
-    jsFreeValue(ctx, jsRet);
-    return ret;
   }
 
   Pointer<JSValue> _invoke(List<dynamic> arguments, [dynamic thisVal]) {
@@ -176,18 +181,28 @@ class _JSFunction extends _JSObject implements JSInvokable, _IsolateEncodable {
     final val = _val;
     if (ctx == null || val == null)
       throw JSError("InternalError: JSValue released");
-    final args = arguments
-        .map(
-          (e) => _dartToJs(ctx, e),
-        )
-        .toList();
-    final jsThis = _dartToJs(ctx, thisVal);
-    final jsRet = jsCall(ctx, val, jsThis, args);
-    jsFreeValue(ctx, jsThis);
-    for (final jsArg in args) {
-      jsFreeValue(ctx, jsArg);
+    final args = <Pointer<JSValue>>[];
+    Pointer<JSValue> jsThis;
+    try {
+      for (final e in arguments) {
+        args.add(_dartToJs(ctx, e));
+      }
+      jsThis = _dartToJs(ctx, thisVal);
+    } catch (e) {
+      for (final a in args) {
+        jsFreeValue(ctx, a);
+      }
+      rethrow;
     }
-    return jsRet;
+    try {
+      final jsRet = jsCall(ctx, val, jsThis, args);
+      return jsRet;
+    } finally {
+      jsFreeValue(ctx, jsThis);
+      for (final jsArg in args) {
+        jsFreeValue(ctx, jsArg);
+      }
+    }
   }
 
   @override

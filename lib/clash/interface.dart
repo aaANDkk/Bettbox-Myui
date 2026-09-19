@@ -65,6 +65,8 @@ mixin ClashInterface {
 
   FutureOr<String> getMemory();
 
+  FutureOr<String> getCoreStatus();
+
   FutureOr<void> resetTraffic();
 
   FutureOr<void> startLog();
@@ -151,7 +153,7 @@ abstract class ClashHandlerInterface with ClashInterface {
       } else if (T == bool) {
         mDefaultValue = false;
       } else if (T == Map) {
-        mDefaultValue = {};
+        mDefaultValue = <String, dynamic>{};
       }
     }
 
@@ -251,7 +253,7 @@ abstract class ClashHandlerInterface with ClashInterface {
       method: ActionMethod.getConfig,
       data: json.encode(params),
       timeout: const Duration(seconds: 60),
-      defaultValue: Result.success({}),
+      defaultValue: Result.success(<String, dynamic>{}),
     );
     return res;
   }
@@ -417,6 +419,11 @@ abstract class ClashHandlerInterface with ClashInterface {
   @override
   FutureOr<String> getMemory() {
     return invoke<String>(method: ActionMethod.getMemory);
+  }
+
+  @override
+  FutureOr<String> getCoreStatus() {
+    return invoke<String>(method: ActionMethod.getCoreStatus);
   }
 
   @override

@@ -1851,6 +1851,23 @@ final checkIpProvider = AutoDisposeProvider<VM2<int, bool>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CheckIpRef = AutoDisposeProviderRef<VM2<int, bool>>;
+String _$checkMediaUnlockHash() => r'6487b5f673e9092c48978ec82f79d9a4f0fd078a';
+
+/// See also [checkMediaUnlock].
+@ProviderFor(checkMediaUnlock)
+final checkMediaUnlockProvider = AutoDisposeProvider<VM2<int, bool>>.internal(
+  checkMediaUnlock,
+  name: r'checkMediaUnlockProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$checkMediaUnlockHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CheckMediaUnlockRef = AutoDisposeProviderRef<VM2<int, bool>>;
 String _$genColorSchemeHash() => r'b18f15c938a8132ee4ed02cdfc02f3b9f01724e2';
 
 /// See also [genColorScheme].

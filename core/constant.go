@@ -132,6 +132,7 @@ const (
 	convertAgeSecretKeyToPublicKeyMethod  Method = "convertAgeSecretKeyToPublicKey"
 	getModeMethod                         Method = "getMode"
 	parseExternalProviderContentMethod    Method = "parseExternalProviderContent"
+	getCoreStatusMethod                   Method = "getCoreStatus"
 )
 
 type Method string

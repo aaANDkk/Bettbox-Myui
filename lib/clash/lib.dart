@@ -251,8 +251,10 @@ class ClashLibHandler {
       if (configRaw == nullptr) return <String, dynamic>{};
       try {
         final configString = configRaw.cast<Utf8>().toDartString();
-        if (configString.isEmpty) return <String, dynamic>{};
-        return json.decode(configString) as Map<String, dynamic>;
+        final decoded = json.decode(configString);
+        if (decoded is Map<String, dynamic>) return decoded;
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+        return <String, dynamic>{};
       } finally {
         clashFFI.freeCString(configRaw);
       }

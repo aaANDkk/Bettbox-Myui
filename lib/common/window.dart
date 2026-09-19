@@ -59,7 +59,9 @@ class Window {
     render?.resume();
     await windowManager.show();
     await windowManager.focus();
-    await windowManager.setSkipTaskbar(false);
+    if (!system.isMacOS) {
+      await windowManager.setSkipTaskbar(false);
+    }
     await globalState.resumeForegroundUpdates();
     await globalState.appController.syncWakelockIfNeeded();
   }
@@ -85,7 +87,9 @@ class Window {
 
   Future<void> hide() async {
     await windowManager.hide();
-    await windowManager.setSkipTaskbar(true);
+    if (!system.isMacOS) {
+      await windowManager.setSkipTaskbar(true);
+    }
     await globalState.handleBackground();
   }
 }

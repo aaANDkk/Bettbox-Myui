@@ -110,6 +110,33 @@ List<DashboardWidget> desktopDashboardWidgetsSafeFromJson(
   }
 }
 
+const List<MediaPlatform> defaultPinnedMediaPlatforms = [
+  MediaPlatform.reddit,
+  MediaPlatform.gemini,
+  MediaPlatform.cloudflare,
+];
+
+List<MediaPlatform> pinnedMediaPlatformsSafeFromJson(
+  List<dynamic>? pinnedMediaPlatforms,
+) {
+  try {
+    if (pinnedMediaPlatforms == null) return defaultPinnedMediaPlatforms;
+    final list = <MediaPlatform>[];
+    for (final e in pinnedMediaPlatforms) {
+      final str = e.toString();
+      if (str == 'chatgpt') {
+        list.add(MediaPlatform.openai);
+        continue;
+      }
+      final p = MediaPlatform.values.where((v) => v.name == str).firstOrNull;
+      if (p != null) list.add(p);
+    }
+    return list.isEmpty ? defaultPinnedMediaPlatforms : list;
+  } catch (_) {
+    return defaultPinnedMediaPlatforms;
+  }
+}
+
 @freezed
 abstract class AppSettingProps with _$AppSettingProps {
   const factory AppSettingProps({
@@ -123,6 +150,13 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(defaultDashboardWidgets)
     @JsonKey(fromJson: desktopDashboardWidgetsSafeFromJson)
     List<DashboardWidget> desktopDashboardWidgets,
+    @Default(defaultPinnedMediaPlatforms)
+    @JsonKey(fromJson: pinnedMediaPlatformsSafeFromJson)
+    List<MediaPlatform> pinnedMediaPlatforms,
+    @Default(false) bool mediaUnlockExtraDetails,
+    @Default(true) bool mediaUnlockRefreshOnNodeChange,
+    @Default(true) bool mediaUnlockColorfulIcons,
+    @Default(true) bool mediaUnlockRefreshByCategory,
     @Default(true) bool onlyStatisticsProxy,
     @Default(false) bool autoLaunch,
     @Default(false) bool silentLaunch,

@@ -106,10 +106,13 @@ class FlutterQjs {
         final throwObj = _dartToJs(ctx, e);
         final err = jsThrow(ctx, throwObj);
         jsFreeValue(ctx, throwObj);
-        if (type == JSChannelType.MODULE) {
+        if (type == JSChannelType.PROMISE_TRACK) {
+          // js_promise_rejection_tracker discards the channel return value,
+          // so the JSValue wrapper must be released here.
           jsFreeValue(ctx, err);
           return nullptr;
         }
+        // METHON: ownership transfers to js_channel, which releases the wrapper.
         return err;
       }
     }, timeout ?? 0, port);
@@ -117,12 +120,14 @@ class FlutterQjs {
     if (stackSize > 0) jsSetMaxStackSize(rt, stackSize);
     final memoryLimit = this.memoryLimit ?? 0;
     if (memoryLimit > 0) jsSetMemoryLimit(rt, memoryLimit);
-    _rt = rt;
-    final ctx = jsNewContext(rt);
-    if (ctx == nullptr) {
-      throw Exception('Failed to allocate JS Context from C');
+    try {
+      final ctx = jsNewContext(rt);
+      _rt = rt;
+      _ctx = ctx;
+    } catch (e) {
+      jsFreeRuntime(rt);
+      rethrow;
     }
-    _ctx = ctx;
   }
 
   /// Free Runtime and Context which can be recreate when evaluate again.
@@ -132,10 +137,14 @@ class FlutterQjs {
     _rt = null;
     _ctx = null;
     try {
-      if (ctx != null) jsFreeContext(ctx);
-      if (rt == null) return;
-      _executePendingJob();
-      jsFreeRuntime(rt);
+      try {
+        if (ctx != null) jsFreeContext(ctx);
+      } finally {
+        if (rt != null) {
+          _executePendingJob();
+          jsFreeRuntime(rt);
+        }
+      }
     } on String catch (e) {
       throw JSError(e);
     } finally {

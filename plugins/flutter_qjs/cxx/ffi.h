@@ -73,6 +73,8 @@ extern "C"
 
   DLLEXPORT void jsFreeValue(JSContext *ctx, JSValue *v, int32_t free);
 
+  DLLEXPORT void jsDeleteValue(JSValue *v);
+
   DLLEXPORT void jsFreeValueRT(JSRuntime *rt, JSValue *v, int32_t free);
 
   DLLEXPORT JSValue *jsDupValue(JSContext *ctx, JSValueConst *v);

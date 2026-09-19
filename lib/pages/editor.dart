@@ -494,6 +494,8 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                       enableLocalSuggestions: true,
                       enableKeyboardSuggestions: true,
                       enableMagnifier: true,
+                      tabSize: 2,
+                      useSpaceAsTab: true,
                       language: _languageMode(),
                       languageId: switch (widget.languages.firstOrNull) {
                         Language.yaml => 'yaml',

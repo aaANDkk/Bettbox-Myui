@@ -4219,4 +4219,300 @@ as ResultType,
 
 }
 
+
+/// @nodoc
+mixin _$CoreStatus {
+
+ int get physical;@JsonKey(name: 'in-use') int get inUse; int get reclaimable; int get goroutines;@JsonKey(name: 'heap-objects') int get heapObjects;@JsonKey(name: 'last-gc') int get lastGC; int get rules; int get proxies;@JsonKey(name: 'proxy-groups') int get proxyGroups;@JsonKey(name: 'rule-providers') int get ruleProviders;@JsonKey(name: 'proxy-providers') int get proxyProviders;@JsonKey(name: 'geodata-use') String get geodataUse;
+/// Create a copy of CoreStatus
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CoreStatusCopyWith<CoreStatus> get copyWith => _$CoreStatusCopyWithImpl<CoreStatus>(this as CoreStatus, _$identity);
+
+  /// Serializes this CoreStatus to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CoreStatus&&(identical(other.physical, physical) || other.physical == physical)&&(identical(other.inUse, inUse) || other.inUse == inUse)&&(identical(other.reclaimable, reclaimable) || other.reclaimable == reclaimable)&&(identical(other.goroutines, goroutines) || other.goroutines == goroutines)&&(identical(other.heapObjects, heapObjects) || other.heapObjects == heapObjects)&&(identical(other.lastGC, lastGC) || other.lastGC == lastGC)&&(identical(other.rules, rules) || other.rules == rules)&&(identical(other.proxies, proxies) || other.proxies == proxies)&&(identical(other.proxyGroups, proxyGroups) || other.proxyGroups == proxyGroups)&&(identical(other.ruleProviders, ruleProviders) || other.ruleProviders == ruleProviders)&&(identical(other.proxyProviders, proxyProviders) || other.proxyProviders == proxyProviders)&&(identical(other.geodataUse, geodataUse) || other.geodataUse == geodataUse));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,physical,inUse,reclaimable,goroutines,heapObjects,lastGC,rules,proxies,proxyGroups,ruleProviders,proxyProviders,geodataUse);
+
+@override
+String toString() {
+  return 'CoreStatus(physical: $physical, inUse: $inUse, reclaimable: $reclaimable, goroutines: $goroutines, heapObjects: $heapObjects, lastGC: $lastGC, rules: $rules, proxies: $proxies, proxyGroups: $proxyGroups, ruleProviders: $ruleProviders, proxyProviders: $proxyProviders, geodataUse: $geodataUse)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CoreStatusCopyWith<$Res>  {
+  factory $CoreStatusCopyWith(CoreStatus value, $Res Function(CoreStatus) _then) = _$CoreStatusCopyWithImpl;
+@useResult
+$Res call({
+ int physical,@JsonKey(name: 'in-use') int inUse, int reclaimable, int goroutines,@JsonKey(name: 'heap-objects') int heapObjects,@JsonKey(name: 'last-gc') int lastGC, int rules, int proxies,@JsonKey(name: 'proxy-groups') int proxyGroups,@JsonKey(name: 'rule-providers') int ruleProviders,@JsonKey(name: 'proxy-providers') int proxyProviders,@JsonKey(name: 'geodata-use') String geodataUse
+});
+
+
+
+
+}
+/// @nodoc
+class _$CoreStatusCopyWithImpl<$Res>
+    implements $CoreStatusCopyWith<$Res> {
+  _$CoreStatusCopyWithImpl(this._self, this._then);
+
+  final CoreStatus _self;
+  final $Res Function(CoreStatus) _then;
+
+/// Create a copy of CoreStatus
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? physical = null,Object? inUse = null,Object? reclaimable = null,Object? goroutines = null,Object? heapObjects = null,Object? lastGC = null,Object? rules = null,Object? proxies = null,Object? proxyGroups = null,Object? ruleProviders = null,Object? proxyProviders = null,Object? geodataUse = null,}) {
+  return _then(_self.copyWith(
+physical: null == physical ? _self.physical : physical // ignore: cast_nullable_to_non_nullable
+as int,inUse: null == inUse ? _self.inUse : inUse // ignore: cast_nullable_to_non_nullable
+as int,reclaimable: null == reclaimable ? _self.reclaimable : reclaimable // ignore: cast_nullable_to_non_nullable
+as int,goroutines: null == goroutines ? _self.goroutines : goroutines // ignore: cast_nullable_to_non_nullable
+as int,heapObjects: null == heapObjects ? _self.heapObjects : heapObjects // ignore: cast_nullable_to_non_nullable
+as int,lastGC: null == lastGC ? _self.lastGC : lastGC // ignore: cast_nullable_to_non_nullable
+as int,rules: null == rules ? _self.rules : rules // ignore: cast_nullable_to_non_nullable
+as int,proxies: null == proxies ? _self.proxies : proxies // ignore: cast_nullable_to_non_nullable
+as int,proxyGroups: null == proxyGroups ? _self.proxyGroups : proxyGroups // ignore: cast_nullable_to_non_nullable
+as int,ruleProviders: null == ruleProviders ? _self.ruleProviders : ruleProviders // ignore: cast_nullable_to_non_nullable
+as int,proxyProviders: null == proxyProviders ? _self.proxyProviders : proxyProviders // ignore: cast_nullable_to_non_nullable
+as int,geodataUse: null == geodataUse ? _self.geodataUse : geodataUse // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CoreStatus].
+extension CoreStatusPatterns on CoreStatus {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CoreStatus value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CoreStatus() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CoreStatus value)  $default,){
+final _that = this;
+switch (_that) {
+case _CoreStatus():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CoreStatus value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CoreStatus() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int physical, @JsonKey(name: 'in-use')  int inUse,  int reclaimable,  int goroutines, @JsonKey(name: 'heap-objects')  int heapObjects, @JsonKey(name: 'last-gc')  int lastGC,  int rules,  int proxies, @JsonKey(name: 'proxy-groups')  int proxyGroups, @JsonKey(name: 'rule-providers')  int ruleProviders, @JsonKey(name: 'proxy-providers')  int proxyProviders, @JsonKey(name: 'geodata-use')  String geodataUse)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CoreStatus() when $default != null:
+return $default(_that.physical,_that.inUse,_that.reclaimable,_that.goroutines,_that.heapObjects,_that.lastGC,_that.rules,_that.proxies,_that.proxyGroups,_that.ruleProviders,_that.proxyProviders,_that.geodataUse);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int physical, @JsonKey(name: 'in-use')  int inUse,  int reclaimable,  int goroutines, @JsonKey(name: 'heap-objects')  int heapObjects, @JsonKey(name: 'last-gc')  int lastGC,  int rules,  int proxies, @JsonKey(name: 'proxy-groups')  int proxyGroups, @JsonKey(name: 'rule-providers')  int ruleProviders, @JsonKey(name: 'proxy-providers')  int proxyProviders, @JsonKey(name: 'geodata-use')  String geodataUse)  $default,) {final _that = this;
+switch (_that) {
+case _CoreStatus():
+return $default(_that.physical,_that.inUse,_that.reclaimable,_that.goroutines,_that.heapObjects,_that.lastGC,_that.rules,_that.proxies,_that.proxyGroups,_that.ruleProviders,_that.proxyProviders,_that.geodataUse);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int physical, @JsonKey(name: 'in-use')  int inUse,  int reclaimable,  int goroutines, @JsonKey(name: 'heap-objects')  int heapObjects, @JsonKey(name: 'last-gc')  int lastGC,  int rules,  int proxies, @JsonKey(name: 'proxy-groups')  int proxyGroups, @JsonKey(name: 'rule-providers')  int ruleProviders, @JsonKey(name: 'proxy-providers')  int proxyProviders, @JsonKey(name: 'geodata-use')  String geodataUse)?  $default,) {final _that = this;
+switch (_that) {
+case _CoreStatus() when $default != null:
+return $default(_that.physical,_that.inUse,_that.reclaimable,_that.goroutines,_that.heapObjects,_that.lastGC,_that.rules,_that.proxies,_that.proxyGroups,_that.ruleProviders,_that.proxyProviders,_that.geodataUse);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CoreStatus implements CoreStatus {
+  const _CoreStatus({this.physical = 0, @JsonKey(name: 'in-use') this.inUse = 0, this.reclaimable = 0, this.goroutines = 0, @JsonKey(name: 'heap-objects') this.heapObjects = 0, @JsonKey(name: 'last-gc') this.lastGC = 0, this.rules = 0, this.proxies = 0, @JsonKey(name: 'proxy-groups') this.proxyGroups = 0, @JsonKey(name: 'rule-providers') this.ruleProviders = 0, @JsonKey(name: 'proxy-providers') this.proxyProviders = 0, @JsonKey(name: 'geodata-use') this.geodataUse = 'None'});
+  factory _CoreStatus.fromJson(Map<String, dynamic> json) => _$CoreStatusFromJson(json);
+
+@override@JsonKey() final  int physical;
+@override@JsonKey(name: 'in-use') final  int inUse;
+@override@JsonKey() final  int reclaimable;
+@override@JsonKey() final  int goroutines;
+@override@JsonKey(name: 'heap-objects') final  int heapObjects;
+@override@JsonKey(name: 'last-gc') final  int lastGC;
+@override@JsonKey() final  int rules;
+@override@JsonKey() final  int proxies;
+@override@JsonKey(name: 'proxy-groups') final  int proxyGroups;
+@override@JsonKey(name: 'rule-providers') final  int ruleProviders;
+@override@JsonKey(name: 'proxy-providers') final  int proxyProviders;
+@override@JsonKey(name: 'geodata-use') final  String geodataUse;
+
+/// Create a copy of CoreStatus
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CoreStatusCopyWith<_CoreStatus> get copyWith => __$CoreStatusCopyWithImpl<_CoreStatus>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CoreStatusToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CoreStatus&&(identical(other.physical, physical) || other.physical == physical)&&(identical(other.inUse, inUse) || other.inUse == inUse)&&(identical(other.reclaimable, reclaimable) || other.reclaimable == reclaimable)&&(identical(other.goroutines, goroutines) || other.goroutines == goroutines)&&(identical(other.heapObjects, heapObjects) || other.heapObjects == heapObjects)&&(identical(other.lastGC, lastGC) || other.lastGC == lastGC)&&(identical(other.rules, rules) || other.rules == rules)&&(identical(other.proxies, proxies) || other.proxies == proxies)&&(identical(other.proxyGroups, proxyGroups) || other.proxyGroups == proxyGroups)&&(identical(other.ruleProviders, ruleProviders) || other.ruleProviders == ruleProviders)&&(identical(other.proxyProviders, proxyProviders) || other.proxyProviders == proxyProviders)&&(identical(other.geodataUse, geodataUse) || other.geodataUse == geodataUse));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,physical,inUse,reclaimable,goroutines,heapObjects,lastGC,rules,proxies,proxyGroups,ruleProviders,proxyProviders,geodataUse);
+
+@override
+String toString() {
+  return 'CoreStatus(physical: $physical, inUse: $inUse, reclaimable: $reclaimable, goroutines: $goroutines, heapObjects: $heapObjects, lastGC: $lastGC, rules: $rules, proxies: $proxies, proxyGroups: $proxyGroups, ruleProviders: $ruleProviders, proxyProviders: $proxyProviders, geodataUse: $geodataUse)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CoreStatusCopyWith<$Res> implements $CoreStatusCopyWith<$Res> {
+  factory _$CoreStatusCopyWith(_CoreStatus value, $Res Function(_CoreStatus) _then) = __$CoreStatusCopyWithImpl;
+@override @useResult
+$Res call({
+ int physical,@JsonKey(name: 'in-use') int inUse, int reclaimable, int goroutines,@JsonKey(name: 'heap-objects') int heapObjects,@JsonKey(name: 'last-gc') int lastGC, int rules, int proxies,@JsonKey(name: 'proxy-groups') int proxyGroups,@JsonKey(name: 'rule-providers') int ruleProviders,@JsonKey(name: 'proxy-providers') int proxyProviders,@JsonKey(name: 'geodata-use') String geodataUse
+});
+
+
+
+
+}
+/// @nodoc
+class __$CoreStatusCopyWithImpl<$Res>
+    implements _$CoreStatusCopyWith<$Res> {
+  __$CoreStatusCopyWithImpl(this._self, this._then);
+
+  final _CoreStatus _self;
+  final $Res Function(_CoreStatus) _then;
+
+/// Create a copy of CoreStatus
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? physical = null,Object? inUse = null,Object? reclaimable = null,Object? goroutines = null,Object? heapObjects = null,Object? lastGC = null,Object? rules = null,Object? proxies = null,Object? proxyGroups = null,Object? ruleProviders = null,Object? proxyProviders = null,Object? geodataUse = null,}) {
+  return _then(_CoreStatus(
+physical: null == physical ? _self.physical : physical // ignore: cast_nullable_to_non_nullable
+as int,inUse: null == inUse ? _self.inUse : inUse // ignore: cast_nullable_to_non_nullable
+as int,reclaimable: null == reclaimable ? _self.reclaimable : reclaimable // ignore: cast_nullable_to_non_nullable
+as int,goroutines: null == goroutines ? _self.goroutines : goroutines // ignore: cast_nullable_to_non_nullable
+as int,heapObjects: null == heapObjects ? _self.heapObjects : heapObjects // ignore: cast_nullable_to_non_nullable
+as int,lastGC: null == lastGC ? _self.lastGC : lastGC // ignore: cast_nullable_to_non_nullable
+as int,rules: null == rules ? _self.rules : rules // ignore: cast_nullable_to_non_nullable
+as int,proxies: null == proxies ? _self.proxies : proxies // ignore: cast_nullable_to_non_nullable
+as int,proxyGroups: null == proxyGroups ? _self.proxyGroups : proxyGroups // ignore: cast_nullable_to_non_nullable
+as int,ruleProviders: null == ruleProviders ? _self.ruleProviders : ruleProviders // ignore: cast_nullable_to_non_nullable
+as int,proxyProviders: null == proxyProviders ? _self.proxyProviders : proxyProviders // ignore: cast_nullable_to_non_nullable
+as int,geodataUse: null == geodataUse ? _self.geodataUse : geodataUse // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
 // dart format on

@@ -16,7 +16,6 @@ import android.util.Base64
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.content.getSystemService
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
@@ -233,10 +232,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
                 tip(call.argument<String>("message"))
                 result.success(true)
             }
-            "openFile" -> {
-                openFile(call.argument<String>("path")!!)
-                result.success(true)
-            }
             "getSelfLastUpdateTime" -> {
                 result.success(getSelfLastUpdateTime())
             }
@@ -285,22 +280,6 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             context.startActivity(intent)
             true
         }.getOrElse { false }
-    }
-
-    private fun openFile(path: String) {
-        val context = BettboxApplication.getAppContext()
-        val file = File(path)
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileProvider",
-            file
-        )
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "text/plain")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        runCatching { context.startActivity(intent) }
     }
 
     private fun updateExcludeFromRecents(value: Boolean?) {

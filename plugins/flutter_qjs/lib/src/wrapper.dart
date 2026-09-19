@@ -28,17 +28,22 @@ void _definePropertyValue(
 }) {
   final jsAtomVal = _dartToJs(ctx, key, cache: cache);
   final jsAtom = jsValueToAtom(ctx, jsAtomVal);
+  Pointer<JSValue>? jsVal;
   try {
+    jsVal = _dartToJs(ctx, val, cache: cache);
     jsDefinePropertyValue(
       ctx,
       obj,
       jsAtom,
-      _dartToJs(ctx, val, cache: cache),
+      jsVal,
       JSProp.C_W_E,
     );
   } finally {
     jsFreeAtom(ctx, jsAtom);
     jsFreeValue(ctx, jsAtomVal);
+    // JS_DefinePropertyValue consumes the value reference (success or
+    // failure); only the JSValue wrapper still needs releasing.
+    if (jsVal != null) jsDeleteValue(jsVal);
   }
 }
 
@@ -194,10 +199,13 @@ dynamic _jsToDart(Pointer<JSContext> ctx, Pointer<JSValue> val,
       } else if (jsIsError(ctx, val) != 0) {
         final err = jsToCString(ctx, val);
         final pstack = _jsGetPropertyValue(ctx, val, 'stack');
-        final stack =
-            jsToBool(ctx, pstack) != 0 ? jsToCString(ctx, pstack) : null;
-        jsFreeValue(ctx, pstack);
-        return JSError(err, stack);
+        try {
+          final stack =
+              jsToBool(ctx, pstack) != 0 ? jsToCString(ctx, pstack) : null;
+          return JSError(err, stack);
+        } finally {
+          jsFreeValue(ctx, pstack);
+        }
       } else if (jsIsPromise(ctx, val) != 0) {
         final jsPromiseThen = _jsGetPropertyValue(ctx, val, 'then');
         final _JSFunction promiseThen =
@@ -225,39 +233,56 @@ dynamic _jsToDart(Pointer<JSContext> ctx, Pointer<JSValue> val,
       } else if (jsIsArray(ctx, val) != 0) {
         final jslength = _jsGetPropertyValue(ctx, val, 'length');
         final length = jsToInt64(ctx, jslength);
+        jsFreeValue(ctx, jslength);
         final ret = [];
         cache[valptr] = ret;
         for (var i = 0; i < length; ++i) {
           final jsProp = _jsGetPropertyValue(ctx, val, i);
-          ret.add(_jsToDart(ctx, jsProp, cache: cache));
-          jsFreeValue(ctx, jsProp);
+          try {
+            ret.add(_jsToDart(ctx, jsProp, cache: cache));
+          } finally {
+            jsFreeValue(ctx, jsProp);
+          }
         }
         return ret;
       } else {
         final ptab = malloc<Pointer<JSPropertyEnum>>();
         final plen = malloc<Uint32>();
-        if (jsGetOwnPropertyNames(ctx, ptab, plen, val, -1) != 0) {
+        try {
+          if (jsGetOwnPropertyNames(ctx, ptab, plen, val, -1) != 0) {
+            return null;
+          }
+          final len = plen.value;
+          final ret = Map();
+          cache[valptr] = ret;
+          var i = 0;
+          try {
+            for (; i < len; ++i) {
+              final jsAtom = jsPropertyEnumGetAtom(ptab.value, i);
+              final jsAtomValue = jsAtomToValue(ctx, jsAtom);
+              final jsProp = jsGetProperty(ctx, val, jsAtom);
+              try {
+                ret[_jsToDart(ctx, jsAtomValue, cache: cache)] =
+                    _jsToDart(ctx, jsProp, cache: cache);
+              } finally {
+                jsFreeValue(ctx, jsAtomValue);
+                jsFreeValue(ctx, jsProp);
+                jsFreeAtom(ctx, jsAtom);
+              }
+            }
+          } finally {
+            // free the atoms of iterations never entered after an abort
+            // (the aborted iteration was already released above)
+            for (var j = i + 1; j < len; ++j) {
+              jsFreeAtom(ctx, jsPropertyEnumGetAtom(ptab.value, j));
+            }
+            jsFree(ctx, ptab.value);
+          }
+          return ret;
+        } finally {
           malloc.free(plen);
           malloc.free(ptab);
-          return null;
         }
-        final len = plen.value;
-        malloc.free(plen);
-        final ret = Map();
-        cache[valptr] = ret;
-        for (var i = 0; i < len; ++i) {
-          final jsAtom = jsPropertyEnumGetAtom(ptab.value, i);
-          final jsAtomValue = jsAtomToValue(ctx, jsAtom);
-          final jsProp = jsGetProperty(ctx, val, jsAtom);
-          ret[_jsToDart(ctx, jsAtomValue, cache: cache)] =
-              _jsToDart(ctx, jsProp, cache: cache);
-          jsFreeValue(ctx, jsAtomValue);
-          jsFreeValue(ctx, jsProp);
-          jsFreeAtom(ctx, jsAtom);
-        }
-        jsFree(ctx, ptab.value);
-        malloc.free(ptab);
-        return ret;
       }
     default:
   }

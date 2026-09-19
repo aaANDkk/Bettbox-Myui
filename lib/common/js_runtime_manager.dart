@@ -105,7 +105,7 @@ class JavaScriptRuntimeManager {
         return result;
       } catch (e) {
         commonPrint.log('extractScriptOptions error: $e');
-        return {};
+        return <String, dynamic>{};
       } finally {
         try {
           await engine.close();

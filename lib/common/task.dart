@@ -121,32 +121,82 @@ bool _needsQuotes(String s) {
       s.contains('}')) {
     return true;
   }
-  if (s.contains('\n') || s.contains('\r') || s.contains('\t')) return true;
+  for (int i = 0; i < s.length; i++) {
+    final c = s.codeUnitAt(i);
+    if (c < 0x20 ||
+        c == 0x7F ||
+        (c >= 0x80 && c <= 0x9F && c != 0x85) ||
+        (c >= 0xD800 && c <= 0xDFFF) ||
+        c == 0xFFFE ||
+        c == 0xFFFF) {
+      return true;
+    }
+  }
   return false;
 }
 
 String _escapeString(String s) {
   final sb = StringBuffer('"');
   for (int i = 0; i < s.length; i++) {
-    final char = s[i];
-    switch (char) {
-      case '\\':
+    final code = s.codeUnitAt(i);
+    switch (code) {
+      case 0x5C:
         sb.write(r'\\');
         break;
-      case '"':
+      case 0x22:
         sb.write(r'\"');
         break;
-      case '\n':
-        sb.write(r'\n');
+      case 0x00:
+        sb.write(r'\0');
         break;
-      case '\r':
-        sb.write(r'\r');
+      case 0x07:
+        sb.write(r'\a');
         break;
-      case '\t':
+      case 0x08:
+        sb.write(r'\b');
+        break;
+      case 0x09:
         sb.write(r'\t');
         break;
+      case 0x0A:
+        sb.write(r'\n');
+        break;
+      case 0x0B:
+        sb.write(r'\v');
+        break;
+      case 0x0C:
+        sb.write(r'\f');
+        break;
+      case 0x0D:
+        sb.write(r'\r');
+        break;
+      case 0x1B:
+        sb.write(r'\e');
+        break;
       default:
-        sb.write(char);
+        if (code < 0x20 || code == 0x7F) {
+          sb.write(r'\x');
+          sb.write(code.toRadixString(16).padLeft(2, '0'));
+        } else if (code >= 0x80 && code <= 0x9F && code != 0x85) {
+          sb.write(r'\u');
+          sb.write(code.toRadixString(16).padLeft(4, '0'));
+        } else if (code >= 0xD800 && code <= 0xDBFF) {
+          if (i + 1 < s.length &&
+              s.codeUnitAt(i + 1) >= 0xDC00 &&
+              s.codeUnitAt(i + 1) <= 0xDFFF) {
+            sb.writeCharCode(code);
+            i++;
+            sb.writeCharCode(s.codeUnitAt(i));
+          } else {
+            sb.write(r'\uFFFD');
+          }
+        } else if (code >= 0xDC00 && code <= 0xDFFF) {
+          sb.write(r'\uFFFD');
+        } else if (code == 0xFFFE || code == 0xFFFF) {
+          sb.write(r'\uFFFD');
+        } else {
+          sb.writeCharCode(code);
+        }
     }
   }
   sb.write('"');

@@ -252,3 +252,24 @@ extension ActionResultExt on ActionResult {
     }
   }
 }
+
+@freezed
+abstract class CoreStatus with _$CoreStatus {
+  const factory CoreStatus({
+    @Default(0) int physical,
+    @JsonKey(name: 'in-use') @Default(0) int inUse,
+    @Default(0) int reclaimable,
+    @Default(0) int goroutines,
+    @JsonKey(name: 'heap-objects') @Default(0) int heapObjects,
+    @JsonKey(name: 'last-gc') @Default(0) int lastGC,
+    @Default(0) int rules,
+    @Default(0) int proxies,
+    @JsonKey(name: 'proxy-groups') @Default(0) int proxyGroups,
+    @JsonKey(name: 'rule-providers') @Default(0) int ruleProviders,
+    @JsonKey(name: 'proxy-providers') @Default(0) int proxyProviders,
+    @JsonKey(name: 'geodata-use') @Default('None') String geodataUse,
+  }) = _CoreStatus;
+
+  factory CoreStatus.fromJson(Map<String, Object?> json) =>
+      _$CoreStatusFromJson(json);
+}

@@ -111,6 +111,9 @@ func resumeHealthChecks() {
 func clearSuspendedHealthChecks() {
 	suspendedHCLock.Lock()
 	defer suspendedHCLock.Unlock()
+	for _, entry := range suspendedEntries {
+		*entry.target = entry.orig
+	}
 	suspendedEntries = nil
 }
 

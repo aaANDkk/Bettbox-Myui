@@ -701,6 +701,19 @@ VM2<int, bool> checkIp(Ref ref) {
 }
 
 @riverpod
+VM2<int, bool> checkMediaUnlock(Ref ref) {
+  final checkIpNum = ref.watch(checkIpNumProvider);
+  final containsMediaUnlock = ref.watch(
+    dashboardStateProvider.select(
+      (state) =>
+          state.dashboardWidgets.contains(DashboardWidget.mediaUnlock) ||
+          state.dashboardWidgets.contains(DashboardWidget.mediaUnlockSmall),
+    ),
+  );
+  return VM2(a: checkIpNum, b: containsMediaUnlock);
+}
+
+@riverpod
 ColorScheme genColorScheme(
   Ref ref,
   Brightness brightness, {

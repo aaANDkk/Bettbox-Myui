@@ -177,6 +177,10 @@ jobs:
           cache-key: flutter-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('**/pubspec.lock') }}
           flutter-version: ${{ contains(matrix.os, 'arm') && '' || '3.44.9' }}
 
+      - name: Clear Pub Cache Credentials
+        shell: bash
+        run: rm -f ~/.pub-cache/credentials.json 2>/dev/null || true
+
 
       - name: Clean Gradle (Android)
         if: matrix.platform == 'android'

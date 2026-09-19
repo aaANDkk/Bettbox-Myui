@@ -169,6 +169,17 @@ class _WindowContainerState extends ConsumerState<WindowManager>
   }
 
   @override
+  void onWindowFocus() {
+    if (globalState.backgroundMode.value) {
+      globalState.handleForeground();
+      _scheduleRenderToggle(true);
+      unawaited(globalState.resumeForegroundUpdates());
+      unawaited(globalState.appController.syncWakelockIfNeeded());
+    }
+    super.onWindowFocus();
+  }
+
+  @override
   void onWindowRestore() {
     globalState.handleForeground();
     _scheduleRenderToggle(true);

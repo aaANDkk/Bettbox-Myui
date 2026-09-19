@@ -128,8 +128,11 @@ class ClashCore {
       final groupNames = [
         UsedProxy.GLOBAL.name,
         ...allList.where((e) {
-          final proxy = allProxies[e] as Map<String, dynamic>?;
-          return GroupTypeExtension.valueList.contains(proxy?['type']);
+          final proxy = allProxies[e];
+          if (proxy is Map) {
+            return GroupTypeExtension.valueList.contains(proxy['type']);
+          }
+          return false;
         }),
       ];
       final groupsRaw = groupNames.map((groupName) {
@@ -139,7 +142,10 @@ class ClashCore {
           proxyData.cast<String, dynamic>(),
         );
         group['all'] = ((group['all'] ?? []) as List)
-            .map((name) => allProxies[name])
+            .map((name) {
+              final p = allProxies[name];
+              return p is Map ? Map<String, dynamic>.from(p) : null;
+            })
             .whereType<Map<String, dynamic>>()
             .toList();
         return group;
@@ -271,7 +277,14 @@ class ClashCore {
     final profilePath = await appPath.getProfilePath(id);
     final res = await clashInterface.getConfig(profilePath, ageSecretKey: ageSecretKey);
     if (res.isSuccess) {
-      return res.data as Map<String, dynamic>;
+      final data = res.data;
+      if (data is Map<String, dynamic>) {
+        return data;
+      }
+      if (data is Map) {
+        return Map<String, dynamic>.from(data);
+      }
+      return <String, dynamic>{};
     } else {
       throw res.message;
     }
@@ -317,6 +330,18 @@ class ClashCore {
       return 0;
     }
     return int.parse(value);
+  }
+
+  Future<CoreStatus?> getCoreStatus() async {
+    final value = await clashInterface.getCoreStatus();
+    if (value.isEmpty) {
+      return null;
+    }
+    final decoded = json.decode(value);
+    if (decoded is! Map) {
+      return null;
+    }
+    return CoreStatus.fromJson(Map<String, dynamic>.from(decoded));
   }
 
   void resetTraffic() {

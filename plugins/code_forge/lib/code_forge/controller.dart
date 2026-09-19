@@ -970,7 +970,25 @@ class CodeForgeController implements DeltaTextInputClient {
     for (int k = uniqueOffsets.length - 1; k >= 0; k--) {
       final offset = uniqueOffsets[k];
       if (offset > 0) {
-        final deleteStart = (offset - 1).clamp(0, _rope.length);
+        final lineIndex = _rope.getLineAtOffset(offset);
+        final lineStart = _rope.getLineStartOffset(lineIndex);
+        final localScalar = offset - lineStart;
+        int deleteCount = 1;
+        if (localScalar <= 0) {
+          if (offset >= 2 &&
+              _rope.charAt(offset - 2) == '\r' &&
+              _rope.charAt(offset - 1) == '\n') {
+            deleteCount = 2;
+          }
+        } else {
+          final lineText = _rope.getLineText(lineIndex);
+          final utf16Offset = scalarToStringIndex(lineText, localScalar);
+          final textBefore = lineText.substring(0, utf16Offset);
+          if (textBefore.isNotEmpty) {
+            deleteCount = textBefore.characters.last.runes.length;
+          }
+        }
+        final deleteStart = (offset - deleteCount).clamp(0, _rope.length);
         final deletedChar = _rope.substring(deleteStart, offset);
         deletedLengths[k] = deletedChar.runes.length;
         _rope.delete(deleteStart, offset);
@@ -1139,7 +1157,10 @@ class CodeForgeController implements DeltaTextInputClient {
         final shouldIncreaseIndent = RegExp(r'[:{[(]\s*$').hasMatch(lineText);
         final tabStr = useSpaceAsTab ? ' ' * tabSize : '\t';
         final extraIndent = shouldIncreaseIndent ? tabStr : '';
-        toInsert = '\n$currentIndent$extraIndent';
+        final normalizedCurrentIndent = useSpaceAsTab
+            ? currentIndent.replaceAll('\t', ' ' * tabSize)
+            : currentIndent;
+        toInsert = '\n$normalizedCurrentIndent$extraIndent';
       }
 
       insertedLengths[k] = toInsert.runes.length;
@@ -1818,10 +1839,10 @@ class CodeForgeController implements DeltaTextInputClient {
   bool readOnly = false;
 
   /// Use space instead of the `\t` character for tab key press.
-  bool useSpaceAsTab = false;
+  bool useSpaceAsTab = true;
 
   /// Custom tabSize for the editor.
-  int tabSize = 1;
+  int tabSize = 2;
 
   /// The tabspace inserted on tab key press.
   String get tabSpace {
@@ -1829,6 +1850,183 @@ class CodeForgeController implements DeltaTextInputClient {
       return ' ' * tabSize;
     }
     return '\t' * tabSize;
+  }
+
+  /// Reindent the whole document to [newTabSize], mapping the current
+  /// selection through the transformation.
+  void reindentDocument({required int newTabSize}) {
+    final oldTabSize = detectIndentation();
+
+    if (oldTabSize <= 0 || newTabSize <= 0 || oldTabSize == newTabSize) {
+      tabSize = newTabSize;
+      return;
+    }
+
+    final originalText = text;
+    if (originalText.isEmpty) {
+      tabSize = newTabSize;
+      return;
+    }
+
+    final originalSelection = selection;
+    final originalLines = originalText.split("\n");
+    final newLines = <String>[];
+
+    for (final line in originalLines) {
+      final match = RegExp(r"^[ \t]+").firstMatch(line);
+      if (match == null) {
+        newLines.add(line);
+        continue;
+      }
+
+      final leadingWhitespace = match.group(0)!;
+      final content = line.substring(leadingWhitespace.length);
+
+      int visualSpaces = 0;
+      for (int i = 0; i < leadingWhitespace.length; i++) {
+        if (leadingWhitespace[i] == '\t') {
+          visualSpaces += oldTabSize - (visualSpaces % oldTabSize);
+        } else {
+          visualSpaces += 1;
+        }
+      }
+
+      final indentLevels = visualSpaces ~/ oldTabSize;
+      final remainder = visualSpaces % oldTabSize;
+      final newIndentLength = (indentLevels * newTabSize) + remainder;
+
+      newLines.add("${' ' * newIndentLength}$content");
+    }
+
+    final newText = newLines.join("\n");
+    tabSize = newTabSize;
+
+    if (newText == originalText) return;
+
+    final newLineStarts = _lineStarts(newText);
+    final originalLineStarts = _lineStarts(originalText);
+
+    final mappedSelection = TextSelection(
+      baseOffset: _mapOffsetForReindent(
+        originalOffset: originalSelection.baseOffset,
+        originalText: originalText,
+        newText: newText,
+        originalLineStarts: originalLineStarts,
+        newLineStarts: newLineStarts,
+      ),
+      extentOffset: _mapOffsetForReindent(
+        originalOffset: originalSelection.extentOffset,
+        originalText: originalText,
+        newText: newText,
+        originalLineStarts: originalLineStarts,
+        newLineStarts: newLineStarts,
+      ),
+    );
+
+    text = newText;
+    selection = mappedSelection;
+  }
+
+  /// Detect the document's actual indentation width based on line diffs.
+  int detectIndentation() {
+    final lines = text.split("\n");
+    final diffCount = <int, int>{};
+    int previousIndent = 0;
+
+    for (final line in lines) {
+      if (line.trim().isEmpty) continue;
+
+      final match = RegExp(r"^( +)\S").firstMatch(line);
+      final currentIndent = match?.group(1)?.length ?? 0;
+
+      final diff = (currentIndent - previousIndent).abs();
+      if (diff >= 1 && diff <= 32) {
+        diffCount[diff] = (diffCount[diff] ?? 0) + 1;
+      }
+
+      previousIndent = currentIndent;
+    }
+
+    if (diffCount.isEmpty) return tabSize > 0 ? tabSize : 2;
+
+    int bestIndent = tabSize;
+    int maxOccurrences = 0;
+
+    diffCount.forEach((indent, count) {
+      if (count > maxOccurrences) {
+        maxOccurrences = count;
+        bestIndent = indent;
+      }
+    });
+
+    return bestIndent;
+  }
+
+  int _mapOffsetForReindent({
+    required int originalOffset,
+    required String originalText,
+    required String newText,
+    required List<int> originalLineStarts,
+    required List<int> newLineStarts,
+  }) {
+    if (originalOffset <= 0) return 0;
+    if (originalOffset >= originalText.length) return newText.length;
+
+    final lineIndex = _findLineIndex(originalLineStarts, originalOffset);
+    final originalLineStart = originalLineStarts[lineIndex];
+    final originalNextLineStart = lineIndex + 1 < originalLineStarts.length
+        ? originalLineStarts[lineIndex + 1]
+        : originalText.length;
+
+    final originalLineText = originalText.substring(
+      originalLineStart,
+      originalNextLineStart,
+    );
+    final originalWhitespaceLen =
+        RegExp(r"^[ \t]+").firstMatch(originalLineText)?.group(0)?.length ?? 0;
+
+    final newLineStart = lineIndex < newLineStarts.length
+        ? newLineStarts[lineIndex]
+        : newText.length;
+    final newNextLineStart = lineIndex + 1 < newLineStarts.length
+        ? newLineStarts[lineIndex + 1]
+        : newText.length;
+
+    final newLineText = newText.substring(newLineStart, newNextLineStart);
+    final newWhitespaceLen =
+        RegExp(r"^[ \t]+").firstMatch(newLineText)?.group(0)?.length ?? 0;
+
+    final column = originalOffset - originalLineStart;
+
+    int newColumn;
+    if (column <= originalWhitespaceLen) {
+      newColumn = originalWhitespaceLen == 0
+          ? 0
+          : ((column / originalWhitespaceLen) * newWhitespaceLen).round();
+    } else {
+      newColumn = newWhitespaceLen + (column - originalWhitespaceLen);
+    }
+
+    return (newLineStart + newColumn).clamp(0, newText.length);
+  }
+
+  List<int> _lineStarts(String value) {
+    final starts = <int>[0];
+    for (var index = 0; index < value.length; index++) {
+      if (value[index] == "\n") {
+        starts.add(index + 1);
+      }
+    }
+    return starts;
+  }
+
+  int _findLineIndex(List<int> lineStarts, int offset) {
+    var lineIndex = 0;
+    while (lineIndex + 1 < lineStarts.length &&
+        lineStarts[lineIndex + 1] <= offset) {
+      lineIndex++;
+    }
+    return lineIndex;
   }
 
   /// Whether the line structure has changed (lines added or removed).
@@ -1878,7 +2076,27 @@ class CodeForgeController implements DeltaTextInputClient {
     if (!isShiftPressed && selection.start != selection.end) {
       newOffset = selection.start;
     } else if (selection.extentOffset > 0) {
-      newOffset = selection.extentOffset - 1;
+      final currentOffset = selection.extentOffset;
+      final lineIndex = getLineAtOffset(currentOffset);
+      final lineStart = getLineStartOffset(lineIndex);
+      final localScalar = currentOffset - lineStart;
+      if (localScalar <= 0) {
+        if (currentOffset >= 2 && substring(currentOffset - 2, currentOffset) == '\r\n') {
+          newOffset = currentOffset - 2;
+        } else {
+          newOffset = currentOffset - 1;
+        }
+      } else {
+        final lineText = getLineText(lineIndex);
+        final utf16Offset = scalarToStringIndex(lineText, localScalar);
+        final textBefore = lineText.substring(0, utf16Offset);
+        if (textBefore.isNotEmpty) {
+          final cluster = textBefore.characters.last;
+          newOffset = currentOffset - cluster.runes.length;
+        } else {
+          newOffset = currentOffset - 1;
+        }
+      }
     } else {
       newOffset = 0;
     }
@@ -1907,7 +2125,23 @@ class CodeForgeController implements DeltaTextInputClient {
     if (!isShiftPressed && selection.start != selection.end) {
       newOffset = selection.end;
     } else if (selection.extentOffset < length) {
-      newOffset = selection.extentOffset + 1;
+      final currentOffset = selection.extentOffset;
+      final lineIndex = getLineAtOffset(currentOffset);
+      final lineStart = getLineStartOffset(lineIndex);
+      final localScalar = currentOffset - lineStart;
+      final lineText = getLineText(lineIndex);
+      final utf16Offset = scalarToStringIndex(lineText, localScalar);
+      if (utf16Offset >= lineText.length) {
+        newOffset = currentOffset + 1;
+      } else {
+        final textAfter = lineText.substring(utf16Offset);
+        if (textAfter.isNotEmpty) {
+          final cluster = textAfter.characters.first;
+          newOffset = currentOffset + cluster.runes.length;
+        } else {
+          newOffset = currentOffset + 1;
+        }
+      }
     } else {
       newOffset = length;
     }
@@ -3966,91 +4200,83 @@ class CodeForgeController implements DeltaTextInputClient {
 
     if (sel.start <= 0) return;
 
-    final deleteOffset = sel.start - 1;
+    int currentLineIndex;
+    int currentLineStart;
+    int localScalarOffset;
 
-    String charToDelete;
     if (_bufferLineIndex != null && _bufferDirty) {
-      final bufferEnd = _bufferLineRopeStart + _bufferLineText!.runes.length;
-      if (deleteOffset >= _bufferLineRopeStart && deleteOffset < bufferEnd) {
-        charToDelete = _bufferLineText![deleteOffset - _bufferLineRopeStart];
+      final bufferStart = _bufferLineRopeStart;
+      final bufferEnd = bufferStart + _bufferLineText!.runes.length;
+      if (sel.start > bufferStart && sel.start <= bufferEnd) {
+        currentLineIndex = _bufferLineIndex!;
+        currentLineStart = bufferStart;
+        localScalarOffset = sel.start - bufferStart;
       } else {
-        charToDelete = _rope.charAt(deleteOffset);
+        _flushBuffer();
+        currentLineIndex = _rope.getLineAtOffset(sel.start);
+        currentLineStart = _rope.getLineStartOffset(currentLineIndex);
+        localScalarOffset = sel.start - currentLineStart;
       }
     } else {
-      charToDelete = _rope.charAt(deleteOffset);
+      currentLineIndex = _rope.getLineAtOffset(sel.start);
+      currentLineStart = _rope.getLineStartOffset(currentLineIndex);
+      localScalarOffset = sel.start - currentLineStart;
     }
 
-    if (charToDelete == '\n') {
+    if (localScalarOffset <= 0) {
       _flushBuffer();
-      _rope.delete(deleteOffset, sel.start);
+      int deleteStart = sel.start - 1;
+      if (deleteStart > 0 &&
+          _rope.charAt(deleteStart - 1) == '\r' &&
+          _rope.charAt(deleteStart) == '\n') {
+        deleteStart--;
+      }
+      deletedText = _rope.substring(deleteStart, sel.start);
+      _rope.delete(deleteStart, sel.start);
       _currentVersion++;
-      _selection = TextSelection.collapsed(offset: deleteOffset);
-      dirtyLine = _rope.getLineAtOffset(deleteOffset);
+      _selection = TextSelection.collapsed(offset: deleteStart);
+      dirtyLine = _rope.getLineAtOffset(deleteStart);
       lineStructureChanged = true;
-      dirtyRegion = TextRange(start: deleteOffset, end: deleteOffset);
+      dirtyRegion = TextRange(start: deleteStart, end: deleteStart);
 
-      _recordDeletion(deleteOffset, '\n', selectionBefore, _selection);
+      _recordDeletion(deleteStart, deletedText, selectionBefore, _selection);
       _imeSelectionNeedsResync = true;
       _invalidateImeSnapshotAndScheduleSync();
       notifyListeners();
       return;
     }
 
-    if (_bufferLineIndex != null && _bufferDirty) {
-      final bufferEnd = _bufferLineRopeStart + _bufferLineText!.runes.length;
-
-      if (deleteOffset >= _bufferLineRopeStart && deleteOffset < bufferEnd) {
-        final localOffset = deleteOffset - _bufferLineRopeStart;
-        final utf16Local = scalarToStringIndex(_bufferLineText!, localOffset);
-        final cu = _bufferLineText!.codeUnitAt(utf16Local);
-        final charLen = (cu >= 0xD800 && cu <= 0xDBFF) ? 2 : 1;
-        final charToDelete = _bufferLineText!.substring(
-          utf16Local,
-          utf16Local + charLen,
-        );
-        final utf16End = utf16Local + charLen;
-        deletedText = charToDelete;
-        _bufferLineText =
-            _bufferLineText!.substring(0, utf16Local) +
-            _bufferLineText!.substring(utf16End);
-        _selection = TextSelection.collapsed(offset: deleteOffset);
-        _currentVersion++;
-        bufferNeedsRepaint = true;
-        dirtyRegion = TextRange(start: deleteOffset, end: deleteOffset);
-        _recordDeletion(deleteOffset, deletedText, selectionBefore, _selection);
-        _imeSelectionNeedsResync = true;
-        _invalidateImeSnapshotAndScheduleSync();
-        _scheduleFlush();
-        notifyListeners();
-        return;
-      }
+    if (_bufferLineIndex != currentLineIndex || _bufferLineText == null) {
+      _initBuffer(currentLineIndex);
     }
 
-    final lineIndex = _rope.getLineAtOffset(deleteOffset);
-    _initBuffer(lineIndex);
+    final utf16Caret = scalarToStringIndex(_bufferLineText!, localScalarOffset);
+    final textBeforeCaret = _bufferLineText!.substring(0, utf16Caret);
+    if (textBeforeCaret.isEmpty) return;
 
-    final localOffset = deleteOffset - _bufferLineRopeStart;
-    if (localOffset >= 0 && localOffset < _bufferLineText!.length) {
-      final utf16Local = scalarToStringIndex(_bufferLineText!, localOffset);
-      final charToDelete = _rope.charAt(deleteOffset);
-      final utf16End = utf16Local + charToDelete.length;
-      deletedText = charToDelete;
-      _bufferLineText =
-          _bufferLineText!.substring(0, utf16Local) +
-          _bufferLineText!.substring(utf16End);
-      _bufferDirty = true;
-      _cachedBufferLines = null;
-      _selection = TextSelection.collapsed(offset: deleteOffset);
-      _currentVersion++;
-      dirtyLine = lineIndex;
-      bufferNeedsRepaint = true;
-      dirtyRegion = TextRange(start: deleteOffset, end: deleteOffset);
-      _recordDeletion(deleteOffset, deletedText, selectionBefore, _selection);
-      _imeSelectionNeedsResync = true;
-      _invalidateImeSnapshotAndScheduleSync();
-      _scheduleFlush();
-      notifyListeners();
-    }
+    final cluster = textBeforeCaret.characters.last;
+    final clusterScalarLen = cluster.runes.length;
+    final clusterUtf16Len = cluster.length;
+
+    final deleteStart = sel.start - clusterScalarLen;
+    final utf16Start = utf16Caret - clusterUtf16Len;
+
+    deletedText = cluster;
+    _bufferLineText =
+        _bufferLineText!.substring(0, utf16Start) +
+        _bufferLineText!.substring(utf16Caret);
+    _bufferDirty = true;
+    _cachedBufferLines = null;
+    _selection = TextSelection.collapsed(offset: deleteStart);
+    _currentVersion++;
+    dirtyLine = currentLineIndex;
+    bufferNeedsRepaint = true;
+    dirtyRegion = TextRange(start: deleteStart, end: deleteStart);
+    _recordDeletion(deleteStart, deletedText, selectionBefore, _selection);
+    _imeSelectionNeedsResync = true;
+    _invalidateImeSnapshotAndScheduleSync();
+    _scheduleFlush();
+    notifyListeners();
   }
 
   /// Remove the selection or the char at cursor position (delete key)
@@ -4160,90 +4386,94 @@ class CodeForgeController implements DeltaTextInputClient {
     final textLen = length;
     if (sel.start >= textLen) return;
 
-    final deleteOffset = sel.start;
+    int currentLineIndex;
+    int currentLineStart;
+    int localScalarOffset;
 
-    String charToDelete;
     if (_bufferLineIndex != null && _bufferDirty) {
-      final bufferEnd = _bufferLineRopeStart + _bufferLineText!.runes.length;
-      if (deleteOffset >= _bufferLineRopeStart && deleteOffset < bufferEnd) {
-        charToDelete = _bufferLineText![deleteOffset - _bufferLineRopeStart];
+      final bufferStart = _bufferLineRopeStart;
+      final bufferEnd = bufferStart + _bufferLineText!.runes.length;
+      if (sel.start >= bufferStart && sel.start < bufferEnd) {
+        currentLineIndex = _bufferLineIndex!;
+        currentLineStart = bufferStart;
+        localScalarOffset = sel.start - bufferStart;
       } else {
-        charToDelete = _rope.charAt(deleteOffset);
+        _flushBuffer();
+        currentLineIndex = _rope.getLineAtOffset(sel.start);
+        currentLineStart = _rope.getLineStartOffset(currentLineIndex);
+        localScalarOffset = sel.start - currentLineStart;
       }
     } else {
-      charToDelete = _rope.charAt(deleteOffset);
+      currentLineIndex = _rope.getLineAtOffset(sel.start);
+      currentLineStart = _rope.getLineStartOffset(currentLineIndex);
+      localScalarOffset = sel.start - currentLineStart;
     }
 
-    if (charToDelete == '\n') {
-      _flushBuffer();
-      _rope.delete(deleteOffset, deleteOffset + 1);
-      _currentVersion++;
-      dirtyLine = _rope.getLineAtOffset(deleteOffset);
-      lineStructureChanged = true;
-      dirtyRegion = TextRange(start: deleteOffset, end: deleteOffset);
+    if (_bufferLineIndex != currentLineIndex || _bufferLineText == null) {
+      _initBuffer(currentLineIndex);
+    }
 
-      _recordDeletion(deleteOffset, '\n', selectionBefore, _selection);
+    final utf16Caret = scalarToStringIndex(_bufferLineText!, localScalarOffset);
+    final textAfterCaret = _bufferLineText!.substring(utf16Caret);
+
+    if (textAfterCaret.isEmpty) {
+      _flushBuffer();
+      int deleteEnd = sel.start + 1;
+      if (sel.start < _rope.length &&
+          _rope.charAt(sel.start) == '\r' &&
+          sel.start + 1 < _rope.length &&
+          _rope.charAt(sel.start + 1) == '\n') {
+        deleteEnd = sel.start + 2;
+      }
+      deletedText = _rope.substring(sel.start, deleteEnd);
+      _rope.delete(sel.start, deleteEnd);
+      _currentVersion++;
+      dirtyLine = _rope.getLineAtOffset(sel.start);
+      lineStructureChanged = true;
+      dirtyRegion = TextRange(start: sel.start, end: sel.start);
+
+      _recordDeletion(sel.start, deletedText, selectionBefore, _selection);
       _invalidateImeSnapshotAndScheduleSync();
       notifyListeners();
       return;
     }
 
-    if (_bufferLineIndex != null && _bufferDirty) {
-      final bufferEnd = _bufferLineRopeStart + _bufferLineText!.runes.length;
-
-      if (deleteOffset >= _bufferLineRopeStart && deleteOffset < bufferEnd) {
-        final localOffset = deleteOffset - _bufferLineRopeStart;
-        final utf16Local = scalarToStringIndex(_bufferLineText!, localOffset);
-        final cu = _bufferLineText!.codeUnitAt(utf16Local);
-        final charLen = (cu >= 0xD800 && cu <= 0xDBFF) ? 2 : 1;
-        final charToDelete = _bufferLineText!.substring(
-          utf16Local,
-          utf16Local + charLen,
-        );
-        final utf16End = utf16Local + charLen;
-        deletedText = charToDelete;
-        _bufferLineText =
-            _bufferLineText!.substring(0, utf16Local) +
-            _bufferLineText!.substring(utf16End);
-        _currentVersion++;
-
-        bufferNeedsRepaint = true;
-        dirtyRegion = TextRange(start: deleteOffset, end: deleteOffset);
-
-        _recordDeletion(deleteOffset, deletedText, selectionBefore, _selection);
-        _imeSelectionNeedsResync = true;
-        _invalidateImeSnapshotAndScheduleSync();
-        _scheduleFlush();
-        notifyListeners();
-        return;
-      }
-    }
-
-    final lineIndex = _rope.getLineAtOffset(deleteOffset);
-    _initBuffer(lineIndex);
-
-    final localOffset = deleteOffset - _bufferLineRopeStart;
-    if (localOffset >= 0 && localOffset < _bufferLineText!.length) {
-      final utf16Local = scalarToStringIndex(_bufferLineText!, localOffset);
-      final charToDelete = _rope.charAt(deleteOffset);
-      final utf16End = utf16Local + charToDelete.length;
-      deletedText = charToDelete;
-      _bufferLineText =
-          _bufferLineText!.substring(0, utf16Local) +
-          _bufferLineText!.substring(utf16End);
-      _bufferDirty = true;
-      _cachedBufferLines = null;
+    final cluster = textAfterCaret.characters.first;
+    if (cluster == '\r\n' || cluster == '\n') {
+      _flushBuffer();
+      final deleteEnd = sel.start + cluster.runes.length;
+      deletedText = cluster;
+      _rope.delete(sel.start, deleteEnd);
       _currentVersion++;
-      dirtyLine = lineIndex;
+      dirtyLine = _rope.getLineAtOffset(sel.start);
+      lineStructureChanged = true;
+      dirtyRegion = TextRange(start: sel.start, end: sel.start);
 
-      bufferNeedsRepaint = true;
-
-      _recordDeletion(deleteOffset, deletedText, selectionBefore, _selection);
-      _imeSelectionNeedsResync = true;
+      _recordDeletion(sel.start, deletedText, selectionBefore, _selection);
       _invalidateImeSnapshotAndScheduleSync();
-      _scheduleFlush();
       notifyListeners();
+      return;
     }
+
+    final clusterUtf16Len = cluster.length;
+    final utf16End = utf16Caret + clusterUtf16Len;
+
+    deletedText = cluster;
+    _bufferLineText =
+        _bufferLineText!.substring(0, utf16Caret) +
+        _bufferLineText!.substring(utf16End);
+    _bufferDirty = true;
+    _cachedBufferLines = null;
+    _currentVersion++;
+    dirtyLine = currentLineIndex;
+    bufferNeedsRepaint = true;
+    dirtyRegion = TextRange(start: sel.start, end: sel.start);
+
+    _recordDeletion(sel.start, deletedText, selectionBefore, _selection);
+    _imeSelectionNeedsResync = true;
+    _invalidateImeSnapshotAndScheduleSync();
+    _scheduleFlush();
+    notifyListeners();
   }
 
   void _rebuildFoldSortedCache() {
@@ -4795,7 +5025,9 @@ class CodeForgeController implements DeltaTextInputClient {
           .map(
             (line) => line.startsWith(tabSpace)
                 ? line.substring(tabSize)
-                : line.replaceFirst(RegExp(r'^ +'), ''),
+                : (line.startsWith('\t')
+                    ? line.substring(1)
+                    : line.replaceFirst(RegExp(r'^ +'), '')),
           )
           .join('\n');
 
@@ -4803,17 +5035,20 @@ class CodeForgeController implements DeltaTextInputClient {
       for (final line in lines) {
         if (line.startsWith(tabSpace)) {
           removedChars += tabSize;
+        } else if (line.startsWith('\t')) {
+          removedChars += 1;
         } else {
           removedChars += RegExp(r'^ +').stringMatch(line)?.length ?? 0;
         }
       }
 
+      final firstLineRemoved = lines.first.startsWith(tabSpace)
+          ? tabSize
+          : (lines.first.startsWith('\t')
+              ? 1
+              : (RegExp(r'^ +').stringMatch(lines.first)?.length ?? 0));
       final newSelection = TextSelection(
-        baseOffset:
-            selection.baseOffset -
-            (lines.first.startsWith(tabSpace)
-                ? tabSize
-                : (RegExp(r'^ +').stringMatch(lines.first)?.length ?? 0)),
+        baseOffset: selection.baseOffset - firstLineRemoved,
         extentOffset: selection.extentOffset - removedChars,
       );
 
@@ -4829,6 +5064,8 @@ class CodeForgeController implements DeltaTextInputClient {
       int removeCount = 0;
       if (line.startsWith(tabSpace)) {
         removeCount = tabSize;
+      } else if (line.startsWith('\t')) {
+        removeCount = 1;
       } else {
         removeCount = RegExp(r'^ +').stringMatch(line)?.length ?? 0;
       }
@@ -5874,7 +6111,10 @@ class CodeForgeController implements DeltaTextInputClient {
           final prevIndent = indentMatch?.group(0) ?? '';
           final shouldIndent = RegExp(r'[:{[(]\s*$').hasMatch(prevLine);
           final extraIndent = shouldIndent ? tabSpace : '';
-          final indent = prevIndent + extraIndent;
+          final normalizedPrevIndent = useSpaceAsTab
+              ? prevIndent.replaceAll('\t', ' ' * tabSize)
+              : prevIndent;
+          final indent = normalizedPrevIndent + extraIndent;
           final openToClose = {'{': '}', '(': ')', '[': ']'};
           final trimmedPrev = prevLine.trimRight();
           final lastChar = trimmedPrev.isNotEmpty
@@ -5887,7 +6127,7 @@ class CodeForgeController implements DeltaTextInputClient {
               isBracketOpen && openToClose[lastChar] == nextChar;
 
           if (isBracketOpen && isNextClosing) {
-            actualInsertedText = '\n$indent\n$prevIndent';
+            actualInsertedText = '\n$indent\n$normalizedPrevIndent';
             actualSelection = TextSelection.collapsed(
               offset: offset + 1 + indent.length,
             );

@@ -20,7 +20,11 @@ class FloatLayout extends StatelessWidget {
         Positioned(
           bottom: 0,
           right: 0,
-          child: Container(child: floatingWidget),
+          child: SafeArea(
+            top: false,
+            left: false,
+            child: floatingWidget,
+          ),
         ),
       ],
     );

@@ -213,6 +213,11 @@ func handleAction(action *Action, result ActionResult) {
 			result.success(value)
 		})
 		return
+	case getCoreStatusMethod:
+		handleGetCoreStatus(func(value string) {
+			result.success(value)
+		})
+		return
 	case setStateMethod:
 		data := action.Data.(string)
 		handleSetState(data)

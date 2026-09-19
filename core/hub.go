@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"regexp"
 	"runtime"
 	"runtime/debug"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/metacubex/mihomo/adapter"
@@ -81,6 +83,7 @@ func handleGetIsInit() bool {
 func handleForceGc(forceFreeOSMemory bool) {
 	go func() {
 		log.Infoln("[APP] Request force GC, forceFreeOSMemory=%t", forceFreeOSMemory)
+		tryUnloadGeoData()
 		runtime.GC()
 		if forceFreeOSMemory {
 			debug.FreeOSMemory()
@@ -91,10 +94,17 @@ func handleForceGc(forceFreeOSMemory bool) {
 func handleShutdown() bool {
 	stopListeners()
 	executor.Shutdown()
+	tryUnloadGeoData()
 	runtime.GC()
 	debug.FreeOSMemory()
 	isInit = false
 	return true
+}
+
+var shortIDRegexp = regexp.MustCompile(`(?m)(short-id\s*:\s*)([0-9a-fA-F]+)(\s*(?:$|[,\s#\}]))`)
+
+func patchYamlShortID(data []byte) []byte {
+	return shortIDRegexp.ReplaceAll(data, []byte(`${1}"${2}"${3}`))
 }
 
 func handleValidateConfig(params *ValidateConfigParams) string {
@@ -106,7 +116,8 @@ func handleValidateConfig(params *ValidateConfigParams) string {
 		defer age.SetGlobalSecretKeys()
 	}
 
-	_, err := config.Parse([]byte(params.Data))
+	data := patchYamlShortID([]byte(params.Data))
+	_, err := config.Parse(data)
 	if err != nil {
 		return err.Error()
 	}
@@ -296,10 +307,7 @@ func handleCloseConnections() bool {
 
 func closeConnections() {
 	statistic.DefaultManager.Range(func(c statistic.Tracker) bool {
-		err := c.Close()
-		if err != nil {
-			return false
-		}
+		_ = c.Close()
 		return true
 	})
 }
@@ -529,7 +537,106 @@ func handleGetCountryCode(ip string, fn func(value string)) {
 
 func handleGetMemory(fn func(value string)) {
 	go func() {
-		fn(strconv.FormatUint(statistic.DefaultManager.Memory(), 10))
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+		var retainedIdle uint64
+		if m.HeapIdle > m.HeapReleased {
+			retainedIdle = m.HeapIdle - m.HeapReleased
+		}
+		mem := m.HeapInuse + retainedIdle + m.StackInuse
+		fn(strconv.FormatUint(mem, 10))
+	}()
+}
+
+func handleGetCoreStatus(fn func(value string)) {
+	go func() {
+		var m runtime.MemStats
+		runtime.ReadMemStats(&m)
+		var retainedIdle uint64
+		if m.HeapIdle > m.HeapReleased {
+			retainedIdle = m.HeapIdle - m.HeapReleased
+		}
+		inUse := m.HeapInuse + m.StackInuse
+		physical := inUse + retainedIdle
+
+		var proxyGroupsCount int
+		proxyNames := make(map[string]struct{})
+		for _, p := range tunnel.Proxies() {
+			if p == nil {
+				continue
+			}
+			if _, ok := p.Adapter().(outboundgroup.ProxyGroup); ok {
+				proxyGroupsCount++
+				continue
+			}
+			switch p.Type() {
+			case constant.Direct, constant.Reject, constant.RejectDrop, constant.Compatible, constant.Pass, constant.PassRule, constant.Rematch, constant.Dns:
+				continue
+			default:
+				proxyNames[p.Name()] = struct{}{}
+			}
+		}
+
+		for name, pr := range tunnel.Providers() {
+			if pr == nil || name == "default" || pr.VehicleType() == cp.Compatible {
+				continue
+			}
+			for _, p := range pr.Proxies() {
+				if p != nil {
+					proxyNames[p.Name()] = struct{}{}
+				}
+			}
+		}
+
+		var ruleProvidersCount int
+		var proxyProvidersCount int
+		if currentRawConfig != nil {
+			ruleProvidersCount = len(currentRawConfig.RuleProvider)
+			proxyProvidersCount = len(currentRawConfig.ProxyProvider)
+		} else {
+			for name, pr := range tunnel.Providers() {
+				if pr == nil || name == "default" || pr.VehicleType() == cp.Compatible {
+					continue
+				}
+				proxyProvidersCount++
+			}
+			ruleProvidersCount = len(tunnel.RuleProviders())
+		}
+
+		hasMMDB, hasSite, hasASN := checkActiveGeoUsage()
+
+		var geodatas []string
+		if hasMMDB {
+			geodatas = append(geodatas, "MMDB")
+		}
+		if hasSite {
+			geodatas = append(geodatas, "Site")
+		}
+		if hasASN {
+			geodatas = append(geodatas, "ASN")
+		}
+
+		geodataUse := "None"
+		if len(geodatas) > 0 {
+			geodataUse = strings.Join(geodatas, ", ")
+		}
+
+		status := map[string]any{
+			"physical":        physical,
+			"in-use":          inUse,
+			"reclaimable":     retainedIdle,
+			"goroutines":      runtime.NumGoroutine(),
+			"heap-objects":    m.HeapObjects,
+			"last-gc":         m.LastGC / 1000000,
+			"rules":           len(tunnel.Rules()),
+			"proxies":         len(proxyNames),
+			"proxy-groups":    proxyGroupsCount,
+			"rule-providers":  ruleProvidersCount,
+			"proxy-providers": proxyProvidersCount,
+			"geodata-use":     geodataUse,
+		}
+		bytes, _ := json.Marshal(status)
+		fn(string(bytes))
 	}()
 }
 
@@ -557,6 +664,7 @@ func handleGetConfig(params *GetConfigParams) (*config.RawConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	bytes = patchYamlShortID(bytes)
 	prof, err := config.UnmarshalRawConfig(bytes)
 	if err != nil {
 		return nil, err
@@ -606,6 +714,9 @@ func handleSetupConfig(bytes []byte) string {
 	}
 	clearSuspendedHealthChecks()
 	clearSuspendedWireGuard()
+	suspendModeLock.Lock()
+	currentSuspendMode = 0
+	suspendModeLock.Unlock()
 	err = setupConfig(params)
 	if err != nil {
 		return err.Error()
@@ -613,11 +724,23 @@ func handleSetupConfig(bytes []byte) string {
 	return ""
 }
 
-func handleSuspend(suspended bool) bool {
+var (
+	currentSuspendMode = 0
+	suspendModeLock    sync.Mutex
+)
+
+func handleSuspend(mode int) bool {
 	if !isInit {
 		return false
 	}
-	if suspended {
+	suspendModeLock.Lock()
+	defer suspendModeLock.Unlock()
+
+	switch mode {
+	case 1:
+		if currentSuspendMode == 1 {
+			return true
+		}
 		log.Infoln("[APP] Suspend mode enabled")
 		tunnel.OnSuspend()
 		pauseHealthChecks()
@@ -631,25 +754,49 @@ func handleSuspend(suspended bool) bool {
 		})
 
 		runtime.GC()
-	} else {
-		log.Infoln("[APP] Resume from suspend")
-		tunnel.OnRunning()
-		resumeHealthChecks()
-		resumeWireGuard()
+		currentSuspendMode = 1
 
-		runLock.Lock()
-		cfg := currentConfig
-		runLock.Unlock()
-		if cfg != nil && cfg.NTP != nil && cfg.NTP.Enable {
-			c := cfg.NTP
-			mihomoNtp.ReCreateNTPService(
-				net.JoinHostPort(c.Server, strconv.Itoa(c.Port)),
-				time.Duration(c.Interval),
-				c.DialerProxy,
-				tunnel.Tunnel,
-				c.WriteToSystem,
-			)
+	case 2:
+		if currentSuspendMode == 1 || currentSuspendMode == 2 {
+			return true
 		}
+		log.Infoln("[APP] Doze suspend mode enabled")
+		pauseHealthChecks()
+		runtime.GC()
+		currentSuspendMode = 2
+
+	case 0:
+		if currentSuspendMode == 0 {
+			return true
+		}
+		log.Infoln("[APP] Resume from suspend")
+		prevMode := currentSuspendMode
+		currentSuspendMode = 0
+
+		if prevMode == 1 {
+			tunnel.OnRunning()
+			resumeHealthChecks()
+			resumeWireGuard()
+
+			runLock.Lock()
+			cfg := currentConfig
+			runLock.Unlock()
+			if cfg != nil && cfg.NTP != nil && cfg.NTP.Enable {
+				c := cfg.NTP
+				mihomoNtp.ReCreateNTPService(
+					net.JoinHostPort(c.Server, strconv.Itoa(c.Port)),
+					time.Duration(c.Interval),
+					c.DialerProxy,
+					tunnel.Tunnel,
+					c.WriteToSystem,
+				)
+			}
+		} else if prevMode == 2 {
+			resumeHealthChecks()
+		}
+
+	default:
+		return false
 	}
 	return true
 }

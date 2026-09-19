@@ -47,6 +47,19 @@ class AppPath {
   }
 
   String get corePath {
+    final devWorkspacePath = _devWorkspacePath;
+    if (devWorkspacePath != null) {
+      final corePath = join(
+        devWorkspacePath,
+        'libclash',
+        'windows',
+        '${AppIdentity.coreExecutableName}$executableExtension',
+      );
+      if (File(corePath).existsSync()) {
+        return corePath;
+      }
+    }
+
     return join(
       executableDirPath,
       '${AppIdentity.coreExecutableName}$executableExtension',
@@ -117,6 +130,16 @@ class AppPath {
   Future<String> get sharedPreferencesPath async {
     final directory = await dataDir.future;
     return join(directory.path, 'shared_preferences.json');
+  }
+
+  Future<String> get appConfigPath async {
+    final directory = await dataDir.future;
+    return join(directory.path, 'config.json');
+  }
+
+  Future<String> get ipCacheFilePath async {
+    final tempDirectory = await tempPath;
+    return join(tempDirectory, 'ip_cache.json');
   }
 
   Future<String> get helperAuthKeyPath async {

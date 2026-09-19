@@ -327,6 +327,7 @@ const _$ActionMethodEnumMap = {
   ActionMethod.decryptAgeConfig: 'decryptAgeConfig',
   ActionMethod.getMode: 'getMode',
   ActionMethod.parseExternalProviderContent: 'parseExternalProviderContent',
+  ActionMethod.getCoreStatus: 'getCoreStatus',
   ActionMethod.setState: 'setState',
   ActionMethod.startTun: 'startTun',
   ActionMethod.stopTun: 'stopTun',
@@ -355,3 +356,34 @@ Map<String, dynamic> _$ActionResultToJson(_ActionResult instance) =>
     };
 
 const _$ResultTypeEnumMap = {ResultType.success: 0, ResultType.error: -1};
+
+_CoreStatus _$CoreStatusFromJson(Map<String, dynamic> json) => _CoreStatus(
+  physical: (json['physical'] as num?)?.toInt() ?? 0,
+  inUse: (json['in-use'] as num?)?.toInt() ?? 0,
+  reclaimable: (json['reclaimable'] as num?)?.toInt() ?? 0,
+  goroutines: (json['goroutines'] as num?)?.toInt() ?? 0,
+  heapObjects: (json['heap-objects'] as num?)?.toInt() ?? 0,
+  lastGC: (json['last-gc'] as num?)?.toInt() ?? 0,
+  rules: (json['rules'] as num?)?.toInt() ?? 0,
+  proxies: (json['proxies'] as num?)?.toInt() ?? 0,
+  proxyGroups: (json['proxy-groups'] as num?)?.toInt() ?? 0,
+  ruleProviders: (json['rule-providers'] as num?)?.toInt() ?? 0,
+  proxyProviders: (json['proxy-providers'] as num?)?.toInt() ?? 0,
+  geodataUse: json['geodata-use'] as String? ?? 'None',
+);
+
+Map<String, dynamic> _$CoreStatusToJson(_CoreStatus instance) =>
+    <String, dynamic>{
+      'physical': instance.physical,
+      'in-use': instance.inUse,
+      'reclaimable': instance.reclaimable,
+      'goroutines': instance.goroutines,
+      'heap-objects': instance.heapObjects,
+      'last-gc': instance.lastGC,
+      'rules': instance.rules,
+      'proxies': instance.proxies,
+      'proxy-groups': instance.proxyGroups,
+      'rule-providers': instance.ruleProviders,
+      'proxy-providers': instance.proxyProviders,
+      'geodata-use': instance.geodataUse,
+    };

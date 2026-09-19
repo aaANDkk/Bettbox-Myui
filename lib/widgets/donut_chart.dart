@@ -33,30 +33,47 @@ class DonutChartData {
 class DonutChart extends StatefulWidget {
   final List<DonutChartData> data;
   final Duration duration;
+  final Color? trackColor;
 
   const DonutChart({
     super.key,
     required this.data,
     this.duration = commonDuration,
+    this.trackColor,
   });
 
   @override
-  State<DonutChart> createState() => _DonutChartState();
+  State<DonutChart> createState() => DonutChartState();
 }
 
-class _DonutChartState extends State<DonutChart>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+class DonutChartState extends State<DonutChart> with TickerProviderStateMixin {
+  late AnimationController _dataController;
+  late AnimationController _entryController;
+  late CurvedAnimation _entryAnimation;
   late List<DonutChartData> _oldData;
 
   @override
   void initState() {
     super.initState();
     _oldData = widget.data;
-    _animationController = AnimationController(
+    _dataController = AnimationController(
       vsync: this,
       duration: widget.duration,
     );
+    _entryController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _entryAnimation = CurvedAnimation(
+      parent: _entryController,
+      curve: Curves.easeOutCubic,
+    );
+    _entryController.forward();
+  }
+
+  void replayEntryAnimation() {
+    if (!mounted) return;
+    _entryController.forward(from: 0);
   }
 
   @override
@@ -64,29 +81,35 @@ class _DonutChartState extends State<DonutChart>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.data != widget.data) {
       _oldData = oldWidget.data;
-      _animationController.forward(from: 0);
+      _dataController.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _dataController.dispose();
+    _entryAnimation.dispose();
+    _entryController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: DonutChartPainter(
-            _oldData,
-            widget.data,
-            _animationController.value,
-          ),
-        );
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_dataController, _entryAnimation]),
+        builder: (context, child) {
+          return CustomPaint(
+            painter: DonutChartPainter(
+              oldData: _oldData,
+              newData: widget.data,
+              progress: _dataController.value,
+              entryProgress: _entryAnimation.value,
+              trackColor: widget.trackColor,
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -95,8 +118,16 @@ class DonutChartPainter extends CustomPainter {
   final List<DonutChartData> oldData;
   final List<DonutChartData> newData;
   final double progress;
+  final double entryProgress;
+  final Color? trackColor;
 
-  DonutChartPainter(this.oldData, this.newData, this.progress);
+  DonutChartPainter({
+    required this.oldData,
+    required this.newData,
+    required this.progress,
+    required this.entryProgress,
+    this.trackColor,
+  });
 
   double _logTransform(double value) {
     const base = 10.0;
@@ -112,10 +143,16 @@ class DonutChartPainter extends CustomPainter {
   }
 
   List<DonutChartData> get interpolatedData {
-    if (oldData.length != newData.length) return newData;
-    final interpolatedData = List.generate(newData.length, (index) {
+    if (progress >= 1.0 ||
+        oldData == newData ||
+        oldData.length != newData.length) {
+      return newData;
+    }
+    return List.generate(newData.length, (index) {
       final oldValue = oldData[index].value;
       final newValue = newData[index].value;
+      if (oldValue == newValue) return newData[index];
+
       final logOldValue = _logTransform(oldValue);
       final logNewValue = _logTransform(newValue);
       final interpolatedLogValue =
@@ -128,44 +165,48 @@ class DonutChartPainter extends CustomPainter {
         color: newData[index].color,
       );
     });
-
-    return interpolatedData;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
     final strokeWidth = 10.0.ap;
-    final radius = min(size.width / 2, size.height / 2) - strokeWidth / 2;
+    final minSide = min(size.width, size.height);
+    if (minSide <= strokeWidth) return;
 
-    final gapAngle = 2 * asin(strokeWidth * 1 / (2 * radius)) * 1.2;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (minSide - strokeWidth) / 2;
+
+    final sinArg = (strokeWidth / (2 * radius)) * 1.2;
+    if (sinArg >= 1.0) return;
+    final gapAngle = 2 * asin(sinArg);
+
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final currentTrackColor = trackColor;
+    if (currentTrackColor != null) {
+      paint.color = currentTrackColor;
+      canvas.drawCircle(center, radius, paint);
+    }
 
     final data = interpolatedData;
     final total = data.fold<double>(0, (sum, item) => sum + item.value);
 
-    if (total <= 0) return;
+    if (total <= 0 || entryProgress <= 0) return;
 
     final availableAngle = 2 * pi - (data.length * gapAngle);
     double startAngle = -pi / 2 + gapAngle / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    paint.strokeCap = StrokeCap.round;
 
     for (final item in data) {
-      final sweepAngle = availableAngle * (item.value / total);
+      final sweepAngle = availableAngle * (item.value / total) * entryProgress;
 
       if (sweepAngle <= 0) continue;
 
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round
-        ..color = item.color;
-
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepAngle,
-        false,
-        paint,
-      );
+      paint.color = item.color;
+      canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
 
       startAngle += sweepAngle + gapAngle;
     }
@@ -174,7 +215,9 @@ class DonutChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(DonutChartPainter oldDelegate) {
     return oldDelegate.progress != progress ||
+        oldDelegate.entryProgress != entryProgress ||
         oldDelegate.oldData != oldData ||
-        oldDelegate.newData != newData;
+        oldDelegate.newData != newData ||
+        oldDelegate.trackColor != trackColor;
   }
 }

@@ -670,12 +670,12 @@ List<Rule> _genRule(List<dynamic>? rules) {
   return rules.map((item) => Rule.value(item)).toList();
 }
 
-List<RuleProvider> _genRuleProviders(Map<String, dynamic> json) {
-  return json.entries.map((entry) => RuleProvider(name: entry.key)).toList();
+List<RuleProvider> _genRuleProviders(Map json) {
+  return json.entries.map((entry) => RuleProvider(name: entry.key.toString())).toList();
 }
 
-List<SubRule> _genSubRules(Map<String, dynamic> json) {
-  return json.entries.map((entry) => SubRule(name: entry.key)).toList();
+List<SubRule> _genSubRules(Map json) {
+  return json.entries.map((entry) => SubRule(name: entry.key.toString())).toList();
 }
 
 @freezed

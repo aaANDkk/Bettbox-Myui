@@ -114,7 +114,7 @@ enum Network { tcp, udp }
 
 enum ProxiesSortType { none, delay, name }
 
-enum TunStack { gvisor, system, mixed }
+enum TunStack { gvisor, system, mixed, mips }
 
 enum AccessControlMode { acceptSelected, rejectSelected }
 
@@ -208,7 +208,6 @@ enum HotAction { start, view, mode, proxy, tun }
 enum ProxiesIconStyle { standard, none, icon }
 
 enum FontFamily {
-  openMoji('OpenMoji'),
   twEmoji('Twemoji'),
   jetBrainsMono('JetBrainsMono'),
   icon('Icons');
@@ -259,6 +258,7 @@ enum ActionMethod {
   decryptAgeConfig,
   getMode,
   parseExternalProviderContent,
+  getCoreStatus,
 
   ///Android,
   setState,
@@ -331,7 +331,12 @@ enum DashboardWidget {
   ntpOverride(GridItem(crossAxisCellCount: 4, child: NtpOverride())),
   providersInfo(GridItem(crossAxisCellCount: 4, child: ProvidersInfo())),
   fcmStatus(GridItem(crossAxisCellCount: 4, child: FcmStatus())),
-  onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel()));
+  onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel())),
+  mediaUnlock(GridItem(crossAxisCellCount: 8, child: MediaUnlock())),
+  mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall())),
+  startButton(
+    GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
+  );
 
   final GridItem widget;
   final List<SupportPlatform> platforms;

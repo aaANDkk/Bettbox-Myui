@@ -10,6 +10,7 @@ import 'text.dart';
 
 class CommonDialog extends ConsumerWidget {
   final String title;
+  final Widget? titleTrailing;
   final Widget? child;
   final List<Widget>? actions;
   final EdgeInsets? padding;
@@ -19,6 +20,7 @@ class CommonDialog extends ConsumerWidget {
   const CommonDialog({
     super.key,
     required this.title,
+    this.titleTrailing,
     this.actions,
     this.child,
     this.padding,
@@ -41,11 +43,17 @@ class CommonDialog extends ConsumerWidget {
               Navigator.of(context).pop();
             },
       child: AlertDialog(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(35),
-        ),
-        title: EmojiText(title),
+        title: titleTrailing == null
+            ? EmojiText(title)
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  EmojiText(title),
+                  const SizedBox(width: 8),
+                  titleTrailing!,
+                ],
+              ),
         actions: actions,
         contentPadding: padding,
         backgroundColor: backgroundColor,
@@ -55,12 +63,7 @@ class CommonDialog extends ConsumerWidget {
             maxWidth: 300,
           ),
           width: size.width - 40,
-          child: !overrideScroll
-              ? SingleChildScrollView(
-                  clipBehavior: Clip.hardEdge,
-                  child: child,
-                )
-              : child,
+          child: !overrideScroll ? SingleChildScrollView(child: child) : child,
         ),
       ),
     );
@@ -76,17 +79,12 @@ class CommonModal extends ConsumerWidget {
   Widget build(BuildContext context, ref) {
     final size = ref.watch(viewSizeProvider);
     return Center(
-      child: SizedBox(
+      child: Container(
         width: size.width * 0.85,
         height: size.height * 0.85,
-        child: Material(
-          type: MaterialType.transparency,
-          shape: RoundedSuperellipseBorder(
-            borderRadius: BorderRadius.circular(35),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: child,
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+        clipBehavior: Clip.antiAlias,
+        child: child,
       ),
     );
   }

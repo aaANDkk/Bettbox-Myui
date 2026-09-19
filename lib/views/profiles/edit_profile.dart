@@ -488,7 +488,9 @@ class EditProfileViewState extends State<EditProfileView> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: ListView.separated(
-              padding: kMaterialListPadding.copyWith(bottom: 72),
+              padding: kMaterialListPadding.copyWith(
+                bottom: 72 + MediaQuery.viewPaddingOf(context).bottom,
+              ),
               itemBuilder: (_, index) {
                 return items[index];
               },

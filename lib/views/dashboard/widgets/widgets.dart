@@ -15,3 +15,6 @@ export 'providers_info.dart';
 export 'fcm_status.dart';
 export 'online_panel.dart';
 export 'wakelock_switch.dart';
+export 'core_status_dialog.dart';
+export 'media_unlock.dart';
+export 'media_unlock_small.dart';

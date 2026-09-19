@@ -6,3 +6,4 @@ export 'core.dart';
 export 'profile.dart';
 export 'selector.dart';
 export 'widget.dart';
+export 'media_unlock.dart';

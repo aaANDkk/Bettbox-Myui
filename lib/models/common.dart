@@ -428,10 +428,10 @@ class IpInfo {
   final String? continent;
   final String? continentCode;
 
-  const IpInfo({
+  IpInfo({
     required this.ip,
     required this.countryCode,
-    this.country,
+    String? country,
     this.province,
     this.city,
     this.isp,
@@ -440,7 +440,19 @@ class IpInfo {
     this.asDomain,
     this.continent,
     this.continentCode,
-  });
+  }) : country = _normalizeCountry(country);
+
+  static String? _normalizeCountry(String? country) {
+    if (country == null) return null;
+    final trimmed = country.trim();
+    if (trimmed.toLowerCase() == 'taiwan') {
+      return 'Taiwan (China)';
+    }
+    if (trimmed == '台湾' || trimmed == '台灣') {
+      return '$trimmed (中国)';
+    }
+    return country;
+  }
 
   static IpInfo fromJson(Map<String, dynamic> json) {
     if (json['ret'] == 'ok' && json['data'] is Map) {

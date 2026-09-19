@@ -168,7 +168,8 @@ final Pointer<JSRuntime> Function(
 class _RuntimeOpaque {
   final _JSChannel _channel;
   final Map<int, JSRef> _dartObjects = {};
-  int _nextDartObjectId = 0;
+  // ids double as JS object opaques; 0 means "no opaque" to QuickJS, so start at 1.
+  int _nextDartObjectId = 1;
   final ReceivePort _port;
   int? _dartObjectClassId;
   _RuntimeOpaque(this._channel, this._port);
@@ -282,6 +283,7 @@ void jsFreeRuntime(
     }
   }
   _jsFreeRuntime(rt);
+  runtimeOpaques.remove(rt);
   if (referenceleak.length > 0) {
     throw ('reference leak:\n    ADDR\tREF\tTYPE\tPROP\n' +
         referenceleak.join('\n'));
@@ -314,9 +316,14 @@ final Pointer<JSContext> Function(
 
 Pointer<JSContext> jsNewContext(Pointer<JSRuntime> rt) {
   final ctx = _jsNewContext(rt);
-  if (ctx.address == 0) throw Exception('Context create failed!');
+  if (ctx.address == 0) {
+    throw Exception('Context create failed!');
+  }
   final runtimeOpaque = runtimeOpaques[rt];
-  if (runtimeOpaque == null) throw Exception('Runtime has been released!');
+  if (runtimeOpaque == null) {
+    jsFreeContext(ctx);
+    throw Exception('Runtime has been released!');
+  }
   runtimeOpaque._dartObjectClassId = jsNewClass(ctx, 'DartObject');
   return ctx;
 }
@@ -537,6 +544,19 @@ void jsFreeValue(
 }) {
   _jsFreeValue(ctx, val, free ? 1 : 0);
 }
+
+/// void jsDeleteValue(JSValue *val)
+/// Releases only the C++ JSValue wrapper without touching the JS value
+/// reference (already consumed, e.g. by JS_DefinePropertyValue).
+final void Function(
+  Pointer<JSValue> val,
+) jsDeleteValue = _qjsLib
+    .lookup<
+        NativeFunction<
+            Void Function(
+      Pointer<JSValue>,
+    )>>('jsDeleteValue')
+    .asFunction();
 
 /// void jsFreeValue(JSRuntime *rt, JSValue *val, int32_t free)
 final void Function(

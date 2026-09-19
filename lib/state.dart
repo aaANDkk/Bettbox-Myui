@@ -37,7 +37,26 @@ class GlobalState {
   bool isScreenOn = true;
   Timer? timer;
   Timer? groupsUpdateTimer;
-  late Config config;
+  Config? _config;
+
+  bool get hasConfig => _config != null;
+
+  Config get config =>
+      _config ??
+      Config(
+        themeProps: defaultThemeProps,
+        patchClashConfig: system.isAndroid
+            ? const ClashConfig(findProcessMode: FindProcessMode.always)
+            : defaultClashConfig,
+        networkProps: defaultNetworkProps.copyWith(
+          systemProxy: system.isDesktop,
+        ),
+        appSetting: defaultAppSettingProps.copyWith(
+          showStartSwitch: _isAndroidTV ?? false,
+        ),
+      );
+
+  set config(Config value) => _config = value;
   late AppState appState;
   bool isPre = true;
   String? coreSHA256;
@@ -63,6 +82,21 @@ class GlobalState {
   Timer? _backgroundCleanupTimer;
   final Lock _scriptEvaluateLock = Lock();
   bool isInit = false;
+
+  bool get hasMediaUnlockWidget {
+    final widgets = system.isAndroid
+        ? config.appSetting.mobileDashboardWidgets
+        : config.appSetting.desktopDashboardWidgets;
+    return widgets.contains(DashboardWidget.mediaUnlock) ||
+        widgets.contains(DashboardWidget.mediaUnlockSmall);
+  }
+
+  bool get hasNetworkDetectionWidget {
+    final widgets = system.isAndroid
+        ? config.appSetting.mobileDashboardWidgets
+        : config.appSetting.desktopDashboardWidgets;
+    return widgets.contains(DashboardWidget.networkDetection);
+  }
 
   bool get isStart => startTime != null && startTime!.isBeforeNow;
 
@@ -627,7 +661,7 @@ class GlobalState {
   }) async {
     final targetProfile = profile ?? config.currentProfile;
     if (targetProfile == null) {
-      return {};
+      return <String, dynamic>{};
     }
     final profileId = targetProfile.id;
     final configMap = await getProfileConfig(profileId);
@@ -685,7 +719,7 @@ class GlobalState {
     rawConfig['allow-lan'] = realPatchConfig.allowLan;
     rawConfig['mode'] = realPatchConfig.mode.name;
     if (rawConfig['tun'] == null) {
-      rawConfig['tun'] = {};
+      rawConfig['tun'] = <String, dynamic>{};
     }
     rawConfig['tun']['enable'] = realPatchConfig.tun.enable;
     rawConfig['tun']['device'] = realPatchConfig.tun.device;
@@ -717,7 +751,7 @@ class GlobalState {
       }
     }
     if (rawConfig['profile'] == null) {
-      rawConfig['profile'] = {};
+      rawConfig['profile'] = <String, dynamic>{};
     }
     if (rawConfig['proxy-providers'] != null) {
       final proxyProviders = rawConfig['proxy-providers'] as Map;
@@ -762,7 +796,7 @@ class GlobalState {
     rawConfig['geox-url'] = realPatchConfig.geoXUrl.toJson();
     rawConfig['global-ua'] = realPatchConfig.globalUa;
     if (rawConfig['hosts'] == null) {
-      rawConfig['hosts'] = {};
+      rawConfig['hosts'] = <String, dynamic>{};
     }
     for (final host in realPatchConfig.hosts.entries) {
       rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
@@ -774,7 +808,7 @@ class GlobalState {
     ];
 
     if (rawConfig['dns'] == null) {
-      rawConfig['dns'] = {};
+      rawConfig['dns'] = <String, dynamic>{};
     }
     final isEnableDns = rawConfig['dns']['enable'] == true;
     final overrideDns = globalState.config.overrideDns;
@@ -792,7 +826,7 @@ class GlobalState {
         false => realPatchConfig.dns,
       };
       rawConfig['dns'] = dns.toJson();
-      rawConfig['dns']['nameserver-policy'] = {};
+      rawConfig['dns']['nameserver-policy'] = <String, dynamic>{};
       for (final entry in dns.nameserverPolicy.entries) {
         rawConfig['dns']['nameserver-policy'][entry.key] =
             entry.value.splitByMultipleSeparators;
@@ -1020,7 +1054,7 @@ class GlobalState {
         final realityOpts = proxy['reality-opts'];
         if (realityOpts is Map) {
           final shortId = realityOpts['short-id'];
-          if (shortId is num) {
+          if (shortId is int) {
             realityOpts['short-id'] = shortId.toString();
           }
         }
@@ -1081,7 +1115,7 @@ class GlobalState {
 
       if (profile != null && !profile.useScriptOverride) return config;
 
-      config['proxy-providers'] ??= {};
+      config['proxy-providers'] ??= <String, dynamic>{};
 
       try {
         return await JavaScriptRuntimeManager.evaluateScript(
@@ -1259,12 +1293,10 @@ class DetectionState {
     final appState = globalState.appState;
     if (!appState.isInit) return;
 
-    if (showLoading || state.value.ipInfo == null) {
-      state.value = state.value.copyWith(
-        isLoading: true,
-        errorMessage: null,
-      );
-    }
+    state.value = state.value.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
 
     final delay = immediate
         ? Duration.zero
@@ -1391,3 +1423,333 @@ class DetectionState {
 }
 
 final detectionState = DetectionState();
+
+class MediaUnlockStateNotifier {
+  static MediaUnlockStateNotifier? _instance;
+  final _checker = MediaUnlockChecker();
+  int _requestId = 0;
+  Timer? _nodeChangeTimer;
+  static const _nodeChangeDelay = Duration(milliseconds: 800);
+  String? _lastCheckedNodeSignature;
+  bool? _preIsStart;
+
+  String _getNodeSignature() {
+    final profileId = globalState.config.currentProfileId ?? '';
+    final mode = globalState.config.patchClashConfig.mode.name;
+    final selectedMap = globalState.config.currentProfile?.selectedMap ?? {};
+    final sortedEntries = selectedMap.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    final selectedStr =
+        sortedEntries.map((e) => '${e.key}:${e.value}').join(';');
+    return '$profileId|$mode|$selectedStr';
+  }
+
+  final state = ValueNotifier<MediaUnlockState>(
+    const MediaUnlockState(),
+  );
+  final Set<MediaPlatform> _batchTestingPlatforms = {};
+
+  bool isBatchChecking([Iterable<MediaPlatform>? platforms]) {
+    if (state.value.isLoading) return true;
+    if (platforms == null) {
+      return state.value.testingPlatforms.any(_batchTestingPlatforms.contains);
+    }
+    return platforms.any(
+      (p) =>
+          state.value.testingPlatforms.contains(p) &&
+          _batchTestingPlatforms.contains(p),
+    );
+  }
+
+  MediaUnlockStateNotifier._internal();
+
+  factory MediaUnlockStateNotifier() {
+    _instance ??= MediaUnlockStateNotifier._internal();
+    return _instance!;
+  }
+
+  List<MediaPlatform> get pinnedPlatforms {
+    final pinned = globalState.config.appSetting.pinnedMediaPlatforms;
+    return (pinned.isNotEmpty ? pinned : defaultPinnedMediaPlatforms)
+        .take(4)
+        .toList();
+  }
+
+  void checkSingle(MediaPlatform platform) async {
+    _batchTestingPlatforms.remove(platform);
+    if (state.value.testingPlatforms.contains(platform)) return;
+    final currentTesting =
+        Set<MediaPlatform>.from(state.value.testingPlatforms)..add(platform);
+    state.value = state.value.copyWith(testingPlatforms: currentTesting);
+
+    try {
+      final res = await _checker.checkPlatform(platform).timeout(
+        const Duration(seconds: 8),
+        onTimeout: () => MediaUnlockResult(
+          platform: platform,
+          status: MediaUnlockStatus.failed,
+        ),
+      );
+      final finalMap =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      finalMap[platform] = res;
+      state.value = state.value.copyWith(
+        results: finalMap,
+        lastChecked: DateTime.now(),
+      );
+    } catch (_) {
+      final finalMap =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      finalMap.putIfAbsent(
+        platform,
+        () => MediaUnlockResult(
+          platform: platform,
+          status: MediaUnlockStatus.failed,
+        ),
+      );
+      state.value = state.value.copyWith(
+        results: finalMap,
+        lastChecked: DateTime.now(),
+      );
+    } finally {
+      final nextTesting =
+          Set<MediaPlatform>.from(state.value.testingPlatforms)
+            ..remove(platform);
+      state.value = state.value.copyWith(testingPlatforms: nextTesting);
+    }
+  }
+
+  void checkPlatforms(
+    List<MediaPlatform> platforms, {
+    bool force = false,
+    bool isFullCheck = false,
+    bool isBatchCheck = false,
+  }) async {
+    final isRunning = globalState.appState.runTime != null;
+    if (!isRunning && !force) return;
+
+    if (force) {
+      _checker.cancel();
+    }
+
+    final targetPlatforms = force
+        ? platforms.toList()
+        : platforms
+            .where((p) => !state.value.testingPlatforms.contains(p))
+            .toList();
+    if (targetPlatforms.isEmpty) return;
+
+    final requestId = ++_requestId;
+    if (isBatchCheck) {
+      _batchTestingPlatforms.addAll(targetPlatforms);
+    }
+    final pendingTesting =
+        Set<MediaPlatform>.from(state.value.testingPlatforms)
+          ..addAll(targetPlatforms);
+
+    state.value = state.value.copyWith(
+      isLoading: isFullCheck ? true : state.value.isLoading,
+      testingPlatforms: pendingTesting,
+    );
+
+    Timer? throttleTimer;
+    final bufferResults = <MediaPlatform, MediaUnlockResult>{};
+
+    void flushUpdates() {
+      throttleTimer?.cancel();
+      throttleTimer = null;
+      if (bufferResults.isEmpty) return;
+      final updates = Map<MediaPlatform, MediaUnlockResult>.from(bufferResults);
+      bufferResults.clear();
+      final nextResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results)
+            ..addAll(updates);
+      final nextTesting =
+          Set<MediaPlatform>.from(state.value.testingPlatforms)
+            ..removeAll(updates.keys);
+      state.value = state.value.copyWith(
+        results: nextResults,
+        testingPlatforms: nextTesting,
+      );
+    }
+
+    try {
+      final results = await _checker.checkAll(
+        platforms: targetPlatforms,
+        onProgress: (res) {
+          if (requestId != _requestId) return;
+          bufferResults[res.platform] = res;
+          throttleTimer ??= Timer(
+            const Duration(milliseconds: 100),
+            flushUpdates,
+          );
+        },
+      ).timeout(
+        Duration(seconds: (targetPlatforms.length / 8).ceil() * 8 + 5),
+        onTimeout: () {
+          _checker.cancel();
+          final timeoutMap = <MediaPlatform, MediaUnlockResult>{};
+          for (final p in targetPlatforms) {
+            timeoutMap[p] = bufferResults[p] ??
+                state.value.results[p] ??
+                MediaUnlockResult(
+                  platform: p,
+                  status: MediaUnlockStatus.failed,
+                );
+          }
+          return timeoutMap;
+        },
+      );
+      if (requestId != _requestId) return;
+      flushUpdates();
+      final nextResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in targetPlatforms) {
+        nextResults[p] = results[p] ??
+            bufferResults[p] ??
+            state.value.results[p] ??
+            MediaUnlockResult(
+              platform: p,
+              status: MediaUnlockStatus.failed,
+            );
+      }
+      _lastCheckedNodeSignature = _getNodeSignature();
+      state.value = state.value.copyWith(
+        isLoading: isFullCheck ? false : state.value.isLoading,
+        results: nextResults,
+        lastChecked: DateTime.now(),
+      );
+    } catch (_) {
+      throttleTimer?.cancel();
+      if (requestId != _requestId) return;
+      flushUpdates();
+      final fallbackResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in targetPlatforms) {
+        fallbackResults.putIfAbsent(
+          p,
+          () => MediaUnlockResult(
+            platform: p,
+            status: MediaUnlockStatus.failed,
+          ),
+        );
+      }
+      _lastCheckedNodeSignature = _getNodeSignature();
+      state.value = state.value.copyWith(
+        isLoading: isFullCheck ? false : state.value.isLoading,
+        results: fallbackResults,
+        lastChecked: DateTime.now(),
+      );
+    } finally {
+      throttleTimer?.cancel();
+      _batchTestingPlatforms.removeAll(targetPlatforms);
+      final nextTesting =
+          Set<MediaPlatform>.from(state.value.testingPlatforms)
+            ..removeAll(targetPlatforms);
+      state.value = state.value.copyWith(
+        isLoading: (requestId == _requestId && isFullCheck)
+            ? false
+            : state.value.isLoading,
+        testingPlatforms: nextTesting,
+      );
+    }
+  }
+
+  void checkPinned({bool force = false, List<MediaPlatform>? platforms}) {
+    checkPlatforms(platforms ?? pinnedPlatforms, force: force);
+  }
+
+  void checkAll({
+    bool force = false,
+    List<MediaPlatform>? platforms,
+  }) {
+    final targets = platforms ?? MediaPlatform.values;
+    final isFull = targets.length >= MediaPlatform.values.length;
+    checkPlatforms(
+      targets,
+      force: force,
+      isFullCheck: isFull,
+      isBatchCheck: true,
+    );
+  }
+
+  void startCheckOnNodeChange() async {
+    final isRunning = globalState.appState.runTime != null;
+    if (!isRunning) {
+      _preIsStart = false;
+      return;
+    }
+    final isStartup = _preIsStart != true;
+    _preIsStart = true;
+
+    if (!globalState.hasMediaUnlockWidget) return;
+    if (!globalState.config.appSetting.mediaUnlockRefreshOnNodeChange) return;
+
+    final requestId = ++_requestId;
+    _nodeChangeTimer?.cancel();
+    _checker.cancel();
+
+    if (isStartup) {
+      if (globalState.hasNetworkDetectionWidget) {
+        var waited = 0;
+        while (detectionState.state.value.isLoading &&
+            waited < 6000 &&
+            globalState.appState.runTime != null &&
+            requestId == _requestId) {
+          await Future.delayed(const Duration(milliseconds: 150));
+          waited += 150;
+        }
+      } else {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      if (requestId != _requestId || globalState.appState.runTime == null) return;
+      final nextResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in pinnedPlatforms) {
+        nextResults.remove(p);
+      }
+      state.value = state.value.copyWith(
+        results: nextResults,
+        testingPlatforms: {},
+        isLoading: false,
+      );
+    } else {
+      final currentSignature = _getNodeSignature();
+      if (_lastCheckedNodeSignature == currentSignature &&
+          state.value.results.isNotEmpty) {
+        return;
+      }
+      _lastCheckedNodeSignature = currentSignature;
+      final nextResults =
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in pinnedPlatforms) {
+        nextResults.remove(p);
+      }
+      state.value = state.value.copyWith(
+        results: nextResults,
+        testingPlatforms: {},
+        isLoading: false,
+      );
+      await Future.delayed(_nodeChangeDelay);
+      if (requestId != _requestId || globalState.appState.runTime == null) return;
+    }
+
+    _lastCheckedNodeSignature = _getNodeSignature();
+    checkPinned(force: true);
+  }
+
+  void tryStartCheck() {
+    final isRunning = globalState.appState.runTime != null;
+    if (!isRunning) return;
+    if (!globalState.hasMediaUnlockWidget) return;
+    if (state.value.isLoading || state.value.testingPlatforms.isNotEmpty) return;
+    if (state.value.results.isNotEmpty) return;
+    final needsInitialCheck =
+        pinnedPlatforms.any((p) => !state.value.results.containsKey(p));
+    if (!needsInitialCheck) return;
+    checkPinned();
+  }
+}
+
+final mediaUnlockState = MediaUnlockStateNotifier();
+

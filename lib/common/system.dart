@@ -665,7 +665,11 @@ class MacOS {
 
     try {
       final rawBackup = await backupFile.readAsString();
-      final backup = jsonDecode(rawBackup) as Map<String, dynamic>;
+      final decodedBackup = jsonDecode(rawBackup);
+      if (decodedBackup is! Map) {
+        throw const FormatException('Invalid macOS system DNS backup');
+      }
+      final backup = Map<String, dynamic>.from(decodedBackup);
       final serviceName = backup['serviceName'] as String?;
       final servers = (backup['servers'] as List?)
           ?.whereType<String>()

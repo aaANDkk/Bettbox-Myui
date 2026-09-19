@@ -149,8 +149,11 @@ void _runJsIsolate(Map spawnMessage) async {
         case #close:
           data = false;
           qjs.port.close();
-          qjs.close();
-          port.close();
+          try {
+            qjs.close();
+          } finally {
+            port.close();
+          }
           data = true;
           break;
       }
@@ -274,18 +277,21 @@ class IsolateQjs {
   }) async {
     _ensureEngine();
     final evaluatePort = ReceivePort();
-    final sendPort = await _sendPort!;
-    sendPort.send({
-      #type: #evaluate,
-      #command: command,
-      #name: name,
-      #flag: evalFlags,
-      #port: evaluatePort.sendPort,
-    });
-    final result = await evaluatePort.first;
-    evaluatePort.close();
-    if (result is Map && result.containsKey(#error))
-      throw _decodeData(result[#error]);
-    return _decodeData(result);
+    try {
+      final sendPort = await _sendPort!;
+      sendPort.send({
+        #type: #evaluate,
+        #command: command,
+        #name: name,
+        #flag: evalFlags,
+        #port: evaluatePort.sendPort,
+      });
+      final result = await evaluatePort.first;
+      if (result is Map && result.containsKey(#error))
+        throw _decodeData(result[#error]);
+      return _decodeData(result);
+    } finally {
+      evaluatePort.close();
+    }
   }
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/metacubex/mihomo/adapter/provider"
 	"github.com/metacubex/mihomo/common/batch"
 	"github.com/metacubex/mihomo/component/dialer"
+	"github.com/metacubex/mihomo/component/geodata"
+	"github.com/metacubex/mihomo/component/mmdb"
 	"github.com/metacubex/mihomo/component/resolver"
 	"github.com/metacubex/mihomo/config"
 	"github.com/metacubex/mihomo/constant"
@@ -26,6 +28,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
+	"strings"
 	"sync"
 	"time"
 )
@@ -279,6 +282,103 @@ func updateConfig(params *UpdateParams) {
 	updateListeners()
 }
 
+var (
+	mmdbUnloaded bool
+	asnUnloaded  bool
+)
+
+func checkActiveGeoUsage() (hasMMDB, hasSite, hasASN bool) {
+	for _, r := range tunnel.Rules() {
+		if r == nil {
+			continue
+		}
+		switch r.RuleType() {
+		case constant.GEOIP, constant.SrcGEOIP:
+			hasMMDB = true
+		case constant.GEOSITE:
+			hasSite = true
+		case constant.IPASN, constant.SrcIPASN:
+			hasASN = true
+		case constant.AND, constant.OR, constant.NOT, constant.SubRules:
+			payload := strings.ToUpper(r.Payload())
+			if strings.Contains(payload, "(GEOIP,") || strings.Contains(payload, "(SRCGEOIP,") {
+				hasMMDB = true
+			}
+			if strings.Contains(payload, "(GEOSITE,") {
+				hasSite = true
+			}
+			if strings.Contains(payload, "(IPASN,") || strings.Contains(payload, "(SRCIPASN,") {
+				hasASN = true
+			}
+		}
+		if hasMMDB && hasSite && hasASN {
+			return
+		}
+	}
+
+	if currentRawConfig != nil {
+		if !hasSite && currentRawConfig.DNS.Enable && currentRawConfig.DNS.NameServerPolicy != nil {
+			for pair := currentRawConfig.DNS.NameServerPolicy.Oldest(); pair != nil; pair = pair.Next() {
+				if strings.HasPrefix(strings.ToLower(pair.Key), "geosite:") {
+					hasSite = true
+					break
+				}
+			}
+		}
+		if !hasMMDB && currentRawConfig.DNS.Enable && len(currentRawConfig.DNS.Fallback) > 0 && currentRawConfig.DNS.FallbackFilter.GeoIP {
+			hasMMDB = true
+		}
+		if !hasSite && currentRawConfig.DNS.Enable && len(currentRawConfig.DNS.Fallback) > 0 && len(currentRawConfig.DNS.FallbackFilter.GeoSite) > 0 {
+			hasSite = true
+		}
+		if !hasSite && currentRawConfig.Sniffer.Enable {
+			for _, d := range currentRawConfig.Sniffer.ForceDomain {
+				if strings.HasPrefix(strings.ToLower(d), "geosite:") {
+					hasSite = true
+					break
+				}
+			}
+			if !hasSite {
+				for _, d := range currentRawConfig.Sniffer.SkipDomain {
+					if strings.HasPrefix(strings.ToLower(d), "geosite:") {
+						hasSite = true
+						break
+					}
+				}
+			}
+		}
+	}
+	return
+}
+
+func tryUnloadGeoData() {
+	hasMMDB, _, hasASN := checkActiveGeoUsage()
+
+	if hasMMDB {
+		mmdbUnloaded = false
+	} else if !mmdbUnloaded && geodata.GeoIpEnable() {
+		if _, err := os.Stat(constant.Path.MMDB()); err == nil {
+			if reader := mmdb.IPInstance().Reader; reader != nil {
+				_ = reader.Close()
+			}
+			mmdb.ReloadIP()
+			mmdbUnloaded = true
+		}
+	}
+
+	if hasASN {
+		asnUnloaded = false
+	} else if !asnUnloaded && geodata.ASNEnable() {
+		if _, err := os.Stat(constant.Path.ASN()); err == nil {
+			if reader := mmdb.ASNInstance().Reader; reader != nil {
+				_ = reader.Close()
+			}
+			mmdb.ReloadASN()
+			asnUnloaded = true
+		}
+	}
+}
+
 func setupConfig(params *SetupParams) error {
 	runLock.Lock()
 	defer runLock.Unlock()
@@ -308,6 +408,7 @@ func setupConfig(params *SetupParams) error {
 	hub.ApplyConfig(currentConfig)
 	patchSelectGroup(params.SelectedMap)
 	updateListeners()
+	tryUnloadGeoData()
 	runtime.GC()
 	debug.FreeOSMemory()
 	return nil
