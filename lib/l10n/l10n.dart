@@ -1190,10 +1190,10 @@ class AppLocalizations {
     return Intl.message('QR Code', name: 'qrcode', desc: '', args: []);
   }
 
-  /// `Scan QR code to get profile`
+  /// `Scan QR code to import profile`
   String get qrcodeDesc {
     return Intl.message(
-      'Scan QR code to get profile',
+      'Scan QR code to import profile',
       name: 'qrcodeDesc',
       desc: '',
       args: [],
@@ -6130,126 +6130,91 @@ class AppLocalizations {
     return Intl.message('Flagged', name: 'flagged', desc: '', args: []);
   }
 
-  /// `Fading Cube`
-  String get fadingCube {
+  /// `Scan / LAN Import`
+  String get tvScanImport {
     return Intl.message(
-      'Fading Cube',
-      name: 'fadingCube',
+      'Scan / LAN Import',
+      name: 'tvScanImport',
       desc: '',
       args: [],
     );
   }
 
-  /// `Folding Cube`
-  String get foldingCube {
+  /// `Scan QR or push profile to TV via LAN`
+  String get tvScanImportDesc {
     return Intl.message(
-      'Folding Cube',
-      name: 'foldingCube',
+      'Scan QR or push profile to TV via LAN',
+      name: 'tvScanImportDesc',
       desc: '',
       args: [],
     );
   }
 
-  /// `Pumping Heart`
-  String get pumpingHeart {
+  /// `Ensure phone and TV are on the same Wi-Fi network`
+  String get tvScanStep1 {
     return Intl.message(
-      'Pumping Heart',
-      name: 'pumpingHeart',
+      'Ensure phone and TV are on the same Wi-Fi network',
+      name: 'tvScanStep1',
       desc: '',
       args: [],
     );
   }
 
-  /// `Pouring Hour Glass`
-  String get pouringHourGlass {
+  /// `Scan the QR code with a supported camera or browser`
+  String get tvScanStep2 {
     return Intl.message(
-      'Pouring Hour Glass',
-      name: 'pouringHourGlass',
+      'Scan the QR code with a supported camera or browser',
+      name: 'tvScanStep2',
       desc: '',
       args: [],
     );
   }
 
-  /// `Square Circle`
-  String get squareCircle {
+  /// `Paste subscription URL or upload profile on the webpage and push`
+  String get tvScanStep3 {
     return Intl.message(
-      'Square Circle',
-      name: 'squareCircle',
+      'Paste subscription URL or upload profile on the webpage and push',
+      name: 'tvScanStep3',
       desc: '',
       args: [],
     );
   }
 
-  /// `Three Rotating Dots`
-  String get threeRotatingDots {
+  /// `Or enter directly in phone browser:`
+  String get tvScanManualUrl {
     return Intl.message(
-      'Three Rotating Dots',
-      name: 'threeRotatingDots',
+      'Or enter directly in phone browser:',
+      name: 'tvScanManualUrl',
       desc: '',
       args: [],
     );
   }
 
-  /// `Four Rotating Dots`
-  String get fourRotatingDots {
+  /// `Waiting for profile from phone...`
+  String get tvScanWaiting {
     return Intl.message(
-      'Four Rotating Dots',
-      name: 'fourRotatingDots',
+      'Waiting for profile from phone...',
+      name: 'tvScanWaiting',
       desc: '',
       args: [],
     );
   }
 
-  /// `Staggered Dots Wave`
-  String get staggeredDotsWave {
+  /// `Profile received, importing...`
+  String get tvScanSuccess {
     return Intl.message(
-      'Staggered Dots Wave',
-      name: 'staggeredDotsWave',
+      'Profile received, importing...',
+      name: 'tvScanSuccess',
       desc: '',
       args: [],
     );
   }
 
-  /// `Dots Triangle`
-  String get dotsTriangle {
+  /// `No available LAN detected, please check Wi-Fi`
+  String get tvScanNoNetwork {
     return Intl.message(
-      'Dots Triangle',
-      name: 'dotsTriangle',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `General`
-  String get basicInfo {
-    return Intl.message(
-      'General',
-      name: 'basicInfo',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Address`
-  String get addressInfo {
-    return Intl.message(
-      'Address',
-      name: 'addressInfo',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Traffic`
-  String get traffic {
-    return Intl.message('Traffic', name: 'traffic', desc: '', args: []);
-  }
-
-  /// `Advanced`
-  String get advancedInfo {
-    return Intl.message(
-      'Advanced',
-      name: 'advancedInfo',
+      'No available LAN detected, please check Wi-Fi',
+      name: 'tvScanNoNetwork',
       desc: '',
       args: [],
     );

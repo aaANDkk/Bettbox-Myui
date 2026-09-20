@@ -7,6 +7,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'edit_profile.dart';
+import 'tv_qr_import_dialog.dart';
 
 /// 打开「添加配置」弹层：配置页悬浮按钮与全局常驻悬浮按钮共用同一个入口。
 void showAddProfileExtend() {
@@ -98,6 +99,13 @@ class AddProfileView extends StatelessWidget {
   Future<void> _toScan() async {
     if (system.isDesktop) {
       globalState.appController.addProfileFormQrCode();
+      return;
+    }
+    if (globalState.isAndroidTV) {
+      await showDialog(
+        context: context,
+        builder: (_) => const TvQrImportDialog(),
+      );
       return;
     }
     final url = await BaseNavigator.push(context, const ScanPage());
