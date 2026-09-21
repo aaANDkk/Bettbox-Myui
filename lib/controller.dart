@@ -1109,9 +1109,7 @@ class AppController {
     commonPrint.log('clear preferences');
     globalState.config = Config(
       themeProps: defaultThemeProps,
-      networkProps: defaultNetworkProps.copyWith(
-        systemProxy: system.isDesktop,
-      ),
+      networkProps: defaultNetworkProps,
     );
   }
 

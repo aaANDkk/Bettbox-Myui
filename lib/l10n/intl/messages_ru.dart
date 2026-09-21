@@ -1396,9 +1396,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "Автоматическая маршрутизация всего трафика через VpnService",
     ),
-    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
-      "HTTP-прокси обычно не рекомендуется на мобильных платформах. Включайте эту функцию только при необходимости и если вы осознаёте возможные последствия.",
-    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "Добавить HTTP-прокси к VPN",
     ),

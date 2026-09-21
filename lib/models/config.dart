@@ -258,6 +258,7 @@ abstract class WindowProps with _$WindowProps {
     double? top,
     double? left,
     @Default(false) bool isPinned,
+    @Default(1.0) double scaleFactor,
   }) = _WindowProps;
 
   factory WindowProps.fromJson(Map<String, Object?>? json) =>
@@ -268,7 +269,7 @@ abstract class WindowProps with _$WindowProps {
 abstract class VpnProps with _$VpnProps {
   const factory VpnProps({
     @Default(true) bool enable,
-    @Default(false) bool systemProxy,
+    @Default(true) bool systemProxy,
     @Default(false) bool allowBypass,
     @Default(true) bool bypassPrivateRoute,
     @Default(true) bool dozeSuspend,
@@ -302,7 +303,7 @@ abstract class VpnProps with _$VpnProps {
 @freezed
 abstract class NetworkProps with _$NetworkProps {
   const factory NetworkProps({
-    @Default(false) bool systemProxy,
+    @Default(true) bool systemProxy,
     @Default(defaultBypassDomain) List<String> bypassDomain,
     @Default(true) bool bypassPrivateRoute,
     @Default([]) List<String> bypassPrivateRouteAddress,
