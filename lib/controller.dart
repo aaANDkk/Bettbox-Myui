@@ -220,7 +220,6 @@ class AppController {
             return;
           }
           await globalState.handleStart([updateRunTime, updateTraffic]);
-          await updateProviders();
           if (!res.isError) {
             Future.microtask(() async {
               try {
@@ -236,7 +235,6 @@ class AppController {
         } catch (e) {
           commonPrint.log('FastStart macOS auth error: $e');
           await globalState.handleStart([updateRunTime, updateTraffic]);
-          await updateProviders();
           _backgroundLoad();
         }
         _scheduleCheckIpRefresh();
@@ -244,7 +242,6 @@ class AppController {
       }
 
       await globalState.handleStart([updateRunTime, updateTraffic]);
-      await updateProviders();
 
       Future.microtask(() async {
         try {
@@ -279,7 +276,6 @@ class AppController {
 
     _scheduleCheckIpRefresh();
 
-    await updateProviders();
     _backgroundLoad();
   }
 
@@ -295,6 +291,10 @@ class AppController {
 
     Future.microtask(() async {
       try {
+        await updateProviders();
+        if (version != _backgroundLoadVersion) return;
+        if (generation != _coreGeneration) return;
+
         List<Group> groups = [];
         for (var attempt = 0; attempt < 3; attempt++) {
           if (version != _backgroundLoadVersion) return;

@@ -488,6 +488,31 @@ class Request {
   static const _ipCacheKey = 'ip_detail_cache';
   static const _cacheDuration = Duration(days: 30);
 
+  Future<File> _getIpCacheFile() async {
+    final filePath = await appPath.ipCacheFilePath;
+    final file = File(filePath);
+    if (!file.parent.existsSync()) {
+      await file.parent.create(recursive: true);
+    }
+    return file;
+  }
+
+  Future<void> _writeIpCacheFile(File file, Map<String, dynamic> entries) async {
+    try {
+      final tempFile = File('${file.path}.${DateTime.now().microsecondsSinceEpoch}.tmp');
+      await tempFile.parent.create(recursive: true);
+      await tempFile.writeAsString(json.encode(entries), flush: true);
+      try {
+        await tempFile.rename(file.path);
+      } catch (_) {
+        if (await tempFile.exists()) {
+          await tempFile.copy(file.path);
+          await tempFile.delete();
+        }
+      }
+    } catch (_) {}
+  }
+
   Future<IpInfo?> _getValidCachedIp(String cacheKey) async {
     try {
       final prefs = await preferences.sharedPreferencesCompleter.future;

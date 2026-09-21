@@ -140,8 +140,16 @@ NavigationItemsState currentNavigationItemsState(Ref ref) {
 @riverpod
 CoreState coreState(Ref ref) {
   final vpnProps = ref.watch(vpnSettingProvider);
-  final bypassPrivateRoute = ref.watch(
-    networkSettingProvider.select((state) => state.bypassPrivateRoute),
+  final (
+    :bypassPrivateRoute,
+    :bypassDomain,
+  ) = ref.watch(
+    networkSettingProvider.select(
+      (state) => (
+        bypassPrivateRoute: state.bypassPrivateRoute,
+        bypassDomain: state.bypassDomain,
+      ),
+    ),
   );
   final currentProfile = ref.watch(currentProfileProvider);
   final onlyStatisticsProxy = ref.watch(appSettingProvider).onlyStatisticsProxy;
@@ -149,6 +157,7 @@ CoreState coreState(Ref ref) {
     vpnProps: vpnProps.copyWith(bypassPrivateRoute: bypassPrivateRoute),
     onlyStatisticsProxy: onlyStatisticsProxy,
     currentProfileName: currentProfile?.label ?? currentProfile?.id ?? '',
+    bypassDomain: bypassDomain,
   );
 }
 

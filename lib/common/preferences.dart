@@ -78,15 +78,24 @@ class Preferences {
     await preferences?.setBool(wakelockEnabledKey, value);
   }
 
-  /// 小型流量统计小部件显示上传还是下载数据（默认下载）
-  Future<bool> getTrafficUsageShowUpload() async {
-    final preferences = await sharedPreferencesCompleter.future;
-    return preferences?.getBool(trafficUsageShowUploadKey) ?? false;
-  }
-
-  Future<void> setTrafficUsageShowUpload(bool value) async {
-    final preferences = await sharedPreferencesCompleter.future;
-    await preferences?.setBool(trafficUsageShowUploadKey, value);
+    try {
+      final configFilePath = await appPath.appConfigPath;
+      final tempFile = File('$configFilePath.${DateTime.now().microsecondsSinceEpoch}.tmp');
+      await tempFile.parent.create(recursive: true);
+      await tempFile.writeAsString(jsonStr, flush: true);
+      try {
+        await tempFile.rename(configFilePath);
+      } catch (_) {
+        if (await tempFile.exists()) {
+          await tempFile.copy(configFilePath);
+          await tempFile.delete();
+        }
+      }
+      return true;
+    } catch (e, stackTrace) {
+      commonPrint.log('Failed to save config to file: $e\n$stackTrace');
+      return false;
+    }
   }
 
   Future<void> clearClashConfig() async {
