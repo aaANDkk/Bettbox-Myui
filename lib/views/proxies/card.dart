@@ -8,8 +8,6 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:emoji_regex/emoji_regex.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 final proxyIconProvider = Provider.family<String, String>((ref, proxyName) {
   if (proxyName.isEmpty) return '';
@@ -94,8 +92,8 @@ class ProxyCard extends StatelessWidget {
             return SizedBox(
               height: measure.labelSmallHeight,
               width: measure.labelSmallHeight,
-              child: buildDelayAnimationWidget(
-                delayAnimation,
+              child: DelayAnimation(
+                type: delayAnimation,
                 size: measure.labelSmallHeight,
                 color: context.colorScheme.primary,
               ),

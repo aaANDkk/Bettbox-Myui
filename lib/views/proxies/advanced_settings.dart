@@ -214,66 +214,29 @@ class _HealthCheckTimeoutItem extends ConsumerWidget {
 class _DelayAnimationItem extends ConsumerWidget {
   const _DelayAnimationItem();
 
-  String _getTextForDelayAnimation(DelayAnimationType type) {
-    return switch (type) {
-      DelayAnimationType.none => appLocalizations.noAnimation,
-      DelayAnimationType.fadingCube => appLocalizations.fadingCube,
-      DelayAnimationType.foldingCube => appLocalizations.foldingCube,
-      DelayAnimationType.pumpingHeart => appLocalizations.pumpingHeart,
-      DelayAnimationType.pouringHourGlass => appLocalizations.pouringHourGlass,
-      DelayAnimationType.squareCircle => appLocalizations.squareCircle,
-      DelayAnimationType.threeRotatingDots =>
-        appLocalizations.threeRotatingDots,
-      DelayAnimationType.fourRotatingDots => appLocalizations.fourRotatingDots,
-      DelayAnimationType.staggeredDotsWave =>
-        appLocalizations.staggeredDotsWave,
-      DelayAnimationType.dotsTriangle => appLocalizations.dotsTriangle,
-      DelayAnimationType.rotatingCircle => appLocalizations.rotatingCircle,
-      DelayAnimationType.pulse => appLocalizations.pulse,
-      DelayAnimationType.spinningLines => appLocalizations.spinningLines,
-      DelayAnimationType.threeInOut => appLocalizations.threeInOut,
-      DelayAnimationType.threeBounce => appLocalizations.threeBounce,
-      DelayAnimationType.circle => appLocalizations.circle,
-      DelayAnimationType.fadingFour => appLocalizations.fadingFour,
-      DelayAnimationType.wave => appLocalizations.wave,
-      DelayAnimationType.doubleBounce => appLocalizations.doubleBounce,
-    };
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final delayAnimation = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.delayAnimation),
     );
 
-    return ListItem<DelayAnimationType>.options(
-      leading: const Icon(Icons.animation_rounded),
+    return ListItem(
+      leading: const Icon(Icons.animation),
       title: Text(appLocalizations.delayAnimation),
       subtitle: Text(appLocalizations.delayAnimationDesc),
-      delegate: OptionsDelegate(
-        title: appLocalizations.delayAnimation,
-        options: DelayAnimationType.values,
-        value: delayAnimation,
-        textBuilder: (value) => _getTextForDelayAnimation(value),
-        trailingBuilder: (value) => SizedBox(
-          width: 24,
-          height: 24,
-          child: Center(
-            child: buildDelayAnimationWidget(
-              value,
-              size: 16.0,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+      onTap: () async {
+        final value = await globalState.showCommonDialog<DelayAnimationType>(
+          child: DelayAnimationPickerDialog(
+            title: appLocalizations.delayAnimation,
+            initialValue: delayAnimation,
           ),
-        ),
-        onChanged: (value) {
-          if (value != null) {
-            ref.read(proxiesStyleSettingProvider.notifier).updateState(
-                  (state) => state.copyWith(delayAnimation: value),
-                );
-          }
-        },
-      ),
+        );
+        if (value != null) {
+          ref.read(proxiesStyleSettingProvider.notifier).updateState(
+                (state) => state.copyWith(delayAnimation: value),
+              );
+        }
+      },
     );
   }
 }
