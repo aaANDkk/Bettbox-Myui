@@ -1818,6 +1818,16 @@ class AppController {
     final homeDirPath = await appPath.homeDirPath;
     final profilesPath = await appPath.profilesPath;
     final configJson = globalState.config.toJson();
+    if (configJson['dav'] is Map) {
+      final davMap = Map<String, dynamic>.from(configJson['dav'] as Map);
+      if (davMap['user'] is String) {
+        davMap['user'] = utils.encryptSecret(davMap['user'] as String);
+      }
+      if (davMap['password'] is String) {
+        davMap['password'] = utils.encryptSecret(davMap['password'] as String);
+      }
+      configJson['dav'] = davMap;
+    }
 
     // Get valid profile IDs
     final validProfileIds = globalState.config.profiles
@@ -2055,11 +2065,41 @@ class AppController {
     var tempConfig = Config.compatibleFromJson(
       json.decode(utf8.decode(configContent)),
     );
+    if (tempConfig.dav != null) {
+      tempConfig = tempConfig.copyWith(
+        dav: tempConfig.dav!.copyWith(
+          user: utils.decryptSecret(tempConfig.dav!.user),
+          password: utils.decryptSecret(tempConfig.dav!.password),
+        ),
+      );
+    }
 
     await restoreBackupFiles(profiles, homeDirPath);
 
     // Apply recovery logic
     _recovery(tempConfig, recoveryOption);
+    await savePreferences();
+    if (globalState.isStart) {
+      await applyProfile(silence: true);
+    }
+  }
+
+  Future<void> _cleanProfilesDirForOverride() async {
+    try {
+      final profilesDirPath = await appPath.profilesPath;
+      final dir = Directory(profilesDirPath);
+      if (await dir.exists()) {
+        await for (final entity in dir.list(followLinks: false)) {
+          try {
+            await entity.delete(recursive: true);
+          } catch (e) {
+            commonPrint.log('Delete profile entity failed: $e');
+          }
+        }
+      }
+    } catch (e) {
+      commonPrint.log('Clean profiles dir for override failed: $e');
+    }
   }
 
   /// Restore legacy
@@ -2200,6 +2240,10 @@ class AppController {
 
     // Apply limited recovery
     _recoveryLimited(limitedConfig, recoveryOption);
+    await savePreferences();
+    if (globalState.isStart) {
+      await applyProfile(silence: true);
+    }
 
     // Show recovery result message
     _showRecoveryResultMessage(profiles, extractedFromDatabase);
