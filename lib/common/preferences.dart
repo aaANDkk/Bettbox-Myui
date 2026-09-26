@@ -55,16 +55,43 @@ class Preferences {
       commonPrint.log('Failed to parse config from preferences: $e\n$stackTrace');
       return null;
     }
+
+    Config? selectedConfig;
+    if (fileConfig != null && prefsConfig != null) {
+      if (fileConfig.profiles.isEmpty && prefsConfig.profiles.isNotEmpty) {
+        selectedConfig = prefsConfig;
+        await saveConfig(prefsConfig);
+      } else {
+        selectedConfig = fileConfig;
+      }
+    } else {
+      selectedConfig = fileConfig ?? prefsConfig;
+      if (selectedConfig != null && fileConfig == null) {
+        await saveConfig(selectedConfig);
+      }
+    }
+
+    if (selectedConfig != null &&
+        preferences?.getBool('autoLaunch') != selectedConfig.appSetting.autoLaunch) {
+      await preferences?.setBool('autoLaunch', selectedConfig.appSetting.autoLaunch);
+    }
+
+    if (Platform.isMacOS &&
+        selectedConfig != null &&
+        preferences?.getBool('keepDockIcon') != selectedConfig.appSetting.keepDockIcon) {
+      await preferences?.setBool('keepDockIcon', selectedConfig.appSetting.keepDockIcon);
+    }
+
+    return selectedConfig;
   }
 
   Future<bool> saveConfig(Config config) async {
     final preferences = await sharedPreferencesCompleter.future;
     
     await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
-    
-    return await preferences?.setString(configKey, json.encode(config)) ??
-        false;
-  }
+    if (Platform.isMacOS) {
+      await preferences?.setBool('keepDockIcon', config.appSetting.keepDockIcon);
+    }
 
   /// 读取「亮屏锁」开关的上次状态（默认关闭）
   Future<bool> getWakelockEnabled() async {
