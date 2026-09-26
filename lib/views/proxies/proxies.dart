@@ -16,6 +16,7 @@ import '../profiles/scripts.dart'
 import 'advanced_settings.dart';
 import 'setting.dart';
 import 'tab.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ProxiesView extends ConsumerStatefulWidget {
   const ProxiesView({super.key});
@@ -52,12 +53,12 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             _proxiesTabKey.currentState?.scrollToGroupSelected();
           },
           tooltip: appLocalizations.locate,
-          icon: const Icon(Icons.adjust_rounded, weight: 1),
+          icon: const Icon(FluentIcons.target_arrow_24_regular),
         ),
       if (hasCustom)
         IconButton(
           onPressed: _handleCustomOptions,
-          icon: const Icon(Icons.tune_rounded),
+          icon: const Icon(FluentIcons.options_24_regular),
           tooltip: appLocalizations.custom,
         ),
       CommonPopupBox(
@@ -67,13 +68,13 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               open(offset: const Offset(0, 20));
             },
             tooltip: appLocalizations.more,
-            icon: const Icon(Icons.more_vert_rounded),
+            icon: const Icon(FluentIcons.symbols_24_regular),
           );
         },
         popup: CommonPopupMenu(
           items: [
             PopupMenuItemData(
-              icon: Icons.build_circle_outlined,
+              icon: FluentIcons.style_guide_24_regular,
               label: appLocalizations.styleSetting,
               onPressed: () {
                 showSheet(
@@ -90,7 +91,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               },
             ),
             PopupMenuItemData(
-              icon: Icons.settings_suggest_outlined,
+              icon: FluentIcons.star_emphasis_24_regular,
               label: appLocalizations.advancedSettings,
               onPressed: () {
                 showExtend(
@@ -107,7 +108,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
             ),
             if (!_isTab)
               PopupMenuItemData(
-                icon: Icons.burst_mode_outlined,
+                icon: FluentIcons.image_edit_24_regular,
                 label: appLocalizations.iconConfiguration,
                 onPressed: () {
                   showExtend(
@@ -124,7 +125,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               ),
             if (_hasProviders)
               PopupMenuItemData(
-                icon: Icons.insert_chart_outlined_rounded,
+                icon: FluentIcons.calendar_3_day_24_regular,
                 label: appLocalizations.providers,
                 onPressed: () {
                   showExtend(
@@ -137,8 +138,8 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
               ),
             PopupMenuItemData(
               icon: showHiddenItems
-                  ? Icons.radio_button_checked_rounded
-                  : Icons.radio_button_unchecked_rounded,
+                  ? FluentIcons.record_24_regular
+                  : FluentIcons.circle_24_regular,
               label: appLocalizations.showHiddenItems,
               onPressed: () {
                 ref
@@ -156,7 +157,6 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   }
 
   Widget? _buildFAB() {
-    // 竖屏下改由全局常驻悬浮按钮承担（列表模式本来就不显示）
     if (!_isTab ||
         globalState.isAndroidTV ||
         ref.watch(isMobileViewProvider)) {
@@ -207,8 +207,6 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   void initState() {
     super.initState();
 
-    // 把「测速当前策略组」注册给全局常驻悬浮按钮使用；页面销毁后 GlobalKey
-    // 取不到 state，回调自然变成空操作，无需额外清理
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.read(residentProxyTestProvider.notifier).state = () {
@@ -256,6 +254,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
       actions: _buildActions(),
       title: appLocalizations.proxies,
       searchState: AppBarSearchState(onSearch: _onSearch),
+      showScrollGradient: false,
       body: switch (hasGroups) {
         false => NullStatus(
             label: appLocalizations.noProxy,

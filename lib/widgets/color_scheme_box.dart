@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'card.dart';
 import 'grid.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ColorSchemeBox extends StatelessWidget {
   final Color? primaryColor;
@@ -70,7 +71,7 @@ class ColorSchemeBox extends StatelessWidget {
                   const Positioned(
                     bottom: 4,
                     right: 4,
-                    child: Icon(Icons.colorize_rounded, size: 20),
+                    child: Icon(FluentIcons.eyedropper_24_filled, size: 20),
                   ),
               ],
             );

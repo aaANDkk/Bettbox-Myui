@@ -4,6 +4,7 @@ import 'package:bett_box/widgets/fade_box.dart';
 import 'package:flutter/material.dart';
 
 import 'text.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Info {
   final String label;
@@ -24,9 +25,6 @@ class InfoHeader extends StatelessWidget {
   final List<Widget> actions;
   final EdgeInsetsGeometry? padding;
 
-  /// 右侧操作区（actions）的高度上限。卡片表头传「一行标题」高
-  /// （`globalState.measure.titleSmallHeight`）后，按钮不再撑高整行，
-  /// 图标 / 标题 / 按钮落在同一条线上；不传则完全沿用按钮自身尺寸。
   final double? actionsHeight;
 
   const InfoHeader({
@@ -262,8 +260,6 @@ class CommonCard extends StatelessWidget {
   }
 }
 
-/// 选中标记：色块上的勾选徽标（第 40 节曾试过换成圆环+实心点，
-/// 但在彩色色块上看不清，按需求还原为勾选徽标）。
 class SelectIcon extends StatelessWidget {
   const SelectIcon({super.key});
 
@@ -274,20 +270,14 @@ class SelectIcon extends StatelessWidget {
       shape: const CircleBorder(),
       child: Container(
         padding: const EdgeInsets.all(4),
-        child: const Icon(Icons.check_rounded, size: 16),
+        child: const Icon(FluentIcons.checkmark_24_regular, size: 16),
       ),
     );
   }
 }
 
-/// 「选中 / 未选中」圆形单选指示图标（出站模式部件与各处选项弹窗共用）。
-///
-/// 用于**选中一次即结束**的单选场合（选项弹窗、单选行、只取一个值的显示设置弹窗）；
-/// **可多选**的场合用 [OptionCheckIcon]（方块勾选），见定制规范第 7 节。
 class OptionRadioIcon extends StatelessWidget {
   final bool selected;
-
-  /// 外框边长（默认 21；圆环与实心点按比例缩放）
   final double size;
 
   const OptionRadioIcon({super.key, required this.selected, this.size = 21});
@@ -326,14 +316,6 @@ class OptionRadioIcon extends StatelessWidget {
   }
 }
 
-/// 「选中 / 未选中」方块勾选指示图标（**可多选**的场合使用）。
-///
-/// 与 [OptionRadioIcon] 成对，构成全站选项指示的两套体系（定制规范第 7 节）：
-/// - **选中一次即结束**的单选 → 圆形 [OptionRadioIcon]（出站模式同款）；
-/// - **可多选**（访问控制列表、连通性测试置顶平台等）→ 本组件（Bettbox 原本的方块勾选）。
-///
-/// 用 `shrinkWrap` 去掉 Checkbox 自带 48×48 的隐形点击区（整行本身就可点），
-/// 并固定 `standard` 视觉密度，避免桌面端被主题压成迷你方块。
 class OptionCheckIcon extends StatelessWidget {
   final bool selected;
   final ValueChanged<bool?>? onChanged;

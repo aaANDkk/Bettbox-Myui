@@ -1,4 +1,4 @@
-import 'dart:ui' show FontVariation;
+import 'dart:ui';
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -25,7 +25,7 @@ class SheetProps {
     this.maxHeight,
     this.useSafeArea = true,
     this.isScrollControlled = false,
-    this.blur = false,
+    this.blur = true,
     this.barrierColor,
   });
 }
@@ -40,7 +40,7 @@ class ExtendProps {
   const ExtendProps({
     this.maxWidth,
     this.useSafeArea = true,
-    this.blur = false,
+    this.blur = true,
     this.forceFull = false,
   });
 }
@@ -49,35 +49,122 @@ enum SheetType { page, bottomSheet, sideSheet }
 
 typedef SheetBuilder = Widget Function(BuildContext context, SheetType type);
 
+class _BlurModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
+  final ImageFilter? _filter;
+
+  _BlurModalBottomSheetRoute({
+    required super.builder,
+    super.capturedThemes,
+    super.barrierLabel,
+    super.barrierOnTapHint,
+    super.backgroundColor,
+    super.elevation,
+    super.shape,
+    super.clipBehavior,
+    super.constraints,
+    super.modalBarrierColor,
+    super.isDismissible = true,
+    super.enableDrag = true,
+    super.showDragHandle,
+    required super.isScrollControlled,
+    super.scrollControlDisabledMaxHeightRatio = 9.0 / 16.0,
+    super.settings,
+    super.transitionAnimationController,
+    super.anchorPoint,
+    super.useSafeArea = false,
+    super.sheetAnimationStyle,
+    ImageFilter? filter,
+  }) : _filter = filter;
+
+  @override
+  Widget buildModalBarrier() {
+    final Widget barrier = barrierColor.a != 0 && !offstage
+        ? AnimatedModalBarrier(
+            color: animation!.drive(
+              ColorTween(
+                begin: barrierColor.withValues(alpha: 0.0),
+                end: barrierColor,
+              ).chain(CurveTween(curve: barrierCurve)),
+            ),
+            dismissible: barrierDismissible,
+            semanticsLabel: barrierLabel,
+            barrierSemanticsDismissible: semanticsDismissible,
+            semanticsOnTapHint: barrierOnTapHint,
+          )
+        : ModalBarrier(
+            dismissible: barrierDismissible,
+            semanticsLabel: barrierLabel,
+            barrierSemanticsDismissible: semanticsDismissible,
+            semanticsOnTapHint: barrierOnTapHint,
+          );
+    final blurFilter = _filter;
+    if (blurFilter == null) {
+      return barrier;
+    }
+    // 模糊层随动画淡入（恒定子树，压暗层在其上），与系统弹窗背景虚化同款过渡
+    return Stack(
+      fit: StackFit.expand,
+      alignment: Alignment.topLeft,
+      clipBehavior: Clip.none,
+      children: [
+        FadeTransition(
+          opacity: animation!.drive(CurveTween(curve: barrierCurve)),
+          child: BackdropFilter(
+            filter: blurFilter,
+            child: const SizedBox.expand(),
+          ),
+        ),
+        barrier,
+      ],
+    );
+  }
+}
+
 Future<T?> showSheet<T>({
   required BuildContext context,
   required SheetBuilder builder,
   SheetProps props = const SheetProps(),
 }) {
   final isMobile = globalState.appState.viewMode == ViewMode.mobile;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final defaultBarrierColor =
+      isDark ? const Color(0x66000000) : const Color(0x33000000);
   return switch (isMobile) {
-    true => showModalBottomSheet<T>(
-      context: context,
-      isScrollControlled: props.isScrollControlled,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      builder: (_) {
-        return builder(context, SheetType.bottomSheet);
-      },
-      showDragHandle: false,
-      useSafeArea: props.useSafeArea,
-    ),
+    true => () {
+        final navigator = Navigator.of(context);
+        final localizations = MaterialLocalizations.of(context);
+        return navigator.push<T>(
+          _BlurModalBottomSheetRoute<T>(
+            builder: (_) => builder(context, SheetType.bottomSheet),
+            capturedThemes:
+                InheritedTheme.capture(from: context, to: navigator.context),
+            isScrollControlled: props.isScrollControlled,
+            barrierLabel: localizations.scrimLabel,
+            barrierOnTapHint:
+                localizations.scrimOnTapHint(localizations.bottomSheetLabel),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            modalBarrierColor: props.barrierColor ?? defaultBarrierColor,
+            showDragHandle: false,
+            useSafeArea: props.useSafeArea,
+            filter: resolveSheetFilter(
+              context,
+              props.blur ? commonFilter : null,
+            ),
+          ),
+        );
+      }(),
     false => showModalSideSheet<T>(
-      useSafeArea: props.useSafeArea,
-      isScrollControlled: props.isScrollControlled,
-      barrierColor: props.barrierColor,
-      context: context,
-      constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
-      filter: props.blur ? commonFilter : null,
-      builder: (_) {
-        return builder(context, SheetType.sideSheet);
-      },
-    ),
+        useSafeArea: props.useSafeArea,
+        isScrollControlled: props.isScrollControlled,
+        barrierColor: props.barrierColor ?? defaultBarrierColor,
+        context: context,
+        constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
+        filter: props.blur ? commonFilter : null,
+        builder: (_) {
+          return builder(context, SheetType.sideSheet);
+        },
+      ),
   };
 }
 
@@ -87,17 +174,21 @@ Future<T?> showExtend<T>(
   ExtendProps props = const ExtendProps(),
 }) {
   final isMobile = globalState.appState.viewMode == ViewMode.mobile;
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final defaultBarrierColor =
+      isDark ? const Color(0x66000000) : const Color(0x33000000);
   return switch (isMobile || props.forceFull) {
     true => BaseNavigator.push(context, builder(context, SheetType.page)),
     false => showModalSideSheet<T>(
-      useSafeArea: props.useSafeArea,
-      context: context,
-      constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
-      filter: props.blur ? commonFilter : null,
-      builder: (context) {
-        return builder(context, SheetType.sideSheet);
-      },
-    ),
+        useSafeArea: props.useSafeArea,
+        barrierColor: defaultBarrierColor,
+        context: context,
+        constraints: BoxConstraints(maxWidth: props.maxWidth ?? 360),
+        filter: props.blur ? commonFilter : null,
+        builder: (context) {
+          return builder(context, SheetType.sideSheet);
+        },
+      ),
   };
 }
 
@@ -107,6 +198,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
   final String title;
   final List<Widget> actions;
   final Widget? leading;
+  final bool? showScrollGradient;
 
   const AdaptiveSheetScaffold({
     super.key,
@@ -115,6 +207,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     required this.title,
     this.actions = const [],
     this.leading,
+    this.showScrollGradient,
   });
 
   @override
@@ -125,22 +218,30 @@ class AdaptiveSheetScaffold extends StatelessWidget {
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     final implyLeading = !bottomSheet && (!(actions.isEmpty && sideSheet));
     final hasLeading = leading != null || (implyLeading && canPop);
+    final effectiveLeading =
+        leading ?? (implyLeading && canPop ? const BackButton() : null);
     final appBar = AppBar(
-      leading: leading,
+      leading: effectiveLeading != null
+          ? Padding(
+              padding: const EdgeInsets.only(left: 2.0),
+              child: Center(
+                child: effectiveLeading,
+              ),
+            )
+          : null,
+      leadingWidth: hasLeading ? 58.0 : null,
       forceMaterialTransparency: bottomSheet ? true : false,
-      automaticallyImplyLeading: implyLeading,
-      titleSpacing: hasLeading ? 0.0 : null,
+      automaticallyImplyLeading: false,
+      titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
       backgroundColor: backgroundColor,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0.0,
       title: EmojiText(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontVariations: [FontVariation('wght', 700)],
-        ),
       ),
       actions: genActions([
-        if (actions.isEmpty && sideSheet) CloseButton(),
+        if (actions.isEmpty && sideSheet) const CloseButton(),
         ...actions,
       ]),
     );
@@ -148,7 +249,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
         ? Material(
             color: backgroundColor,
             clipBehavior: Clip.antiAlias,
-            shape: RoundedSuperellipseBorder(
+            shape: const RoundedSuperellipseBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(35.0),
               ),
@@ -159,7 +260,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.only(top: 16),
                     child: Container(
                       alignment: Alignment.center,
                       height: 4,
@@ -171,7 +272,15 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                     ),
                   ),
                   appBar,
-                  Flexible(flex: 1, child: body),
+                  Flexible(
+                    flex: 1,
+                    child: (showScrollGradient ?? true)
+                        ? ScrollConfiguration(
+                            behavior: const FeatherBarScrollBehavior(),
+                            child: body,
+                          )
+                        : body,
+                  ),
                 ],
               ),
             ),
@@ -180,6 +289,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
             appBar: appBar,
             backgroundColor: backgroundColor,
             body: body,
+            showScrollGradient: showScrollGradient,
           );
 
     final isTv = globalState.isAndroidTV;

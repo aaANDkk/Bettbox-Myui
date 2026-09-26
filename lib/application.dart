@@ -20,6 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'controller.dart';
 import 'pages/pages.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});
@@ -206,7 +207,7 @@ class ApplicationState extends ConsumerState<Application>
             return ValueListenableBuilder<String?>(
               valueListenable: FontManager.fontFamilyNotifier,
               builder: (_, customFontFamily, _) {
-                final fontFamily = (themeProps.useHarmonyFont &&
+                final fontFamily = (themeProps.useCustomFont &&
                         customFontFamily != null &&
                         customFontFamily.isNotEmpty)
                     ? customFontFamily
@@ -254,12 +255,20 @@ class ApplicationState extends ConsumerState<Application>
                   brightness: Brightness.light,
                   primaryColor: themeProps.primaryColor,
                 ),
+                appBarTheme: AppBarTheme(
+                  backgroundColor: _getAppColorScheme(
+                    brightness: Brightness.light,
+                    primaryColor: themeProps.primaryColor,
+                  ).surface,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
                   backButtonIconBuilder: (BuildContext context) =>
-                      const Icon(Icons.arrow_back_rounded),
+                      const Icon(FluentIcons.arrow_left_24_regular),
                   closeButtonIconBuilder: (BuildContext context) =>
-                      const Icon(Icons.close_rounded),
+                      const Icon(FluentIcons.dismiss_24_regular),
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                   shape: RoundedSuperellipseBorder(
@@ -371,12 +380,20 @@ class ApplicationState extends ConsumerState<Application>
                   brightness: Brightness.dark,
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
+                appBarTheme: AppBarTheme(
+                  backgroundColor: _getAppColorScheme(
+                    brightness: Brightness.dark,
+                    primaryColor: themeProps.primaryColor,
+                  ).toPureBlack(themeProps.pureBlack).surface,
+                  surfaceTintColor: Colors.transparent,
+                  scrolledUnderElevation: 0,
+                ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
                   backButtonIconBuilder: (BuildContext context) =>
-                      const Icon(Icons.arrow_back_rounded),
+                      const Icon(FluentIcons.arrow_left_24_regular),
                   closeButtonIconBuilder: (BuildContext context) =>
-                      const Icon(Icons.close_rounded),
+                      const Icon(FluentIcons.dismiss_24_regular),
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
                   shape: RoundedSuperellipseBorder(

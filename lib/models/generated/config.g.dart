@@ -30,6 +30,8 @@ _AppSettingProps _$AppSettingPropsFromJson(
   mediaUnlockRefreshOnNodeChange:
       json['mediaUnlockRefreshOnNodeChange'] as bool? ?? true,
   mediaUnlockColorfulIcons: json['mediaUnlockColorfulIcons'] as bool? ?? true,
+  mediaUnlockRefreshByCategory:
+      json['mediaUnlockRefreshByCategory'] as bool? ?? true,
   onlyStatisticsProxy: json['onlyStatisticsProxy'] as bool? ?? true,
   autoLaunch: json['autoLaunch'] as bool? ?? false,
   silentLaunch: json['silentLaunch'] as bool? ?? false,
@@ -39,6 +41,7 @@ _AppSettingProps _$AppSettingPropsFromJson(
   closeConnections: json['closeConnections'] as bool? ?? true,
   testUrl: json['testUrl'] as String? ?? defaultTestUrl,
   showStartSwitch: json['showStartSwitch'] as bool? ?? false,
+  showCardStartButton: json['showCardStartButton'] as bool? ?? false,
   enableNavBarHapticFeedback:
       json['enableNavBarHapticFeedback'] as bool? ?? true,
   autoCheckUpdate: json['autoCheckUpdate'] as bool? ?? true,
@@ -77,6 +80,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'mediaUnlockExtraDetails': instance.mediaUnlockExtraDetails,
       'mediaUnlockRefreshOnNodeChange': instance.mediaUnlockRefreshOnNodeChange,
       'mediaUnlockColorfulIcons': instance.mediaUnlockColorfulIcons,
+      'mediaUnlockRefreshByCategory': instance.mediaUnlockRefreshByCategory,
       'onlyStatisticsProxy': instance.onlyStatisticsProxy,
       'autoLaunch': instance.autoLaunch,
       'silentLaunch': instance.silentLaunch,
@@ -86,6 +90,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'closeConnections': instance.closeConnections,
       'testUrl': instance.testUrl,
       'showStartSwitch': instance.showStartSwitch,
+      'showCardStartButton': instance.showCardStartButton,
       'enableNavBarHapticFeedback': instance.enableNavBarHapticFeedback,
       'autoCheckUpdate': instance.autoCheckUpdate,
       'showLabel': instance.showLabel,
@@ -132,6 +137,7 @@ const _$DashboardWidgetEnumMap = {
   DashboardWidget.mediaUnlock: 'mediaUnlock',
   DashboardWidget.mediaUnlockSmall: 'mediaUnlockSmall',
   DashboardWidget.currentProfile: 'currentProfile',
+  DashboardWidget.startButton: 'startButton',
 };
 
 const _$MediaPlatformEnumMap = {
@@ -496,7 +502,7 @@ _ThemeProps _$ThemePropsFromJson(Map<String, dynamic> json) => _ThemeProps(
       ? const TextScale()
       : TextScale.fromJson(json['textScale'] as Map<String, dynamic>),
   useDarkIcon: json['useDarkIcon'] as bool? ?? false,
-  useHarmonyFont: json['useHarmonyFont'] as bool? ?? false,
+  useCustomFont: (json['useCustomFont'] ?? json['useHarmonyFont']) as bool? ?? false,
   invertTrayIcon: json['invertTrayIcon'] as bool? ?? false,
 );
 
@@ -509,7 +515,7 @@ Map<String, dynamic> _$ThemePropsToJson(_ThemeProps instance) =>
       'pureBlack': instance.pureBlack,
       'textScale': instance.textScale,
       'useDarkIcon': instance.useDarkIcon,
-      'useHarmonyFont': instance.useHarmonyFont,
+      'useCustomFont': instance.useCustomFont,
       'invertTrayIcon': instance.invertTrayIcon,
     };
 

@@ -8,6 +8,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 import 'core_status_dialog.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class MemoryInfo extends StatefulWidget {
   const MemoryInfo({super.key});
@@ -123,7 +124,7 @@ class _MemoryInfoState extends State<MemoryInfo> {
               padding: baseInfoEdgeInsets.copyWith(bottom: 0),
               info: Info(
                 label: appLocalizations.memoryInfo,
-                iconData: Icons.memory_rounded,
+                iconData: FluentIcons.hard_drive_24_regular,
               ),
             ),
             Container(

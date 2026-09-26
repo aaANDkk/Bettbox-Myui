@@ -6,6 +6,7 @@ import 'package:bett_box/views/profiles/edit_profile.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class CurrentProfile extends ConsumerWidget {
   const CurrentProfile({super.key});
@@ -31,7 +32,7 @@ class CurrentProfile extends ConsumerWidget {
       child: CommonCard(
         info: Info(
           label: appLocalizations.currentProfile,
-          iconData: Icons.rocket_outlined,
+          iconData: FluentIcons.rocket_24_regular,
         ),
         onPressed: profile == null
             ? () {}

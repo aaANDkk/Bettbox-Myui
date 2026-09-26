@@ -7,21 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+
 class ProxiesSetting extends StatelessWidget {
   const ProxiesSetting({super.key});
 
   IconData _getIconWithProxiesType(ProxiesType type) {
     return switch (type) {
-      ProxiesType.tab => Icons.view_carousel_rounded,
-      ProxiesType.list => Icons.view_list_rounded,
+      ProxiesType.tab => FluentIcons.app_recent_24_regular,
+      ProxiesType.list => FluentIcons.apps_list_detail_24_regular,
     };
   }
 
   IconData _getIconWithProxiesSortType(ProxiesSortType type) {
     return switch (type) {
-      ProxiesSortType.none => Icons.align_horizontal_left_rounded,
-      ProxiesSortType.delay => Icons.network_ping_rounded,
-      ProxiesSortType.name => Icons.sort_by_alpha_rounded,
+      ProxiesSortType.none => FluentIcons.text_align_left_24_regular,
+      ProxiesSortType.delay => FluentIcons.top_speed_24_regular,
+      ProxiesSortType.name => FluentIcons.text_sort_ascending_24_regular,
     };
   }
 
@@ -133,6 +134,61 @@ class ProxiesSetting extends StatelessWidget {
     );
   }
 
+  Info _getInfoWithProxiesLayout(ProxiesLayout proxiesLayout) {
+    return switch (proxiesLayout) {
+      ProxiesLayout.tight => Info(
+          label: getTextForProxiesLayout(proxiesLayout),
+          iconData: FluentIcons.dock_row_24_regular,
+        ),
+      ProxiesLayout.standard => Info(
+          label: getTextForProxiesLayout(proxiesLayout),
+          iconData: FluentIcons.grid_24_regular,
+        ),
+      ProxiesLayout.loose => Info(
+          label: getTextForProxiesLayout(proxiesLayout),
+          icon: const RotatedBox(
+            quarterTurns: 1,
+            child: Icon(FluentIcons.pause_24_regular),
+          ),
+        ),
+    };
+  }
+
+  Info _getInfoWithProxyCardType(ProxyCardType cardType) {
+    return switch (cardType) {
+      ProxyCardType.expand => Info(
+          label: Intl.message(cardType.name),
+          iconData: FluentIcons.maximize_24_regular,
+        ),
+      ProxyCardType.shrink => Info(
+          label: Intl.message(cardType.name),
+          iconData: FluentIcons.system_24_regular,
+        ),
+      ProxyCardType.min => Info(
+          label: Intl.message(cardType.name),
+          iconData: IconsExt.storageMin,
+        ),
+    };
+  }
+
+  Info _getInfoWithProxiesIconStyle(ProxiesIconStyle style) {
+    return switch (style) {
+      ProxiesIconStyle.standard => Info(
+          label: _getTextWithProxiesIconStyle(style),
+          iconData: FluentIcons.image_border_24_regular,
+        ),
+      ProxiesIconStyle.none => Info(
+          label: _getTextWithProxiesIconStyle(style),
+          iconData: FluentIcons.image_off_24_regular,
+        ),
+      ProxiesIconStyle.icon => Info(
+          label: _getTextWithProxiesIconStyle(style),
+          iconData: FluentIcons.image_24_regular,
+        ),
+    };
+  }
+
+
   List<Widget> _buildSizeSetting() {
     return generateSection(
       plain: true,
@@ -150,8 +206,8 @@ class ProxiesSetting extends StatelessWidget {
                 spacing: 16,
                 children: [
                   for (final item in ProxyCardType.values)
-                    SettingTextCard(
-                      Intl.message(item.name),
+                    SettingInfoCard(
+                      _getInfoWithProxyCardType(item),
                       isSelected: item == cardType,
                       onPressed: () {
                         ref
@@ -187,8 +243,8 @@ class ProxiesSetting extends StatelessWidget {
                 spacing: 16,
                 children: [
                   for (final item in ProxiesLayout.values)
-                    SettingTextCard(
-                      getTextForProxiesLayout(item),
+                    SettingInfoCard(
+                      _getInfoWithProxiesLayout(item),
                       isSelected: item == layout,
                       onPressed: () {
                         ref
@@ -224,8 +280,8 @@ class ProxiesSetting extends StatelessWidget {
                 spacing: 16,
                 children: [
                   for (final item in ProxiesIconStyle.values)
-                    SettingTextCard(
-                      _getTextWithProxiesIconStyle(item),
+                    SettingInfoCard(
+                      _getInfoWithProxiesIconStyle(item),
                       isSelected: iconStyle == item,
                       onPressed: () {
                         ref

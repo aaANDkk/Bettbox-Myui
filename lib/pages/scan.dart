@@ -7,6 +7,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/activate_box.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -157,27 +158,27 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              icon: const Icon(Icons.close_rounded),
+              icon: const Icon(FluentIcons.dismiss_24_regular),
             ),
             actions: [
               if (!_permissionDenied)
                 ValueListenableBuilder<MobileScannerState>(
                   valueListenable: controller,
                   builder: (context, state, _) {
-                    var icon = const Icon(Icons.flash_off_rounded);
+                    var icon = const Icon(FluentIcons.flash_off_24_regular);
                     var backgroundColor = Colors.black12;
                     switch (state.torchState) {
                       case TorchState.off:
-                        icon = const Icon(Icons.flash_off_rounded);
+                        icon = const Icon(FluentIcons.flash_off_24_regular);
                         backgroundColor = Colors.black12;
                       case TorchState.on:
-                        icon = const Icon(Icons.flash_on_rounded);
+                        icon = const Icon(FluentIcons.flash_24_regular);
                         backgroundColor = Colors.orange;
                       case TorchState.unavailable:
-                        icon = const Icon(Icons.flash_off_rounded);
+                        icon = const Icon(FluentIcons.flash_off_24_regular);
                         backgroundColor = Colors.transparent;
                       case TorchState.auto:
-                        icon = const Icon(Icons.flash_auto_rounded);
+                        icon = const Icon(FluentIcons.flash_auto_24_regular);
                         backgroundColor = Colors.orange;
                     }
                     return Container(
@@ -216,7 +217,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(16),
                 iconSize: 32.0,
                 onPressed: globalState.appController.addProfileFormQrCode,
-                icon: const Icon(Icons.photo_camera_back_rounded),
+                icon: const Icon(FluentIcons.image_24_regular),
               ),
             ),
         ],
@@ -235,7 +236,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(
-                Icons.camera_alt_outlined,
+                FluentIcons.camera_24_regular,
                 size: 80,
                 color: Colors.white54,
               ),
@@ -286,7 +287,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline_rounded, size: 80, color: Colors.red),
+              const Icon(FluentIcons.error_circle_24_regular, size: 80, color: Colors.red),
               const SizedBox(height: 24),
               Text(
                 errorMessage,

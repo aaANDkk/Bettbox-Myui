@@ -153,7 +153,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "accessControlSetting": MessageLookupByLibrary.simpleMessage(
       "Настройки маршрутизации приложений",
     ),
-    "accessControlShort": MessageLookupByLibrary.simpleMessage("Маршрутизация приложений"),
+    "accessControlShort": MessageLookupByLibrary.simpleMessage(
+      "Маршрутизация приложений",
+    ),
     "appDesc": MessageLookupByLibrary.simpleMessage("Настройки приложения"),
     "application": MessageLookupByLibrary.simpleMessage("Приложение"),
     "applicationDesc": MessageLookupByLibrary.simpleMessage(
@@ -251,7 +253,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "categoryGaming": MessageLookupByLibrary.simpleMessage("Игровой центр"),
     "categorySocial": MessageLookupByLibrary.simpleMessage("Сообщество"),
     "categoryStreaming": MessageLookupByLibrary.simpleMessage("Стриминг"),
-    "chasingDots": MessageLookupByLibrary.simpleMessage("Догоняющие точки"),
     "checkError": MessageLookupByLibrary.simpleMessage("Ошибка проверки"),
     "checkFailed": MessageLookupByLibrary.simpleMessage("Timeout"),
     "checkOrAddProfile": MessageLookupByLibrary.simpleMessage(
@@ -307,6 +308,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "connectivity": MessageLookupByLibrary.simpleMessage("Подключение: "),
     "contactMe": MessageLookupByLibrary.simpleMessage("Связаться со мной"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("Переключить подписи"),
     "content": MessageLookupByLibrary.simpleMessage("Содержимое"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("Контентная тема"),
     "continent": MessageLookupByLibrary.simpleMessage("Континент"),
@@ -336,7 +338,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("Тест сбоя"),
     "create": MessageLookupByLibrary.simpleMessage("Создать"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Время создания"),
-    "cubeGrid": MessageLookupByLibrary.simpleMessage("Сетка кубов"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("Текущий профиль"),
     "custom": MessageLookupByLibrary.simpleMessage("Пользовательский"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Пользовательский заголовок",
@@ -344,7 +346,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("Свои правила"),
     "customUrl": MessageLookupByLibrary.simpleMessage("Пользовательский URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Вырезать"),
-    "dancingSquare": MessageLookupByLibrary.simpleMessage("Танцующий квадрат"),
     "dark": MessageLookupByLibrary.simpleMessage("Тёмная"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("Тёмная иконка"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage(
@@ -434,7 +435,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "Синхронизация с режимом сна Android",
     ),
-    "dualRing": MessageLookupByLibrary.simpleMessage("Двойное кольцо"),
     "edit": MessageLookupByLibrary.simpleMessage("Редактировать"),
     "editTunnel": MessageLookupByLibrary.simpleMessage(
       "Изменить перенаправление",
@@ -496,10 +496,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "externalResources": MessageLookupByLibrary.simpleMessage(
       "Внешние ресурсы",
     ),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("Затухающий круг"),
-    "fadingCube": MessageLookupByLibrary.simpleMessage("Затухающий куб"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("Затухающие точки"),
-    "fadingGrid": MessageLookupByLibrary.simpleMessage("Затухающая сетка"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage(
       "Режим фильтрации FakeIP",
     ),
@@ -548,7 +545,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "Включить определение процессов",
     ),
     "flagged": MessageLookupByLibrary.simpleMessage("Помечен"),
-    "foldingCube": MessageLookupByLibrary.simpleMessage("Складывающийся куб"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("Шрифт"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage(
       "Принудительное DNS-отображение",
@@ -589,8 +585,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Глобально"),
     "go": MessageLookupByLibrary.simpleMessage("Перейти"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Перейти к загрузке"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("По умолчанию системный шрифт, включите для применения своего шрифта"),
+    "customFont": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский шрифт",
+    ),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "По умолчанию системный шрифт, включите для применения своего шрифта",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Кэшировать изменения?",
     ),
@@ -624,7 +624,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hotkeyManagementDesc": MessageLookupByLibrary.simpleMessage(
       "Управление приложением с клавиатуры",
     ),
-    "hourGlass": MessageLookupByLibrary.simpleMessage("Песочные часы"),
     "hours": m5,
     "httpPortSniffer": MessageLookupByLibrary.simpleMessage(
       "HTTP порты сниффера",
@@ -713,7 +712,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Развернуть"),
     "mediaUnlock": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
-    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage("Проверка доступности"),
+    "mediaUnlockShort": MessageLookupByLibrary.simpleMessage(
+      "Проверка доступности",
+    ),
     "mediaUnlockColorfulIcons": MessageLookupByLibrary.simpleMessage(
       "Показывать цветные значки по умолчанию",
     ),
@@ -887,6 +888,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("Организация / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("Опции"),
     "other": MessageLookupByLibrary.simpleMessage("Другое"),
+    "contributor": MessageLookupByLibrary.simpleMessage("Участник"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "Другие участники (в случайном порядке)",
     ),
@@ -955,7 +957,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "password": MessageLookupByLibrary.simpleMessage("Пароль"),
     "paste": MessageLookupByLibrary.simpleMessage("Вставить"),
-    "pianoWave": MessageLookupByLibrary.simpleMessage("Фортепианная волна"),
     "pin": MessageLookupByLibrary.simpleMessage("Закрепить"),
     "pleaseBindWebDAV": MessageLookupByLibrary.simpleMessage(
       "Привяжите WebDAV",
@@ -981,10 +982,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "Введите разные порты",
     ),
     "portTip": m11,
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Сыплющиеся часы"),
-    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
-      "Точные песочные часы",
-    ),
     "powerSwitch": MessageLookupByLibrary.simpleMessage("Запуск"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage(
       "Приоритет HTTP/3 для DoH",
@@ -1047,12 +1044,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Наборы прокси",
     ),
     "pulse": MessageLookupByLibrary.simpleMessage("Пульсация"),
-    "pulsingGrid": MessageLookupByLibrary.simpleMessage("Пульсирующая сетка"),
-    "pumpingHeart": MessageLookupByLibrary.simpleMessage("Бьющееся сердце"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Чистый чёрный"),
     "qrcode": MessageLookupByLibrary.simpleMessage("QR-код"),
     "qrcodeDesc": MessageLookupByLibrary.simpleMessage(
-      "Сканировать QR для импорта профиля",
+      "Сканировать QR для получения профиля",
     ),
     "quicGoDisableEcn": MessageLookupByLibrary.simpleMessage(
       "Отключить ECN QUIC",
@@ -1141,12 +1136,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restore": MessageLookupByLibrary.simpleMessage("Восстановить"),
     "retry": MessageLookupByLibrary.simpleMessage("Повторить"),
     "rightClickBehavior": MessageLookupByLibrary.simpleMessage("Действие ПКМ"),
-    "ring": MessageLookupByLibrary.simpleMessage("Кольцо"),
-    "ripple": MessageLookupByLibrary.simpleMessage("Рябь"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("Вращающийся круг"),
-    "rotatingPlain": MessageLookupByLibrary.simpleMessage(
-      "Вращающаяся плоскость",
-    ),
     "rule": MessageLookupByLibrary.simpleMessage("По правилам"),
     "ruleName": MessageLookupByLibrary.simpleMessage("Имя правила"),
     "ruleProviders": MessageLookupByLibrary.simpleMessage("Провайдеры правил"),
@@ -1189,6 +1179,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "Отображать отдельную кнопку переключения на главной странице",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("Переключатель-карточка"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "Отображать кнопку-карточку переключения на главной странице"),
     "shrink": MessageLookupByLibrary.simpleMessage("Стандарт"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("Тихий запуск"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1243,9 +1236,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sourceIp": MessageLookupByLibrary.simpleMessage("IP источника"),
     "specialProxy": MessageLookupByLibrary.simpleMessage("Специальный прокси"),
     "specialRules": MessageLookupByLibrary.simpleMessage("Специальные правила"),
-    "spinningCircle": MessageLookupByLibrary.simpleMessage("Вращающийся диск"),
     "spinningLines": MessageLookupByLibrary.simpleMessage("Вращающиеся линии"),
-    "squareCircle": MessageLookupByLibrary.simpleMessage("Квадратный круг"),
     "stackMode": MessageLookupByLibrary.simpleMessage("Режим стека"),
     "standard": MessageLookupByLibrary.simpleMessage("Стандарт"),
     "start": MessageLookupByLibrary.simpleMessage("Запуск"),
@@ -1371,33 +1362,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunnelTargetHint": MessageLookupByLibrary.simpleMessage(
       "Например: 114.114.114.114:53",
     ),
-    "tvScanImport": MessageLookupByLibrary.simpleMessage(
-      "Сканирование / Импорт по LAN",
-    ),
-    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
-      "Сканируйте QR или отправьте профиль на ТВ через LAN",
-    ),
-    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
-      "Или введите адрес в браузере телефона:",
-    ),
-    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
-      "Доступная локальная сеть не найдена, проверьте Wi-Fi",
-    ),
-    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
-      "Убедитесь, что телефон и TV подключены к одной сети Wi-Fi",
-    ),
-    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
-      "Отсканируйте QR-код поддерживаемой камерой или браузером",
-    ),
-    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
-      "Вставьте URL подписки или загрузите конфигурацию на веб-странице и отправьте",
-    ),
-    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
-      "Профиль получен, выполняется импорт...",
-    ),
-    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
-      "Ожидание отправки профиля с телефона...",
-    ),
     "twoColumns": MessageLookupByLibrary.simpleMessage("2 колонки"),
     "unableToUpdateCurrentProfileDesc": MessageLookupByLibrary.simpleMessage(
       "Невозможно обновить текущий профиль",
@@ -1448,6 +1412,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "Автоматическая маршрутизация всего трафика через VpnService",
     ),
+    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "HTTP-прокси обычно не рекомендуется на мобильных платформах. Включайте эту функцию только при необходимости и если вы осознаёте возможные последствия.",
+    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "Добавить HTTP-прокси к VPN",
     ),
@@ -1458,9 +1425,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "Эта функция не требует специальных разрешений, так как использует только блокировку пробуждения экрана, а не CPU. Приложение остаётся активным в фоне, экран не гаснет автоматически, что полезно в некоторых сценариях.",
     ),
-    "wanderingCubes": MessageLookupByLibrary.simpleMessage("Блуждающие кубы"),
     "wave": MessageLookupByLibrary.simpleMessage("Волна"),
-    "waveSpinner": MessageLookupByLibrary.simpleMessage("Волновой спиннер"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage(
       "Настройки WebDAV",
     ),
@@ -1473,30 +1438,134 @@ class MessageLookup extends MessageLookupByLibrary {
       "Требуются права администратора",
     ),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Стиль эмодзи"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("Выберите стиль эмодзи в приложении"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "Выберите стиль эмодзи в приложении",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("Анимация вкладок"),
-    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("Действует только в мобильном режиме"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(
+      "Действует только в мобильном режиме",
+    ),
     "startRunning": MessageLookupByLibrary.simpleMessage("Запуск"),
-    "selectCustomFont": MessageLookupByLibrary.simpleMessage("Выбрать / изменить шрифт"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("Нажмите, чтобы выбрать файл шрифта .ttf или .otf"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("Пользовательский шрифт применен"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("Восстановлен системный шрифт по умолчанию"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("Поддерживаются только файлы шрифтов .ttf или .otf"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage(
+      "Выбрать / изменить шрифт",
+    ),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Нажмите, чтобы выбрать файл шрифта .ttf или .otf",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский шрифт применен",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "Восстановлен системный шрифт по умолчанию",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "Поддерживаются только файлы шрифтов .ttf или .otf",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("Угасающий куб"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("Складывающийся куб"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("Пульсирующее сердце"),
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Струящиеся песочные часы"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage(
+      "Струящиеся песочные часы",
+    ),
     "squareCircle": MessageLookupByLibrary.simpleMessage("Квадрат в круг"),
-    "threeRotatingDots": MessageLookupByLibrary.simpleMessage("Три вращающиеся точки"),
-    "fourRotatingDots": MessageLookupByLibrary.simpleMessage("Четыре вращающиеся точки"),
-    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage("Ступенчатая волна"),
-    "dotsTriangle": MessageLookupByLibrary.simpleMessage("Точечный треугольник"),
+    "threeRotatingDots": MessageLookupByLibrary.simpleMessage(
+      "Три вращающиеся точки",
+    ),
+    "fourRotatingDots": MessageLookupByLibrary.simpleMessage(
+      "Четыре вращающиеся точки",
+    ),
+    "staggeredDotsWave": MessageLookupByLibrary.simpleMessage(
+      "Ступенчатая волна",
+    ),
+    "dotsTriangle": MessageLookupByLibrary.simpleMessage(
+      "Точечный треугольник",
+    ),
     "zoom": MessageLookupByLibrary.simpleMessage("Масштаб"),
     "basicInfo": MessageLookupByLibrary.simpleMessage("Основная информация"),
     "addressInfo": MessageLookupByLibrary.simpleMessage("Адресная информация"),
     "traffic": MessageLookupByLibrary.simpleMessage("Трафик"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("Дополнительно"),
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("Догоняющие точки"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("Сетка кубов"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("Танцующий квадрат"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("Двойное кольцо"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("Затухающая сетка"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("Песочные часы"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("Фортепианная волна"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "Точные песочные часы",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("Пульсирующая сетка"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("Кольцо"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("Рябь"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage(
+      "Вращающаяся плоскость",
+    ),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("Вращающийся диск"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("Блуждающие кубы"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("Волновой спиннер"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Исправление шрифта"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Встроенный шрифт для исправления отображения",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "Частичное обновление по текущей категории",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage(
+      "Сканирование / Импорт по LAN",
+    ),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "Сканируйте QR или отправьте профиль на ТВ через LAN",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "Убедитесь, что телефон и TV подключены к одной сети Wi-Fi",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "Отсканируйте QR-код поддерживаемой камерой или браузером",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "Вставьте URL подписки или загрузите конфигурацию на веб-странице и отправьте",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "Или введите адрес в браузере телефона:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "Ожидание отправки профиля с телефона...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "Профиль получен, выполняется импорт...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "Доступная локальная сеть не найдена, проверьте Wi-Fi",
+    ),
   };
 }

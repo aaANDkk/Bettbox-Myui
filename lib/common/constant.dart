@@ -46,10 +46,7 @@ const clashConfigKey = 'clash_config';
 const configKey = 'config';
 const customSidebarIconKey = 'custom_sidebar_icon';
 const customDashboardTitleKey = 'custom_dashboard_title';
-// 亮屏锁开关的用户偏好（仅记录「上次是否开启」，完全退出应用时会主动释放
-// 系统亮屏锁，不影响系统默认息屏策略，下次启动再按偏好恢复）
 const wakelockEnabledKey = 'wakelock_enabled';
-// 小型流量统计小部件显示上传还是下载（默认下载），长按小部件可切换
 const trafficUsageShowUploadKey = 'traffic_usage_show_upload';
 const double dialogCommonWidth = 300;
 const repository = 'aaANDkk/Bettbox_Myui';
@@ -123,9 +120,11 @@ const presetNtpServers = [
 ];
 
 class CommonFilters {
+  static const double blurSigma = 5;
+
   static final ImageFilter blur = ImageFilter.blur(
-    sigmaX: 5,
-    sigmaY: 5,
+    sigmaX: blurSigma,
+    sigmaY: blurSigma,
     tileMode: TileMode.clamp,
   );
 }

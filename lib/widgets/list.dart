@@ -71,6 +71,7 @@ class NextDelegate extends Delegate {
   final bool blur;
   final bool wrap;
   final bool forceFull;
+  final bool? showScrollGradient;
 
   const NextDelegate({
     required this.title,
@@ -81,6 +82,7 @@ class NextDelegate extends Delegate {
     this.blur = false,
     this.wrap = true,
     this.forceFull = true,
+    this.showScrollGradient,
   }) : assert(widget != null || builder != null);
 }
 
@@ -360,6 +362,7 @@ class ListItem<T> extends StatelessWidget {
                       type: type,
                       body: child,
                       title: nextDelegate.title,
+                      showScrollGradient: nextDelegate.showScrollGradient,
                     )
                   : child;
             },
@@ -417,7 +420,6 @@ class ListItem<T> extends StatelessWidget {
             checkboxDelegate.onChanged!(!checkboxDelegate.value);
           }
         },
-        // 可多选的复选框行 → 方块勾选（规范第 7 节）。
         trailing: Padding(
           padding: const EdgeInsets.only(right: 8),
           child: OptionCheckIcon(
@@ -489,9 +491,6 @@ class ListHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.centerLeft,
-      // 分区小标题左侧内缩 24 = 卡片外边距 16 + 额外 8，
-      // 与「更多」页面（_buildModernSection）的小标题视觉完全一致，
-      // 彻底消除标题紧贴屏幕左边缘的违和感。
       padding:
           padding ??
           const EdgeInsets.only(left: 24, right: 8, top: 24, bottom: 8),
@@ -540,6 +539,7 @@ class SectionContainer extends StatelessWidget {
   final bool separated;
   final bool plain;
   final bool isFirst;
+  final double? radius;
 
   const SectionContainer({
     super.key,
@@ -549,6 +549,7 @@ class SectionContainer extends StatelessWidget {
     this.separated = true,
     this.plain = false,
     this.isFirst = false,
+    this.radius,
   });
 
   @override
@@ -585,6 +586,7 @@ class SectionContainer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: CommonCard(
             type: CommonCardType.filled,
+            radius: radius ?? 20.0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -618,6 +620,7 @@ class ContinuousListItem extends StatelessWidget {
   final int index;
   final int count;
   final bool reversed;
+  final double radius;
 
   const ContinuousListItem({
     super.key,
@@ -625,6 +628,7 @@ class ContinuousListItem extends StatelessWidget {
     required this.index,
     required this.count,
     this.reversed = false,
+    this.radius = 20.0,
   });
 
   @override
@@ -641,8 +645,8 @@ class ContinuousListItem extends StatelessWidget {
         color: context.colorScheme.surfaceContainer,
         shape: RoundedSuperellipseBorder(
           borderRadius: BorderRadius.vertical(
-            top: isFirst ? const Radius.circular(20) : Radius.zero,
-            bottom: isLast ? const Radius.circular(20) : Radius.zero,
+            top: isFirst ? Radius.circular(radius) : Radius.zero,
+            bottom: isLast ? Radius.circular(radius) : Radius.zero,
           ),
         ),
       ),

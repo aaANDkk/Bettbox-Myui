@@ -15,6 +15,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../models/common.dart';
 import 'card.dart';
 import 'common.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef ProxyGroupViewKeyMap =
     Map<String, GlobalObjectKey<_ProxyGroupViewState>>;
@@ -90,8 +91,8 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
         return IconButton(
           onPressed: _showMoreMenu,
           icon: isMobileView
-              ? const Icon(Icons.expand_more_rounded)
-              : const Icon(Icons.chevron_right_rounded),
+              ? const Icon(FluentIcons.chevron_down_24_regular)
+              : const Icon(FluentIcons.chevron_right_24_regular),
         );
       },
     );
@@ -153,7 +154,7 @@ class ProxiesTabViewState extends ConsumerState<ProxiesTabView>
         final isTesting = delayTestCoordinator.isTesting;
         return IconButton(
           onPressed: isTesting ? null : delayTestCurrentGroup,
-          icon: Icon(Icons.network_ping_rounded),
+          icon: Icon(FluentIcons.flash_24_filled),
           tooltip: appLocalizations.startTest,
         );
       },
@@ -598,7 +599,7 @@ class _DelayTestButtonState extends ConsumerState<DelayTestButton>
                     : _healthcheck,
                 icon: Transform.scale(
                   scale: contentScale,
-                  child: const Icon(Icons.network_ping_rounded),
+                  child: const Icon(FluentIcons.flash_24_filled),
                 ),
                 label: Transform.scale(
                   scale: contentScale,

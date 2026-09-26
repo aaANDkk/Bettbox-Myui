@@ -1,12 +1,14 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/providers/config.dart';
 import 'package:bett_box/state.dart';
-import 'package:bett_box/widgets/list.dart';
+import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 @immutable
 class Contributor {
@@ -40,26 +42,26 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Github Releases',
-            icon: Icons.star_rounded,
+            icon: FluentIcons.star_add_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/$repository'),
           ),
           right: _LinkGridTile(
             title: appLocalizations.checkUpdate,
-            icon: Icons.refresh_rounded,
+            icon: FluentIcons.arrow_clockwise_24_regular,
             onTap: () => _checkUpdate(context),
           ),
         ),
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'Telegram Group',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://telegram.me/appshub_chat'),
           ),
           right: _LinkGridTile(
             title: 'Channel',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://telegram.me/appshub_channel'),
           ),
@@ -67,13 +69,13 @@ class AboutView extends StatelessWidget {
         _LinkGridRow(
           left: _LinkGridTile(
             title: 'FlClash',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/chen08209/FlClash'),
           ),
           right: _LinkGridTile(
             title: 'Mihomo',
-            icon: Icons.launch_rounded,
+            icon: FluentIcons.open_24_regular,
             onTap: () =>
                 globalState.openUrl('https://github.com/MetaCubeX/mihomo'),
           ),
@@ -82,7 +84,10 @@ class AboutView extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildContributorsSection() {
+  static final int _contributorShuffleSeed =
+      DateTime.now().microsecondsSinceEpoch;
+
+  List<Widget> _buildContributorsSection(BuildContext context) {
     final contributors = [
       const Contributor(
         avatar: 'assets/images/avatars/june2.jpg',
@@ -150,20 +155,26 @@ class AboutView extends StatelessWidget {
         avatar: 'assets/images/avatars/aaANDkk.png',
         name: 'aaANDkk',
       ),
-    ]..shuffle();
+    ]..shuffle(Random(_contributorShuffleSeed));
+
     return generateSection(
       separated: false,
       title: appLocalizations.otherContributors,
       items: [
-        ListItem(
-          title: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Wrap(
-              spacing: 24,
-              children: [
-                for (final contributor in contributors)
-                  Avatar(contributor: contributor),
-              ],
+        SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int i = 0; i < contributors.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 14),
+                    Avatar(contributor: contributors[i]),
+                  ],
+                ],
+              ),
             ),
           ),
         ),
@@ -200,7 +211,8 @@ class AboutView extends StatelessWidget {
                         children: [
                           Text(
                             appName,
-                            style: Theme.of(context).textTheme.headlineSmall,
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
                             '${globalState.packageInfo.version}+${globalState.packageInfo.buildNumber}',
@@ -232,7 +244,7 @@ class AboutView extends StatelessWidget {
           ],
         ),
       ),
-      ..._buildContributorsSection(),
+      ..._buildContributorsSection(context),
       ..._buildMoreSection(context),
     ];
     return generateListView(items);
@@ -246,16 +258,179 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 36,
-          height: 36,
-          child: CircleAvatar(foregroundImage: AssetImage(contributor.avatar)),
+    final borderColor = context.colorScheme.outline.withValues(
+      alpha: context.colorScheme.brightness == Brightness.dark ? 0.65 : 0.5,
+    );
+
+    return Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          globalState.showCommonDialog(
+            child: _ContributorDialog(contributor: contributor),
+          );
+        },
+        child: SizedBox(
+          width: 42,
+          height: 42,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  contributor.avatar,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: borderColor,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 4),
-        Text(contributor.name, style: context.textTheme.bodySmall),
-      ],
+      ),
+    );
+  }
+}
+
+class _ContributorDialog extends StatelessWidget {
+  final Contributor contributor;
+
+  const _ContributorDialog({required this.contributor});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final fabTheme = theme.floatingActionButtonTheme;
+    final fabBgColor = fabTheme.backgroundColor ?? colorScheme.primaryContainer;
+    final fabFgColor = fabTheme.foregroundColor ?? colorScheme.onPrimaryContainer;
+    final borderColor = colorScheme.outline.withValues(
+      alpha: isDark ? 0.65 : 0.5,
+    );
+
+    return CommonDialog(
+      title: appLocalizations.contributor,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 82,
+              height: 82,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.35 : 0.14,
+                          ),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.20 : 0.06,
+                          ),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ClipOval(
+                    child: Image.asset(
+                      contributor.avatar,
+                      width: 76,
+                      height: 76,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: borderColor,
+                        width: 3.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+              decoration: ShapeDecoration(
+                color: fabBgColor,
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.35 : 0.14,
+                    ),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: isDark ? 0.20 : 0.06,
+                    ),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    FluentIcons.person_starburst_24_regular,
+                    size: 20,
+                    color: fabFgColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      contributor.name,
+                      style: (fabTheme.extendedTextStyle ??
+                              context.textTheme.titleMedium)
+                          ?.copyWith(
+                        color: fabFgColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

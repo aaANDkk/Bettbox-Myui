@@ -112,9 +112,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
-    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
-      "访问控制设置",
-    ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage("访问控制设置"),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("访问控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("处理应用相关设置"),
     "application": MessageLookupByLibrary.simpleMessage("应用程序"),
@@ -175,7 +173,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "categoryGaming": MessageLookupByLibrary.simpleMessage("游戏中心"),
     "categorySocial": MessageLookupByLibrary.simpleMessage("社区平台"),
     "categoryStreaming": MessageLookupByLibrary.simpleMessage("流媒体"),
-    "chasingDots": MessageLookupByLibrary.simpleMessage("双星追逐"),
     "checkError": MessageLookupByLibrary.simpleMessage("检测失败"),
     "checkFailed": MessageLookupByLibrary.simpleMessage("Timeout"),
     "checkOrAddProfile": MessageLookupByLibrary.simpleMessage("请先添加配置"),
@@ -215,6 +212,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("连接排序"),
     "connectivity": MessageLookupByLibrary.simpleMessage("连通性："),
     "contactMe": MessageLookupByLibrary.simpleMessage("联系我"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("切换标签"),
     "content": MessageLookupByLibrary.simpleMessage("内容"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("内容主题"),
     "continent": MessageLookupByLibrary.simpleMessage("大洲"),
@@ -238,13 +236,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("崩溃测试"),
     "create": MessageLookupByLibrary.simpleMessage("创建"),
     "creationTime": MessageLookupByLibrary.simpleMessage("创建时间"),
-    "cubeGrid": MessageLookupByLibrary.simpleMessage("九宫烁影"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("当前配置"),
     "custom": MessageLookupByLibrary.simpleMessage("自定义"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("个性化标题"),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("自定义规则开关"),
     "customUrl": MessageLookupByLibrary.simpleMessage("自定义URL"),
     "cut": MessageLookupByLibrary.simpleMessage("剪切"),
-    "dancingSquare": MessageLookupByLibrary.simpleMessage("方块起舞"),
     "dark": MessageLookupByLibrary.simpleMessage("深色"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("深色图标"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage("手动切换深色系桌面 APP 图标"),
@@ -306,7 +303,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "开启后同步系统 Doze 休眠模式",
     ),
-    "dualRing": MessageLookupByLibrary.simpleMessage("双环回旋"),
     "edit": MessageLookupByLibrary.simpleMessage("编辑"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("编辑转发"),
     "editUser": MessageLookupByLibrary.simpleMessage("编辑用户"),
@@ -352,10 +348,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("外部链接"),
     "externalResources": MessageLookupByLibrary.simpleMessage("外部资源"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("环影隐渐"),
-    "fadingCube": MessageLookupByLibrary.simpleMessage("方影微漾"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("四方烁动"),
-    "fadingGrid": MessageLookupByLibrary.simpleMessage("栅格隐现"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage("FakeIP过滤模式"),
     "fakeIpFilterModeDesc": MessageLookupByLibrary.simpleMessage(
       "指定 FakeIP 过滤模式",
@@ -386,7 +379,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "findProcessMode": MessageLookupByLibrary.simpleMessage("查找进程"),
     "findProcessModeDesc": MessageLookupByLibrary.simpleMessage("开启后可以匹配查找进程"),
     "flagged": MessageLookupByLibrary.simpleMessage("已标记"),
-    "foldingCube": MessageLookupByLibrary.simpleMessage("魔方翻折"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("字体"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage("强制 DNS 映射"),
     "forceDnsMappingDesc": MessageLookupByLibrary.simpleMessage(
@@ -415,8 +407,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("全局"),
     "go": MessageLookupByLibrary.simpleMessage("前往"),
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下载"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("自定义字体"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("默认系统字体，开启后可自定义自己喜欢的字体"),
+    "customFont": MessageLookupByLibrary.simpleMessage("自定义字体"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "默认系统字体，开启后可自定义自己喜欢的字体",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否缓存修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超时时间"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -432,7 +426,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("快捷键冲突"),
     "hotkeyManagement": MessageLookupByLibrary.simpleMessage("快捷键管理"),
     "hotkeyManagementDesc": MessageLookupByLibrary.simpleMessage("使用键盘控制应用程序"),
-    "hourGlass": MessageLookupByLibrary.simpleMessage("沙漏翻转"),
     "hours": m5,
     "httpPortSniffer": MessageLookupByLibrary.simpleMessage("HTTP 端口嗅探"),
     "icmpForwarding": MessageLookupByLibrary.simpleMessage("ICMP转发"),
@@ -623,6 +616,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("归属 / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("选项"),
     "other": MessageLookupByLibrary.simpleMessage("其他"),
+    "contributor": MessageLookupByLibrary.simpleMessage("贡献者"),
     "otherContributors": MessageLookupByLibrary.simpleMessage("其他贡献者(随机排序)"),
     "otherSettings": MessageLookupByLibrary.simpleMessage("增强工具"),
     "otherSettingsDesc": MessageLookupByLibrary.simpleMessage("修改增强工具设置"),
@@ -669,7 +663,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "parsePureIpDesc": MessageLookupByLibrary.simpleMessage("解析纯 IP 连接"),
     "password": MessageLookupByLibrary.simpleMessage("密码"),
     "paste": MessageLookupByLibrary.simpleMessage("粘贴"),
-    "pianoWave": MessageLookupByLibrary.simpleMessage("琴键律动"),
     "pin": MessageLookupByLibrary.simpleMessage("置顶"),
     "pleaseBindWebDAV": MessageLookupByLibrary.simpleMessage("请绑定 WebDAV"),
     "pleaseCloseSystemProxyFirst": MessageLookupByLibrary.simpleMessage(
@@ -687,8 +680,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "port": MessageLookupByLibrary.simpleMessage("端口"),
     "portConflictTip": MessageLookupByLibrary.simpleMessage("请输入不同的端口"),
     "portTip": m11,
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("流沙倾注"),
-    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("玉漏凝光"),
     "powerSwitch": MessageLookupByLibrary.simpleMessage("启动开关"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage("优先使用 DoH 的 HTTP/3"),
     "pressKeyboard": MessageLookupByLibrary.simpleMessage("请按下按键"),
@@ -733,11 +724,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyProviders": MessageLookupByLibrary.simpleMessage("代理提供者"),
     "proxyProvidersCount": MessageLookupByLibrary.simpleMessage("代理集"),
     "pulse": MessageLookupByLibrary.simpleMessage("脉冲律动"),
-    "pulsingGrid": MessageLookupByLibrary.simpleMessage("矩阵脉动"),
-    "pumpingHeart": MessageLookupByLibrary.simpleMessage("怦然心动"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("纯黑模式"),
     "qrcode": MessageLookupByLibrary.simpleMessage("二维码"),
-    "qrcodeDesc": MessageLookupByLibrary.simpleMessage("扫描二维码导入配置文件"),
+    "qrcodeDesc": MessageLookupByLibrary.simpleMessage("扫描二维码获取配置文件"),
     "quicGoDisableEcn": MessageLookupByLibrary.simpleMessage("禁用 QUIC 显式拥塞通知"),
     "quicGoDisableEcnDesc": MessageLookupByLibrary.simpleMessage(
       "禁用 QUIC 的显式拥塞通知功能",
@@ -791,10 +780,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restore": MessageLookupByLibrary.simpleMessage("还原"),
     "retry": MessageLookupByLibrary.simpleMessage("重试"),
     "rightClickBehavior": MessageLookupByLibrary.simpleMessage("右键点击"),
-    "ring": MessageLookupByLibrary.simpleMessage("光环流转"),
-    "ripple": MessageLookupByLibrary.simpleMessage("水波荡漾"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("单圆自转"),
-    "rotatingPlain": MessageLookupByLibrary.simpleMessage("灵板翻转"),
     "rule": MessageLookupByLibrary.simpleMessage("规则"),
     "ruleName": MessageLookupByLibrary.simpleMessage("规则名称"),
     "ruleProviders": MessageLookupByLibrary.simpleMessage("规则提供者"),
@@ -825,6 +811,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showPanel": MessageLookupByLibrary.simpleMessage("显示窗口"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("联动开关"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage("首页显示独立的开关按钮"),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("卡片开关"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "首页显示卡片式开关按钮"),
     "shrink": MessageLookupByLibrary.simpleMessage("紧凑"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("静默启动"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage("不打开软件直接在后台启动"),
@@ -859,9 +848,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sourceIp": MessageLookupByLibrary.simpleMessage("源 IP"),
     "specialProxy": MessageLookupByLibrary.simpleMessage("特殊代理"),
     "specialRules": MessageLookupByLibrary.simpleMessage("特殊规则"),
-    "spinningCircle": MessageLookupByLibrary.simpleMessage("圆盘翻转"),
     "spinningLines": MessageLookupByLibrary.simpleMessage("流光旋绕"),
-    "squareCircle": MessageLookupByLibrary.simpleMessage("方圆化境"),
     "stackMode": MessageLookupByLibrary.simpleMessage("栈模式"),
     "standard": MessageLookupByLibrary.simpleMessage("标准"),
     "start": MessageLookupByLibrary.simpleMessage("启动"),
@@ -947,19 +934,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunnelTargetHint": MessageLookupByLibrary.simpleMessage(
       "例如: 114.114.114.114:53",
     ),
-    "tvScanImport": MessageLookupByLibrary.simpleMessage("扫码 / 局域网导入"),
-    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage("手机扫码或局域网推送配置至电视"),
-    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage("手机浏览器也可直接访问："),
-    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
-      "未检测到可用的局域网，请检查 Wi-Fi",
-    ),
-    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
-      "确保手机与 TV 连接在同一 Wi-Fi 局域网",
-    ),
-    "tvScanStep2": MessageLookupByLibrary.simpleMessage("使用支持的相机或浏览器以扫描二维码"),
-    "tvScanStep3": MessageLookupByLibrary.simpleMessage("在网页中粘贴订阅链接或上传配置并推送"),
-    "tvScanSuccess": MessageLookupByLibrary.simpleMessage("配置推送成功，正在导入..."),
-    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("等待手机推送配置中..."),
     "twoColumns": MessageLookupByLibrary.simpleMessage("两列"),
     "unableToUpdateCurrentProfileDesc": MessageLookupByLibrary.simpleMessage(
       "无法更新当前配置文件",
@@ -996,6 +970,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "通过 VpnService 自动路由系统流量",
     ),
+    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "非桌面端通常不推荐使用 HTTP 代理，此功能仅建议您在必要且熟悉的情况下开启",
+    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "为 VpnService 附加 HTTP 代理",
     ),
@@ -1004,26 +981,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "本功能不需要任何特殊权限，因为它仅启用屏幕唤醒锁，而不是任何 CPU 唤醒锁，应用会在后台保持必要的活跃，且屏幕不会自动熄灭，这在一些场景下会很有用",
     ),
-    "wanderingCubes": MessageLookupByLibrary.simpleMessage("双角巡游"),
     "wave": MessageLookupByLibrary.simpleMessage("波浪起伏"),
-    "waveSpinner": MessageLookupByLibrary.simpleMessage("波澜叠转"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV 配置"),
     "whitelist": MessageLookupByLibrary.simpleMessage("白名单"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("白名单模式"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("写入系统"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("需要管理员权限"),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji 风格"),
     "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("选择应用内显示的 Emoji 风格"),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("选项卡动画"),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("仅在移动视图有效"),
     "startRunning": MessageLookupByLibrary.simpleMessage("启动"),
     "selectCustomFont": MessageLookupByLibrary.simpleMessage("选择 / 更换字体"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("点击选择本地 .ttf 或 .otf 字体文件"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "点击选择本地 .ttf 或 .otf 字体文件",
+    ),
     "customFontApplied": MessageLookupByLibrary.simpleMessage("已应用自定义字体"),
     "customFontDisabled": MessageLookupByLibrary.simpleMessage("已恢复系统默认字体"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("仅支持 .ttf 或 .otf 格式的字体文件"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "仅支持 .ttf 或 .otf 格式的字体文件",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("渐隐方块"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("折叠魔方"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("心跳波动"),
@@ -1038,5 +1017,65 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("地址"),
     "traffic": MessageLookupByLibrary.simpleMessage("流量"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("高级"),
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("双星追逐"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("九宫烁影"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("方块起舞"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("双环回旋"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("栅格隐现"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("沙漏翻转"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("琴键律动"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("玉漏凝光"),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("矩阵脉动"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("光环流转"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("水波荡漾"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("灵板翻转"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("圆盘翻转"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("双角巡游"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("波澜叠转"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("字体修复"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("使用内置字体解决显示异常问题"),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "根据当前分组状态局部刷新",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("扫码 / 局域网导入"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage("手机扫码或局域网推送配置至电视"),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "确保手机与 TV 连接在同一 Wi-Fi 局域网",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage("使用支持的相机或浏览器以扫描二维码"),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage("在网页中粘贴订阅链接或上传配置并推送"),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage("手机浏览器也可直接访问："),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("等待手机推送配置中..."),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage("配置推送成功，正在导入..."),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "未检测到可用的局域网，请检查 Wi-Fi",
+    ),
   };
 }

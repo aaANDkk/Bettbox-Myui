@@ -12,6 +12,7 @@ import 'card.dart';
 import 'effect.dart';
 import 'float_layout.dart';
 import 'list.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class OptionsDialog<T> extends StatelessWidget {
   final String title;
@@ -322,7 +323,7 @@ class ListInputPage extends StatelessWidget {
             onPressed: () async {
               _handleAddOrEdit();
             },
-            child: const Icon(Icons.add_rounded),
+            child: const Icon(FluentIcons.add_circle_24_filled),
           ),
         ),
       ),
@@ -350,7 +351,7 @@ class ListInputPage extends StatelessWidget {
                             ? subtitleBuilder!(e)
                             : null,
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline_rounded),
+                          icon: const Icon(FluentIcons.delete_24_regular),
                           onPressed: () {
                             _handleDelete(e);
                           },
@@ -476,7 +477,7 @@ class MapInputPage extends StatelessWidget {
             onPressed: () async {
               _handleAddOrEdit();
             },
-            child: const Icon(Icons.add_rounded),
+            child: const Icon(FluentIcons.add_circle_24_filled),
           ),
         ),
       ),
@@ -506,7 +507,7 @@ class MapInputPage extends StatelessWidget {
                             : null,
                         trailing: (canDelete == null || canDelete!(e))
                             ? IconButton(
-                                icon: const Icon(Icons.delete_outline_rounded),
+                                icon: const Icon(FluentIcons.delete_24_regular),
                                 onPressed: () {
                                   _handleDelete(e);
                                 },

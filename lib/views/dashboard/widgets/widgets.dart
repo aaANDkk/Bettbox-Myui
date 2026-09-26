@@ -22,3 +22,4 @@ export 'media_unlock.dart';
 export 'media_unlock_small.dart';
 export 'script_override.dart';
 export 'current_profile.dart';
+export 'start_button.dart';

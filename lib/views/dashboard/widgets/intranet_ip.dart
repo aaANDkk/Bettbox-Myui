@@ -5,6 +5,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class IntranetIP extends ConsumerWidget {
   const IntranetIP({super.key});
@@ -15,7 +16,7 @@ class IntranetIP extends ConsumerWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: appLocalizations.intranetIP, iconData: Icons.devices_rounded),
+        info: Info(label: appLocalizations.intranetIP, iconData: FluentIcons.phone_laptop_24_regular),
         onPressed: (localIp != null && localIp.isNotEmpty)
             ? () => showIpDetailDialog(context, localIp)
             : () {},

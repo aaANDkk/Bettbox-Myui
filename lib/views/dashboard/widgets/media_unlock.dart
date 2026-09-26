@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class MediaUnlock extends ConsumerStatefulWidget {
   const MediaUnlock({super.key});
@@ -212,7 +213,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                     // 卡片标题用短标题键（英文只写 Connectivity，去掉后面的 Test）；
                     // 解锁页面标题仍用 mediaUnlock
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: Icons.link_rounded,
+                    iconData: FluentIcons.link_24_regular,
                   ),
                   actions: [
                     SizedBox(
@@ -236,7 +237,7 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                                 ),
                               )
                             : Icon(
-                                Icons.sync_rounded,
+                                FluentIcons.arrow_sync_24_regular,
                                 size: 18.ap,
                                 color: context.colorScheme.onSurfaceVariant,
                               ),

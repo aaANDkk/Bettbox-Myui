@@ -13,6 +13,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef UpdatingMap = Map<String, bool>;
 
@@ -107,7 +108,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
           IconButton(
             onPressed: _updateProviders,
             tooltip: appLocalizations.update,
-            icon: const Icon(Icons.sync_rounded),
+            icon: const Icon(FluentIcons.arrow_sync_24_regular),
           ),
         ],
         type: widget.type,
@@ -139,7 +140,7 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
                         IconButton(
                           onPressed: section.onSync,
                           tooltip: appLocalizations.update,
-                          icon: const Icon(Icons.sync_rounded),
+                          icon: const Icon(FluentIcons.arrow_sync_24_regular),
                           iconSize: 20,
                           splashRadius: 20,
                           padding: EdgeInsets.zero,
@@ -343,12 +344,12 @@ class ProviderItem extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               CommonChip(
-                avatar: const Icon(Icons.upload_rounded),
+                avatar: const Icon(FluentIcons.folder_open_24_regular),
                 label: appLocalizations.upload,
                 onPressed: _handleSideLoadProvider,
               ),
               CommonChip(
-                avatar: const Icon(Icons.visibility_rounded),
+                avatar: const Icon(FluentIcons.eye_24_regular),
                 label: appLocalizations.view,
                 onPressed: () => _handleViewProviderContent(context),
               ),
@@ -362,7 +363,7 @@ class ProviderItem extends StatelessWidget {
                             size: 16,
                           ),
                         )
-                      : const Icon(Icons.sync_rounded),
+                      : const Icon(FluentIcons.arrow_sync_24_regular),
                   label: appLocalizations.sync,
                   onPressed:
                       provider.isUpdating ? null : _handleUpdateProvider,

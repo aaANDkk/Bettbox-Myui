@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class MediaUnlockSmall extends ConsumerStatefulWidget {
   const MediaUnlockSmall({super.key});
@@ -155,7 +156,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                   info: Info(
                     // 与连通性测试大卡一致：短标题键（英文 Connectivity）
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: Icons.link_rounded,
+                    iconData: FluentIcons.link_24_regular,
                   ),
                   actions: [
                     SizedBox(
@@ -179,7 +180,7 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                                 ),
                               )
                             : Icon(
-                                Icons.sync_rounded,
+                                FluentIcons.arrow_sync_24_regular,
                                 size: 18.ap,
                                 color: context.colorScheme.onSurfaceVariant,
                               ),

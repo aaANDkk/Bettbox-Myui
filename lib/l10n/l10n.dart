@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'intl/messages_all.dart';
 
 // **************************************************************************
@@ -171,14 +172,8 @@ class AppLocalizations {
 
   /// `Traffic`
   String get trafficUsage {
-    return Intl.message(
-      'Traffic',
-      name: 'trafficUsage',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Traffic', name: 'trafficUsage', desc: '', args: []);
   }
-
 
   /// `Core Info`
   String get coreInfo {
@@ -1210,10 +1205,10 @@ class AppLocalizations {
     return Intl.message('QR Code', name: 'qrcode', desc: '', args: []);
   }
 
-  /// `Scan QR code to import profile`
+  /// `Scan QR code to get profile`
   String get qrcodeDesc {
     return Intl.message(
-      'Scan QR code to import profile',
+      'Scan QR code to get profile',
       name: 'qrcodeDesc',
       desc: '',
       args: [],
@@ -1715,6 +1710,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Card Switch`
+  String get cardStartButton {
+    return Intl.message(
+      'Card Switch',
+      name: 'cardStartButton',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Display card-style switch button on the homepage`
+  String get cardStartButtonDesc {
+    return Intl.message(
+      'Display card-style switch button on the homepage',
+      name: 'cardStartButtonDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Bettbox is based on the powerful and flexible Mihomo (Clash.Meta) proxy kernel, dedicated to a superior user experience. Our vision: Connecting Open Source and AI, Accelerating Innovation`
   String get desc {
     return Intl.message(
@@ -1987,12 +2002,7 @@ class AppLocalizations {
 
   /// `Null`
   String get notAcquired {
-    return Intl.message(
-      'Null',
-      name: 'notAcquired',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Null', name: 'notAcquired', desc: '', args: []);
   }
 
   /// `GeoData`
@@ -2140,6 +2150,16 @@ class AppLocalizations {
     return Intl.message(
       'Attach HTTP proxy to VpnService',
       name: 'vpnSystemProxyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `HTTP proxy is generally not recommended on non-desktop platforms. Only enable this feature when necessary and you fully understand the implications.`
+  String get vpnSystemProxyConfirmDesc {
+    return Intl.message(
+      'HTTP proxy is generally not recommended on non-desktop platforms. Only enable this feature when necessary and you fully understand the implications.',
+      name: 'vpnSystemProxyConfirmDesc',
       desc: '',
       args: [],
     );
@@ -2481,15 +2501,6 @@ class AppLocalizations {
   }
 
   /// `Fading Circle`
-  String get fadingCircle {
-    return Intl.message(
-      'Fading Circle',
-      name: 'fadingCircle',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Fading Four`
   String get fadingFour {
     return Intl.message('Fading Four', name: 'fadingFour', desc: '', args: []);
@@ -2505,166 +2516,6 @@ class AppLocalizations {
     return Intl.message(
       'Double Bounce',
       name: 'doubleBounce',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Chasing Dots`
-  String get chasingDots {
-    return Intl.message(
-      'Chasing Dots',
-      name: 'chasingDots',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Cube Grid`
-  String get cubeGrid {
-    return Intl.message('Cube Grid', name: 'cubeGrid', desc: '', args: []);
-  }
-
-  /// `Dancing Square`
-  String get dancingSquare {
-    return Intl.message(
-      'Dancing Square',
-      name: 'dancingSquare',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Dual Ring`
-  String get dualRing {
-    return Intl.message('Dual Ring', name: 'dualRing', desc: '', args: []);
-  }
-
-  /// `Fading Cube`
-  String get fadingCube {
-    return Intl.message('Fading Cube', name: 'fadingCube', desc: '', args: []);
-  }
-
-  /// `Fading Grid`
-  String get fadingGrid {
-    return Intl.message('Fading Grid', name: 'fadingGrid', desc: '', args: []);
-  }
-
-  /// `Folding Cube`
-  String get foldingCube {
-    return Intl.message(
-      'Folding Cube',
-      name: 'foldingCube',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Hourglass`
-  String get hourGlass {
-    return Intl.message('Hourglass', name: 'hourGlass', desc: '', args: []);
-  }
-
-  /// `Piano Wave`
-  String get pianoWave {
-    return Intl.message('Piano Wave', name: 'pianoWave', desc: '', args: []);
-  }
-
-  /// `Pouring Hourglass`
-  String get pouringHourGlass {
-    return Intl.message(
-      'Pouring Hourglass',
-      name: 'pouringHourGlass',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Refined Hourglass`
-  String get pouringHourGlassRefined {
-    return Intl.message(
-      'Refined Hourglass',
-      name: 'pouringHourGlassRefined',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Pulsing Grid`
-  String get pulsingGrid {
-    return Intl.message(
-      'Pulsing Grid',
-      name: 'pulsingGrid',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Pumping Heart`
-  String get pumpingHeart {
-    return Intl.message(
-      'Pumping Heart',
-      name: 'pumpingHeart',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Ring`
-  String get ring {
-    return Intl.message('Ring', name: 'ring', desc: '', args: []);
-  }
-
-  /// `Ripple`
-  String get ripple {
-    return Intl.message('Ripple', name: 'ripple', desc: '', args: []);
-  }
-
-  /// `Rotating Plain`
-  String get rotatingPlain {
-    return Intl.message(
-      'Rotating Plain',
-      name: 'rotatingPlain',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Spinning Circle`
-  String get spinningCircle {
-    return Intl.message(
-      'Spinning Circle',
-      name: 'spinningCircle',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Square Circle`
-  String get squareCircle {
-    return Intl.message(
-      'Square Circle',
-      name: 'squareCircle',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Wandering Cubes`
-  String get wanderingCubes {
-    return Intl.message(
-      'Wandering Cubes',
-      name: 'wanderingCubes',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Wave Spinner`
-  String get waveSpinner {
-    return Intl.message(
-      'Wave Spinner',
-      name: 'waveSpinner',
       desc: '',
       args: [],
     );
@@ -2708,6 +2559,11 @@ class AppLocalizations {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Contributor`
+  String get contributor {
+    return Intl.message('Contributor', name: 'contributor', desc: '', args: []);
   }
 
   /// `Other Contributors (Random Order)`
@@ -2957,22 +2813,12 @@ class AppLocalizations {
 
   /// `Last edited`
   String get lastEdit {
-    return Intl.message(
-      'Last edited',
-      name: 'lastEdit',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Last edited', name: 'lastEdit', desc: '', args: []);
   }
 
   /// `Start`
   String get startRunning {
-    return Intl.message(
-      'Start',
-      name: 'startRunning',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Start', name: 'startRunning', desc: '', args: []);
   }
 
   /// `Stop`
@@ -5100,16 +4946,16 @@ class AppLocalizations {
     );
   }
 
-  /// `Font Fix`
-  String get harmonyFont {
-    return Intl.message('Custom Font', name: 'harmonyFont', desc: '', args: []);
+  /// `Custom Font`
+  String get customFont {
+    return Intl.message('Custom Font', name: 'customFont', desc: '', args: []);
   }
 
-  /// `Use built-in font to fix display issues`
-  String get harmonyFontDesc {
+  /// `Use system font by default, enable to customize your favorite font`
+  String get customFontDesc {
     return Intl.message(
       'Use system font by default, enable to customize your favorite font',
-      name: 'harmonyFontDesc',
+      name: 'customFontDesc',
       desc: '',
       args: [],
     );
@@ -5153,6 +4999,16 @@ class AppLocalizations {
   /// `Contact Me`
   String get contactMe {
     return Intl.message('Contact Me', name: 'contactMe', desc: '', args: []);
+  }
+
+  /// `Toggle labels`
+  String get toggleLabel {
+    return Intl.message(
+      'Toggle labels',
+      name: 'toggleLabel',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Recovery Strategy`
@@ -5967,27 +5823,52 @@ class AppLocalizations {
 
   /// `Select / Change Font`
   String get selectCustomFont {
-    return Intl.message('Select / Change Font', name: 'selectCustomFont', desc: '', args: []);
+    return Intl.message(
+      'Select / Change Font',
+      name: 'selectCustomFont',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Tap to select a local .ttf or .otf font file`
   String get selectCustomFontDesc {
-    return Intl.message('Tap to select a local .ttf or .otf font file', name: 'selectCustomFontDesc', desc: '', args: []);
+    return Intl.message(
+      'Tap to select a local .ttf or .otf font file',
+      name: 'selectCustomFontDesc',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Custom font applied`
   String get customFontApplied {
-    return Intl.message('Custom font applied', name: 'customFontApplied', desc: '', args: []);
+    return Intl.message(
+      'Custom font applied',
+      name: 'customFontApplied',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Restored to system default font`
   String get customFontDisabled {
-    return Intl.message('Restored to system default font', name: 'customFontDisabled', desc: '', args: []);
+    return Intl.message(
+      'Restored to system default font',
+      name: 'customFontDisabled',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Only .ttf and .otf font formats are supported`
   String get invalidFontFormat {
-    return Intl.message('Only .ttf and .otf font formats are supported', name: 'invalidFontFormat', desc: '', args: []);
+    return Intl.message(
+      'Only .ttf and .otf font formats are supported',
+      name: 'invalidFontFormat',
+      desc: '',
+      args: [],
+    );
   }
 
   /// `Zoom`
@@ -6102,12 +5983,7 @@ class AppLocalizations {
 
   /// `{count}`
   String itemsCount(Object count) {
-    return Intl.message(
-      '$count',
-      name: 'itemsCount',
-      desc: '',
-      args: [count],
-    );
+    return Intl.message('$count', name: 'itemsCount', desc: '', args: [count]);
   }
 
   /// `Connectivity Test`
@@ -6320,7 +6196,233 @@ class AppLocalizations {
     return Intl.message('Flagged', name: 'flagged', desc: '', args: []);
   }
 
-  /// `Scan / LAN Import`
+  /// `Fading Cube`
+  String get fadingCube {
+    return Intl.message('Fading Cube', name: 'fadingCube', desc: '', args: []);
+  }
+
+  /// `Folding Cube`
+  String get foldingCube {
+    return Intl.message(
+      'Folding Cube',
+      name: 'foldingCube',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pumping Heart`
+  String get pumpingHeart {
+    return Intl.message(
+      'Pumping Heart',
+      name: 'pumpingHeart',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pouring Hour Glass`
+  String get pouringHourGlass {
+    return Intl.message(
+      'Pouring Hour Glass',
+      name: 'pouringHourGlass',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Square Circle`
+  String get squareCircle {
+    return Intl.message(
+      'Square Circle',
+      name: 'squareCircle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Three Rotating Dots`
+  String get threeRotatingDots {
+    return Intl.message(
+      'Three Rotating Dots',
+      name: 'threeRotatingDots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Four Rotating Dots`
+  String get fourRotatingDots {
+    return Intl.message(
+      'Four Rotating Dots',
+      name: 'fourRotatingDots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Staggered Dots Wave`
+  String get staggeredDotsWave {
+    return Intl.message(
+      'Staggered Dots Wave',
+      name: 'staggeredDotsWave',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dots Triangle`
+  String get dotsTriangle {
+    return Intl.message(
+      'Dots Triangle',
+      name: 'dotsTriangle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `General`
+  String get basicInfo {
+    return Intl.message('General', name: 'basicInfo', desc: '', args: []);
+  }
+
+  /// `Address`
+  String get addressInfo {
+    return Intl.message('Address', name: 'addressInfo', desc: '', args: []);
+  }
+
+  /// `Traffic`
+  String get traffic {
+    return Intl.message('Traffic', name: 'traffic', desc: '', args: []);
+  }
+
+  /// `Advanced`
+  String get advancedInfo {
+    return Intl.message('Advanced', name: 'advancedInfo', desc: '', args: []);
+  }
+
+  String get chasingDots {
+    return Intl.message(
+      'Chasing Dots',
+      name: 'chasingDots',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get cubeGrid {
+    return Intl.message('Cube Grid', name: 'cubeGrid', desc: '', args: []);
+  }
+
+  String get dancingSquare {
+    return Intl.message(
+      'Dancing Square',
+      name: 'dancingSquare',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get dualRing {
+    return Intl.message('Dual Ring', name: 'dualRing', desc: '', args: []);
+  }
+
+  String get fadingGrid {
+    return Intl.message('Fading Grid', name: 'fadingGrid', desc: '', args: []);
+  }
+
+  String get hourGlass {
+    return Intl.message('Hourglass', name: 'hourGlass', desc: '', args: []);
+  }
+
+  String get pianoWave {
+    return Intl.message('Piano Wave', name: 'pianoWave', desc: '', args: []);
+  }
+
+  String get pouringHourGlassRefined {
+    return Intl.message(
+      'Refined Hourglass',
+      name: 'pouringHourGlassRefined',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get pulsingGrid {
+    return Intl.message(
+      'Pulsing Grid',
+      name: 'pulsingGrid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get ring {
+    return Intl.message('Ring', name: 'ring', desc: '', args: []);
+  }
+
+  String get ripple {
+    return Intl.message('Ripple', name: 'ripple', desc: '', args: []);
+  }
+
+  String get rotatingPlain {
+    return Intl.message(
+      'Rotating Plain',
+      name: 'rotatingPlain',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get spinningCircle {
+    return Intl.message(
+      'Spinning Circle',
+      name: 'spinningCircle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get wanderingCubes {
+    return Intl.message(
+      'Wandering Cubes',
+      name: 'wanderingCubes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get waveSpinner {
+    return Intl.message(
+      'Wave Spinner',
+      name: 'waveSpinner',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get harmonyFont {
+    return Intl.message('Font Fix', name: 'harmonyFont', desc: '', args: []);
+  }
+
+  String get harmonyFontDesc {
+    return Intl.message(
+      'Use built-in font to fix display issues',
+      name: 'harmonyFontDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String get mediaUnlockRefreshByCategory {
+    return Intl.message(
+      'Partially refresh based on current category',
+      name: 'mediaUnlockRefreshByCategory',
+      desc: '',
+      args: [],
+    );
+  }
+
   String get tvScanImport {
     return Intl.message(
       'Scan / LAN Import',
@@ -6330,7 +6432,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Scan QR or push profile to TV via LAN`
   String get tvScanImportDesc {
     return Intl.message(
       'Scan QR or push profile to TV via LAN',
@@ -6340,7 +6441,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Ensure phone and TV are on the same Wi-Fi network`
   String get tvScanStep1 {
     return Intl.message(
       'Ensure phone and TV are on the same Wi-Fi network',
@@ -6350,7 +6450,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Scan the QR code with a supported camera or browser`
   String get tvScanStep2 {
     return Intl.message(
       'Scan the QR code with a supported camera or browser',
@@ -6360,7 +6459,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Paste subscription URL or upload profile on the webpage and push`
   String get tvScanStep3 {
     return Intl.message(
       'Paste subscription URL or upload profile on the webpage and push',
@@ -6370,7 +6468,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Or enter directly in phone browser:`
   String get tvScanManualUrl {
     return Intl.message(
       'Or enter directly in phone browser:',
@@ -6380,7 +6477,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Waiting for profile from phone...`
   String get tvScanWaiting {
     return Intl.message(
       'Waiting for profile from phone...',
@@ -6390,7 +6486,6 @@ class AppLocalizations {
     );
   }
 
-  /// `Profile received, importing...`
   String get tvScanSuccess {
     return Intl.message(
       'Profile received, importing...',
@@ -6400,7 +6495,6 @@ class AppLocalizations {
     );
   }
 
-  /// `No available LAN detected, please check Wi-Fi`
   String get tvScanNoNetwork {
     return Intl.message(
       'No available LAN detected, please check Wi-Fi',

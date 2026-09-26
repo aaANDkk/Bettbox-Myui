@@ -15,6 +15,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ThemeModeItem {
   final ThemeMode themeMode;
@@ -41,8 +42,8 @@ class ThemeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final brightness = ref.watch(currentBrightnessProvider);
-    final useHarmonyFont = ref.watch(
-      themeSettingProvider.select((state) => state.useHarmonyFont),
+    final useCustomFont = ref.watch(
+      themeSettingProvider.select((state) => state.useCustomFont),
     );
 
     final toggleItems = [
@@ -50,7 +51,7 @@ class ThemeView extends ConsumerWidget {
       if (system.isWindows) _TrayIconInvertItem(),
       _TextScaleFactorItem(),
       const _CustomFontItem(),
-      if (useHarmonyFont) const _SelectCustomFontItem(),
+      if (useCustomFont) const _SelectCustomFontItem(),
       const _EmojiStyleItem(),
     ];
 
@@ -103,17 +104,17 @@ class _ThemeModeItem extends ConsumerWidget {
     );
     List<ThemeModeItem> themeModeItems = [
       ThemeModeItem(
-        iconData: Icons.auto_mode_rounded,
+        iconData: FluentIcons.arrow_sync_circle_24_regular,
         label: appLocalizations.auto,
         themeMode: ThemeMode.system,
       ),
       ThemeModeItem(
-        iconData: Icons.light_mode_rounded,
+        iconData: FluentIcons.weather_sunny_24_regular,
         label: appLocalizations.light,
         themeMode: ThemeMode.light,
       ),
       ThemeModeItem(
-        iconData: Icons.dark_mode_rounded,
+        iconData: FluentIcons.weather_moon_24_regular,
         label: appLocalizations.dark,
         themeMode: ThemeMode.dark,
       ),
@@ -121,7 +122,7 @@ class _ThemeModeItem extends ConsumerWidget {
     return ItemCard(
       info: Info(
         label: appLocalizations.themeMode,
-        iconData: Icons.brightness_high_rounded,
+        iconData: FluentIcons.weather_sunny_low_24_regular,
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -288,6 +289,11 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
     final primaryColors = [null, ...vm4.b];
     final schemeVariant = vm4.c;
     final isEquals = vm4.d;
+    final fabTheme = Theme.of(context).floatingActionButtonTheme;
+    final fabBgColor =
+        fabTheme.backgroundColor ?? context.colorScheme.primaryContainer;
+    final fabFgColor =
+        fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
 
     return CommonPopScope(
       onPop: () {
@@ -300,17 +306,25 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         return true;
       },
       child: ItemCard(
-        info: Info(label: appLocalizations.themeColor, iconData: Icons.palette_rounded),
+        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.paint_brush_24_regular),
         actions: genActions([
           if (_removablePrimaryColor == null)
             FilledButton(
-              style: ButtonStyle(visualDensity: VisualDensity.compact),
+              style: FilledButton.styleFrom(
+                backgroundColor: fabBgColor,
+                foregroundColor: fabFgColor,
+                visualDensity: VisualDensity.compact,
+              ),
               onPressed: _handleChangeSchemeVariant,
               child: Text(Intl.message('${schemeVariant.name}Scheme')),
             ),
           if (_removablePrimaryColor != null)
             FilledButton(
-              style: ButtonStyle(visualDensity: VisualDensity.compact),
+              style: FilledButton.styleFrom(
+                backgroundColor: fabBgColor,
+                foregroundColor: fabFgColor,
+                visualDensity: VisualDensity.compact,
+              ),
               onPressed: () {
                 setState(() {
                   _removablePrimaryColor = null;
@@ -324,7 +338,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
               padding: EdgeInsets.all(4),
               visualDensity: VisualDensity.compact,
               onPressed: _handleReset,
-              icon: Icon(Icons.replay_rounded),
+              icon: Icon(FluentIcons.arrow_repeat_all_24_regular),
             ),
         ], space: 8),
         child: Container(
@@ -390,7 +404,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
                                 iconSize: 30,
                                 icon: Icon(
                                   color: context.colorScheme.primary,
-                                  Icons.delete_rounded,
+                                  FluentIcons.delete_24_regular,
                                 ),
                               ),
                             ),
@@ -412,7 +426,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
                         iconSize: 32,
                         icon: Icon(
                           color: context.colorScheme.primary,
-                          Icons.add_rounded,
+                          FluentIcons.add_24_regular,
                         ),
                       ),
                     ),
@@ -435,7 +449,7 @@ class _PrueBlackItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.pureBlack),
     );
     return ListItem.switchItem(
-      leading: Icon(Icons.contrast_rounded),
+      leading: const Icon(Icons.desktop_windows_outlined),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.pureBlackMode,
@@ -460,8 +474,8 @@ class _CustomFontItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final useHarmonyFont = ref.watch(
-      themeSettingProvider.select((state) => state.useHarmonyFont),
+    final useCustomFont = ref.watch(
+      themeSettingProvider.select((state) => state.useCustomFont),
     );
 
     return ValueListenableBuilder<String?>(
@@ -469,19 +483,19 @@ class _CustomFontItem extends ConsumerWidget {
       builder: (context, _, _) {
         final fontName = FontManager.customFontName;
         final String subtitle;
-        if (useHarmonyFont) {
+        if (useCustomFont) {
           subtitle = fontName?.isNotEmpty == true
               ? '${appLocalizations.customFontApplied}: $fontName'
               : appLocalizations.selectCustomFontDesc;
         } else {
-          subtitle = appLocalizations.harmonyFontDesc;
+          subtitle = appLocalizations.customFontDesc;
         }
 
         return ListItem.switchItem(
-          leading: const Icon(Icons.font_download_outlined),
+          leading: const Icon(FluentIcons.text_font_24_regular),
           horizontalTitleGap: 12,
           title: Text(
-            appLocalizations.harmonyFont,
+            appLocalizations.customFont,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               color: context.colorScheme.onSurfaceVariant,
             ),
@@ -493,7 +507,7 @@ class _CustomFontItem extends ConsumerWidget {
             ),
           ),
           delegate: SwitchDelegate(
-            value: useHarmonyFont,
+            value: useCustomFont,
             onChanged: (value) async {
               if (value) {
                 final hasFile = await FontManager.hasFontFile();
@@ -501,13 +515,13 @@ class _CustomFontItem extends ConsumerWidget {
                   final loaded = await FontManager.ensureLoaded();
                   if (loaded) {
                     ref.read(themeSettingProvider.notifier).updateState(
-                      (state) => state.copyWith(useHarmonyFont: true),
+                      (state) => state.copyWith(useCustomFont: true),
                     );
                   } else {
                     final picked = await FontManager.pickAndApplyFont(context);
                     if (picked) {
                       ref.read(themeSettingProvider.notifier).updateState(
-                        (state) => state.copyWith(useHarmonyFont: true),
+                        (state) => state.copyWith(useCustomFont: true),
                       );
                     }
                   }
@@ -515,13 +529,13 @@ class _CustomFontItem extends ConsumerWidget {
                   final picked = await FontManager.pickAndApplyFont(context);
                   if (picked) {
                     ref.read(themeSettingProvider.notifier).updateState(
-                      (state) => state.copyWith(useHarmonyFont: true),
+                      (state) => state.copyWith(useCustomFont: true),
                     );
                   }
                 }
               } else {
                 ref.read(themeSettingProvider.notifier).updateState(
-                  (state) => state.copyWith(useHarmonyFont: false),
+                  (state) => state.copyWith(useCustomFont: false),
                 );
                 FontManager.disableFont();
               }
@@ -543,7 +557,7 @@ class _SelectCustomFontItem extends ConsumerWidget {
       builder: (context, _, _) {
         final fontName = FontManager.customFontName;
         return ListItem(
-          leading: const Icon(Icons.folder_open_rounded),
+          leading: const Icon(FluentIcons.folder_open_24_regular),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.selectCustomFont,
@@ -563,7 +577,7 @@ class _SelectCustomFontItem extends ConsumerWidget {
             final picked = await FontManager.pickAndApplyFont(context);
             if (picked) {
               ref.read(themeSettingProvider.notifier).updateState(
-                (state) => state.copyWith(useHarmonyFont: true),
+                (state) => state.copyWith(useCustomFont: true),
               );
             }
           },
@@ -582,7 +596,7 @@ class _EmojiStyleItem extends StatelessWidget {
       valueListenable: EmojiManager.emojiStyleNotifier,
       builder: (context, currentStyle, _) {
         return ListItem(
-          leading: const Icon(Icons.sentiment_very_satisfied_rounded),
+          leading: const Icon(FluentIcons.emoji_sparkle_24_regular),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.emojiStyle,
@@ -704,7 +718,7 @@ class _DarkIconItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.useDarkIcon),
     );
     return ListItem.switchItem(
-      leading: const Icon(Icons.join_left_rounded),
+      leading: const Icon(FluentIcons.dark_theme_24_regular),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.darkIcon,
@@ -740,7 +754,7 @@ class _TrayIconInvertItem extends ConsumerWidget {
       themeSettingProvider.select((state) => state.invertTrayIcon),
     );
     return ListItem.switchItem(
-      leading: Icon(Icons.invert_colors_rounded),
+      leading: Icon(FluentIcons.dark_theme_24_regular),
       horizontalTitleGap: 12,
       title: Text(
         appLocalizations.trayIconInvert,
@@ -782,7 +796,7 @@ class _TextScaleFactorItem extends ConsumerWidget {
         Padding(
           padding: EdgeInsets.only(bottom: 8),
           child: ListItem.switchItem(
-            leading: Icon(Icons.text_fields_rounded),
+            leading: Icon(FluentIcons.text_field_24_regular),
             horizontalTitleGap: 12,
             title: Text(
               appLocalizations.textScale,

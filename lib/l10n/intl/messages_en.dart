@@ -240,7 +240,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "categoryGaming": MessageLookupByLibrary.simpleMessage("Gaming Center"),
     "categorySocial": MessageLookupByLibrary.simpleMessage("Social Platforms"),
     "categoryStreaming": MessageLookupByLibrary.simpleMessage("Streaming"),
-    "chasingDots": MessageLookupByLibrary.simpleMessage("Chasing Dots"),
     "checkError": MessageLookupByLibrary.simpleMessage("Check Failed"),
     "checkFailed": MessageLookupByLibrary.simpleMessage("Timeout"),
     "checkOrAddProfile": MessageLookupByLibrary.simpleMessage(
@@ -298,6 +297,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("Connections Sort"),
     "connectivity": MessageLookupByLibrary.simpleMessage("Connectivity:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("Contact Me"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("Toggle labels"),
     "content": MessageLookupByLibrary.simpleMessage("Content"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("Content"),
     "continent": MessageLookupByLibrary.simpleMessage("Continent"),
@@ -327,7 +327,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("Crash Test"),
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "creationTime": MessageLookupByLibrary.simpleMessage("Creation Time"),
-    "cubeGrid": MessageLookupByLibrary.simpleMessage("Cube Grid"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("Profile"),
     "custom": MessageLookupByLibrary.simpleMessage("Custom"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "Custom Dashboard Title",
@@ -337,7 +337,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "customUrl": MessageLookupByLibrary.simpleMessage("Custom URL"),
     "cut": MessageLookupByLibrary.simpleMessage("Cut"),
-    "dancingSquare": MessageLookupByLibrary.simpleMessage("Dancing Square"),
     "dark": MessageLookupByLibrary.simpleMessage("Dark"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("Dark Icon"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage(
@@ -425,7 +424,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "Sync with system Doze mode",
     ),
-    "dualRing": MessageLookupByLibrary.simpleMessage("Dual Ring"),
     "edit": MessageLookupByLibrary.simpleMessage("Edit"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("Edit Forwarding"),
     "editUser": MessageLookupByLibrary.simpleMessage("Edit User"),
@@ -483,10 +481,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "externalResources": MessageLookupByLibrary.simpleMessage(
       "External Resources",
     ),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("Fading Circle"),
-    "fadingCube": MessageLookupByLibrary.simpleMessage("Fading Cube"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("Fading Four"),
-    "fadingGrid": MessageLookupByLibrary.simpleMessage("Fading Grid"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage(
       "FakeIP Filter Mode",
     ),
@@ -529,7 +524,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "Enable process matching",
     ),
     "flagged": MessageLookupByLibrary.simpleMessage("Flagged"),
-    "foldingCube": MessageLookupByLibrary.simpleMessage("Folding Cube"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("Font"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage(
       "Force DNS Mapping",
@@ -568,8 +562,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("Global"),
     "go": MessageLookupByLibrary.simpleMessage("Go"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Download Now"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("Custom Font"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("Use system font by default, enable to customize your favorite font"),
+    "customFont": MessageLookupByLibrary.simpleMessage("Custom Font"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Use system font by default, enable to customize your favorite font",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "Cache modifications?",
     ),
@@ -599,7 +595,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hotkeyManagementDesc": MessageLookupByLibrary.simpleMessage(
       "Control app via keyboard",
     ),
-    "hourGlass": MessageLookupByLibrary.simpleMessage("Hourglass"),
     "hours": m5,
     "httpPortSniffer": MessageLookupByLibrary.simpleMessage(
       "HTTP Port Sniffing",
@@ -860,6 +855,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("Organization / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("Options"),
     "other": MessageLookupByLibrary.simpleMessage("Other"),
+    "contributor": MessageLookupByLibrary.simpleMessage("Contributor"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "Other Contributors (Random Order)",
     ),
@@ -920,7 +916,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "password": MessageLookupByLibrary.simpleMessage("Password"),
     "paste": MessageLookupByLibrary.simpleMessage("Paste"),
-    "pianoWave": MessageLookupByLibrary.simpleMessage("Piano Wave"),
     "pin": MessageLookupByLibrary.simpleMessage("Pin"),
     "pleaseBindWebDAV": MessageLookupByLibrary.simpleMessage(
       "Please bind WebDAV",
@@ -948,12 +943,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "Please enter a different port",
     ),
     "portTip": m11,
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage(
-      "Pouring Hourglass",
-    ),
-    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
-      "Refined Hourglass",
-    ),
     "powerSwitch": MessageLookupByLibrary.simpleMessage("Power"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage(
       "Prioritize DoH HTTP/3",
@@ -1010,12 +999,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Proxy Providers",
     ),
     "pulse": MessageLookupByLibrary.simpleMessage("Pulse"),
-    "pulsingGrid": MessageLookupByLibrary.simpleMessage("Pulsing Grid"),
-    "pumpingHeart": MessageLookupByLibrary.simpleMessage("Pumping Heart"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("Pure Black Mode"),
     "qrcode": MessageLookupByLibrary.simpleMessage("QR Code"),
     "qrcodeDesc": MessageLookupByLibrary.simpleMessage(
-      "Scan QR code to import profile",
+      "Scan QR code to get profile",
     ),
     "quicGoDisableEcn": MessageLookupByLibrary.simpleMessage(
       "Disable QUIC ECN",
@@ -1106,10 +1093,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restore": MessageLookupByLibrary.simpleMessage("Restore"),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "rightClickBehavior": MessageLookupByLibrary.simpleMessage("Right Click"),
-    "ring": MessageLookupByLibrary.simpleMessage("Ring"),
-    "ripple": MessageLookupByLibrary.simpleMessage("Ripple"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("Rotating Circle"),
-    "rotatingPlain": MessageLookupByLibrary.simpleMessage("Rotating Plain"),
     "rule": MessageLookupByLibrary.simpleMessage("Rule"),
     "ruleName": MessageLookupByLibrary.simpleMessage("Rule Name"),
     "ruleProviders": MessageLookupByLibrary.simpleMessage("Rule Providers"),
@@ -1154,6 +1138,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "Display independent switch button on the homepage",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("Card Switch"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "Display card-style switch button on the homepage"),
     "shrink": MessageLookupByLibrary.simpleMessage("Compact"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("Silent Launch"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1206,9 +1193,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sourceIp": MessageLookupByLibrary.simpleMessage("Source IP"),
     "specialProxy": MessageLookupByLibrary.simpleMessage("Special Proxy"),
     "specialRules": MessageLookupByLibrary.simpleMessage("Special Rules"),
-    "spinningCircle": MessageLookupByLibrary.simpleMessage("Spinning Circle"),
     "spinningLines": MessageLookupByLibrary.simpleMessage("Spinning Lines"),
-    "squareCircle": MessageLookupByLibrary.simpleMessage("Square Circle"),
     "stackMode": MessageLookupByLibrary.simpleMessage("Stack Mode"),
     "standard": MessageLookupByLibrary.simpleMessage("Standard"),
     "start": MessageLookupByLibrary.simpleMessage("Start"),
@@ -1233,9 +1218,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit": MessageLookupByLibrary.simpleMessage("Submit"),
     "success": MessageLookupByLibrary.simpleMessage("Success"),
     "switchLabel": MessageLookupByLibrary.simpleMessage("Switch"),
-    "switchToDomesticIp": MessageLookupByLibrary.simpleMessage(
-      "Get Direct IP",
-    ),
+    "switchToDomesticIp": MessageLookupByLibrary.simpleMessage("Get Direct IP"),
     "sync": MessageLookupByLibrary.simpleMessage("Sync"),
     "syncAll": MessageLookupByLibrary.simpleMessage("Sync All"),
     "syncFailed": MessageLookupByLibrary.simpleMessage("Sync Failed"),
@@ -1318,31 +1301,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunnelTargetHint": MessageLookupByLibrary.simpleMessage(
       "e.g.: 114.114.114.114:53",
     ),
-    "tvScanImport": MessageLookupByLibrary.simpleMessage("Scan / LAN Import"),
-    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
-      "Scan QR or push profile to TV via LAN",
-    ),
-    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
-      "Or enter directly in phone browser:",
-    ),
-    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
-      "No available LAN detected, please check Wi-Fi",
-    ),
-    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
-      "Ensure phone and TV are on the same Wi-Fi network",
-    ),
-    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
-      "Scan the QR code with a supported camera or browser",
-    ),
-    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
-      "Paste subscription URL or upload profile on the webpage and push",
-    ),
-    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
-      "Profile received, importing...",
-    ),
-    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
-      "Waiting for profile from phone...",
-    ),
     "twoColumns": MessageLookupByLibrary.simpleMessage("2 Columns"),
     "unableToUpdateCurrentProfileDesc": MessageLookupByLibrary.simpleMessage(
       "Unable to update current profile",
@@ -1387,6 +1345,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "Route system traffic via VpnService",
     ),
+    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "HTTP proxy is generally not recommended on non-desktop platforms. Only enable this feature when necessary and you fully understand the implications.",
+    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "Attach HTTP proxy to VpnService",
     ),
@@ -1397,9 +1358,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "Keeps the screen on and app active in the background without requiring special CPU wakelock permissions.",
     ),
-    "wanderingCubes": MessageLookupByLibrary.simpleMessage("Wandering Cubes"),
     "wave": MessageLookupByLibrary.simpleMessage("Wave"),
-    "waveSpinner": MessageLookupByLibrary.simpleMessage("Wave Spinner"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage(
       "WebDAV Configuration",
     ),
@@ -1410,21 +1369,37 @@ class MessageLookup extends MessageLookupByLibrary {
       "Requires administrator privileges",
     ),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji Style"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("Select the Emoji style displayed in the app"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "Select the Emoji style displayed in the app",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("Tab Animation"),
-    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("Only valid in mobile view"),
+    "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(
+      "Only valid in mobile view",
+    ),
     "startRunning": MessageLookupByLibrary.simpleMessage("Start"),
-    "selectCustomFont": MessageLookupByLibrary.simpleMessage("Select / Change Font"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("Tap to select a local .ttf or .otf font file"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("Custom font applied"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("Restored to system default font"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("Only .ttf and .otf font formats are supported"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage(
+      "Select / Change Font",
+    ),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Tap to select a local .ttf or .otf font file",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "Custom font applied",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "Restored to system default font",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "Only .ttf and .otf font formats are supported",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("Fading Cube"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("Folding Cube"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("Pumping Heart"),
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("Pouring Hour Glass"),
+    "pouringHourGlass": MessageLookupByLibrary.simpleMessage(
+      "Pouring Hour Glass",
+    ),
     "squareCircle": MessageLookupByLibrary.simpleMessage("Square Circle"),
     "threeRotatingDots": MessageLookupByLibrary.simpleMessage("Three Rotating"),
     "fourRotatingDots": MessageLookupByLibrary.simpleMessage("Four Rotating"),
@@ -1435,5 +1410,81 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("Address"),
     "traffic": MessageLookupByLibrary.simpleMessage("Traffic"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("Advanced"),
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("Chasing Dots"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("Cube Grid"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("Dancing Square"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("Dual Ring"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("Fading Grid"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("Hourglass"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("Piano Wave"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "Refined Hourglass",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("Pulsing Grid"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("Ring"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("Ripple"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("Rotating Plain"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("Spinning Circle"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("Wandering Cubes"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("Wave Spinner"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("Font Fix"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "Use built-in font to fix display issues",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "Partially refresh based on current category",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("Scan / LAN Import"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "Scan QR or push profile to TV via LAN",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "Ensure phone and TV are on the same Wi-Fi network",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "Scan the QR code with a supported camera or browser",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "Paste subscription URL or upload profile on the webpage and push",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "Or enter directly in phone browser:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "Waiting for profile from phone...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "Profile received, importing...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "No available LAN detected, please check Wi-Fi",
+    ),
   };
 }

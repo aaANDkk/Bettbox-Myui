@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/start_fab.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 final customDashboardTitleProvider =
     StateNotifierProvider<CustomDashboardTitleNotifier, String?>((ref) {
@@ -106,7 +107,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   onPressed: () {
                     _showAddWidgetsModal();
                   },
-                  icon: Icon(Icons.add_circle_rounded),
+                  icon: const Icon(FluentIcons.add_circle_24_regular),
                 ),
               )
             : SizedBox();
@@ -125,7 +126,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: _buildIsEdit((isEdit) {
-              return isEdit ? const Icon(Icons.save_rounded) : const Icon(Icons.edit_rounded);
+              return isEdit ? const Icon(FluentIcons.save_24_regular) : const Icon(FluentIcons.edit_24_regular);
             }),
           ),
         ),
@@ -207,6 +208,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     final dashboardState = ref.watch(dashboardStateProvider);
     final columns = max(4 * ((dashboardState.viewWidth / 320).ceil()), 8);
     final spacing = 16.ap;
+    final showCardStartButton = ref.watch(
+      appSettingProvider.select((state) => state.showCardStartButton),
+    );
     final isMobileView = ref.watch(isMobileViewProvider);
     final children = [
       ...dashboardState.dashboardWidgets
@@ -220,6 +224,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .where(
             (item) =>
                 !children.contains(item.widget) &&
+                (showCardStartButton || item != DashboardWidget.startButton) &&
                 item.platforms.contains(SupportPlatform.currentPlatform),
           )
           .map((item) => item.widget)
@@ -230,9 +235,10 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       title:
           ref.watch(customDashboardTitleProvider) ?? '⚡️Bettbox',
       actions: _buildActions(),
-      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）；
-      // 非移动视图（横屏 / 桌面 / TV）保持官方位置，不要加底栏避让内边距
-      floatingActionButton: isMobileView ? null : const StartFab(),
+      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）；开启卡片开关后由卡片小部件承担；
+      // 非移动视图（横屏 / 桌面 / TV）且未开启卡片开关时保持悬浮按钮
+      floatingActionButton:
+          (isMobileView || showCardStartButton) ? null : const StartFab(),
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -317,7 +323,12 @@ class _AddDashboardWidgetModal extends StatelessWidget {
                       onAdd: () {
                         onAdd(item);
                       },
-                      child: child,
+                      // 这里的预览全是"活"的小部件（图表 / 转圈该动的都在动）。
+                      // 不冻结 + 不隔离的话，每个预览的重绘都会把整块抽屉标记为脏，
+                      // 抽屉滑入时整块面板每帧重绘 → 全程掉帧（info / 当前配置这类纯内容抽屉就不会）。
+                      child: RepaintBoundary(
+                        child: TickerMode(enabled: false, child: child),
+                      ),
                     );
                   },
                 ),
@@ -377,7 +388,7 @@ class _AddedContainerState extends State<_AddedContainer> {
                 iconSize: 20,
                 padding: EdgeInsets.all(2),
                 onPressed: _handleAdd,
-                icon: Icon(Icons.add_rounded),
+                icon: Icon(FluentIcons.add_24_regular),
               ),
             ),
           ),

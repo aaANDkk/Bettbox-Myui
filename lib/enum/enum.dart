@@ -346,7 +346,10 @@ enum DashboardWidget {
   onlinePanel(GridItem(crossAxisCellCount: 4, child: OnlinePanel())),
   mediaUnlock(GridItem(crossAxisCellCount: 8, child: MediaUnlock())),
   mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall())),
-  currentProfile(GridItem(crossAxisCellCount: 4, child: CurrentProfile()));
+  currentProfile(GridItem(crossAxisCellCount: 4, child: CurrentProfile())),
+  startButton(
+    GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
+  );
 
   final GridItem widget;
   final List<SupportPlatform> platforms;
@@ -470,15 +473,6 @@ enum ScrollPositionCacheKeys { tools, profiles, proxiesList, proxiesTabList }
 
 enum DelayAnimationType {
   none,
-  fadingCube,
-  foldingCube,
-  pumpingHeart,
-  pouringHourGlass,
-  squareCircle,
-  threeRotatingDots,
-  fourRotatingDots,
-  staggeredDotsWave,
-  dotsTriangle,
   rotatingCircle,
   pulse,
   spinningLines,

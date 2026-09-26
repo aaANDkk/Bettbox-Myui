@@ -4,6 +4,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:bett_box/views/config/general.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Ipv6Switch extends StatelessWidget {
   const Ipv6Switch({super.key});
@@ -13,7 +14,10 @@ class Ipv6Switch extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'IPv6', iconData: Icons.looks_6_outlined),
+        info: Info(
+          label: 'IPv6',
+          iconData: FluentIcons.number_circle_6_24_regular,
+        ),
         onPressed: () {
           // Open general settings
           showExtend(
@@ -25,7 +29,6 @@ class Ipv6Switch extends StatelessWidget {
                 body: generateListView(generalItems),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         child: Container(

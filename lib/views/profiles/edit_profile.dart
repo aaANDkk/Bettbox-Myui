@@ -12,6 +12,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class EditProfileView extends StatefulWidget {
   final Profile profile;
@@ -341,8 +342,8 @@ class EditProfileViewState extends State<EditProfileView> {
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureAgeSecretKey
-                      ? Icons.visibility_rounded
-                      : Icons.visibility_off_rounded,
+                      ? FluentIcons.eye_24_regular
+                      : FluentIcons.eye_off_24_regular,
                 ),
                 onPressed: () {
                   setState(() {
@@ -412,12 +413,12 @@ class EditProfileViewState extends State<EditProfileView> {
                             spacing: 12,
                             children: [
                               CommonChip(
-                                avatar: const Icon(Icons.edit_rounded),
+                                avatar: const Icon(FluentIcons.edit_24_regular),
                                 label: appLocalizations.edit,
                                 onPressed: _editProfileFile,
                               ),
                               CommonChip(
-                                avatar: const Icon(Icons.upload_rounded),
+                                avatar: const Icon(FluentIcons.folder_open_24_regular),
                                 label: appLocalizations.upload,
                                 onPressed: _uploadProfileFile,
                               ),
@@ -432,10 +433,7 @@ class EditProfileViewState extends State<EditProfileView> {
     ];
     return CommonPopScope(
       onPop: () {
-        if (dismissTvInputFocus()) {
-          return false;
-        }
-        if (fileData == null) {
+        if (_formKey.currentState?.validate() ?? false) {
           return true;
         }
         _handleBack();
@@ -462,7 +460,7 @@ class EditProfileViewState extends State<EditProfileView> {
                   fontVariations: const [FontVariation('wght', 700)],
                 ),
               ),
-              icon: const Icon(Icons.save_rounded),
+              icon: const Icon(FluentIcons.save_24_filled),
             ),
           ),
         ),
@@ -623,7 +621,7 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
               floatingLabelBehavior: FloatingLabelBehavior.always,
               labelText: appLocalizations.agePrivateKeyLabel,
               suffixIcon: IconButton(
-                icon: const Icon(Icons.copy_rounded),
+                icon: const Icon(FluentIcons.copy_24_regular),
                 onPressed: () => _copyToClipboard(_privateKeyController.text),
               ),
             ),
@@ -650,7 +648,7 @@ class _AgeKeyGeneratorDialogState extends State<_AgeKeyGeneratorDialog> {
                         ? TextStyle(color: context.colorScheme.primary)
                         : null),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.copy_rounded),
+                icon: const Icon(FluentIcons.copy_24_regular),
                 onPressed: () => _copyToClipboard(_publicKeyController.text),
               ),
             ),

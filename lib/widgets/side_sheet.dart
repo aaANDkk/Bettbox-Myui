@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:bett_box/common/color.dart';
+import 'package:bett_box/common/constant.dart' as constants;
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 const Duration _bottomSheetEnterDuration = Duration(milliseconds: 300);
-const Duration _bottomSheetExitDuration = Duration(milliseconds: 200);
+const Duration _bottomSheetExitDuration = Duration(milliseconds: 300);
 const Curve _modalBottomSheetCurve = Easing.standardDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
 
@@ -107,202 +109,6 @@ class _SideSheetState extends State<SideSheet> {
   }
 }
 
-typedef _SizeChangeCallback<Size> = void Function(Size);
-
-class _SideSheetLayoutWithSizeListener extends SingleChildRenderObjectWidget {
-  const _SideSheetLayoutWithSizeListener({
-    required this.onChildSizeChanged,
-    required this.animationValue,
-    required this.isScrollControlled,
-    required this.scrollControlDisabledMaxHeightRatio,
-    super.child,
-  });
-
-  final _SizeChangeCallback<Size> onChildSizeChanged;
-  final double animationValue;
-  final bool isScrollControlled;
-  final double scrollControlDisabledMaxHeightRatio;
-
-  @override
-  _RenderSideSheetLayoutWithSizeListener createRenderObject(
-    BuildContext context,
-  ) {
-    return _RenderSideSheetLayoutWithSizeListener(
-      onChildSizeChanged: onChildSizeChanged,
-      animationValue: animationValue,
-      isScrollControlled: isScrollControlled,
-      scrollControlDisabledMaxHeightRatio: scrollControlDisabledMaxHeightRatio,
-    );
-  }
-
-  @override
-  void updateRenderObject(
-    BuildContext context,
-    _RenderSideSheetLayoutWithSizeListener renderObject,
-  ) {
-    renderObject.onChildSizeChanged = onChildSizeChanged;
-    renderObject.animationValue = animationValue;
-    renderObject.isScrollControlled = isScrollControlled;
-    renderObject.scrollControlDisabledMaxHeightRatio =
-        scrollControlDisabledMaxHeightRatio;
-  }
-}
-
-class _RenderSideSheetLayoutWithSizeListener extends RenderShiftedBox {
-  _RenderSideSheetLayoutWithSizeListener({
-    RenderBox? child,
-    required _SizeChangeCallback<Size> onChildSizeChanged,
-    required double animationValue,
-    required bool isScrollControlled,
-    required double scrollControlDisabledMaxHeightRatio,
-  }) : _onChildSizeChanged = onChildSizeChanged,
-       _animationValue = animationValue,
-       _isScrollControlled = isScrollControlled,
-       _scrollControlDisabledMaxHeightRatio =
-           scrollControlDisabledMaxHeightRatio,
-       super(child);
-
-  Size _lastSize = Size.zero;
-
-  _SizeChangeCallback<Size> get onChildSizeChanged => _onChildSizeChanged;
-  _SizeChangeCallback<Size> _onChildSizeChanged;
-
-  set onChildSizeChanged(_SizeChangeCallback<Size> newCallback) {
-    if (_onChildSizeChanged == newCallback) {
-      return;
-    }
-
-    _onChildSizeChanged = newCallback;
-    markNeedsLayout();
-  }
-
-  double get animationValue => _animationValue;
-  double _animationValue;
-
-  set animationValue(double newValue) {
-    if (_animationValue == newValue) {
-      return;
-    }
-
-    _animationValue = newValue;
-    markNeedsLayout();
-  }
-
-  bool get isScrollControlled => _isScrollControlled;
-  bool _isScrollControlled;
-
-  set isScrollControlled(bool newValue) {
-    if (_isScrollControlled == newValue) {
-      return;
-    }
-
-    _isScrollControlled = newValue;
-    markNeedsLayout();
-  }
-
-  double get scrollControlDisabledMaxHeightRatio =>
-      _scrollControlDisabledMaxHeightRatio;
-  double _scrollControlDisabledMaxHeightRatio;
-
-  set scrollControlDisabledMaxHeightRatio(double newValue) {
-    if (_scrollControlDisabledMaxHeightRatio == newValue) {
-      return;
-    }
-
-    _scrollControlDisabledMaxHeightRatio = newValue;
-    markNeedsLayout();
-  }
-
-  Size _getSize(BoxConstraints constraints) {
-    return constraints.constrain(constraints.biggest);
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) {
-    final double width = _getSize(
-      BoxConstraints.tightForFinite(height: height),
-    ).width;
-    if (width.isFinite) {
-      return width;
-    }
-    return 0.0;
-  }
-
-  @override
-  double computeMaxIntrinsicWidth(double height) {
-    final double width = _getSize(
-      BoxConstraints.tightForFinite(height: height),
-    ).width;
-    if (width.isFinite) {
-      return width;
-    }
-    return 0.0;
-  }
-
-  @override
-  double computeMinIntrinsicHeight(double width) {
-    final double height = _getSize(
-      BoxConstraints.tightForFinite(width: width),
-    ).height;
-    if (height.isFinite) {
-      return height;
-    }
-    return 0.0;
-  }
-
-  @override
-  double computeMaxIntrinsicHeight(double width) {
-    final double height = _getSize(
-      BoxConstraints.tightForFinite(width: width),
-    ).height;
-    if (height.isFinite) {
-      return height;
-    }
-    return 0.0;
-  }
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    return _getSize(constraints);
-  }
-
-  BoxConstraints _getConstraintsForChild(BoxConstraints constraints) {
-    return BoxConstraints(maxHeight: constraints.maxHeight);
-  }
-
-  Offset _getPositionForChild(Size size, Size childSize) {
-    return Offset(size.width - childSize.width * animationValue, 0.0);
-  }
-
-  @override
-  void performLayout() {
-    size = _getSize(constraints);
-    if (child != null) {
-      final BoxConstraints childConstraints = _getConstraintsForChild(
-        constraints,
-      );
-      assert(childConstraints.debugAssertIsValid(isAppliedConstraint: true));
-      child!.layout(
-        childConstraints,
-        parentUsesSize: !childConstraints.isTight,
-      );
-      final BoxParentData childParentData = child!.parentData! as BoxParentData;
-      childParentData.offset = _getPositionForChild(
-        size,
-        childConstraints.isTight ? childConstraints.smallest : child!.size,
-      );
-      final Size childSize = childConstraints.isTight
-          ? childConstraints.smallest
-          : child!.size;
-
-      if (_lastSize != childSize) {
-        _lastSize = childSize;
-        _onChildSizeChanged.call(_lastSize);
-      }
-    }
-  }
-}
-
 class _ModalSideSheet<T> extends StatefulWidget {
   const _ModalSideSheet({
     super.key,
@@ -335,7 +141,7 @@ class _ModalSideSheet<T> extends StatefulWidget {
 }
 
 class _ModalSideSheetState<T> extends State<_ModalSideSheet<T>> {
-  ParametricCurve<double> animationCurve = _modalBottomSheetCurve;
+  Curve animationCurve = _modalBottomSheetCurve;
 
   String _getRouteLabel(MaterialLocalizations localizations) {
     switch (Theme.of(context).platform) {
@@ -350,10 +156,6 @@ class _ModalSideSheetState<T> extends State<_ModalSideSheet<T>> {
     }
   }
 
-  EdgeInsets _getNewClipDetails(Size topLayerSize) {
-    return EdgeInsets.fromLTRB(0, 0, 0, topLayerSize.height);
-  }
-
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
@@ -363,49 +165,44 @@ class _ModalSideSheetState<T> extends State<_ModalSideSheet<T>> {
     );
     final String routeLabel = _getRouteLabel(localizations);
 
-    return AnimatedBuilder(
-      animation: widget.route.animation!,
-      child: SideSheet(
-        animationController: widget.route._animationController,
-        onClosing: () {
-          if (widget.route.isCurrent) {
-            Navigator.pop(context);
-          }
-        },
-        builder: widget.route.builder,
-        backgroundColor: widget.backgroundColor,
-        elevation: widget.elevation,
-        shape: widget.shape,
-        clipBehavior: widget.clipBehavior,
-        constraints: widget.constraints,
-        enableDrag: widget.enableDrag,
-        showDragHandle: widget.showDragHandle,
-      ),
-      builder: (BuildContext context, Widget? child) {
-        final double animationValue = animationCurve.transform(
-          widget.route.animation!.value,
-        );
-        return Semantics(
-          scopesRoute: true,
-          namesRoute: true,
-          label: routeLabel,
-          explicitChildNodes: true,
-          child: ClipRect(
-            child: _SideSheetLayoutWithSizeListener(
-              onChildSizeChanged: (Size size) {
-                widget.route._didChangeBarrierSemanticsClip(
-                  _getNewClipDetails(size),
-                );
+    final curvedAnimation = CurvedAnimation(
+      parent: widget.route.animation!,
+      curve: animationCurve,
+      reverseCurve: animationCurve.flipped,
+    );
+
+    return Semantics(
+      scopesRoute: true,
+      namesRoute: true,
+      label: routeLabel,
+      explicitChildNodes: true,
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1.0, 0.0),
+            end: Offset.zero,
+          ).animate(curvedAnimation),
+          child: RepaintBoundary(
+            child: SideSheet(
+              animationController: widget.route._animationController,
+              onClosing: () {
+                if (widget.route.isCurrent) {
+                  Navigator.pop(context);
+                }
               },
-              animationValue: animationValue,
-              isScrollControlled: widget.isScrollControlled,
-              scrollControlDisabledMaxHeightRatio:
-                  widget.scrollControlDisabledMaxHeightRatio,
-              child: child,
+              builder: widget.route.builder,
+              backgroundColor: widget.backgroundColor,
+              elevation: widget.elevation,
+              shape: widget.shape,
+              clipBehavior: widget.clipBehavior,
+              constraints: widget.constraints,
+              enableDrag: widget.enableDrag,
+              showDragHandle: widget.showDragHandle,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -430,8 +227,8 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
     this.transitionAnimationController,
     this.anchorPoint,
     this.useSafeArea = false,
-    super.filter,
-  });
+    ImageFilter? filter,
+  }) : _filter = filter;
 
   final WidgetBuilder builder;
 
@@ -463,6 +260,8 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
 
   final String? barrierOnTapHint;
 
+  final ImageFilter? _filter;
+
   final ValueNotifier<EdgeInsets> _clipDetailsNotifier =
       ValueNotifier<EdgeInsets>(EdgeInsets.zero);
 
@@ -470,14 +269,6 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
   void dispose() {
     _clipDetailsNotifier.dispose();
     super.dispose();
-  }
-
-  bool _didChangeBarrierSemanticsClip(EdgeInsets newClipDetails) {
-    if (_clipDetailsNotifier.value == newClipDetails) {
-      return false;
-    }
-    _clipDetailsNotifier.value = newClipDetails;
-    return true;
   }
 
   @override
@@ -542,6 +333,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildModalBarrier() {
+    final Widget barrier;
     if (barrierColor.a != 0 && !offstage) {
       assert(barrierColor != barrierColor.opacity0);
       final Animation<Color?> color = animation!.drive(
@@ -550,7 +342,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
           end: barrierColor,
         ).chain(CurveTween(curve: barrierCurve)),
       );
-      return AnimatedModalBarrier(
+      barrier = AnimatedModalBarrier(
         color: color,
         dismissible: barrierDismissible,
         semanticsLabel: barrierLabel,
@@ -559,7 +351,7 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
         semanticsOnTapHint: barrierOnTapHint,
       );
     } else {
-      return ModalBarrier(
+      barrier = ModalBarrier(
         dismissible: barrierDismissible,
         semanticsLabel: barrierLabel,
         barrierSemanticsDismissible: semanticsDismissible,
@@ -567,7 +359,73 @@ class ModalSideSheetRoute<T> extends PopupRoute<T> {
         semanticsOnTapHint: barrierOnTapHint,
       );
     }
+    if (_filter == null) {
+      return barrier;
+    }
+    // 模糊强度由动画驱动（sigma 0 → 目标值，观感等同淡入，省掉 FadeTransition 每帧的整屏 saveLayer）；
+    // 并且只模糊「面板还没盖住的那一条」：面板完全不透明，被盖住的区域不需要模糊，
+    // 于是模糊面积随面板推进不断缩小，展开全程的合成开销大幅下降。
+    final anim = animation!;
+    final panelWidth = constraints?.maxWidth ?? 360;
+    return Stack(
+      fit: StackFit.expand,
+      alignment: Alignment.topLeft,
+      clipBehavior: Clip.none,
+      children: [
+        LayoutBuilder(
+          builder: (context, box) {
+            final fullWidth = box.maxWidth;
+            final covered = panelWidth.clamp(0.0, fullWidth);
+            return AnimatedBuilder(
+              animation: anim,
+              builder: (context, child) {
+                final t = _modalBottomSheetCurve.transform(anim.value);
+                final sigma = constants.CommonFilters.blurSigma * t;
+                if (sigma <= 0.05) {
+                  return const SizedBox.expand();
+                }
+                final visible = ((fullWidth - covered * t) / fullWidth).clamp(
+                  0.0,
+                  1.0,
+                );
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: visible,
+                    heightFactor: 1,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: sigma,
+                        sigmaY: sigma,
+                        tileMode: TileMode.clamp,
+                      ),
+                      child: child,
+                    ),
+                  ),
+                );
+              },
+              child: const SizedBox.expand(),
+            );
+          },
+        ),
+        barrier,
+      ],
+    );
   }
+}
+
+/// 抽屉/侧边弹层只保留最底层那一层背景模糊：下面已经有模糊路由（另一层弹层或弹窗）时不再叠加。
+ImageFilter? resolveSheetFilter(BuildContext context, ImageFilter? filter) {
+  if (filter == null) return null;
+  final route = ModalRoute.of(context);
+  if (route == null) return filter;
+  if (route is ModalBottomSheetRoute ||
+      route is ModalSideSheetRoute ||
+      route is RawDialogRoute) {
+    return null;
+  }
+  if (route.filter != null) return null;
+  return filter;
 }
 
 Future<T?> showModalSideSheet<T>({
@@ -602,7 +460,7 @@ Future<T?> showModalSideSheet<T>({
   return navigator.push(
     ModalSideSheetRoute<T>(
       builder: builder,
-      filter: filter,
+      filter: resolveSheetFilter(context, filter),
       capturedThemes: InheritedTheme.capture(
         from: context,
         to: navigator.context,

@@ -5,6 +5,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class TunnelListWidget extends ConsumerWidget {
   const TunnelListWidget({super.key});
@@ -34,7 +35,7 @@ class TunnelListWidget extends ConsumerWidget {
                 index: index,
               ),
               trailing: IconButton(
-                icon: const Icon(Icons.delete_outline_rounded),
+                icon: const Icon(FluentIcons.delete_24_regular),
                 onPressed: () => _deleteTunnel(ref, tunnels, index),
               ),
             ),
@@ -227,7 +228,7 @@ class TunnelListView extends ConsumerWidget {
         clipBehavior: Clip.none,
         heroTag: null,
         onPressed: () => _showTunnelDialog(context, ref, tunnels),
-        child: const Icon(Icons.add_rounded),
+        child: const Icon(FluentIcons.add_circle_24_filled),
       ),
     );
   }

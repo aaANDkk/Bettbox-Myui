@@ -6,6 +6,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 Future<void> _handleNetworkConfigChange(WidgetRef ref) async {
   if (system.isAndroid) {
@@ -496,7 +497,7 @@ class BypassDomainItem extends StatelessWidget {
                   await _handleNetworkConfigChange(ref);
                 },
                 tooltip: appLocalizations.reset,
-                icon: const Icon(Icons.replay_rounded),
+                icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
               );
             },
           ),
@@ -558,7 +559,7 @@ class BypassPrivateRouteItem extends ConsumerWidget {
                   await _handleNetworkConfigChange(ref);
                 },
                 tooltip: appLocalizations.reset,
-                icon: const Icon(Icons.replay_rounded),
+                icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
               );
             },
           ),
@@ -612,7 +613,7 @@ class BypassPrivateRouteItem extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(7),
                   child: Icon(
-                    Icons.settings_outlined,
+                    FluentIcons.settings_24_regular,
                     size: 18,
                     color: context.colorScheme.onSurfaceVariant,
                   ),

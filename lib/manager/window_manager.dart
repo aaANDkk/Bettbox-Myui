@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_ext/window_ext.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class WindowManager extends ConsumerStatefulWidget {
   final Widget child;
@@ -351,8 +352,8 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       return IconButton(
                         onPressed: _updatePin,
                         icon: value
-                            ? const Icon(Icons.push_pin_rounded)
-                            : const Icon(Icons.push_pin_outlined),
+                            ? const Icon(FluentIcons.pin_24_filled)
+                            : const Icon(FluentIcons.pin_24_regular),
                       );
                     },
                   ),
@@ -360,7 +361,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                     onPressed: () {
                       windowManager.minimize();
                     },
-                    icon: const Icon(Icons.remove_rounded),
+                    icon: const Icon(FluentIcons.subtract_24_regular),
                   ),
                   ValueListenableBuilder(
                     valueListenable: isMaximizedNotifier,
@@ -370,8 +371,8 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                           _updateMaximized();
                         },
                         icon: value
-                            ? const Icon(Icons.filter_none_rounded, size: 20)
-                            : const Icon(Icons.crop_square_rounded),
+                            ? const Icon(FluentIcons.square_multiple_24_regular, size: 20)
+                            : const Icon(FluentIcons.square_24_regular),
                       );
                     },
                   ),
@@ -381,7 +382,7 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
                       globalState.appController.unBackBlock();
                       globalState.appController.handleBackOrExit();
                     },
-                    icon: const Icon(Icons.close_rounded),
+                    icon: const Icon(FluentIcons.dismiss_24_regular),
                   ),
                 ],
               ),

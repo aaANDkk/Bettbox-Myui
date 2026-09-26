@@ -2,10 +2,12 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/common.dart';
 import 'package:flutter/material.dart';
 
+const _anchorX = 12.0;
+const _anchorY = 32.0;
+
 class CommonPopupRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
   ValueNotifier<Offset> offsetNotifier;
-
   CommonPopupRoute({
     required this.barrierLabel,
     required this.builder,
@@ -47,6 +49,7 @@ class CommonPopupRoute<T> extends PopupRoute<T> {
     final fade = animation.drive(CurveTween(curve: Curves.easeOut));
     final scale = animation.drive(CurveTween(curve: Curves.easeOutBack));
 
+    final padding = MediaQuery.paddingOf(context);
     return SafeArea(
       child: ValueListenableBuilder(
         valueListenable: offsetNotifier,
@@ -55,7 +58,9 @@ class CommonPopupRoute<T> extends PopupRoute<T> {
             alignment: align,
             child: CustomSingleChildLayout(
               delegate: OverflowAwareLayoutDelegate(
-                offset: value.translate(48, -8),
+                offset:
+                    value.translate(_anchorX, _anchorY) -
+                    Offset(padding.left, padding.top),
               ),
               child: child,
             ),
@@ -138,15 +143,17 @@ class _CommonPopupBoxState extends State<CommonPopupBox> {
 
   void _updateOffset() {
     final renderBox = context.findRenderObject() as RenderBox?;
-    if (renderBox == null) {
+    if (renderBox == null || !renderBox.attached || !renderBox.hasSize) {
       return;
     }
-    final viewPadding = MediaQuery.of(context).viewPadding;
-    _targetOffsetValueNotifier.value = renderBox
-        .localToGlobal(
-          Offset.zero.translate(viewPadding.right, viewPadding.top),
-        )
-        .translate(_offset.dx, _offset.dy);
+    final navigatorBox =
+        Navigator.maybeOf(context)?.context.findRenderObject() as RenderBox?;
+    final origin = renderBox.localToGlobal(Offset.zero, ancestor: navigatorBox);
+    _targetOffsetValueNotifier.value =
+        Offset(origin.dx + renderBox.size.width, origin.dy).translate(
+          _offset.dx,
+          _offset.dy,
+        );
   }
 
   @override

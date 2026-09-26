@@ -23,6 +23,31 @@ const monochromeColorFilter = ColorFilter.matrix(<double>[
   0,
 ]);
 
+const themedInvertFilter = ColorFilter.matrix(<double>[
+  -1, 0, 0, 0, 255,
+  0, -1, 0, 0, 255,
+  0, 0, -1, 0, 255,
+  0, 0, 0, 1, 0,
+]);
+
+Widget themedPlatformIcon(
+  BuildContext context,
+  MediaPlatform platform,
+  Widget icon,
+) {
+  if (!platform.invertOnDark) {
+    return icon;
+  }
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  if (!isDark) {
+    return icon;
+  }
+  return ColorFiltered(
+    colorFilter: themedInvertFilter,
+    child: icon,
+  );
+}
+
 const mediaUnlockGreen = Color(0xFF10B981);
 const mediaUnlockOrange = Color(0xFFF59E0B);
 
@@ -36,6 +61,7 @@ enum MediaPlatform {
   openrouter,
   poe,
   suno,
+  cloudflare,
   perplexity,
   netflix,
   disney,
@@ -65,7 +91,6 @@ enum MediaPlatform {
   wikipedia,
   apple,
   onetrust,
-  cloudflare,
   gitlab,
   npm,
   cdnjs,
@@ -91,7 +116,6 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.openrouter ||
     MediaPlatform.poe ||
     MediaPlatform.suno ||
-    MediaPlatform.cloudflare ||
     MediaPlatform.perplexity => MediaCategory.ai,
     MediaPlatform.netflix ||
     MediaPlatform.disney ||
@@ -121,6 +145,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.wikipedia ||
     MediaPlatform.apple ||
     MediaPlatform.onetrust ||
+    MediaPlatform.cloudflare ||
     MediaPlatform.gitlab ||
     MediaPlatform.npm ||
     MediaPlatform.cdnjs ||
@@ -161,7 +186,7 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.tencent => 'Tencent(CN)',
     MediaPlatform.alibaba => 'Alibaba(CN)',
     MediaPlatform.netease => 'Netease(CN)',
-    MediaPlatform.douyin => 'Douyin(CN)',
+    MediaPlatform.douyin => 'ByteDance(CN)',
     MediaPlatform.cloudflarecn => 'Cloudflare(CN)',
     MediaPlatform.reddit => 'Reddit',
     MediaPlatform.x => 'Twitter',
@@ -192,6 +217,7 @@ extension MediaPlatformExt on MediaPlatform {
   };
 
   bool get isMonochrome => switch (this) {
+    MediaPlatform.openai ||
     MediaPlatform.github ||
     MediaPlatform.wikipedia ||
     MediaPlatform.apple ||
@@ -202,23 +228,19 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.openrouter ||
     MediaPlatform.suno ||
     MediaPlatform.v2ex ||
-    MediaPlatform.unpkg ||
-    MediaPlatform.okx => true,
+    MediaPlatform.unpkg => true,
     _ => false,
   };
 
-  /// 深色模式下整体反色的素材，见 [themedPlatformIcon]；单色黑素材请用 [isMonochrome]。
-  ///
-  /// crypto 分类默认整体反色（这类标记多为黑/深色，深色背景下要反色才看得清），
-  /// 但彩色品牌徽标例外：反色会破坏品牌色，因此显式排除。
   bool get invertOnDark => switch (this) {
-        MediaPlatform.coinbase ||
-        MediaPlatform.phantom ||
-        MediaPlatform.kraken => false,
-        // E-Hentai 是深红色单色标记，深色背景下偏暗，单独加入反色
-        MediaPlatform.ehentai => true,
-        _ => category == MediaCategory.crypto,
-      };
+    MediaPlatform.coinbase ||
+    MediaPlatform.phantom ||
+    MediaPlatform.kraken => false,
+    MediaPlatform.ehentai ||
+    MediaPlatform.tiktok ||
+    MediaPlatform.ubisoft => true,
+    _ => category == MediaCategory.crypto,
+  };
 
   bool get pinColoBadge => this == MediaPlatform.telegram;
 

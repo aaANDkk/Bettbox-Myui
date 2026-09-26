@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class MediaUnlockPage extends ConsumerStatefulWidget {
   final SheetType type;
@@ -41,6 +42,12 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         ? MediaCategory.values
         : MediaCategory.values.where((c) => c != MediaCategory.china).toList();
     final categories = [null, ...availableCategories];
+    final fabTheme = Theme.of(context).floatingActionButtonTheme;
+    final fabBgColor =
+        fabTheme.backgroundColor ?? context.colorScheme.primaryContainer;
+    final fabFgColor =
+        fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
+
     return SizedBox(
       height: 34,
       child: ListView.separated(
@@ -56,7 +63,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           );
           return Material(
             color: isSelected
-                ? context.colorScheme.primary
+                ? fabBgColor
                 : context.colorScheme.surfaceContainerHigh,
             shape: shape,
             clipBehavior: Clip.antiAlias,
@@ -76,7 +83,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                   _getCategoryLabel(cat),
                   style: context.textTheme.labelMedium?.copyWith(
                     color: isSelected
-                        ? context.colorScheme.onPrimary
+                        ? fabFgColor
                         : context.colorScheme.onSurfaceVariant,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -218,7 +225,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             title: appLocalizations.mediaUnlockDisplaySettings,
             titleTrailing: IconButton(
               icon: Icon(
-                Icons.settings_outlined,
+                FluentIcons.settings_24_regular,
                 size: 20.ap,
                 color: context.colorScheme.onSurfaceVariant,
               ),
@@ -359,6 +366,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 globalState.appController.savePreferencesDebounce();
               }
 
+              final divider = Divider(
+                height: 1,
+                thickness: 1,
+                color: context.colorScheme.outlineVariant.withValues(
+                  alpha: context.colorScheme.brightness == Brightness.light
+                      ? 0.6
+                      : 0.45,
+                ),
+                indent: 16,
+                endIndent: 16,
+              );
+
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -373,6 +392,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       },
                     ),
                   ),
+                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockRefreshOnNodeChange),
                     delegate: SwitchDelegate(
@@ -384,6 +404,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       },
                     ),
                   ),
+                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockColorfulIcons),
                     delegate: SwitchDelegate(
@@ -391,6 +412,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       onChanged: (value) {
                         updateSetting(
                           (s) => s.copyWith(mediaUnlockColorfulIcons: value),
+                        );
+                      },
+                    ),
+                  ),
+                  divider,
+                  ListItem.switchItem(
+                    title: Text(appLocalizations.mediaUnlockRefreshByCategory),
+                    delegate: SwitchDelegate(
+                      value: setting.mediaUnlockRefreshByCategory,
+                      onChanged: (value) {
+                        updateSetting(
+                          (s) => s.copyWith(mediaUnlockRefreshByCategory: value),
                         );
                       },
                     ),
@@ -551,7 +584,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             child: _buildPlatformIcon(
               platform,
               status: status,
-              size: 25,
+              size: 19,
             ),
           ),
           const SizedBox(width: 12),
@@ -705,7 +738,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                       mediaUnlockState.checkSingle(platform);
                     },
               icon: Icon(
-                Icons.refresh_rounded,
+                FluentIcons.arrow_clockwise_24_regular,
                 size: 18,
                 color: context.colorScheme.onSurfaceVariant,
               ),
@@ -766,8 +799,13 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
   @override
   Widget build(BuildContext context) {
     final isChinese = Localizations.localeOf(context).languageCode == 'zh';
-    final showExtraDetails = ref.watch(
-      appSettingProvider.select((state) => state.mediaUnlockExtraDetails),
+    final (showExtraDetails, refreshByCategory) = ref.watch(
+      appSettingProvider.select(
+        (state) => (
+          state.mediaUnlockExtraDetails,
+          state.mediaUnlockRefreshByCategory,
+        ),
+      ),
     );
 
     return ValueListenableBuilder<MediaUnlockState>(
@@ -794,6 +832,10 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 .where((p) => p.category == effectiveCategory)
                 .toList();
 
+        final isCategoryLoading = refreshByCategory
+            ? mediaUnlockState.isBatchChecking(displayedPlatforms)
+            : mediaUnlockState.isBatchChecking();
+
         for (final p in displayedPlatforms) {
           final status = state.results[p]?.status;
           if (status == MediaUnlockStatus.unlocked) {
@@ -811,18 +853,22 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           title: appLocalizations.mediaUnlock,
           actions: [
             IconButton(
-              icon: const Icon(Icons.tune_rounded),
+              icon: const Icon(FluentIcons.options_24_regular),
               tooltip: appLocalizations.mediaUnlockDisplaySettings,
               onPressed: _showPinnedSettingsDialog,
             ),
             IconButton(
-              onPressed: state.isLoading
+              onPressed: isCategoryLoading
                   ? null
                   : () {
-                      mediaUnlockState.checkAll(force: true);
+                      mediaUnlockState.checkAll(
+                        force: true,
+                        platforms:
+                            refreshByCategory ? displayedPlatforms : null,
+                      );
                     },
               tooltip: appLocalizations.retry,
-              icon: state.isLoading
+              icon: isCategoryLoading
                   ? SizedBox(
                       width: 16,
                       height: 16,
@@ -831,7 +877,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                         size: 16,
                       ),
                     )
-                  : const Icon(Icons.sync_rounded),
+                  : const Icon(FluentIcons.arrow_sync_24_regular),
             ),
           ],
           body: CustomScrollView(
@@ -852,7 +898,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
               ..._buildStatusSectionSlivers(
                 title: appLocalizations.notUnlocked,
-                icon: Icons.cancel_outlined,
+                icon: FluentIcons.dismiss_circle_24_regular,
                 color: context.colorScheme.error,
                 platforms: blockedList,
                 state: state,
@@ -860,7 +906,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               ),
               ..._buildStatusSectionSlivers(
                 title: appLocalizations.other,
-                icon: Icons.help_outline_rounded,
+                icon: FluentIcons.question_circle_24_regular,
                 color: mediaUnlockOrange,
                 platforms: otherList,
                 state: state,
@@ -871,7 +917,7 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                         _selectedCategory == MediaCategory.ai)
                     ? appLocalizations.mediaUnlocked
                     : appLocalizations.unlocked,
-                icon: Icons.check_circle_outline_rounded,
+                icon: FluentIcons.checkmark_circle_24_regular,
                 color: mediaUnlockGreen,
                 platforms: unlockedList,
                 state: state,

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:path/path.dart' hide context;
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 final geoUpdatingKeysProvider =
     StateProvider.autoDispose<Set<String>>((ref) => {});
@@ -105,7 +106,7 @@ class ResourcesView extends ConsumerWidget {
       title: appLocalizations.resources,
       actions: [
         IconButton(
-          icon: const Icon(Icons.replay_rounded),
+          icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
           onPressed: () => _handleResetAll(ref),
           tooltip: appLocalizations.reset,
         ),
@@ -118,7 +119,7 @@ class ResourcesView extends ConsumerWidget {
                     size: 20,
                   ),
                 )
-              : const Icon(Icons.sync_rounded),
+              : const Icon(FluentIcons.arrow_sync_24_regular),
           onPressed: isUpdating ? null : () => _handleSyncAll(ref),
           tooltip: appLocalizations.syncAll,
         ),
@@ -275,7 +276,7 @@ class _GeoDataListItemState extends ConsumerState<GeoDataListItem> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       CommonChip(
-                        avatar: const Icon(Icons.edit_rounded),
+                        avatar: const Icon(FluentIcons.edit_24_regular),
                         label: appLocalizations.edit,
                         onPressed: isSyncing ? null : () => _updateUrl(url),
                       ),
@@ -288,7 +289,7 @@ class _GeoDataListItemState extends ConsumerState<GeoDataListItem> {
                                   size: 16,
                                 ),
                               )
-                            : const Icon(Icons.sync_rounded),
+                            : const Icon(FluentIcons.arrow_sync_24_regular),
                         label: appLocalizations.sync,
                         onPressed: isSyncing ? null : _handleUpdateGeoDataItem,
                       ),

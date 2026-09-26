@@ -120,9 +120,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリのアクセス制御"),
-    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
-      "アクセス制御設定",
-    ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage("アクセス制御設定"),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("アクセス制御"),
     "appDesc": MessageLookupByLibrary.simpleMessage("アプリ設定を管理"),
     "application": MessageLookupByLibrary.simpleMessage("アプリケーション"),
@@ -193,7 +191,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "categoryGaming": MessageLookupByLibrary.simpleMessage("ゲームセンター"),
     "categorySocial": MessageLookupByLibrary.simpleMessage("コミュニティ"),
     "categoryStreaming": MessageLookupByLibrary.simpleMessage("動画配信"),
-    "chasingDots": MessageLookupByLibrary.simpleMessage("チェイシングドット"),
     "checkError": MessageLookupByLibrary.simpleMessage("確認失敗"),
     "checkFailed": MessageLookupByLibrary.simpleMessage("Timeout"),
     "checkOrAddProfile": MessageLookupByLibrary.simpleMessage(
@@ -237,6 +234,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("接続並び替え"),
     "connectivity": MessageLookupByLibrary.simpleMessage("接続性："),
     "contactMe": MessageLookupByLibrary.simpleMessage("お問い合わせ"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("ラベルを切り替え"),
     "content": MessageLookupByLibrary.simpleMessage("内容"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("コンテンツテーマ"),
     "continent": MessageLookupByLibrary.simpleMessage("大陸"),
@@ -262,13 +260,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("クラッシュテスト"),
     "create": MessageLookupByLibrary.simpleMessage("作成"),
     "creationTime": MessageLookupByLibrary.simpleMessage("作成日時"),
-    "cubeGrid": MessageLookupByLibrary.simpleMessage("キューブグリッド"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("現在のプロファイル"),
     "custom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("カスタムタイトル"),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("カスタムルール"),
     "customUrl": MessageLookupByLibrary.simpleMessage("カスタムURL"),
     "cut": MessageLookupByLibrary.simpleMessage("切り取り"),
-    "dancingSquare": MessageLookupByLibrary.simpleMessage("ダンシングスクエア"),
     "dark": MessageLookupByLibrary.simpleMessage("ダーク"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("ダークアイコン"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage("アプリアイコンをダーク系に切り替え"),
@@ -342,7 +339,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "OSのDozeスリープモードに同期",
     ),
-    "dualRing": MessageLookupByLibrary.simpleMessage("デュアルリング"),
     "edit": MessageLookupByLibrary.simpleMessage("編集"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("転送編集"),
     "editUser": MessageLookupByLibrary.simpleMessage("ユーザーを編集"),
@@ -390,10 +386,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("外部リンク"),
     "externalResources": MessageLookupByLibrary.simpleMessage("外部リソース"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("フェードサークル"),
-    "fadingCube": MessageLookupByLibrary.simpleMessage("フェードキューブ"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("フェードフォースクエア"),
-    "fadingGrid": MessageLookupByLibrary.simpleMessage("フェードグリッド"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage("FakeIPフィルターモード"),
     "fakeIpFilterModeDesc": MessageLookupByLibrary.simpleMessage(
       "FakeIPフィルターの動作モードを指定",
@@ -428,7 +421,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "プロセス名をマッチングして検索",
     ),
     "flagged": MessageLookupByLibrary.simpleMessage("フラグ付き"),
-    "foldingCube": MessageLookupByLibrary.simpleMessage("フォールディングキューブ"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("フォント"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage("強制DNSマッピング"),
     "forceDnsMappingDesc": MessageLookupByLibrary.simpleMessage(
@@ -457,8 +449,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("グローバル"),
     "go": MessageLookupByLibrary.simpleMessage("移動"),
     "goDownload": MessageLookupByLibrary.simpleMessage("ダウンロードへ"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("カスタムフォント"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("デフォルトはシステムフォント、有効にして好みのフォントを適用"),
+    "customFont": MessageLookupByLibrary.simpleMessage("カスタムフォント"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "デフォルトはシステムフォント、有効にして好みのフォントを適用",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("変更をキャッシュしますか？"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("タイムアウト時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -480,7 +474,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hotkeyManagementDesc": MessageLookupByLibrary.simpleMessage(
       "キーボードでアプリを操作",
     ),
-    "hourGlass": MessageLookupByLibrary.simpleMessage("アワーグラス"),
     "hours": m5,
     "httpPortSniffer": MessageLookupByLibrary.simpleMessage("HTTPポート解析"),
     "icmpForwarding": MessageLookupByLibrary.simpleMessage("ICMP転送"),
@@ -691,6 +684,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("組織 / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("オプション"),
     "other": MessageLookupByLibrary.simpleMessage("その他"),
+    "contributor": MessageLookupByLibrary.simpleMessage("貢献者"),
     "otherContributors": MessageLookupByLibrary.simpleMessage("その他の貢献者（ランダム順）"),
     "otherSettings": MessageLookupByLibrary.simpleMessage("拡張ツール"),
     "otherSettingsDesc": MessageLookupByLibrary.simpleMessage("拡張ツールの設定を変更"),
@@ -739,7 +733,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "parsePureIpDesc": MessageLookupByLibrary.simpleMessage("IP直接接続を解析"),
     "password": MessageLookupByLibrary.simpleMessage("パスワード"),
     "paste": MessageLookupByLibrary.simpleMessage("貼り付け"),
-    "pianoWave": MessageLookupByLibrary.simpleMessage("ピアノウェーブ"),
     "pin": MessageLookupByLibrary.simpleMessage("固定"),
     "pleaseBindWebDAV": MessageLookupByLibrary.simpleMessage("WebDAVを連携してください"),
     "pleaseCloseSystemProxyFirst": MessageLookupByLibrary.simpleMessage(
@@ -765,10 +758,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "重複しないポート番号を入力してください",
     ),
     "portTip": m11,
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("ポーリングアワーグラス"),
-    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
-      "リファインドグラス",
-    ),
     "powerSwitch": MessageLookupByLibrary.simpleMessage("電源スイッチ"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage("DoHでHTTP/3を優先使用"),
     "pressKeyboard": MessageLookupByLibrary.simpleMessage("キーを入力してください"),
@@ -817,11 +806,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyProviders": MessageLookupByLibrary.simpleMessage("プロキシプロバイダー"),
     "proxyProvidersCount": MessageLookupByLibrary.simpleMessage("プロキシセット"),
     "pulse": MessageLookupByLibrary.simpleMessage("パルス"),
-    "pulsingGrid": MessageLookupByLibrary.simpleMessage("パルスグリッド"),
-    "pumpingHeart": MessageLookupByLibrary.simpleMessage("ハートビート"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("ピュアブラックモード"),
     "qrcode": MessageLookupByLibrary.simpleMessage("QRコード"),
-    "qrcodeDesc": MessageLookupByLibrary.simpleMessage("QRコードをスキャンして設定をインポート"),
+    "qrcodeDesc": MessageLookupByLibrary.simpleMessage("QRコードをスキャンして設定を取得"),
     "quicGoDisableEcn": MessageLookupByLibrary.simpleMessage("QUIC ECN無効化"),
     "quicGoDisableEcnDesc": MessageLookupByLibrary.simpleMessage(
       "QUICのECN（Explicit Congestion Notification）を無効化",
@@ -883,10 +870,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restore": MessageLookupByLibrary.simpleMessage("元に戻す"),
     "retry": MessageLookupByLibrary.simpleMessage("再試行"),
     "rightClickBehavior": MessageLookupByLibrary.simpleMessage("右クリック"),
-    "ring": MessageLookupByLibrary.simpleMessage("リング"),
-    "ripple": MessageLookupByLibrary.simpleMessage("リップル"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("ローテーション"),
-    "rotatingPlain": MessageLookupByLibrary.simpleMessage("プレーンローテーション"),
     "rule": MessageLookupByLibrary.simpleMessage("ルール"),
     "ruleName": MessageLookupByLibrary.simpleMessage("ルール名"),
     "ruleProviders": MessageLookupByLibrary.simpleMessage("ルールプロバイダー"),
@@ -923,6 +907,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "ホーム画面に独立したON/OFFボタンを表示",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("カードスイッチ"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "ホーム画面にカード型スイッチボタンを表示"),
     "shrink": MessageLookupByLibrary.simpleMessage("コンパクト"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("サイレント起動"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
@@ -965,9 +952,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sourceIp": MessageLookupByLibrary.simpleMessage("送信元IP"),
     "specialProxy": MessageLookupByLibrary.simpleMessage("特殊プロキシ"),
     "specialRules": MessageLookupByLibrary.simpleMessage("特殊ルール"),
-    "spinningCircle": MessageLookupByLibrary.simpleMessage("スピンサークル"),
     "spinningLines": MessageLookupByLibrary.simpleMessage("スピンライン"),
-    "squareCircle": MessageLookupByLibrary.simpleMessage("スクエアサークル"),
     "stackMode": MessageLookupByLibrary.simpleMessage("スタックモード"),
     "standard": MessageLookupByLibrary.simpleMessage("標準"),
     "start": MessageLookupByLibrary.simpleMessage("開始"),
@@ -1059,29 +1044,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunnelTargetHint": MessageLookupByLibrary.simpleMessage(
       "例: 114.114.114.114:53",
     ),
-    "tvScanImport": MessageLookupByLibrary.simpleMessage("スキャン / LANインポート"),
-    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
-      "スマホでスキャンまたはLAN経由でTVに設定をプッシュ",
-    ),
-    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
-      "スマホのブラウザに直接入力も可能：",
-    ),
-    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
-      "利用可能なLANが見つかりません。Wi-Fiを確認してください",
-    ),
-    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
-      "スマホとTVが同じWi-Fiネットワークにあることを確認",
-    ),
-    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
-      "対応するカメラまたはブラウザでQRコードをスキャン",
-    ),
-    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
-      "Webページで購読URLを貼り付けまたは設定をアップロードしてプッシュ",
-    ),
-    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
-      "設定がプッシュされました。インポート中...",
-    ),
-    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("スマホからのプッシュを待機中..."),
     "twoColumns": MessageLookupByLibrary.simpleMessage("2列"),
     "unableToUpdateCurrentProfileDesc": MessageLookupByLibrary.simpleMessage(
       "現在のプロファイルを更新できません",
@@ -1124,6 +1086,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "VpnServiceでシステム通信をルーティング",
     ),
+    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "モバイル端末ではHTTPプロキシ併用は非推奨です。必要な場合のみ設定してください",
+    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "VpnServiceにHTTPプロキシを添付",
     ),
@@ -1132,26 +1097,34 @@ class MessageLookup extends MessageLookupByLibrary {
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "画面の自動消灯を防ぐ画面ウェイクロックを有効にします（CPUウェイクは使用しません）。バックグラウンド処理を維持したい場合に便利です。",
     ),
-    "wanderingCubes": MessageLookupByLibrary.simpleMessage("ワンダリングキューブ"),
     "wave": MessageLookupByLibrary.simpleMessage("ウェーブ"),
-    "waveSpinner": MessageLookupByLibrary.simpleMessage("ウェーブスピナー"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV設定"),
     "whitelist": MessageLookupByLibrary.simpleMessage("ホワイトリスト"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("ホワイトリストモード"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("システムへ適用"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("管理者権限が必要です"),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("絵文字スタイル"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("アプリ内で表示する絵文字のスタイルを選択"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "アプリ内で表示する絵文字のスタイルを選択",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
     "startRunning": MessageLookupByLibrary.simpleMessage("開始"),
     "selectCustomFont": MessageLookupByLibrary.simpleMessage("フォントの選択 / 変更"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("タップしてローカルの .ttf または .otf フォントを選択"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("カスタムフォントを適用しました"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("システムデフォルトのフォントに戻しました"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(".ttf または .otf 形式のフォントファイルのみサポートされています"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "タップしてローカルの .ttf または .otf フォントを選択",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "カスタムフォントを適用しました",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "システムデフォルトのフォントに戻しました",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      ".ttf または .otf 形式のフォントファイルのみサポートされています",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("フェージングキューブ"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("折りたたみキューブ"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("心拍パルス"),
@@ -1166,5 +1139,79 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("アドレス情報"),
     "traffic": MessageLookupByLibrary.simpleMessage("トラフィック"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("詳細情報"),
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("チェイシングドット"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("キューブグリッド"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("ダンシングスクエア"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("デュアルリング"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("フェードグリッド"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("アワーグラス"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("ピアノウェーブ"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "リファインドグラス",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("パルスグリッド"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("リング"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("リップル"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("プレーンローテーション"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("スピンサークル"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("ワンダリングキューブ"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("ウェーブスピナー"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("フォント修復"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "表示異常を改善するため内蔵フォントを使用",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "現在のカテゴリに基づいて部分更新",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("スキャン / LANインポート"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "スマホでスキャンまたはLAN経由でTVに設定をプッシュ",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "スマホとTVが同じWi-Fiネットワークにあることを確認",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "対応するカメラまたはブラウザでQRコードをスキャン",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "Webページで購読URLを貼り付けまたは設定をアップロードしてプッシュ",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "スマホのブラウザに直接入力も可能：",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("スマホからのプッシュを待機中..."),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "設定がプッシュされました。インポート中...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "利用可能なLANが見つかりません。Wi-Fiを確認してください",
+    ),
   };
 }

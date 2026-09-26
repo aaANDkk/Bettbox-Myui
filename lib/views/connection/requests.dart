@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'item.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class RequestsView extends ConsumerStatefulWidget {
   const RequestsView({super.key});
@@ -65,7 +66,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
             ref.read(requestsProvider.notifier).clearRequests();
           },
           tooltip: appLocalizations.clear,
-          icon: const Icon(Icons.delete_sweep_outlined),
+          icon: const Icon(FluentIcons.delete_dismiss_24_regular),
         ),
         IconButton(
           style: _autoScrollToEnd
@@ -77,7 +78,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
               : null,
           onPressed: _toggleAutoScroll,
           tooltip: appLocalizations.autoScroll,
-          icon: const Icon(Icons.vertical_align_top_rounded),
+          icon: const Icon(FluentIcons.swipe_up_24_regular),
         ),
       ],
       searchState: AppBarSearchState(onSearch: _onSearch),

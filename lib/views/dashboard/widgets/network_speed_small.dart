@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'network_speed.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class NetworkSpeedSmall extends ConsumerWidget {
   const NetworkSpeedSmall({super.key});
@@ -33,27 +34,6 @@ class NetworkSpeedSmall extends ConsumerWidget {
     return result;
   }
 
-  static Traffic _getLastTraffic(List<Traffic> traffics) {
-    if (traffics.isEmpty) return Traffic();
-    return traffics.last;
-  }
-
-  static String _formatTrafficValue(TrafficValue tv) {
-    final show = tv.trafficValueShow;
-    final numStr = show.value >= 100
-        ? show.value.fixed(decimals: 1)
-        : show.value.fixed(decimals: 2);
-    return '$numStr${show.unit.name}';
-  }
-
-  static String _getSpeedText(Traffic traffic, bool isMobile) {
-    if (isMobile) {
-      final total = TrafficValue(value: traffic.up.value + traffic.down.value);
-      return '$total ↓↑';
-    }
-    return '${_formatTrafficValue(traffic.up)}↑ ${_formatTrafficValue(traffic.down)}↓';
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isMobile = ref.watch(isMobileViewProvider);
@@ -74,14 +54,13 @@ class NetworkSpeedSmall extends ConsumerWidget {
           builder: (_, _, _) {
             final traffics = ref.read(trafficsProvider).list;
             final points = _getPoints(traffics);
-            final lastTraffic = _getLastTraffic(traffics);
             return CommonCard(
               onPressed: () {
                 showSpeedTestConfirm(context);
               },
               info: Info(
-                label: _getSpeedText(lastTraffic, isMobile),
-                iconData: Icons.speed_rounded,
+                label: appLocalizations.networkSpeed,
+                iconData: FluentIcons.gauge_24_regular,
                 style: speedStyle,
               ),
               child: Padding(

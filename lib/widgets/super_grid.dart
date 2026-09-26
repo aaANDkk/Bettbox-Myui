@@ -10,6 +10,7 @@ import 'package:bett_box/widgets/grid.dart';
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef VoidCallback = void Function();
 
@@ -720,7 +721,7 @@ class _DeletableContainerState extends State<_DeletableContainer>
                         )
                       : null,
                   onPressed: _handleDel,
-                  icon: const Icon(Icons.close_rounded),
+                  icon: const Icon(FluentIcons.dismiss_24_regular),
                 ),
               ),
             ),

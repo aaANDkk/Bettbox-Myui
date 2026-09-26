@@ -4,6 +4,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:bett_box/views/config/sniffer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class SnifferOverride extends StatelessWidget {
   const SnifferOverride({super.key});
@@ -13,7 +14,7 @@ class SnifferOverride extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'Sniffer', iconData: Icons.radar_rounded),
+        info: Info(label: 'Sniffer', iconData: FluentIcons.scan_object_24_regular),
         onPressed: () {
           // Open Sniffer settings
           showExtend(
@@ -25,7 +26,6 @@ class SnifferOverride extends StatelessWidget {
                 body: const SnifferListView(),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         child: Container(

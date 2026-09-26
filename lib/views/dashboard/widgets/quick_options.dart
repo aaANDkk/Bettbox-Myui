@@ -4,6 +4,7 @@ import 'package:bett_box/views/config/network.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class TUNButton extends StatelessWidget {
   const TUNButton({super.key});
@@ -37,7 +38,7 @@ class TUNButton extends StatelessWidget {
         },
         info: Info(
           label: appLocalizations.tun,
-          iconData: Icons.stacked_line_chart_rounded,
+          iconData: FluentIcons.protocol_handler_24_regular,
         ),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
@@ -115,7 +116,7 @@ class SystemProxyButton extends StatelessWidget {
         },
         info: Info(
           label: appLocalizations.systemProxy,
-          iconData: Icons.shuffle_rounded,
+          iconData: FluentIcons.arrow_shuffle_24_regular,
         ),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
@@ -195,7 +196,7 @@ class VpnButton extends StatelessWidget {
             },
           );
         },
-        info: Info(label: 'VPN', iconData: Icons.stacked_line_chart_rounded),
+        info: Info(label: 'VPN', iconData: FluentIcons.protocol_handler_24_regular),
         child: Container(
           padding: baseInfoEdgeInsets.copyWith(top: 4, bottom: 8, right: 8),
           child: Row(

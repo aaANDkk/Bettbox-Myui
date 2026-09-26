@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/models.dart';
 import '../widgets/widgets.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class LogsView extends ConsumerStatefulWidget {
   const LogsView({super.key});
@@ -103,7 +104,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
       actions: [
         IconButton(
           onPressed: _handleLogLevelSettings,
-          icon: const Icon(Icons.settings_outlined),
+          icon: const Icon(FluentIcons.settings_24_regular),
           tooltip: appLocalizations.logLevel,
         ),
         IconButton(
@@ -116,7 +117,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
               : null,
           onPressed: _toggleAutoScroll,
           tooltip: appLocalizations.autoScroll,
-          icon: const Icon(Icons.vertical_align_top_rounded),
+          icon: const Icon(FluentIcons.swipe_up_24_regular),
         ),
         Tooltip(
           message: appLocalizations.export,
@@ -126,7 +127,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
             borderRadius: BorderRadius.circular(20),
             child: const Padding(
               padding: EdgeInsets.all(12),
-              child: Icon(Icons.save_as_outlined, size: 24),
+              child: Icon(FluentIcons.save_edit_24_regular, size: 24),
             ),
           ),
         ),

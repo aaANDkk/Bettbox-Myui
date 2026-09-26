@@ -6,6 +6,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class OutboundMode extends StatelessWidget {
   const OutboundMode({super.key});
@@ -23,7 +24,7 @@ class OutboundMode extends StatelessWidget {
             return CommonCard(
               info: Info(
                 label: appLocalizations.outboundMode,
-                iconData: Icons.call_split_rounded,
+                iconData: FluentIcons.arrow_split_24_regular,
               ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 16),

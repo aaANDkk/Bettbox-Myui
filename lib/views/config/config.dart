@@ -13,6 +13,7 @@ import 'package:bett_box/views/config/experimental.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ConfigView extends StatefulWidget {
   const ConfigView({super.key});
@@ -28,7 +29,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.general),
         subtitle: Text(appLocalizations.generalDesc),
-        leading: const Icon(Icons.edit_note_rounded),
+        leading: const Icon(FluentIcons.note_edit_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.general,
           builder: (_) => const GeneralListView(),
@@ -38,7 +39,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.network),
         subtitle: Text(appLocalizations.networkDesc),
-        leading: const Icon(Icons.cell_tower_rounded),
+        leading: const Icon(FluentIcons.sound_source_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.network,
           blur: false,
@@ -72,7 +73,7 @@ class _ConfigViewState extends State<ConfigView> {
                         );
                   },
                   tooltip: appLocalizations.reset,
-                  icon: const Icon(Icons.replay_rounded),
+                  icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
                 );
               },
             ),
@@ -83,7 +84,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: const Text('DNS'),
         subtitle: Text(appLocalizations.dnsDesc),
-        leading: const Icon(Icons.dns_rounded),
+        leading: const Icon(FluentIcons.server_24_regular),
         delegate: NextDelegate(
           title: 'DNS',
           actions: [
@@ -105,7 +106,7 @@ class _ConfigViewState extends State<ConfigView> {
                         );
                   },
                   tooltip: appLocalizations.reset,
-                  icon: const Icon(Icons.replay_rounded),
+                  icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
                 );
               },
             ),
@@ -117,7 +118,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: const Text('NTP'),
         subtitle: Text(appLocalizations.ntpDesc),
-        leading: const Icon(Icons.access_time_rounded),
+        leading: const Icon(FluentIcons.access_time_24_regular),
         delegate: NextDelegate(
           title: 'NTP',
           actions: [
@@ -139,7 +140,7 @@ class _ConfigViewState extends State<ConfigView> {
                         );
                   },
                   tooltip: appLocalizations.reset,
-                  icon: const Icon(Icons.replay_rounded),
+                  icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
                 );
               },
             ),
@@ -151,7 +152,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: const Text('Hosts'),
         subtitle: Text(appLocalizations.hostsDesc),
-        leading: const Icon(Icons.receipt_long_rounded),
+        leading: const Icon(FluentIcons.receipt_24_regular),
         delegate: NextDelegate(
           blur: false,
           title: 'Hosts',
@@ -189,7 +190,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.sniffer),
         subtitle: Text(appLocalizations.snifferDesc),
-        leading: const Icon(Icons.radar_rounded),
+        leading: const Icon(FluentIcons.scan_object_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.sniffer,
           actions: [
@@ -211,7 +212,7 @@ class _ConfigViewState extends State<ConfigView> {
                         );
                   },
                   tooltip: appLocalizations.reset,
-                  icon: const Icon(Icons.replay_rounded),
+                  icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
                 );
               },
             ),
@@ -223,7 +224,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.tunnel),
         subtitle: Text(appLocalizations.tunnelDesc),
-        leading: const Icon(Icons.swap_horiz_rounded),
+        leading: const Icon(FluentIcons.arrows_bidirectional_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.tunnel,
           actions: [
@@ -245,7 +246,7 @@ class _ConfigViewState extends State<ConfigView> {
                         );
                   },
                   tooltip: appLocalizations.reset,
-                  icon: const Icon(Icons.replay_rounded),
+                  icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
                 );
               },
             ),
@@ -257,7 +258,7 @@ class _ConfigViewState extends State<ConfigView> {
       ListItem.next(
         title: Text(appLocalizations.experimental),
         subtitle: Text(appLocalizations.experimentalDesc),
-        leading: const Icon(Icons.science_rounded),
+        leading: const Icon(FluentIcons.beaker_24_regular),
         delegate: NextDelegate(
           title: appLocalizations.experimental,
           actions: [
@@ -280,7 +281,7 @@ class _ConfigViewState extends State<ConfigView> {
                         );
                   },
                   tooltip: appLocalizations.reset,
-                  icon: const Icon(Icons.replay_rounded),
+                  icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
                 );
               },
             ),

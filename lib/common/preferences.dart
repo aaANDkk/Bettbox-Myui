@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bett_box/models/models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constant.dart';
-
+import 'path.dart';
 import 'print.dart';
 
 class Preferences {
@@ -40,20 +41,31 @@ class Preferences {
 
   Future<Config?> getConfig() async {
     final preferences = await sharedPreferencesCompleter.future;
-    final configString = preferences?.getString(configKey);
-    if (configString == null) return null;
+
+    Config? fileConfig;
     try {
-      final configMap = json.decode(configString);
-      final config = Config.compatibleFromJson(configMap);
-
-      if (preferences?.getBool('autoLaunch') != config.appSetting.autoLaunch) {
-        await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
+      final configFilePath = await appPath.appConfigPath;
+      final configFile = File(configFilePath);
+      if (await configFile.exists()) {
+        final content = await configFile.readAsString();
+        if (content.isNotEmpty) {
+          final configMap = json.decode(content);
+          fileConfig = Config.compatibleFromJson(configMap);
+        }
       }
+    } catch (e, stackTrace) {
+      commonPrint.log('Failed to parse config from file: $e\n$stackTrace');
+    }
 
-      return config;
+    Config? prefsConfig;
+    try {
+      final configString = preferences?.getString(configKey);
+      if (configString != null && configString.isNotEmpty) {
+        final configMap = json.decode(configString);
+        prefsConfig = Config.compatibleFromJson(configMap);
+      }
     } catch (e, stackTrace) {
       commonPrint.log('Failed to parse config from preferences: $e\n$stackTrace');
-      return null;
     }
 
     Config? selectedConfig;
@@ -87,23 +99,18 @@ class Preferences {
 
   Future<bool> saveConfig(Config config) async {
     final preferences = await sharedPreferencesCompleter.future;
-    
     await preferences?.setBool('autoLaunch', config.appSetting.autoLaunch);
     if (Platform.isMacOS) {
       await preferences?.setBool('keepDockIcon', config.appSetting.keepDockIcon);
     }
 
-  /// 读取「亮屏锁」开关的上次状态（默认关闭）
-  Future<bool> getWakelockEnabled() async {
-    final preferences = await sharedPreferencesCompleter.future;
-    return preferences?.getBool(wakelockEnabledKey) ?? false;
-  }
+    final jsonStr = json.encode(config);
 
-  /// 记录「亮屏锁」开关状态，重启应用后自动恢复（完全退出时仍会释放系统锁）
-  Future<void> setWakelockEnabled(bool value) async {
-    final preferences = await sharedPreferencesCompleter.future;
-    await preferences?.setBool(wakelockEnabledKey, value);
-  }
+    try {
+      await preferences?.setString(configKey, jsonStr);
+    } catch (e) {
+      commonPrint.log('Failed to mirror config to preferences: $e');
+    }
 
     try {
       final configFilePath = await appPath.appConfigPath;
@@ -125,6 +132,29 @@ class Preferences {
     }
   }
 
+  /// 读取「亮屏锁」开关的上次状态（默认关闭）
+  Future<bool> getWakelockEnabled() async {
+    final preferences = await sharedPreferencesCompleter.future;
+    return preferences?.getBool(wakelockEnabledKey) ?? false;
+  }
+
+  /// 记录「亮屏锁」开关状态，重启应用后自动恢复（完全退出时仍会释放系统锁）
+  Future<void> setWakelockEnabled(bool value) async {
+    final preferences = await sharedPreferencesCompleter.future;
+    await preferences?.setBool(wakelockEnabledKey, value);
+  }
+
+  /// 小型流量统计小部件显示上传还是下载数据（默认下载）
+  Future<bool> getTrafficUsageShowUpload() async {
+    final preferences = await sharedPreferencesCompleter.future;
+    return preferences?.getBool(trafficUsageShowUploadKey) ?? false;
+  }
+
+  Future<void> setTrafficUsageShowUpload(bool value) async {
+    final preferences = await sharedPreferencesCompleter.future;
+    await preferences?.setBool(trafficUsageShowUploadKey, value);
+  }
+
   Future<void> clearClashConfig() async {
     final preferences = await sharedPreferencesCompleter.future;
     preferences?.remove(clashConfigKey);
@@ -132,7 +162,19 @@ class Preferences {
 
   Future<void> clearPreferences() async {
     final sharedPreferencesIns = await sharedPreferencesCompleter.future;
-    sharedPreferencesIns?.clear();
+    await sharedPreferencesIns?.clear();
+    try {
+      final file = File(await appPath.appConfigPath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {}
+    try {
+      final ipFile = File(await appPath.ipCacheFilePath);
+      if (await ipFile.exists()) {
+        await ipFile.delete();
+      }
+    } catch (_) {}
   }
 }
 

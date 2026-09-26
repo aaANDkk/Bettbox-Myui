@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:webdav_client/webdav_client.dart' as webdav;
 
 class BackupAndRecovery extends ConsumerStatefulWidget {
@@ -212,7 +213,7 @@ class _BackupAndRecoveryState extends ConsumerState<BackupAndRecovery> {
         items: [
           if (dav == null)
             ListItem(
-              leading: const Icon(Icons.account_box_rounded),
+              leading: const Icon(FluentIcons.person_square_24_regular),
               title: Text(appLocalizations.noInfo),
               subtitle: Text(appLocalizations.pleaseBindWebDAV),
               trailing: FilledButton.tonal(
@@ -224,7 +225,7 @@ class _BackupAndRecoveryState extends ConsumerState<BackupAndRecovery> {
             )
           else ...[
             ListItem(
-              leading: const Icon(Icons.account_box_rounded),
+              leading: const Icon(FluentIcons.person_square_24_regular),
               title: TooltipText(
                 text: Text(
                   dav.user,
@@ -332,12 +333,22 @@ class _BackupAndRecoveryState extends ConsumerState<BackupAndRecovery> {
               final recoveryStrategy = ref.watch(
                 appSettingProvider.select((state) => state.recoveryStrategy),
               );
+              final fabTheme = Theme.of(context).floatingActionButtonTheme;
+              final fabBgColor =
+                  fabTheme.backgroundColor ?? context.colorScheme.primaryContainer;
+              final fabFgColor =
+                  fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
+
               return ListItem(
                 onTap: () {
                   _handleUpdateRecoveryStrategy(ref);
                 },
                 title: Text(appLocalizations.recoveryStrategy),
                 trailing: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: fabBgColor,
+                    foregroundColor: fabFgColor,
+                  ),
                   onPressed: () {
                     _handleUpdateRecoveryStrategy(ref);
                   },
@@ -523,7 +534,7 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
               maxLines: 5,
               minLines: 1,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.link_rounded),
+                prefixIcon: const Icon(FluentIcons.link_24_regular),
                 labelText: appLocalizations.address,
                 helperText: appLocalizations.addressHelp,
               ),
@@ -537,7 +548,7 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
             TextFormField(
               controller: userController,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.account_circle_rounded),
+                prefixIcon: const Icon(FluentIcons.person_circle_24_regular),
                 labelText: appLocalizations.account,
               ),
               validator: (String? value) {
@@ -554,10 +565,10 @@ class _WebDAVFormDialogState extends ConsumerState<WebDAVFormDialog> {
                   controller: passwordController,
                   obscureText: obscure,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.password_rounded),
+                    prefixIcon: const Icon(FluentIcons.password_24_regular),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscure ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                        obscure ? FluentIcons.eye_24_regular : FluentIcons.eye_off_24_regular,
                       ),
                       onPressed: () {
                         _obscureController.value = !obscure;

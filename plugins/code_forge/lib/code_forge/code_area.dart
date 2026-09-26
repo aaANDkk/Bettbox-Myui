@@ -5221,6 +5221,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             languageId: languageId,
             getLineText: (line) =>
                 _lineTextCache[line] ?? controller.getLineText(line),
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _layoutMap = LayoutMap();
     _rebuildLayoutMap();
@@ -5551,6 +5553,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             languageId: languageId,
             getLineText: (line) =>
                 _lineTextCache[line] ?? controller.getLineText(line),
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
     _paragraphCache.clear();
@@ -5578,6 +5582,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             languageId: languageId,
             getLineText: (line) =>
                 _lineTextCache[line] ?? controller.getLineText(line),
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
     _paragraphCache.clear();
@@ -5649,6 +5655,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             languageId: languageId,
             getLineText: (line) =>
                 _lineTextCache[line] ?? controller.getLineText(line),
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
 
@@ -5702,6 +5710,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             languageId: languageId,
             getLineText: (line) =>
                 _lineTextCache[line] ?? controller.getLineText(line),
+            emojiFamily: _emojiFamily,
+            emojiRegex: _emojiRegex,
           );
     _preHighlightInitialized = false;
     _paragraphCache.clear();

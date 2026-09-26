@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'item.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ConnectionsView extends ConsumerStatefulWidget {
   final bool respectCurrentPage;
@@ -190,7 +191,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
         IconButton(
           onPressed: _handleCloseAll,
           tooltip: appLocalizations.closeAll,
-          icon: const Icon(Icons.delete_sweep_outlined),
+          icon: const Icon(FluentIcons.delete_dismiss_24_regular),
         ),
         IconButton(
           tooltip: appLocalizations.connectionsSort,
@@ -227,7 +228,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
                   selectedSortType;
             }
           },
-          icon: const Icon(Icons.sort_rounded),
+          icon: const Icon(FluentIcons.arrow_sort_24_regular),
         ),
       ],
       body: Consumer(
@@ -263,7 +264,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
                     style: const ButtonStyle(
                       minimumSize: WidgetStatePropertyAll(Size.zero),
                     ),
-                    icon: const Icon(Icons.block_rounded),
+                    icon: const Icon(FluentIcons.prohibited_24_regular),
                     onPressed: () => _handleBlockConnection(trackerInfo.id),
                   ),
                   detailTitle: appLocalizations.details,

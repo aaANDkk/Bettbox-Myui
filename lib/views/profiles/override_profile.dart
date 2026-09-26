@@ -8,6 +8,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class OverrideProfileView extends StatefulWidget {
   final String profileId;
@@ -116,6 +117,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
           _currentMaxWidth = constraints.maxWidth - 104;
           return CommonScrollBar(
             controller: _controller,
+            feather: true,
             child: CustomScrollView(
               controller: _controller,
               // ignore: deprecated_member_use
@@ -143,7 +145,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                       title: Row(
                         spacing: 8,
                         children: [
-                          Icon(Icons.info_rounded),
+                          Icon(FluentIcons.info_24_regular),
                           Text(appLocalizations.overrideInvalidTip),
                         ],
                       ),
@@ -219,7 +221,9 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                 return true;
               },
               child: CommonScaffold(
+                resizeToAvoidBottomInset: false,
                 title: appLocalizations.override,
+                showScrollGradient: false,
                 body: _buildContent(),
                 actions: [
                   if (hasUnsavedChanges)
@@ -233,7 +237,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                         }
                         _handleSave(ref, newOverrideData);
                       },
-                      icon: Icon(Icons.save_rounded),
+                      icon: Icon(FluentIcons.save_24_regular),
                     ),
                   if (editCount == 1)
                     IconButton(
@@ -250,14 +254,14 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                         }
                         globalState.appController.handleAddOrUpdate(ref, rule);
                       },
-                      icon: Icon(Icons.edit_rounded),
+                      icon: Icon(FluentIcons.edit_24_regular),
                     ),
                   if (editCount > 0)
                     IconButton(
                       onPressed: () {
                         _handleDelete(ref);
                       },
-                      icon: Icon(Icons.delete_rounded),
+                      icon: Icon(FluentIcons.delete_24_regular),
                     ),
                 ],
                 editState: AppBarEditState(
@@ -368,7 +372,7 @@ class RuleTitle extends ConsumerWidget {
             if (!isEdit)
               IconButton.filledTonal(
                 icon: Icon(
-                  isOverrideRule ? Icons.edit_document : Icons.note_add_rounded,
+                  isOverrideRule ? FluentIcons.document_edit_24_regular : FluentIcons.note_add_24_regular,
                 ),
                 onPressed: () {
                   _handleChangeType(ref, isOverrideRule);
@@ -713,23 +717,22 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
           child: Text(appLocalizations.confirm),
         ),
       ],
-      child: DropdownMenuTheme(
-        data: DropdownMenuThemeData(
-          menuStyle: menuStyle,
-          inputDecorationTheme: InputDecorationTheme(
-            border: const OutlineInputBorder(),
-            labelStyle: context.textTheme.bodyLarge?.copyWith(
-              overflow: TextOverflow.ellipsis,
+      child: RepaintBoundary(
+        child: DropdownMenuTheme(
+          data: DropdownMenuThemeData(
+            menuStyle: menuStyle,
+            inputDecorationTheme: InputDecorationTheme(
+              border: const OutlineInputBorder(),
+              labelStyle: context.textTheme.bodyLarge?.copyWith(
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-        ),
-        child: Form(
-          key: _formKey,
-          child: LayoutBuilder(
-            builder: (_, constraints) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                   FilledButton.tonal(
                     onPressed: () async {
                       _ruleAction =
@@ -798,7 +801,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                           : _ruleProviderController.text,
                                       style: context.textTheme.bodyLarge,
                                     ),
-                                    const Icon(Icons.arrow_drop_down_rounded),
+                                    const Icon(FluentIcons.chevron_down_24_regular),
                                   ],
                                 ),
                               );
@@ -807,6 +810,8 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                               alignmentOffset: const Offset(0, 8),
                               menuStyle: menuStyle,
                               expandedInsets: EdgeInsets.zero,
+                              enableFilter: false,
+                              enableSearch: false,
                               controller: _ruleProviderController,
                               textStyle: context.textTheme.bodyLarge?.copyWith(
                                 fontFamilyFallback: [
@@ -899,7 +904,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                           : _subRuleController.text,
                                       style: context.textTheme.bodyLarge,
                                     ),
-                                    const Icon(Icons.arrow_drop_down_rounded),
+                                    const Icon(FluentIcons.chevron_down_24_regular),
                                   ],
                                 ),
                               );
@@ -976,7 +981,7 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const Icon(Icons.arrow_drop_down_rounded),
+                                    const Icon(FluentIcons.chevron_down_24_regular),
                                   ],
                                 ),
                               );
@@ -1049,11 +1054,10 @@ class _AddRuleDialogState extends State<AddRuleDialog> {
                   ],
                   const SizedBox(height: 20),
                 ],
-              );
-            },
+              ),
+            ),
           ),
         ),
-      ),
     );
   }
 }

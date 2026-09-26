@@ -2,6 +2,7 @@ import 'package:bett_box/common/common.dart';
 import 'package:bett_box/views/proxies/providers.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ProvidersInfo extends StatelessWidget {
   const ProvidersInfo({super.key});
@@ -12,7 +13,7 @@ class ProvidersInfo extends StatelessWidget {
       child: SizedBox(
         height: getWidgetHeight(1),
         child: CommonCard(
-          info: const Info(iconData: Icons.insert_chart_outlined_rounded, label: 'INFO'),
+          info: const Info(iconData: FluentIcons.calendar_3_day_24_regular, label: 'INFO'),
           onPressed: () {
             showExtend(
               context,

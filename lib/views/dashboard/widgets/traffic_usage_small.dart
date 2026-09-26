@@ -5,10 +5,8 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-/// 小型流量统计小部件：左侧标题 + 底部「上传 / 下载」数据，右侧缩小的流量圆环。
-///
-/// 长按卡片可在弹窗里切换显示上传还是下载（默认下载），选择写进偏好、重启后保留。
 class TrafficUsageSmall extends ConsumerStatefulWidget {
   const TrafficUsageSmall({super.key});
 
@@ -17,8 +15,6 @@ class TrafficUsageSmall extends ConsumerStatefulWidget {
 }
 
 class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
-  /// 圆环边长：47（先是 60、后是 40、再是 45，按需求定稿 47），
-  /// 上下与右侧留白 = (卡片高度 - 圆环边长) / 2 = 18.5，三者一致即上下居中。
   static const double _donutSize = 47;
 
   static double get _donutEdge => (getWidgetHeight(1) - _donutSize) / 2;
@@ -45,9 +41,8 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 选中一次即结束的单选 → 圆形指示（规范第 7 节）。
             ListTile(
-              leading: const Icon(Icons.file_upload_rounded),
+              leading: const Icon(FluentIcons.arrow_circle_up_24_regular),
               title: Text(appLocalizations.upload),
               trailing: OptionRadioIcon(selected: _showUpload),
               onTap: () {
@@ -56,7 +51,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.file_download_rounded),
+              leading: const Icon(FluentIcons.arrow_circle_down_24_regular),
               title: Text(appLocalizations.download),
               trailing: OptionRadioIcon(selected: !_showUpload),
               onTap: () {
@@ -97,7 +92,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               children: [
                 Expanded(
                   child: Padding(
-                    // 左侧沿用卡片标准内边距，标题与其它卡片同一高度、底部同一基线
                     padding: EdgeInsets.only(
                       left: baseInfoEdgeInsets.left,
                       top: baseInfoEdgeInsets.top,
@@ -110,15 +104,13 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                         Row(
                           children: [
                             Icon(
-                              Icons.data_usage_rounded,
+                              FluentIcons.data_pie_24_regular,
                               color: context.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(width: 8),
                             Flexible(
-                              // 标题接近圆环时省略号收尾，避免与圆环贴到一起
                               child: TooltipText(
                                 text: Text(
-                                  // 与流量统计大卡统一用同一个标题键（英文都是 Traffic）
                                   appLocalizations.trafficUsage,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -130,8 +122,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                             ),
                           ],
                         ),
-                        // 与其它数值卡同一套行盒与字号（bodyMedium + 1 → 15sp、行盒
-                        // bodyMediumHeight + 2），底部与它们严格同一基线
                         SizedBox(
                           height: globalState.measure.bodyMediumHeight + 2,
                           child: Row(
@@ -144,8 +134,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                                       const TextSpan(text: ' '),
                                       TextSpan(
                                         text: value.showUnit,
-                                        // 单位比数值小一号（再缩一档 → 约 10sp）；
-                                        // 因为共享同一条基线，其底部（基线下沿）与左侧数值严格齐平
                                         style: context.textTheme.bodyMedium
                                             ?.toLighter
                                             .adjustSize(-4),
@@ -166,9 +154,6 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                   ),
                 ),
                 Padding(
-                  // 上下与右侧留白一致（各 (卡片高度 - 圆环边长) / 2），圆环因此上下居中；
-                  // 左侧间距由 8 收到 4：把宽度让给标题与数值文案（放宽一点文字显示），
-                  // 同时与圆环仍留 4dp 间隙，不会贴到圆环
                   padding: EdgeInsets.only(
                     left: 4,
                     top: _donutEdge,

@@ -1,4 +1,5 @@
 export 'animate_grid.dart';
+export 'animated_nav_icon.dart';
 export 'google_bottom_nav_bar.dart';
 export 'pop_scope.dart';
 export 'builder.dart';
@@ -37,3 +38,5 @@ export 'notification.dart';
 export 'ip_detail_dialog.dart';
 export 'qr_code.dart';
 export 'delay_animation_dialog.dart';
+export 'sidebar_toggle_icon.dart';
+export 'sidebar.dart';

@@ -20,6 +20,7 @@ import 'package:re_highlight/languages/yaml.dart';
 import 'package:re_highlight/re_highlight.dart' show Mode;
 import 'package:re_highlight/styles/atom-one-dark.dart';
 import 'package:re_highlight/styles/atom-one-light.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef EditorWidgetBuilder = Widget Function();
 
@@ -306,32 +307,32 @@ class _EditorPageState extends ConsumerState<EditorPage> {
         !readOnly && !_disableSyntaxHighlight && _languageMode() != null;
     final menuItems = <PopupMenuItemData>[
       PopupMenuItemData(
-        icon: Icons.search_rounded,
+        icon: FluentIcons.search_24_regular,
         label: appLocalizations.search,
         onPressed: _handleSearch,
       ),
       if (canReplace)
         PopupMenuItemData(
-          icon: Icons.find_replace_rounded,
+          icon: FluentIcons.arrow_swap_24_regular,
           label: appLocalizations.replace,
           onPressed: _handleReplace,
         ),
       PopupMenuItemData(
-        icon: Icons.undo_rounded,
+        icon: FluentIcons.arrow_undo_24_regular,
         label: appLocalizations.undo,
         onPressed: _undoController.canUndo
             ? () => _undoController.undo()
             : null,
       ),
       PopupMenuItemData(
-        icon: Icons.redo_rounded,
+        icon: FluentIcons.arrow_redo_24_regular,
         label: appLocalizations.redo,
         onPressed: _undoController.canRedo
             ? () => _undoController.redo()
             : null,
       ),
       PopupMenuItemData(
-        icon: _lineWrap ? Icons.check_rounded : Icons.wrap_text_rounded,
+        icon: _lineWrap ? FluentIcons.checkmark_24_regular : FluentIcons.text_wrap_24_regular,
         label: appLocalizations.lineWrap,
         onPressed: _isLineWrapDisabled ? null : _toggleLineWrap,
       ),
@@ -388,6 +389,13 @@ class _EditorPageState extends ConsumerState<EditorPage> {
           absorbing: _isBusy || _isLoading,
           child: CommonScaffold(
             appBar: AppBar(
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 2.0),
+                child: Center(
+                  child: BackButton(),
+                ),
+              ),
+              leadingWidth: 58.0,
               titleSpacing: 0.0,
               title: TextField(
                 focusNode: _titleFocusNode,
@@ -454,7 +462,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                             : null,
                         onPressed: canSave ? () => _handleSave(context) : null,
                         tooltip: appLocalizations.save,
-                        icon: const Icon(Icons.save_rounded),
+                        icon: const Icon(FluentIcons.save_24_regular),
                       );
                     },
                   ),
@@ -462,7 +470,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                   IconButton(
                     onPressed: _isLoading ? null : _handleImport,
                     tooltip: appLocalizations.download,
-                    icon: const Icon(Icons.arrow_downward_rounded),
+                    icon: const Icon(FluentIcons.arrow_down_24_regular),
                   ),
                 ListenableBuilder(
                   listenable: _undoController,
@@ -475,7 +483,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                                 open(offset: const Offset(-20, 20));
                               },
                         tooltip: appLocalizations.more,
-                        icon: const Icon(Icons.more_vert_rounded),
+                        icon: const Icon(FluentIcons.more_vertical_24_regular),
                       );
                     },
                     popup: CommonPopupMenu(items: menuItems),
@@ -615,14 +623,16 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       builder: (context, _) => Container(
         margin: const EdgeInsets.fromLTRB(12, 4, 12, 6),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: colorScheme.surfaceContainerHighest.withAlpha(220),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: colorScheme.outlineVariant.withAlpha(120),
-            width: 1,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: colorScheme.outlineVariant.withAlpha(120),
+              width: 1,
+            ),
           ),
-          boxShadow: [
+          shadows: [
             BoxShadow(
               color: Colors.black.withAlpha(20),
               blurRadius: 8,
@@ -659,11 +669,13 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
           ],
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: colorScheme.outlineVariant.withAlpha(80),
+              shape: RoundedSuperellipseBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: colorScheme.outlineVariant.withAlpha(80),
+                ),
               ),
             ),
             child: Text(
@@ -685,27 +697,27 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
                   onPressed: controller.matchCount == 0
                       ? null
                       : controller.previous,
-                  icon: Icons.keyboard_arrow_up_rounded,
+                  icon: FluentIcons.chevron_up_24_regular,
                 ),
                 _buildIconButton(
                   onPressed: controller.matchCount == 0
                       ? null
                       : controller.next,
-                  icon: Icons.keyboard_arrow_down_rounded,
+                  icon: FluentIcons.chevron_down_24_regular,
                 ),
                 if (isMobileView && showReplace) ...[
                   _buildIconButton(
                     onPressed: controller.matchCount == 0
                         ? null
                         : controller.replace,
-                    icon: Icons.find_replace_rounded,
+                    icon: FluentIcons.arrow_swap_24_regular,
                     tooltip: appLocalizations.replace,
                   ),
                   _buildIconButton(
                     onPressed: controller.matchCount == 0
                         ? null
                         : controller.replaceAll,
-                    icon: Icons.published_with_changes_rounded,
+                    icon: FluentIcons.checkmark_circle_24_regular,
                     tooltip: appLocalizations.replaceAll,
                   ),
                 ],
@@ -713,8 +725,8 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
                   _buildIconButton(
                     onPressed: () => controller.toggleReplaceMode(),
                     icon: controller.isReplaceMode
-                        ? Icons.unfold_less_rounded
-                        : Icons.unfold_more_rounded,
+                        ? FluentIcons.arrow_collapse_all_24_regular
+                        : FluentIcons.arrow_expand_24_regular,
                     tooltip: appLocalizations.replace,
                   ),
                 const SizedBox(width: 2),
@@ -730,7 +742,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     padding: const WidgetStatePropertyAll(EdgeInsets.all(0)),
                   ),
-                  icon: const Icon(Icons.close_rounded, size: 16),
+                  icon: const Icon(FluentIcons.dismiss_24_regular, size: 16),
                 ),
               ],
             ),
@@ -783,14 +795,14 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(width: 10),
           _buildIconButton(
             onPressed: controller.matchCount == 0 ? null : controller.replace,
-            icon: Icons.find_replace_rounded,
+            icon: FluentIcons.arrow_swap_24_regular,
             tooltip: appLocalizations.replace,
           ),
           _buildIconButton(
             onPressed: controller.matchCount == 0
                 ? null
                 : controller.replaceAll,
-            icon: Icons.published_with_changes_rounded,
+            icon: FluentIcons.checkmark_circle_24_regular,
             tooltip: appLocalizations.replaceAll,
           ),
         ],
@@ -805,7 +817,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         _buildTextField(
           context: context,
           hintText: appLocalizations.search,
-          prefixIcon: Icons.search_rounded,
+          prefixIcon: FluentIcons.search_24_regular,
           onSubmitted: () {
             if (controller.matchCount == 0) {
               return;
@@ -843,7 +855,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
     return _buildTextField(
       context: context,
       hintText: appLocalizations.replace,
-      prefixIcon: Icons.find_replace_rounded,
+      prefixIcon: FluentIcons.arrow_swap_24_regular,
       onSubmitted: () {
         if (controller.matchCount == 0) return;
         controller.replace();
@@ -890,19 +902,19 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
             minWidth: 32,
             minHeight: 36,
           ),
-          border: OutlineInputBorder(
+          border: SuperellipseInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: colorScheme.outlineVariant.withAlpha(100),
             ),
           ),
-          enabledBorder: OutlineInputBorder(
+          enabledBorder: SuperellipseInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: colorScheme.outlineVariant.withAlpha(100),
             ),
           ),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: SuperellipseInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
           ),
@@ -934,19 +946,23 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       width: 28,
       height: 24,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: isSelected
             ? colorScheme.primaryContainer
             : colorScheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: isSelected
-              ? colorScheme.primary.withAlpha(120)
-              : colorScheme.outlineVariant.withAlpha(60),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(6),
+          side: BorderSide(
+            color: isSelected
+                ? colorScheme.primary.withAlpha(120)
+                : colorScheme.outlineVariant.withAlpha(60),
+          ),
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(6),
+        customBorder: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
         onTap: onPressed,
         child: Center(
           child: Text(
@@ -972,9 +988,14 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       visualDensity: VisualDensity.compact,
       onPressed: onPressed,
       tooltip: tooltip,
-      style: const ButtonStyle(
-        padding: WidgetStatePropertyAll(EdgeInsets.all(6)),
-        minimumSize: WidgetStatePropertyAll(Size(28, 28)),
+      style: ButtonStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        padding: const WidgetStatePropertyAll(EdgeInsets.all(6)),
+        minimumSize: const WidgetStatePropertyAll(Size(28, 28)),
       ),
       icon: Icon(icon, size: 18),
     );
@@ -1018,14 +1039,14 @@ class _ImportOptionsDialogState extends State<_ImportOptionsDialog> {
             onTap: () {
               _handleOnTab(ImportOption.url);
             },
-            leading: const Icon(Icons.cloud_download_rounded),
+            leading: const Icon(FluentIcons.cloud_arrow_down_24_regular),
             title: Text(appLocalizations.importUrl),
           ),
           ListItem(
             onTap: () {
               _handleOnTab(ImportOption.file);
             },
-            leading: const Icon(Icons.file_open_rounded),
+            leading: const Icon(FluentIcons.folder_open_24_regular),
             title: Text(appLocalizations.importFile),
           ),
         ],

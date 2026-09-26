@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
@@ -14,11 +13,122 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chip.dart';
 import 'text.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef OnKeywordsUpdateCallback = void Function(List<String> keywords);
 
 typedef AppBarSearchStateBuilder =
     AppBarSearchState? Function(AppBarSearchState? state);
+
+class ScrollFeatherGradientOverlay extends StatefulWidget {
+  final Widget child;
+  final double height;
+  final Color? surfaceColor;
+
+  const ScrollFeatherGradientOverlay({
+    super.key,
+    required this.child,
+    this.height = 28.0,
+    this.surfaceColor,
+  });
+
+  @override
+  State<ScrollFeatherGradientOverlay> createState() =>
+      _ScrollFeatherGradientOverlayState();
+}
+
+class _ScrollFeatherGradientOverlayState
+    extends State<ScrollFeatherGradientOverlay> {
+  final ValueNotifier<double> _progressNotifier = ValueNotifier(0.0);
+
+  @override
+  void dispose() {
+    _progressNotifier.dispose();
+    super.dispose();
+  }
+
+  void _handleScrollMetrics(ScrollMetrics metrics) {
+    if (metrics.axis != Axis.vertical) return;
+    double scrolledUnder = 0.0;
+    if (metrics.axisDirection == AxisDirection.down) {
+      scrolledUnder = metrics.extentBefore;
+    } else if (metrics.axisDirection == AxisDirection.up) {
+      scrolledUnder = metrics.extentAfter;
+    }
+    if (scrolledUnder.isNaN || scrolledUnder.isInfinite || scrolledUnder <= 0) {
+      scrolledUnder = 0.0;
+    }
+    final progress = (scrolledUnder / 16.0).clamp(0.0, 1.0);
+    if (progress != _progressNotifier.value) {
+      _progressNotifier.value = progress;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final surface =
+        widget.surfaceColor ?? Theme.of(context).colorScheme.surface;
+    return NotificationListener<Notification>(
+      onNotification: (notification) {
+        if (notification is ScrollNotification) {
+          _handleScrollMetrics(notification.metrics);
+        } else if (notification is ScrollMetricsNotification) {
+          _handleScrollMetrics(notification.metrics);
+        }
+        return false;
+      },
+      child: Stack(
+        children: [
+          widget.child,
+          ValueListenableBuilder<double>(
+            valueListenable: _progressNotifier,
+            builder: (context, progress, _) {
+              if (progress <= 0) return const SizedBox.shrink();
+              return Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: widget.height,
+                child: IgnorePointer(
+                  child: Opacity(
+                    opacity: progress,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            surface,
+                            surface.withValues(alpha: 0.85),
+                            surface.withValues(alpha: 0.50),
+                            surface.withValues(alpha: 0.18),
+                            surface.withValues(alpha: 0.0),
+                          ],
+                          stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 标记：该滚动视图外层已经有「滚动条 + 羽化」且指示条画在羽化之上，不必再套一层
+class FeatherScope extends InheritedWidget {
+  const FeatherScope({super.key, required super.child});
+
+  static bool has(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<FeatherScope>() != null;
+
+  @override
+  bool updateShouldNotify(FeatherScope oldWidget) => false;
+}
 
 class CommonScaffold extends StatefulWidget {
   final AppBar? appBar;
@@ -33,6 +143,7 @@ class CommonScaffold extends StatefulWidget {
   final AppBarSearchState? searchState;
   final OnKeywordsUpdateCallback? onKeywordsUpdate;
   final bool? resizeToAvoidBottomInset;
+  final bool? showScrollGradient;
 
   const CommonScaffold({
     super.key,
@@ -48,6 +159,7 @@ class CommonScaffold extends StatefulWidget {
     this.floatingActionButton,
     this.onKeywordsUpdate,
     this.resizeToAvoidBottomInset,
+    this.showScrollGradient,
   });
 
   @override
@@ -99,9 +211,9 @@ class CommonScaffoldState extends State<CommonScaffold> {
     return Theme(
       data: theme.copyWith(
         appBarTheme: theme.appBarTheme.copyWith(
-          backgroundColor: colorScheme.brightness == Brightness.dark
-              ? Colors.grey[900]
-              : Colors.white,
+          backgroundColor: widget.backgroundColor ?? colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
           iconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
           titleTextStyle: theme.textTheme.titleLarge,
           toolbarTextStyle: theme.textTheme.bodyMedium,
@@ -185,14 +297,14 @@ class CommonScaffoldState extends State<CommonScaffold> {
     if (_isEdit) {
       return IconButton(
         onPressed: _appBarState.value.editState?.onExit,
-        icon: const Icon(Icons.close_rounded),
+        icon: const Icon(FluentIcons.dismiss_24_regular),
         tooltip: appLocalizations.cancel,
       );
     }
     if (_isSearch) {
       return IconButton(
         onPressed: _handleExitSearching,
-        icon: const Icon(Icons.arrow_back_rounded),
+        icon: const Icon(FluentIcons.arrow_left_24_regular),
         tooltip: appLocalizations.back,
       );
     }
@@ -200,10 +312,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
       return widget.leading;
     }
     if (canPop) {
-      return IconButton(
+      return BackButton(
         onPressed: () => Navigator.maybePop(context),
-        icon: const Icon(Icons.arrow_back_rounded),
-        tooltip: appLocalizations.back,
       );
     }
     return null;
@@ -228,10 +338,6 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 : appLocalizations.selectedCountTitle(
                     '${_appBarState.value.editState?.editCount ?? 0}',
                   ),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontVariations: [FontVariation('wght', 700)],
-            ),
           );
   }
 
@@ -240,7 +346,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
       return genActions([
         IconButton(
           onPressed: _handleClear,
-          icon: const Icon(Icons.close_rounded),
+          icon: const Icon(FluentIcons.dismiss_24_regular),
           tooltip: appLocalizations.clear,
         ),
       ]);
@@ -257,7 +363,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
               });
             });
           },
-          icon: const Icon(Icons.search_rounded),
+          icon: const Icon(FluentIcons.search_24_regular),
           tooltip: appLocalizations.search,
         ),
       ...actions,
@@ -312,9 +418,21 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   final hasLeading = leading != null || canPop;
                   return _buildAppBarWrap(
                     AppBar(
+                      backgroundColor:
+                          widget.backgroundColor ?? context.colorScheme.surface,
+                      surfaceTintColor: Colors.transparent,
+                      scrolledUnderElevation: 0,
                       centerTitle: widget.centerTitle ?? false,
-                      leading: leading,
-                      titleSpacing: hasLeading ? 0.0 : null,
+                      leading: leading != null
+                          ? Padding(
+                              padding: const EdgeInsets.only(left: 2.0),
+                              child: Center(
+                                child: leading,
+                              ),
+                            )
+                          : null,
+                      leadingWidth: hasLeading ? 58.0 : null,
+                      titleSpacing: hasLeading ? 0.0 : 18.0,
                       title: _buildTitle(state.searchState),
                       actions: _buildActions(
                         state.searchState != null,
@@ -374,7 +492,14 @@ class CommonScaffoldState extends State<CommonScaffold> {
               );
             },
           ),
-          Expanded(child: widget.body),
+          Expanded(
+            child: (widget.showScrollGradient ?? true)
+                ? ScrollConfiguration(
+                    behavior: const FeatherBarScrollBehavior(),
+                    child: widget.body,
+                  )
+                : widget.body,
+          ),
         ],
       ),
     );
@@ -405,7 +530,7 @@ class CommonScaffoldState extends State<CommonScaffold> {
 List<Widget> genActions(List<Widget> actions, {double? space}) {
   return <Widget>[
     ...actions.separated(SizedBox(width: space ?? 4)),
-    SizedBox(width: 8),
+    const SizedBox(width: 10),
   ];
 }
 

@@ -36,8 +36,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  bool get isNavFocused =>
-      _navFocusNodes.values.any((node) => node.hasFocus);
+  bool get isNavFocused => _navFocusNodes.values.any((node) => node.hasFocus);
 
   void focusNav() {
     if (!globalState.isAndroidTV || !mounted) return;
@@ -86,6 +85,20 @@ class _HomePageState extends State<HomePage> {
             final isMobile = state.viewMode == ViewMode.mobile;
             final navigationItems = state.navigationItems;
             final currentIndex = state.currentIndex;
+
+            ref.listen<NavigationState>(navigationStateProvider, (prev, next) {
+              final exists = next.navigationItems.any(
+                (item) => item.label == next.pageLabel,
+              );
+              if (!exists) {
+                final fallback = next.navigationItems.isNotEmpty
+                    ? next.navigationItems.first.label
+                    : PageLabel.dashboard;
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  globalState.appController.toPage(fallback);
+                });
+              }
+            });
             final bottomNavigationBar = globalState.isAndroidTV
                 ? _buildTVBottomNavBar(
                     context,
@@ -257,9 +270,9 @@ class _HomePageState extends State<HomePage> {
                               ? context.colorScheme.primary.withValues(
                                   alpha:
                                       context.colorScheme.brightness ==
-                                              Brightness.light
-                                          ? 0.20
-                                          : 0.26,
+                                          Brightness.light
+                                      ? 0.20
+                                      : 0.26,
                                 )
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
@@ -273,14 +286,12 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconTheme(
-                              data: IconThemeData(
-                                color: isSelected
-                                    ? context.colorScheme.primary
-                                    : context.colorScheme.onSurfaceVariant,
-                                size: 24,
-                              ),
-                              child: item.icon,
+                            AnimatedNavIcon(
+                              label: item.label,
+                              selected: isSelected,
+                              color: isSelected
+                                  ? context.colorScheme.primary
+                                  : context.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -330,6 +341,13 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
     super.initState();
     _currentPageIndex = _pageIndex < 0 ? 0 : _pageIndex;
     _pageController = PageController(initialPage: _currentPageIndex);
+    if (_pageIndex < 0 && widget.navigationItems.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          globalState.appController.toPage(widget.navigationItems.first.label);
+        }
+      });
+    }
     _pageLabelSubscription = ref.listenManual(currentPageLabelProvider, (
       prev,
       next,
@@ -343,7 +361,7 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   @override
   void didUpdateWidget(covariant _HomePageView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.navigationItems.length != widget.navigationItems.length) {
+    if (oldWidget.navigationItems != widget.navigationItems) {
       _updatePageController();
     }
   }
@@ -389,6 +407,18 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
   void _updatePageController() {
     final pageLabel = ref.read(currentPageLabelProvider);
+    final exists = widget.navigationItems.any((item) => item.label == pageLabel);
+    if (!exists) {
+      final fallback = widget.navigationItems.isNotEmpty
+          ? widget.navigationItems.first.label
+          : PageLabel.dashboard;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          globalState.appController.toPage(fallback);
+        }
+      });
+      return;
+    }
     _toPage(pageLabel);
   }
 
@@ -405,10 +435,16 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
     // 移动端：仅保留淡入淡出的基础切换动效（不再使用 PageView 水平平移动画）
     if (isMobile) {
-      final targetIndex = (_currentPageIndex >= 0 &&
-              _currentPageIndex < widget.navigationItems.length)
-          ? _currentPageIndex
-          : (_pageIndex < 0 ? 0 : _pageIndex);
+      final currentPageLabel = ref.watch(currentPageLabelProvider);
+      final currentIndex = widget.navigationItems.indexWhere(
+        (item) => item.label == currentPageLabel,
+      );
+      final targetIndex = currentIndex < 0
+          ? (_currentPageIndex >= 0 &&
+                  _currentPageIndex < widget.navigationItems.length
+              ? _currentPageIndex
+              : 0)
+          : currentIndex;
 
       return AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),

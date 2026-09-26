@@ -5,6 +5,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 /// 浏览器测速网站地址（网络速度小部件点击后跳转）
 const speedTestUrl = 'https://ptclspeed.speedtestcustom.com';
@@ -79,7 +80,7 @@ class NetworkSpeed extends ConsumerWidget {
         },
         info: Info(
           label: appLocalizations.networkSpeed,
-          iconData: Icons.speed_rounded,
+          iconData: FluentIcons.gauge_24_regular,
         ),
         actions: [
           ValueListenableBuilder<int>(

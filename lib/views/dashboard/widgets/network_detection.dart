@@ -6,6 +6,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class NetworkDetection extends ConsumerStatefulWidget {
   const NetworkDetection({super.key});
@@ -34,7 +35,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(Icons.sync_rounded),
+              leading: Icon(FluentIcons.arrow_sync_24_regular),
               title: Text(appLocalizations.manualRefreshIp),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
@@ -43,7 +44,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
             ),
             if (isZh)
               ListTile(
-                leading: Icon(Icons.public_rounded),
+                leading: Icon(FluentIcons.cd_16_regular),
                 title: Text(appLocalizations.switchToDomesticIp),
                 onTap: () {
                   Navigator.of(context, rootNavigator: true).pop();
@@ -51,7 +52,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                 },
               ),
             ListTile(
-              leading: Icon(Icons.security_rounded),
+              leading: Icon(FluentIcons.shield_24_regular),
               title: Text(appLocalizations.ipPrivacyProtection),
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
@@ -106,7 +107,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                           )
                         : null,
                     iconData:
-                        ipInfo == null ? Icons.network_check_rounded : null,
+                        ipInfo == null ? FluentIcons.network_check_24_regular : null,
                   ),
                   actions: [
                     SizedBox(
@@ -117,7 +118,7 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
                         onPressed: _showIpClickBehaviorSettings,
                         icon: Icon(
                           size: 18.ap,
-                          Icons.settings_outlined,
+                          FluentIcons.settings_24_regular,
                           color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),

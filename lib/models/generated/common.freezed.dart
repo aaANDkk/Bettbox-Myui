@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$NavigationItem {
 
- Icon get icon; PageLabel get label; String? get description; WidgetBuilder get builder; bool get keep; String? get path; List<NavigationItemMode> get modes;
+ Widget get icon; PageLabel get label; String? get description; WidgetBuilder get builder; bool get keep; String? get path; List<NavigationItemMode> get modes;
 /// Create a copy of NavigationItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $NavigationItemCopyWith<$Res>  {
   factory $NavigationItemCopyWith(NavigationItem value, $Res Function(NavigationItem) _then) = _$NavigationItemCopyWithImpl;
 @useResult
 $Res call({
- Icon icon, PageLabel label, String? description, WidgetBuilder builder, bool keep, String? path, List<NavigationItemMode> modes
+ Widget icon, PageLabel label, String? description, WidgetBuilder builder, bool keep, String? path, List<NavigationItemMode> modes
 });
 
 
@@ -65,7 +65,7 @@ class _$NavigationItemCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? icon = null,Object? label = null,Object? description = freezed,Object? builder = null,Object? keep = null,Object? path = freezed,Object? modes = null,}) {
   return _then(_self.copyWith(
 icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as Icon,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as Widget,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as PageLabel,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,builder: null == builder ? _self.builder : builder // ignore: cast_nullable_to_non_nullable
 as WidgetBuilder,keep: null == keep ? _self.keep : keep // ignore: cast_nullable_to_non_nullable
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Icon icon,  PageLabel label,  String? description,  WidgetBuilder builder,  bool keep,  String? path,  List<NavigationItemMode> modes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Widget icon,  PageLabel label,  String? description,  WidgetBuilder builder,  bool keep,  String? path,  List<NavigationItemMode> modes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _NavigationItem() when $default != null:
 return $default(_that.icon,_that.label,_that.description,_that.builder,_that.keep,_that.path,_that.modes);case _:
@@ -177,7 +177,7 @@ return $default(_that.icon,_that.label,_that.description,_that.builder,_that.kee
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Icon icon,  PageLabel label,  String? description,  WidgetBuilder builder,  bool keep,  String? path,  List<NavigationItemMode> modes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Widget icon,  PageLabel label,  String? description,  WidgetBuilder builder,  bool keep,  String? path,  List<NavigationItemMode> modes)  $default,) {final _that = this;
 switch (_that) {
 case _NavigationItem():
 return $default(_that.icon,_that.label,_that.description,_that.builder,_that.keep,_that.path,_that.modes);case _:
@@ -197,7 +197,7 @@ return $default(_that.icon,_that.label,_that.description,_that.builder,_that.kee
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Icon icon,  PageLabel label,  String? description,  WidgetBuilder builder,  bool keep,  String? path,  List<NavigationItemMode> modes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Widget icon,  PageLabel label,  String? description,  WidgetBuilder builder,  bool keep,  String? path,  List<NavigationItemMode> modes)?  $default,) {final _that = this;
 switch (_that) {
 case _NavigationItem() when $default != null:
 return $default(_that.icon,_that.label,_that.description,_that.builder,_that.keep,_that.path,_that.modes);case _:
@@ -215,7 +215,7 @@ class _NavigationItem implements NavigationItem {
   const _NavigationItem({required this.icon, required this.label, this.description, required this.builder, this.keep = true, this.path, final  List<NavigationItemMode> modes = const [NavigationItemMode.mobile, NavigationItemMode.desktop]}): _modes = modes;
   
 
-@override final  Icon icon;
+@override final  Widget icon;
 @override final  PageLabel label;
 @override final  String? description;
 @override final  WidgetBuilder builder;
@@ -259,7 +259,7 @@ abstract mixin class _$NavigationItemCopyWith<$Res> implements $NavigationItemCo
   factory _$NavigationItemCopyWith(_NavigationItem value, $Res Function(_NavigationItem) _then) = __$NavigationItemCopyWithImpl;
 @override @useResult
 $Res call({
- Icon icon, PageLabel label, String? description, WidgetBuilder builder, bool keep, String? path, List<NavigationItemMode> modes
+ Widget icon, PageLabel label, String? description, WidgetBuilder builder, bool keep, String? path, List<NavigationItemMode> modes
 });
 
 
@@ -279,7 +279,7 @@ class __$NavigationItemCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? icon = null,Object? label = null,Object? description = freezed,Object? builder = null,Object? keep = null,Object? path = freezed,Object? modes = null,}) {
   return _then(_NavigationItem(
 icon: null == icon ? _self.icon : icon // ignore: cast_nullable_to_non_nullable
-as Icon,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as Widget,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as PageLabel,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,builder: null == builder ? _self.builder : builder // ignore: cast_nullable_to_non_nullable
 as WidgetBuilder,keep: null == keep ? _self.keep : keep // ignore: cast_nullable_to_non_nullable

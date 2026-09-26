@@ -9,6 +9,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 Future<void> showCoreStatusDialog(BuildContext context) async {
   await globalState.showCommonDialog<void>(
@@ -545,7 +546,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.travel_explore_rounded,
+              FluentIcons.globe_search_24_regular,
               size: 14,
               color: context.colorScheme.secondary,
             ),
@@ -597,29 +598,29 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       // 顺序与显示条件保持官方逻辑（路由规则在最前，两个「集」类指标按需出现），
       // 仅保留本地挑选的图标
       _MetricItem(
-        icon: Icons.rule_rounded,
+        icon: FluentIcons.task_list_rtl_24_regular,
         label: appLocalizations.rulesCount,
         value: rulesText,
       ),
       _MetricItem(
-        icon: Icons.format_list_numbered_rounded,
+        icon: FluentIcons.brain_circuit_24_regular,
         label: appLocalizations.proxiesCount,
         value: proxiesText,
       ),
       _MetricItem(
-        icon: Icons.hub_rounded,
+        icon: FluentIcons.calendar_day_24_regular,
         label: appLocalizations.proxyGroupsCount,
         value: proxyGroupsText,
       ),
       if ((status?.ruleProviders ?? 0) > 0)
         _MetricItem(
-          icon: Icons.article_rounded,
+          icon: FluentIcons.document_text_24_regular,
           label: appLocalizations.ruleProvidersCount,
           value: ruleProvidersText,
         ),
       if ((status?.proxyProviders ?? 0) > 0)
         _MetricItem(
-          icon: Icons.flight_takeoff_rounded,
+          icon: FluentIcons.airplane_take_off_24_regular,
           label: appLocalizations.proxyProvidersCount,
           value: proxyProvidersText,
         ),
@@ -651,7 +652,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
             children: [
               Expanded(
                 child: _buildMiniStatCard(
-                  icon: Icons.swap_calls_rounded,
+                  icon: FluentIcons.arrow_swap_24_regular,
                   iconColor: context.colorScheme.primary,
                   label: appLocalizations.activeGoroutines,
                   value: goroutinesText,
@@ -660,7 +661,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
               const SizedBox(width: 8),
               Expanded(
                 child: _buildMiniStatCard(
-                  icon: Icons.layers_rounded,
+                  icon: FluentIcons.layer_24_regular,
                   iconColor: context.colorScheme.tertiary,
                   label: appLocalizations.heapObjects,
                   value: heapObjectsText,

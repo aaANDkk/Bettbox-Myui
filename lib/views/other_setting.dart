@@ -9,6 +9,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class SmartAutoStopSection extends ConsumerWidget {
   const SmartAutoStopSection({super.key});
@@ -613,7 +614,7 @@ class TraySection extends ConsumerWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(7),
                         child: Icon(
-                          Icons.settings_outlined,
+                          FluentIcons.settings_24_regular,
                           size: 18,
                           color: context.colorScheme.onSurfaceVariant,
                         ),
@@ -694,12 +695,12 @@ class _TrayClickBehaviorDialogState extends State<_TrayClickBehaviorDialog> {
   List<ButtonSegment<TrayClickBehavior>> get _segments => [
     ButtonSegment(
       value: TrayClickBehavior.showPanel,
-      icon: const Icon(Icons.dashboard_outlined),
+      icon: const Icon(FluentIcons.grid_24_regular),
       label: Text(appLocalizations.showPanel),
     ),
     ButtonSegment(
       value: TrayClickBehavior.showMenu,
-      icon: const Icon(Icons.menu_rounded),
+      icon: const Icon(FluentIcons.navigation_24_regular),
       label: Text(appLocalizations.showMenu),
     ),
   ];

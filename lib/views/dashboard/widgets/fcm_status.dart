@@ -6,6 +6,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class FcmStatusData {
   final int? minutes;
@@ -94,7 +95,7 @@ class _FcmStatusState extends State<FcmStatus> {
                 padding: baseInfoEdgeInsets.copyWith(bottom: 0),
                 info: const Info(
                   label: 'FCM',
-                  iconData: Icons.cloud_outlined,
+                  iconData: FluentIcons.cloud_24_regular,
                 ),
               ),
               Container(

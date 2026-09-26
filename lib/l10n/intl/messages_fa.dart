@@ -240,7 +240,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "پلتفرم‌های اجتماعی",
     ),
     "categoryStreaming": MessageLookupByLibrary.simpleMessage("رسانه‌های جاری"),
-    "chasingDots": MessageLookupByLibrary.simpleMessage("نقاط تعقیب‌کننده"),
     "checkError": MessageLookupByLibrary.simpleMessage("بررسی ناموفق بود"),
     "checkFailed": MessageLookupByLibrary.simpleMessage("Timeout"),
     "checkOrAddProfile": MessageLookupByLibrary.simpleMessage(
@@ -298,6 +297,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "connectivity": MessageLookupByLibrary.simpleMessage("وضعیت اتصال:"),
     "contactMe": MessageLookupByLibrary.simpleMessage("تماس با ما"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("تغییر برچسب‌ها"),
     "content": MessageLookupByLibrary.simpleMessage("محتوا"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("پوسته محتوا"),
     "continent": MessageLookupByLibrary.simpleMessage("قاره"),
@@ -325,7 +325,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("تست خرابی"),
     "create": MessageLookupByLibrary.simpleMessage("ایجاد"),
     "creationTime": MessageLookupByLibrary.simpleMessage("زمان ایجاد"),
-    "cubeGrid": MessageLookupByLibrary.simpleMessage("شبکه مکعب‌ها"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("پروفایل فعلی"),
     "custom": MessageLookupByLibrary.simpleMessage("سفارشی"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage(
       "عنوان سفارشی",
@@ -335,7 +335,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "customUrl": MessageLookupByLibrary.simpleMessage("آدرس URL سفارشی"),
     "cut": MessageLookupByLibrary.simpleMessage("برش"),
-    "dancingSquare": MessageLookupByLibrary.simpleMessage("مربع رقصان"),
     "dark": MessageLookupByLibrary.simpleMessage("تاریک"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("آیکون تاریک"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage(
@@ -421,7 +420,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "همگام‌سازی با حالت خواب سیستم (Doze)",
     ),
-    "dualRing": MessageLookupByLibrary.simpleMessage("حلقه دوتایی"),
     "edit": MessageLookupByLibrary.simpleMessage("ویرایش"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("ویرایش هدایت"),
     "editUser": MessageLookupByLibrary.simpleMessage("ویرایش کاربر"),
@@ -477,10 +475,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("لینک خارجی"),
     "externalResources": MessageLookupByLibrary.simpleMessage("منابع خارجی"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("حلقه محوشونده"),
-    "fadingCube": MessageLookupByLibrary.simpleMessage("مکعب محوشونده"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("چهار دایره محوشونده"),
-    "fadingGrid": MessageLookupByLibrary.simpleMessage("شبکه محوشونده"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage(
       "حالت فیلتر FakeIP",
     ),
@@ -525,7 +520,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "امکان جستجو و تطبیق پردازش‌ها",
     ),
     "flagged": MessageLookupByLibrary.simpleMessage("نشانه‌گذاری‌شده"),
-    "foldingCube": MessageLookupByLibrary.simpleMessage("مکعب تاشو"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("فونت"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage("نگاشت اجباری DNS"),
     "forceDnsMappingDesc": MessageLookupByLibrary.simpleMessage(
@@ -564,8 +558,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("سراسر جهان"),
     "go": MessageLookupByLibrary.simpleMessage("رفتن"),
     "goDownload": MessageLookupByLibrary.simpleMessage("رفتن به دانلود"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید"),
+    "customFont": MessageLookupByLibrary.simpleMessage("فونت سفارشی"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "به طور پیش فرض فونت سیستم، برای اعمال فونت دلخواه خود فعال کنید",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage(
       "آیا تغییرات ذخیره شوند؟",
     ),
@@ -595,7 +591,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hotkeyManagementDesc": MessageLookupByLibrary.simpleMessage(
       "کنترل برنامه با صفحه کلید",
     ),
-    "hourGlass": MessageLookupByLibrary.simpleMessage("ساعت شنی"),
     "hours": m5,
     "httpPortSniffer": MessageLookupByLibrary.simpleMessage("اسنیف پورت HTTP"),
     "icmpForwarding": MessageLookupByLibrary.simpleMessage("هدایت ICMP"),
@@ -868,6 +863,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("سازمان / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("گزینه‌ها"),
     "other": MessageLookupByLibrary.simpleMessage("سایر"),
+    "contributor": MessageLookupByLibrary.simpleMessage("مشارکت‌کننده"),
     "otherContributors": MessageLookupByLibrary.simpleMessage(
       "مشارکت‌کنندگان دیگر (ترتیب تصادفی)",
     ),
@@ -932,7 +928,6 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "password": MessageLookupByLibrary.simpleMessage("رمز عبور"),
     "paste": MessageLookupByLibrary.simpleMessage("جایگذاری"),
-    "pianoWave": MessageLookupByLibrary.simpleMessage("موج پیانو"),
     "pin": MessageLookupByLibrary.simpleMessage("پین"),
     "pleaseBindWebDAV": MessageLookupByLibrary.simpleMessage(
       "لطفاً به WebDAV متصل شوید",
@@ -960,10 +955,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "لطفاً پورت غیرتکراری وارد کنید",
     ),
     "portTip": m11,
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("ساعت شنی روان"),
-    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
-      "ساعت شنی ظریف",
-    ),
     "powerSwitch": MessageLookupByLibrary.simpleMessage("کلید روشن/خاموش"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage(
       "اولویت استفاده از HTTP/3 در DoH",
@@ -1028,12 +1019,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "مجموعه پروکسی",
     ),
     "pulse": MessageLookupByLibrary.simpleMessage("پالس"),
-    "pulsingGrid": MessageLookupByLibrary.simpleMessage("شبکه تپنده"),
-    "pumpingHeart": MessageLookupByLibrary.simpleMessage("قلب تپنده"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("حالت مشکی خالص"),
     "qrcode": MessageLookupByLibrary.simpleMessage("کد QR"),
     "qrcodeDesc": MessageLookupByLibrary.simpleMessage(
-      "اسکن کد QR برای وارد کردن پروفایل",
+      "اسکن کد QR برای دریافت پروفایل",
     ),
     "quicGoDisableEcn": MessageLookupByLibrary.simpleMessage(
       "غیرفعال‌سازی QUIC ECN",
@@ -1128,10 +1117,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restore": MessageLookupByLibrary.simpleMessage("بازیابی"),
     "retry": MessageLookupByLibrary.simpleMessage("تلاش مجدد"),
     "rightClickBehavior": MessageLookupByLibrary.simpleMessage("کلیک راست"),
-    "ring": MessageLookupByLibrary.simpleMessage("حلقه"),
-    "ripple": MessageLookupByLibrary.simpleMessage("موج آب"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("چرخش تک‌دایره"),
-    "rotatingPlain": MessageLookupByLibrary.simpleMessage("صفحه چرخان"),
     "rule": MessageLookupByLibrary.simpleMessage("قوانین"),
     "ruleName": MessageLookupByLibrary.simpleMessage("نام قانون"),
     "ruleProviders": MessageLookupByLibrary.simpleMessage(
@@ -1180,6 +1166,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage(
       "نمایش دکمه مستقل روشن/خاموش در صفحه اصلی",
     ),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("سوئیچ کارتی"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "نمایش دکمه کارتی سوئیچ در صفحه اصلی"),
     "shrink": MessageLookupByLibrary.simpleMessage("فشرده"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("اجرای بی‌صدا"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
@@ -1230,9 +1219,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sourceIp": MessageLookupByLibrary.simpleMessage("IP مبدا"),
     "specialProxy": MessageLookupByLibrary.simpleMessage("پروکسی ویژه"),
     "specialRules": MessageLookupByLibrary.simpleMessage("قوانین ویژه"),
-    "spinningCircle": MessageLookupByLibrary.simpleMessage("دایره چرخان"),
     "spinningLines": MessageLookupByLibrary.simpleMessage("خطوط چرخان"),
-    "squareCircle": MessageLookupByLibrary.simpleMessage("مربع و دایره"),
     "stackMode": MessageLookupByLibrary.simpleMessage("حالت پشته"),
     "standard": MessageLookupByLibrary.simpleMessage("استاندارد"),
     "start": MessageLookupByLibrary.simpleMessage("شروع"),
@@ -1348,33 +1335,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunnelTargetHint": MessageLookupByLibrary.simpleMessage(
       "مثال: 114.114.114.114:53",
     ),
-    "tvScanImport": MessageLookupByLibrary.simpleMessage(
-      "اسکن / وارد کردن از شبکه محلی",
-    ),
-    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
-      "اسکن کد یا ارسال پروفایل به تلویزیون از شبکه محلی",
-    ),
-    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
-      "یا آدرس را مستقیماً در مرورگر گوشی وارد کنید:",
-    ),
-    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
-      "شبکه محلی در دسترس یافت نشد، لطفاً Wi-Fi را بررسی کنید",
-    ),
-    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
-      "مطمئن شوید گوشی و TV به یک شبکه Wi-Fi متصل هستند",
-    ),
-    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
-      "کد QR را با یک دوربین یا مرورگر پشتیبانی‌شده اسکن کنید",
-    ),
-    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
-      "لینک اشتراک را در صفحه وب جای‌گذاری کرده یا فایل پیکربندی را آپلود و ارسال کنید",
-    ),
-    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
-      "پروفایل دریافت شد، در حال وارد کردن...",
-    ),
-    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
-      "در انتظار ارسال پروفایل از گوشی...",
-    ),
     "twoColumns": MessageLookupByLibrary.simpleMessage("۲ ستون"),
     "unableToUpdateCurrentProfileDesc": MessageLookupByLibrary.simpleMessage(
       "امکان بروزرسانی پروفایل فعلی وجود ندارد",
@@ -1423,6 +1383,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "هدایت ترافیک سیستم از طریق VpnService",
     ),
+    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "استفاده از پروکسی HTTP در موبایل پیشنهاد نمی‌شود مگر در صورت نیاز",
+    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "افزودن پروکسی HTTP به VpnService",
     ),
@@ -1433,9 +1396,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "جلوگیری از خاموش شدن خودکار صفحه نمایش برای فعال ماندن برنامه‌ها در پس‌زمینه.",
     ),
-    "wanderingCubes": MessageLookupByLibrary.simpleMessage("مکعب‌های سرگردان"),
     "wave": MessageLookupByLibrary.simpleMessage("موج"),
-    "waveSpinner": MessageLookupByLibrary.simpleMessage("چرخنده موجی"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage(
       "تنظیمات WebDAV",
     ),
@@ -1446,17 +1407,29 @@ class MessageLookup extends MessageLookupByLibrary {
       "نیازمند دسترسی مدیریت (Admin)",
     ),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("سبک ایموجی"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("سبک ایموجی نمایش داده شده در برنامه را انتخاب کنید"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "سبک ایموجی نمایش داده شده در برنامه را انتخاب کنید",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage(""),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage(""),
     "startRunning": MessageLookupByLibrary.simpleMessage("شروع"),
-    "selectCustomFont": MessageLookupByLibrary.simpleMessage("انتخاب / تغییر فونت"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("برای انتخاب فایل فونت .ttf یا .otf محلی ضربه بزنید"),
-    "customFontApplied": MessageLookupByLibrary.simpleMessage("فونت سفارشی اعمال شد"),
-    "customFontDisabled": MessageLookupByLibrary.simpleMessage("به فونت پیش فرض سیستم بازیابی شد"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("فقط فرمت های فونت .ttf یا .otf پشتیبانی می شوند"),
+    "selectCustomFont": MessageLookupByLibrary.simpleMessage(
+      "انتخاب / تغییر فونت",
+    ),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "برای انتخاب فایل فونت .ttf یا .otf محلی ضربه بزنید",
+    ),
+    "customFontApplied": MessageLookupByLibrary.simpleMessage(
+      "فونت سفارشی اعمال شد",
+    ),
+    "customFontDisabled": MessageLookupByLibrary.simpleMessage(
+      "به فونت پیش فرض سیستم بازیابی شد",
+    ),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "فقط فرمت های فونت .ttf یا .otf پشتیبانی می شوند",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("مکعب محو شونده"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("مکعب تاشو"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("ضربان قلب"),
@@ -1471,5 +1444,83 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("اطلاعات آدرس"),
     "traffic": MessageLookupByLibrary.simpleMessage("ترافیک"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("پیشرفته"),
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("نقاط تعقیب‌کننده"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("شبکه مکعب‌ها"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("مربع رقصان"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("حلقه دوتایی"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("شبکه محوشونده"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("ساعت شنی"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("موج پیانو"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage(
+      "ساعت شنی ظریف",
+    ),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("شبکه تپنده"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("حلقه"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("موج آب"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("صفحه چرخان"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("دایره چرخان"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("مکعب‌های سرگردان"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("چرخنده موجی"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("ترمیم فونت"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage(
+      "استفاده از فونت داخلی برای رفع مشکلات نمایش",
+    ),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "تازه‌سازی جزئی بر اساس دسته‌بندی فعلی",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage(
+      "اسکن / وارد کردن از شبکه محلی",
+    ),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "اسکن کد یا ارسال پروفایل به تلویزیون از شبکه محلی",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "مطمئن شوید گوشی و TV به یک شبکه Wi-Fi متصل هستند",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage(
+      "کد QR را با یک دوربین یا مرورگر پشتیبانی‌شده اسکن کنید",
+    ),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage(
+      "لینک اشتراک را در صفحه وب جای‌گذاری کرده یا فایل پیکربندی را آپلود و ارسال کنید",
+    ),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage(
+      "یا آدرس را مستقیماً در مرورگر گوشی وارد کنید:",
+    ),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage(
+      "در انتظار ارسال پروفایل از گوشی...",
+    ),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage(
+      "پروفایل دریافت شد، در حال وارد کردن...",
+    ),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "شبکه محلی در دسترس یافت نشد، لطفاً Wi-Fi را بررسی کنید",
+    ),
   };
 }

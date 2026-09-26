@@ -4,6 +4,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:bett_box/views/config/ntp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class NtpOverride extends StatelessWidget {
   const NtpOverride({super.key});
@@ -13,7 +14,7 @@ class NtpOverride extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'NTP', iconData: Icons.access_time_rounded),
+        info: Info(label: 'NTP', iconData: FluentIcons.access_time_24_regular),
         onPressed: () {
           // Open NTP settings
           showExtend(
@@ -25,7 +26,6 @@ class NtpOverride extends StatelessWidget {
                 body: const NtpListView(),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         child: Container(

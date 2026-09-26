@@ -114,9 +114,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "app": MessageLookupByLibrary.simpleMessage("應用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("應用存取控制"),
-    "accessControlSetting": MessageLookupByLibrary.simpleMessage(
-      "存取控制設定",
-    ),
+    "accessControlSetting": MessageLookupByLibrary.simpleMessage("存取控制設定"),
     "accessControlShort": MessageLookupByLibrary.simpleMessage("存取控制"),
     "appDesc": MessageLookupByLibrary.simpleMessage("處理應用相關設定"),
     "application": MessageLookupByLibrary.simpleMessage("應用程式"),
@@ -177,7 +175,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "categoryGaming": MessageLookupByLibrary.simpleMessage("遊戲中心"),
     "categorySocial": MessageLookupByLibrary.simpleMessage("社群平台"),
     "categoryStreaming": MessageLookupByLibrary.simpleMessage("串流媒體"),
-    "chasingDots": MessageLookupByLibrary.simpleMessage("雙星追逐"),
     "checkError": MessageLookupByLibrary.simpleMessage("檢測失敗"),
     "checkFailed": MessageLookupByLibrary.simpleMessage("Timeout"),
     "checkOrAddProfile": MessageLookupByLibrary.simpleMessage("請先新增配置"),
@@ -217,6 +214,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "connectionsSort": MessageLookupByLibrary.simpleMessage("連接排序"),
     "connectivity": MessageLookupByLibrary.simpleMessage("連通性："),
     "contactMe": MessageLookupByLibrary.simpleMessage("聯絡我"),
+    "toggleLabel": MessageLookupByLibrary.simpleMessage("切換標籤"),
     "content": MessageLookupByLibrary.simpleMessage("內容"),
     "contentScheme": MessageLookupByLibrary.simpleMessage("內容主題"),
     "continent": MessageLookupByLibrary.simpleMessage("大洲"),
@@ -240,13 +238,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "crashTest": MessageLookupByLibrary.simpleMessage("崩潰測試"),
     "create": MessageLookupByLibrary.simpleMessage("建立"),
     "creationTime": MessageLookupByLibrary.simpleMessage("建立時間"),
-    "cubeGrid": MessageLookupByLibrary.simpleMessage("九宮爍影"),
+    "currentProfile": MessageLookupByLibrary.simpleMessage("當前配置"),
     "custom": MessageLookupByLibrary.simpleMessage("自訂"),
     "customDashboardTitle": MessageLookupByLibrary.simpleMessage("個人化標題"),
     "customScriptOptions": MessageLookupByLibrary.simpleMessage("自訂規則開關"),
     "customUrl": MessageLookupByLibrary.simpleMessage("自訂 URL"),
     "cut": MessageLookupByLibrary.simpleMessage("剪下"),
-    "dancingSquare": MessageLookupByLibrary.simpleMessage("方塊起舞"),
     "dark": MessageLookupByLibrary.simpleMessage("深色"),
     "darkIcon": MessageLookupByLibrary.simpleMessage("深色圖示"),
     "darkIconDesc": MessageLookupByLibrary.simpleMessage("手動切換深色系桌面應用程式圖示"),
@@ -308,7 +305,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "dozeSuspendDesc": MessageLookupByLibrary.simpleMessage(
       "開啟後同步系統 Doze 休眠模式",
     ),
-    "dualRing": MessageLookupByLibrary.simpleMessage("雙環迴旋"),
     "edit": MessageLookupByLibrary.simpleMessage("編輯"),
     "editTunnel": MessageLookupByLibrary.simpleMessage("編輯轉發"),
     "editUser": MessageLookupByLibrary.simpleMessage("編輯用戶"),
@@ -354,10 +350,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "externalLink": MessageLookupByLibrary.simpleMessage("外部連結"),
     "externalResources": MessageLookupByLibrary.simpleMessage("外部資源"),
-    "fadingCircle": MessageLookupByLibrary.simpleMessage("環影隱漸"),
-    "fadingCube": MessageLookupByLibrary.simpleMessage("方影微漾"),
     "fadingFour": MessageLookupByLibrary.simpleMessage("四方爍動"),
-    "fadingGrid": MessageLookupByLibrary.simpleMessage("柵格隱現"),
     "fakeIpFilterMode": MessageLookupByLibrary.simpleMessage("FakeIP 過濾模式"),
     "fakeIpFilterModeDesc": MessageLookupByLibrary.simpleMessage(
       "指定 FakeIP 過濾模式",
@@ -390,7 +383,6 @@ class MessageLookup extends MessageLookupByLibrary {
       "開啟後可以匹配尋找處理程序",
     ),
     "flagged": MessageLookupByLibrary.simpleMessage("已標記"),
-    "foldingCube": MessageLookupByLibrary.simpleMessage("魔方翻折"),
     "fontFamily": MessageLookupByLibrary.simpleMessage("字體"),
     "forceDnsMapping": MessageLookupByLibrary.simpleMessage("強制 DNS 映射"),
     "forceDnsMappingDesc": MessageLookupByLibrary.simpleMessage(
@@ -419,8 +411,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "global": MessageLookupByLibrary.simpleMessage("全域"),
     "go": MessageLookupByLibrary.simpleMessage("前往"),
     "goDownload": MessageLookupByLibrary.simpleMessage("前往下載"),
-    "harmonyFont": MessageLookupByLibrary.simpleMessage("自訂字體"),
-    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("預設系統字體，開啟後可自訂自己喜好的字體"),
+    "customFont": MessageLookupByLibrary.simpleMessage("自訂字體"),
+    "customFontDesc": MessageLookupByLibrary.simpleMessage(
+      "預設系統字體，開啟後可自訂自己喜好的字體",
+    ),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("是否快取修改"),
     "healthCheckTimeout": MessageLookupByLibrary.simpleMessage("超時時間"),
     "healthCheckTimeoutDesc": MessageLookupByLibrary.simpleMessage(
@@ -440,7 +434,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("快捷鍵衝突"),
     "hotkeyManagement": MessageLookupByLibrary.simpleMessage("快捷鍵管理"),
     "hotkeyManagementDesc": MessageLookupByLibrary.simpleMessage("使用鍵盤控制應用程式"),
-    "hourGlass": MessageLookupByLibrary.simpleMessage("沙漏翻轉"),
     "hours": m5,
     "httpPortSniffer": MessageLookupByLibrary.simpleMessage("HTTP 連接埠嗅探"),
     "icmpForwarding": MessageLookupByLibrary.simpleMessage("ICMP 轉發"),
@@ -633,6 +626,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "operatorOrAsn": MessageLookupByLibrary.simpleMessage("歸屬 / ASN"),
     "options": MessageLookupByLibrary.simpleMessage("選項"),
     "other": MessageLookupByLibrary.simpleMessage("其他"),
+    "contributor": MessageLookupByLibrary.simpleMessage("貢獻者"),
     "otherContributors": MessageLookupByLibrary.simpleMessage("其他貢獻者(隨機排序)"),
     "otherSettings": MessageLookupByLibrary.simpleMessage("增強工具"),
     "otherSettingsDesc": MessageLookupByLibrary.simpleMessage("修改增強工具設定"),
@@ -679,7 +673,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "parsePureIpDesc": MessageLookupByLibrary.simpleMessage("解析純 IP 連線"),
     "password": MessageLookupByLibrary.simpleMessage("密碼"),
     "paste": MessageLookupByLibrary.simpleMessage("貼上"),
-    "pianoWave": MessageLookupByLibrary.simpleMessage("琴鍵律動"),
     "pin": MessageLookupByLibrary.simpleMessage("置頂"),
     "pleaseBindWebDAV": MessageLookupByLibrary.simpleMessage("請綁定 WebDAV"),
     "pleaseCloseSystemProxyFirst": MessageLookupByLibrary.simpleMessage(
@@ -697,8 +690,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "port": MessageLookupByLibrary.simpleMessage("連接埠"),
     "portConflictTip": MessageLookupByLibrary.simpleMessage("請輸入不同的連接埠"),
     "portTip": m11,
-    "pouringHourGlass": MessageLookupByLibrary.simpleMessage("流沙傾注"),
-    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("玉漏凝光"),
     "powerSwitch": MessageLookupByLibrary.simpleMessage("啟動開關"),
     "preferH3Desc": MessageLookupByLibrary.simpleMessage("優先使用 DoH 的 HTTP/3"),
     "pressKeyboard": MessageLookupByLibrary.simpleMessage("請按下按鍵"),
@@ -743,11 +734,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "proxyProviders": MessageLookupByLibrary.simpleMessage("代理提供者"),
     "proxyProvidersCount": MessageLookupByLibrary.simpleMessage("代理集"),
     "pulse": MessageLookupByLibrary.simpleMessage("脈衝律動"),
-    "pulsingGrid": MessageLookupByLibrary.simpleMessage("矩陣脈動"),
-    "pumpingHeart": MessageLookupByLibrary.simpleMessage("怦然心動"),
     "pureBlackMode": MessageLookupByLibrary.simpleMessage("純黑模式"),
     "qrcode": MessageLookupByLibrary.simpleMessage("二維碼"),
-    "qrcodeDesc": MessageLookupByLibrary.simpleMessage("掃描二維碼導入設定檔"),
+    "qrcodeDesc": MessageLookupByLibrary.simpleMessage("掃描二維碼獲取設定檔"),
     "quicGoDisableEcn": MessageLookupByLibrary.simpleMessage("停用 QUIC 顯式壅塞通知"),
     "quicGoDisableEcnDesc": MessageLookupByLibrary.simpleMessage(
       "停用 QUIC 的顯式擁塞通知功能",
@@ -803,10 +792,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restore": MessageLookupByLibrary.simpleMessage("還原"),
     "retry": MessageLookupByLibrary.simpleMessage("重試"),
     "rightClickBehavior": MessageLookupByLibrary.simpleMessage("右鍵點擊"),
-    "ring": MessageLookupByLibrary.simpleMessage("光環流轉"),
-    "ripple": MessageLookupByLibrary.simpleMessage("水波蕩漾"),
     "rotatingCircle": MessageLookupByLibrary.simpleMessage("單圓自轉"),
-    "rotatingPlain": MessageLookupByLibrary.simpleMessage("靈板翻轉"),
     "rule": MessageLookupByLibrary.simpleMessage("規則"),
     "ruleName": MessageLookupByLibrary.simpleMessage("規則名稱"),
     "ruleProviders": MessageLookupByLibrary.simpleMessage("規則提供者"),
@@ -837,6 +823,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "showPanel": MessageLookupByLibrary.simpleMessage("顯示視窗"),
     "showStartSwitch": MessageLookupByLibrary.simpleMessage("連動開關"),
     "showStartSwitchDesc": MessageLookupByLibrary.simpleMessage("首頁顯示獨立的開關按鈕"),
+    "cardStartButton": MessageLookupByLibrary.simpleMessage("卡片開關"),
+    "cardStartButtonDesc": MessageLookupByLibrary.simpleMessage(
+        "首頁顯示卡片式開關按鈕"),
     "shrink": MessageLookupByLibrary.simpleMessage("緊湊"),
     "silentLaunch": MessageLookupByLibrary.simpleMessage("靜默啟動"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage("不打開軟體直接在背景啟動"),
@@ -871,9 +860,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "sourceIp": MessageLookupByLibrary.simpleMessage("來源 IP"),
     "specialProxy": MessageLookupByLibrary.simpleMessage("特殊代理"),
     "specialRules": MessageLookupByLibrary.simpleMessage("特殊規則"),
-    "spinningCircle": MessageLookupByLibrary.simpleMessage("圓盤翻轉"),
     "spinningLines": MessageLookupByLibrary.simpleMessage("流光旋繞"),
-    "squareCircle": MessageLookupByLibrary.simpleMessage("方圓化境"),
     "stackMode": MessageLookupByLibrary.simpleMessage("堆疊模式"),
     "standard": MessageLookupByLibrary.simpleMessage("標準"),
     "start": MessageLookupByLibrary.simpleMessage("啟動"),
@@ -959,21 +946,6 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunnelTargetHint": MessageLookupByLibrary.simpleMessage(
       "例如: 114.114.114.114:53",
     ),
-    "tvScanImport": MessageLookupByLibrary.simpleMessage("掃碼 / 局域網導入"),
-    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
-      "手機掃碼或局域網推送設定檔至電視",
-    ),
-    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage("也可在手機瀏覽器中直接輸入："),
-    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
-      "未檢測到可用的局域網，請檢查 Wi-Fi",
-    ),
-    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
-      "確保手機與 TV 連接在同一 Wi-Fi 局域網",
-    ),
-    "tvScanStep2": MessageLookupByLibrary.simpleMessage("使用支援的相機或瀏覽器以掃描二維碼"),
-    "tvScanStep3": MessageLookupByLibrary.simpleMessage("在網頁中粘貼訂閱連結或上傳設定檔並推送"),
-    "tvScanSuccess": MessageLookupByLibrary.simpleMessage("設定檔推送成功，正在導入..."),
-    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("等待手機推送設定檔中..."),
     "twoColumns": MessageLookupByLibrary.simpleMessage("兩列"),
     "unableToUpdateCurrentProfileDesc": MessageLookupByLibrary.simpleMessage(
       "無法更新目前的設定檔",
@@ -1012,6 +984,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "vpnEnableDesc": MessageLookupByLibrary.simpleMessage(
       "透過 VpnService 自動路由系統流量",
     ),
+    "vpnSystemProxyConfirmDesc": MessageLookupByLibrary.simpleMessage(
+      "非桌面端通常不建議使用 HTTP 代理，此功能僅建議您在必要且知悉的情況下開啟",
+    ),
     "vpnSystemProxyDesc": MessageLookupByLibrary.simpleMessage(
       "為 VpnService 附加 HTTP 代理",
     ),
@@ -1020,26 +995,30 @@ class MessageLookup extends MessageLookupByLibrary {
     "wakelockDescription": MessageLookupByLibrary.simpleMessage(
       "本功能不需要任何特殊權限，因為它僅啟用螢幕喚醒鎖，而不是任何 CPU 喚醒鎖，應用會在後台保持必要的活躍，且螢幕不會自動熄滅，這在一些場景下會很有用",
     ),
-    "wanderingCubes": MessageLookupByLibrary.simpleMessage("雙角巡遊"),
     "wave": MessageLookupByLibrary.simpleMessage("波浪起伏"),
-    "waveSpinner": MessageLookupByLibrary.simpleMessage("波瀾疊轉"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV 設定"),
     "whitelist": MessageLookupByLibrary.simpleMessage("白名單"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("白名單模式"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("寫入系統"),
     "writeToSystemDesc": MessageLookupByLibrary.simpleMessage("需要管理員權限"),
     "years": m15,
-  
+
     "emojiStyle": MessageLookupByLibrary.simpleMessage("Emoji 風格"),
-    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage("選擇應用程式內顯示的 Emoji 風格"),
+    "emojiStyleDesc": MessageLookupByLibrary.simpleMessage(
+      "選擇應用程式內顯示的 Emoji 風格",
+    ),
     "tabAnimation": MessageLookupByLibrary.simpleMessage("選項卡動畫"),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("僅在行動視圖有效"),
     "startRunning": MessageLookupByLibrary.simpleMessage("啟動"),
     "selectCustomFont": MessageLookupByLibrary.simpleMessage("選擇 / 更換字體"),
-    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage("點擊選擇本機 .ttf 或 .otf 字體檔案"),
+    "selectCustomFontDesc": MessageLookupByLibrary.simpleMessage(
+      "點擊選擇本機 .ttf 或 .otf 字體檔案",
+    ),
     "customFontApplied": MessageLookupByLibrary.simpleMessage("已套用自訂字體"),
     "customFontDisabled": MessageLookupByLibrary.simpleMessage("已恢復系統預設字體"),
-    "invalidFontFormat": MessageLookupByLibrary.simpleMessage("僅支援 .ttf 或 .otf 格式的字體檔案"),
+    "invalidFontFormat": MessageLookupByLibrary.simpleMessage(
+      "僅支援 .ttf 或 .otf 格式的字體檔案",
+    ),
     "fadingCube": MessageLookupByLibrary.simpleMessage("漸隱方塊"),
     "foldingCube": MessageLookupByLibrary.simpleMessage("摺疊魔方"),
     "pumpingHeart": MessageLookupByLibrary.simpleMessage("心跳波動"),
@@ -1054,5 +1033,67 @@ class MessageLookup extends MessageLookupByLibrary {
     "addressInfo": MessageLookupByLibrary.simpleMessage("地址"),
     "traffic": MessageLookupByLibrary.simpleMessage("流量"),
     "advancedInfo": MessageLookupByLibrary.simpleMessage("進階"),
+
+    "chasingDots": MessageLookupByLibrary.simpleMessage("雙星追逐"),
+
+    "cubeGrid": MessageLookupByLibrary.simpleMessage("九宮爍影"),
+
+    "dancingSquare": MessageLookupByLibrary.simpleMessage("方塊起舞"),
+
+    "dualRing": MessageLookupByLibrary.simpleMessage("雙環迴旋"),
+
+    "fadingGrid": MessageLookupByLibrary.simpleMessage("柵格隱現"),
+
+    "hourGlass": MessageLookupByLibrary.simpleMessage("沙漏翻轉"),
+
+    "pianoWave": MessageLookupByLibrary.simpleMessage("琴鍵律動"),
+
+    "pouringHourGlassRefined": MessageLookupByLibrary.simpleMessage("玉漏凝光"),
+
+    "pulsingGrid": MessageLookupByLibrary.simpleMessage("矩陣脈動"),
+
+    "ring": MessageLookupByLibrary.simpleMessage("光環流轉"),
+
+    "ripple": MessageLookupByLibrary.simpleMessage("水波蕩漾"),
+
+    "rotatingPlain": MessageLookupByLibrary.simpleMessage("靈板翻轉"),
+
+    "spinningCircle": MessageLookupByLibrary.simpleMessage("圓盤翻轉"),
+
+    "wanderingCubes": MessageLookupByLibrary.simpleMessage("雙角巡遊"),
+
+    "waveSpinner": MessageLookupByLibrary.simpleMessage("波瀾疊轉"),
+
+    "harmonyFont": MessageLookupByLibrary.simpleMessage("字體修復"),
+
+    "harmonyFontDesc": MessageLookupByLibrary.simpleMessage("使用內建字體解決顯示異常問題"),
+
+    "mediaUnlockRefreshByCategory": MessageLookupByLibrary.simpleMessage(
+      "根據當前分組狀態局部重新整理",
+    ),
+
+    "tvScanImport": MessageLookupByLibrary.simpleMessage("掃碼 / 局域網導入"),
+
+    "tvScanImportDesc": MessageLookupByLibrary.simpleMessage(
+      "手機掃碼或局域網推送設定檔至電視",
+    ),
+
+    "tvScanStep1": MessageLookupByLibrary.simpleMessage(
+      "確保手機與 TV 連接在同一 Wi-Fi 局域網",
+    ),
+
+    "tvScanStep2": MessageLookupByLibrary.simpleMessage("使用支援的相機或瀏覽器以掃描二維碼"),
+
+    "tvScanStep3": MessageLookupByLibrary.simpleMessage("在網頁中粘貼訂閱連結或上傳設定檔並推送"),
+
+    "tvScanManualUrl": MessageLookupByLibrary.simpleMessage("也可在手機瀏覽器中直接輸入："),
+
+    "tvScanWaiting": MessageLookupByLibrary.simpleMessage("等待手機推送設定檔中..."),
+
+    "tvScanSuccess": MessageLookupByLibrary.simpleMessage("設定檔推送成功，正在導入..."),
+
+    "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
+      "未檢測到可用的局域網，請檢查 Wi-Fi",
+    ),
   };
 }

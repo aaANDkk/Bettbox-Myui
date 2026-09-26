@@ -6,6 +6,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/views/connection/connections.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class ConnectionsCount extends StatefulWidget {
   const ConnectionsCount({super.key});
@@ -61,7 +62,10 @@ class _ConnectionsCountState extends State<ConnectionsCount> {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(iconData: Icons.ballot_rounded, label: appLocalizations.connection),
+        info: Info(
+          iconData: FluentIcons.iot_24_regular,
+          label: appLocalizations.connection,
+        ),
         onPressed: () {
           showExtend(
             context,

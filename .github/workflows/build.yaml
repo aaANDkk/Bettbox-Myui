@@ -19,6 +19,9 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      actions: write
     strategy:
       fail-fast: false
       matrix:
@@ -26,45 +29,9 @@ jobs:
           - platform: android
             os: ubuntu-24.04
             arch: arm64
-          - platform: android
-            os: ubuntu-24.04
-            arch: amd64
-          - platform: android
-            os: ubuntu-24.04
-            arch: arm
-          - platform: android
-            os: ubuntu-24.04
-            arch: universal
           - platform: windows
             os: windows-2022
             arch: amd64
-          - platform: windows
-            os: windows-11-arm
-            arch: arm64
-          - platform: windows
-            os: windows-2022
-            arch: amd64
-            compatible: true
-          - platform: macos
-            os: macos-15
-            arch: arm64
-          - platform: macos
-            os: macos-15
-            arch: amd64
-          - platform: macos
-            os: macos-15
-            arch: amd64
-            compatible: true
-          - platform: linux
-            os: ubuntu-22.04
-            arch: amd64
-          - platform: linux
-            os: ubuntu-24.04-arm
-            arch: arm64
-          - platform: linux
-            os: ubuntu-22.04
-            arch: amd64
-            compatible: true
 
     steps:
       - name: Checkout
@@ -138,7 +105,7 @@ jobs:
         shell: bash
         run: |
           NDK_VERSION="28.2.13676358"
-          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}" >/dev/null 2>&1 || true
+          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}" "ndk;27.0.12077973" >/dev/null 2>&1 || true
           echo "ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
 
       - name: Configure Cargo for Android
@@ -409,6 +376,7 @@ jobs:
       
       - name: Clean up intermediate unsigned artifacts
         if: always() && matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
+        continue-on-error: true
         uses: geekyeggo/delete-artifact@v6
         with:
           name: |
@@ -500,6 +468,7 @@ jobs:
           path: ./dist/*.rpm
           archive: false
           overwrite: true
+          retention-days: ${{ (!contains(github.ref, '-') && startsWith(github.ref, 'refs/tags/')) && 90 || 1 }}
 
   upload:
     permissions: write-all
@@ -521,11 +490,11 @@ jobs:
 
       - name: Generate release.md
         run: |
-          if [ -f "./.github/release_template.md" ] && [ "${{ env.IS_PRERELEASE }}" != "true" ]; then
-            cat ./.github/release_template.md > release.md
+          PREV_TAG=$(git describe --tags --abbrev=0 "${{ github.ref_name }}^" 2>/dev/null || true)
+          if [ -n "$PREV_TAG" ]; then
+            echo "## 更新内容 / What's Changed" > release.md
             echo "" >> release.md
-          elif [ -f "./.github/release_template_pre.md" ] && [ "${{ env.IS_PRERELEASE }}" == "true" ]; then
-            cat ./.github/release_template_pre.md > release.md
+            git log "${PREV_TAG}..${{ github.ref_name }}" --pretty=format:"* %s (%h)" --no-merges >> release.md || true
             echo "" >> release.md
           else
             echo "## 更新内容 / What's Changed" > release.md

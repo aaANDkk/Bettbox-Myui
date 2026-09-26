@@ -8,6 +8,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 void showIpDetailDialog(
   BuildContext context,
@@ -120,7 +121,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
   Widget _buildIpTile(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.location_on_outlined),
+      leading: const Icon(FluentIcons.location_24_regular),
       title: Text(appLocalizations.ipAddress),
       subtitle: Text(
         widget.ip,
@@ -130,7 +131,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         ),
       ),
       trailing: IconButton(
-        icon: const Icon(Icons.copy_rounded, size: 18),
+        icon: const Icon(FluentIcons.copy_24_regular, size: 18),
         tooltip: appLocalizations.copy,
         onPressed: () => _copyIp(context),
       ),
@@ -203,7 +204,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.stacked_line_chart_rounded),
+            leading: const Icon(FluentIcons.protocol_handler_24_regular),
             title: Text(appLocalizations.tunVirtualAddress),
             subtitle: Text(
               'TUN Virtual Network Adapter',
@@ -222,7 +223,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.shuffle_rounded),
+            leading: const Icon(FluentIcons.arrow_shuffle_24_regular),
             title: Text(appLocalizations.privateIp),
             subtitle: Text(
               'LAN / Private Network',
@@ -241,7 +242,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
           _buildIpTile(context),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.error_outline_rounded, color: Colors.red),
+            leading: const Icon(FluentIcons.error_circle_24_regular, color: Colors.red),
             title: Text(
               _errorMessage!,
               style: context.textTheme.bodyMedium?.copyWith(color: Colors.red),
@@ -254,48 +255,42 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. IP 地址（右侧图标复制）
           _buildIpTile(context),
-          // 2. 国家 / 地区（EmojiText 精准基线对齐）
           if (countryText.isNotEmpty || flagEmoji.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.emoji_flags_rounded),
+              leading: const Icon(FluentIcons.flag_24_regular),
               title: Text(appLocalizations.countryOrRegion),
               subtitle: EmojiText(
                 flagEmoji.isNotEmpty ? '$flagEmoji $countryText' : countryText,
                 style: context.textTheme.bodyMedium,
               ),
             ),
-          // 3. 省份 / 城市
           if (provinceCity.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.my_location_rounded),
+              leading: const Icon(FluentIcons.city_24_regular),
               title: Text(appLocalizations.provinceAndCity),
               subtitle: Text(provinceCity),
             ),
-          // 4. 归属 / ASN
           if (operatorText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.business_rounded),
+              leading: const Icon(FluentIcons.building_24_regular),
               title: Text(appLocalizations.operatorOrAsn),
               subtitle: Text(operatorText),
             ),
-          // 5. 运营商（单独一行放到下方）
           if (ispText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.router_outlined),
+              leading: const Icon(FluentIcons.router_24_regular),
               title: Text(appLocalizations.isp),
               subtitle: Text(ispText),
             ),
-          // 6. 组织 / 域名（非空才展示）
           if (domainText.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.link_rounded),
+              leading: const Icon(FluentIcons.link_24_regular),
               title: Text(appLocalizations.domain),
               subtitle: Text(domainText),
             ),

@@ -7,6 +7,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class OnlinePanel extends ConsumerWidget {
   const OnlinePanel({super.key});
@@ -19,7 +20,7 @@ class OnlinePanel extends ConsumerWidget {
         child: CommonCard(
           info: Info(
             label: appLocalizations.onlinePanel,
-            iconData: Icons.launch_rounded,
+            iconData: FluentIcons.open_24_regular,
           ),
           onPressed: () async {
             // Get external controller status and secret

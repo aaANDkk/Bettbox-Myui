@@ -27,7 +27,7 @@ class SettingInfoCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Flexible(child: Icon(info.iconData)),
+            Flexible(child: info.icon ?? Icon(info.iconData)),
             const SizedBox(width: 8),
             Flexible(
               child: Text(info.label, style: context.textTheme.bodyMedium),

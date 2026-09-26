@@ -6,6 +6,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/views/config/dns.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class DnsOverride extends StatelessWidget {
   const DnsOverride({super.key});
@@ -46,7 +47,7 @@ class DnsOverride extends StatelessWidget {
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
-        info: Info(label: 'DNS', iconData: Icons.dns_rounded),
+        info: Info(label: 'DNS', iconData: FluentIcons.server_24_regular),
         onPressed: () {
           // Open DNS settings
           showExtend(
@@ -58,7 +59,6 @@ class DnsOverride extends StatelessWidget {
                 body: const DnsListView(),
               );
             },
-            props: const ExtendProps(blur: false),
           );
         },
         onLongPress: () async {

@@ -26,6 +26,7 @@ import 'common/common.dart';
 import 'controller.dart';
 import 'manager/manager.dart';
 import 'models/models.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef UpdateTasks = List<FutureOr Function()>;
 
@@ -183,11 +184,11 @@ class GlobalState {
         utils.getSystemLocale();
     await AppLocalizations.load(locale);
     final hasFont = await FontManager.init(
-      enabled: config.themeProps.useHarmonyFont,
+      enabled: config.themeProps.useCustomFont,
     );
-    if (!hasFont && config.themeProps.useHarmonyFont) {
+    if (!hasFont && config.themeProps.useCustomFont) {
       config = config.copyWith(
-        themeProps: config.themeProps.copyWith(useHarmonyFont: false),
+        themeProps: config.themeProps.copyWith(useCustomFont: false),
       );
     }
     await EmojiManager.init();
@@ -558,7 +559,7 @@ class GlobalState {
                     child: const Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check_circle_outline_rounded),
+                        Icon(FluentIcons.checkmark_circle_24_regular),
                         SizedBox(height: 8),
                         Text('warmup'),
                       ],
@@ -1507,7 +1508,6 @@ class MediaUnlockStateNotifier {
   void checkSingle(MediaPlatform platform) async {
     _batchTestingPlatforms.remove(platform);
     if (state.value.testingPlatforms.contains(platform)) return;
-    final requestId = _requestId;
     final currentTesting =
         Set<MediaPlatform>.from(state.value.testingPlatforms)..add(platform);
     state.value = state.value.copyWith(testingPlatforms: currentTesting);
@@ -1520,19 +1520,14 @@ class MediaUnlockStateNotifier {
           status: MediaUnlockStatus.failed,
         ),
       );
-      if (requestId != _requestId) return;
       final finalMap =
           Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
       finalMap[platform] = res;
-      final nextTesting =
-          Set<MediaPlatform>.from(state.value.testingPlatforms)..remove(platform);
       state.value = state.value.copyWith(
         results: finalMap,
-        testingPlatforms: nextTesting,
         lastChecked: DateTime.now(),
       );
     } catch (_) {
-      if (requestId != _requestId) return;
       final finalMap =
           Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
       finalMap.putIfAbsent(
@@ -1542,13 +1537,15 @@ class MediaUnlockStateNotifier {
           status: MediaUnlockStatus.failed,
         ),
       );
-      final nextTesting =
-          Set<MediaPlatform>.from(state.value.testingPlatforms)..remove(platform);
       state.value = state.value.copyWith(
         results: finalMap,
-        testingPlatforms: nextTesting,
         lastChecked: DateTime.now(),
       );
+    } finally {
+      final nextTesting =
+          Set<MediaPlatform>.from(state.value.testingPlatforms)
+            ..remove(platform);
+      state.value = state.value.copyWith(testingPlatforms: nextTesting);
     }
   }
 
@@ -1561,9 +1558,15 @@ class MediaUnlockStateNotifier {
     final isRunning = globalState.appState.runTime != null;
     if (!isRunning && !force) return;
 
-    final targetPlatforms = platforms
-        .where((p) => !state.value.testingPlatforms.contains(p))
-        .toList();
+    if (force) {
+      _checker.cancel();
+    }
+
+    final targetPlatforms = force
+        ? platforms.toList()
+        : platforms
+            .where((p) => !state.value.testingPlatforms.contains(p))
+            .toList();
     if (targetPlatforms.isEmpty) return;
 
     final requestId = ++_requestId;
@@ -1585,7 +1588,7 @@ class MediaUnlockStateNotifier {
     void flushUpdates() {
       throttleTimer?.cancel();
       throttleTimer = null;
-      if (requestId != _requestId || bufferResults.isEmpty) return;
+      if (bufferResults.isEmpty) return;
       final updates = Map<MediaPlatform, MediaUnlockResult>.from(bufferResults);
       bufferResults.clear();
       final nextResults =
@@ -1630,15 +1633,20 @@ class MediaUnlockStateNotifier {
       if (requestId != _requestId) return;
       flushUpdates();
       final nextResults =
-          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results)
-            ..addAll(results);
-      final nextTesting =
-          Set<MediaPlatform>.from(state.value.testingPlatforms)
-            ..removeAll(targetPlatforms);
+          Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+      for (final p in targetPlatforms) {
+        nextResults[p] = results[p] ??
+            bufferResults[p] ??
+            state.value.results[p] ??
+            MediaUnlockResult(
+              platform: p,
+              status: MediaUnlockStatus.failed,
+            );
+      }
+      _lastCheckedNodeSignature = _getNodeSignature();
       state.value = state.value.copyWith(
         isLoading: isFullCheck ? false : state.value.isLoading,
         results: nextResults,
-        testingPlatforms: nextTesting,
         lastChecked: DateTime.now(),
       );
     } catch (_) {
@@ -1656,18 +1664,24 @@ class MediaUnlockStateNotifier {
           ),
         );
       }
-      final nextTesting =
-          Set<MediaPlatform>.from(state.value.testingPlatforms)
-            ..removeAll(targetPlatforms);
+      _lastCheckedNodeSignature = _getNodeSignature();
       state.value = state.value.copyWith(
         isLoading: isFullCheck ? false : state.value.isLoading,
         results: fallbackResults,
-        testingPlatforms: nextTesting,
         lastChecked: DateTime.now(),
       );
     } finally {
       throttleTimer?.cancel();
       _batchTestingPlatforms.removeAll(targetPlatforms);
+      final nextTesting =
+          Set<MediaPlatform>.from(state.value.testingPlatforms)
+            ..removeAll(targetPlatforms);
+      state.value = state.value.copyWith(
+        isLoading: (requestId == _requestId && isFullCheck)
+            ? false
+            : state.value.isLoading,
+        testingPlatforms: nextTesting,
+      );
     }
   }
 
@@ -1769,6 +1783,7 @@ class MediaUnlockStateNotifier {
     if (!isRunning) return;
     if (!globalState.hasMediaUnlockWidget) return;
     if (state.value.isLoading || state.value.testingPlatforms.isNotEmpty) return;
+    if (state.value.results.isNotEmpty) return;
     final needsInitialCheck =
         pinnedPlatforms.any((p) => !state.value.results.containsKey(p));
     if (!needsInitialCheck) return;

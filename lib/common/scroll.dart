@@ -2,10 +2,13 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:bett_box/common/common.dart';
+import 'package:bett_box/widgets/scaffold.dart';
 import 'package:bett_box/widgets/scroll.dart';
 import 'package:flutter/material.dart';
 
 class BaseScrollBehavior extends MaterialScrollBehavior {
+  const BaseScrollBehavior();
+
   @override
   Set<PointerDeviceKind> get dragDevices => {
     PointerDeviceKind.touch,
@@ -18,6 +21,8 @@ class BaseScrollBehavior extends MaterialScrollBehavior {
 }
 
 class HiddenBarScrollBehavior extends BaseScrollBehavior {
+  const HiddenBarScrollBehavior();
+
   @override
   Widget buildScrollbar(
     BuildContext context,
@@ -29,12 +34,37 @@ class HiddenBarScrollBehavior extends BaseScrollBehavior {
 }
 
 class ShowBarScrollBehavior extends BaseScrollBehavior {
+  const ShowBarScrollBehavior();
+
   @override
   Widget buildScrollbar(
     BuildContext context,
     Widget child,
     ScrollableDetails details,
   ) {
+    return CommonScrollBar(controller: details.controller, child: child);
+  }
+}
+
+/// 羽化 + 滚动条同层：羽化放在滚动条内侧，滑动指示条永远画在羽化之上（且羽化满宽）
+class FeatherBarScrollBehavior extends BaseScrollBehavior {
+  const FeatherBarScrollBehavior();
+
+  @override
+  Widget buildScrollbar(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    if (FeatherScope.has(context)) {
+      return child;
+    }
+    if (axisDirectionToAxis(details.direction) != Axis.vertical) {
+      return super.buildScrollbar(context, child, details);
+    }
+    if (!system.isDesktop) {
+      return FeatherScope(child: ScrollFeatherGradientOverlay(child: child));
+    }
     return CommonScrollBar(controller: details.controller, child: child);
   }
 }

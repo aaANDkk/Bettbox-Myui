@@ -7,6 +7,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class TrafficUsage extends ConsumerStatefulWidget {
   const TrafficUsage({super.key});
@@ -95,7 +96,7 @@ class _TrafficUsageState extends ConsumerState<TrafficUsage> {
       child: CommonCard(
         info: Info(
           label: appLocalizations.trafficUsage,
-          iconData: Icons.data_usage_rounded,
+          iconData: FluentIcons.data_pie_24_regular,
         ),
         onPressed: () {},
         child: ValueListenableBuilder<int>(
@@ -209,14 +210,14 @@ class _TrafficUsageState extends ConsumerState<TrafficUsage> {
                       ),
                       _buildTrafficDataItem(
                         context,
-                        Icon(Icons.arrow_upward_rounded, color: primaryColor, size: 14),
+                        Icon(FluentIcons.arrow_up_24_regular, color: primaryColor, size: 14),
                         upTotalTrafficValue,
                       ),
                       const SizedBox(height: 8),
                       _buildTrafficDataItem(
                         context,
                         Icon(
-                          Icons.arrow_downward_rounded,
+                          FluentIcons.arrow_down_24_regular,
                           color: secondaryColor,
                           size: 14,
                         ),

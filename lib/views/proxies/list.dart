@@ -13,6 +13,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'card.dart';
 import 'common.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 const _staggerRowStepMs = 26;
 const _staggerColStepMs = 8;
@@ -326,6 +327,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
 
         return CommonScrollBar(
           controller: _scrollController,
+          feather: true,
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
@@ -615,7 +617,7 @@ class _GroupHeader extends ConsumerWidget {
                   key: ValueKey('locate_${group.name}'),
                   style: _circleButtonStyle,
                   iconSize: 19,
-                  icon: const Icon(Icons.adjust_rounded),
+                  icon: const Icon(FluentIcons.target_arrow_24_regular),
                   onPressed: onScrollToSelected,
                   tooltip: appLocalizations.locate,
                 ),
@@ -640,7 +642,7 @@ class _GroupHeader extends ConsumerWidget {
                                 size: 18,
                               ),
                             )
-                          : const Icon(Icons.network_ping_rounded),
+                          : const Icon(FluentIcons.top_speed_24_regular),
                       onPressed: delayTestCoordinator.isTesting
                           ? null
                           : () => _delayTest(context),

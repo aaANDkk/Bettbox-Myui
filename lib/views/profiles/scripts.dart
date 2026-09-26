@@ -21,6 +21,7 @@ import 'package:bett_box/widgets/sheet.dart';
 import 'package:bett_box/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 bool _isExtractingCustomOptions = false;
 const Duration _kMinLoadingDuration = Duration(seconds: 1);
@@ -223,13 +224,13 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             open();
                           },
                           tooltip: appLocalizations.more,
-                          icon: Icon(Icons.more_vert_rounded),
+                          icon: Icon(FluentIcons.more_vertical_24_regular),
                         );
                       },
                       popup: CommonPopupMenu(
                         items: [
                           PopupMenuItemData(
-                            icon: Icons.edit_outlined,
+                            icon: FluentIcons.edit_24_regular,
                             label: appLocalizations.edit,
                             onPressed: () {
                               _handleToEditor(script: script);
@@ -237,7 +238,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                           ),
                           if (script.isCompatibleWithBettbox)
                             PopupMenuItemData(
-                              icon: Icons.tune_rounded,
+                              icon: FluentIcons.options_24_regular,
                               label: appLocalizations.custom,
                               onPressed: () {
                                 _handleCustomOptions(script);
@@ -245,21 +246,21 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
                             ),
                           if (script.url != null && script.url!.isNotEmpty)
                             PopupMenuItemData(
-                              icon: Icons.sync_rounded,
+                              icon: FluentIcons.arrow_sync_24_regular,
                               label: appLocalizations.sync,
                               onPressed: () {
                                 _handleSyncScript(script.id);
                               },
                             ),
                           PopupMenuItemData(
-                            icon: Icons.file_copy_outlined,
+                            icon: FluentIcons.document_copy_24_regular,
                             label: appLocalizations.exportFile,
                             onPressed: () {
                               _handleExportFile(script);
                             },
                           ),
                           PopupMenuItemData(
-                            icon: Icons.delete_outlined,
+                            icon: FluentIcons.delete_24_regular,
                             label: appLocalizations.delete,
                             onPressed: () {
                               _handleDelScript(script.label);
@@ -446,7 +447,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         clipBehavior: Clip.none,
         heroTag: null,
         onPressed: _handleImport,
-        child: const Icon(Icons.add_rounded),
+        child: const Icon(FluentIcons.add_circle_24_filled),
       ),
     );
   }
@@ -460,7 +461,7 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         IconButton(
           onPressed: _handleShowScriptSettings,
           tooltip: appLocalizations.settings,
-          icon: const Icon(Icons.settings_outlined),
+          icon: const Icon(FluentIcons.settings_24_regular),
         ),
       ],
       body: _buildContent(),
@@ -536,21 +537,21 @@ class _ScriptImportOptionsDialog extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop(ImportOption.code);
             },
-            leading: const Icon(Icons.code_rounded),
+            leading: const Icon(FluentIcons.code_24_regular),
             title: Text(appLocalizations.importFromCode),
           ),
           ListItem(
             onTap: () {
               Navigator.of(context).pop(ImportOption.url);
             },
-            leading: const Icon(Icons.cloud_download_rounded),
+            leading: const Icon(FluentIcons.cloud_arrow_down_24_regular),
             title: Text(appLocalizations.importUrl),
           ),
           ListItem(
             onTap: () {
               Navigator.of(context).pop(ImportOption.file);
             },
-            leading: const Icon(Icons.file_open_rounded),
+            leading: const Icon(FluentIcons.folder_open_24_regular),
             title: Text(appLocalizations.importFile),
           ),
         ],
@@ -677,7 +678,7 @@ class __ScriptCustomOptionsSheetState
           actions: [
             IconButton(
               onPressed: (_dirty && !_isSaving) ? _handleSave : null,
-              icon: const Icon(Icons.save_rounded),
+              icon: const Icon(FluentIcons.save_24_regular),
               tooltip: appLocalizations.save,
             ),
           ],
@@ -712,7 +713,7 @@ class __ScriptCustomOptionsSheetState
                                         const EdgeInsets.only(left: 16, right: 16),
                                     leading: _isValidIconUrl(iconUrl)
                                         ? CommonTargetIcon(src: iconUrl!, size: 24)
-                                        : const Icon(Icons.alt_route_rounded),
+                                        : const Icon(FluentIcons.arrow_routing_24_regular),
                                     title: Text(key),
                                     trailing: Switch(
                                       value: val,
@@ -970,7 +971,7 @@ class _GroupSwitchOptionsSheetState
           actions: [
             IconButton(
               onPressed: (_dirty && !_isSaving) ? _handleSave : null,
-              icon: const Icon(Icons.save_rounded),
+              icon: const Icon(FluentIcons.save_24_regular),
               tooltip: appLocalizations.save,
             ),
           ],
@@ -1010,7 +1011,7 @@ class _GroupSwitchOptionsSheetState
                                       left: 16,
                                       right: 16,
                                     ),
-                                    leading: const Icon(Icons.alt_route_rounded),
+                                    leading: const Icon(FluentIcons.arrow_routing_24_regular),
                                     title: Text(key),
                                     trailing: Switch(
                                       value: val,

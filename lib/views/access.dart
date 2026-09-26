@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 // Force refresh icon flag
 final forceRefreshIconProvider = StateProvider<bool>((ref) => false);
@@ -69,7 +70,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _requestedPackageListPermission = true;
           await app.requestPackageListPermission();
         },
-        icon: const Icon(Icons.settings_rounded),
+        icon: const Icon(FluentIcons.settings_24_regular),
         label: Text(appLocalizations.openSettings),
       ),
     );
@@ -236,7 +237,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           }
         });
       },
-      icon: const Icon(Icons.search_rounded),
+      icon: const Icon(FluentIcons.search_24_regular),
     );
   }
 
@@ -271,7 +272,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           });
         }
       },
-      icon: const Icon(Icons.sync_rounded),
+      icon: const Icon(FluentIcons.arrow_sync_24_regular),
     );
   }
 
@@ -302,8 +303,8 @@ class _AccessViewState extends ConsumerState<AccessView>
         });
       },
       icon: isSelectedAll
-          ? const Icon(Icons.deselect_rounded)
-          : const Icon(Icons.select_all_rounded),
+          ? const Icon(FluentIcons.select_all_off_24_regular)
+          : const Icon(FluentIcons.select_all_on_24_regular),
     );
   }
 
@@ -357,7 +358,7 @@ class _AccessViewState extends ConsumerState<AccessView>
           _intelligentSelected();
         }
       },
-      icon: const Icon(Icons.build_circle_outlined),
+      icon: const Icon(FluentIcons.options_24_regular),
     );
   }
 
@@ -407,9 +408,17 @@ class _AccessViewState extends ConsumerState<AccessView>
         ? appLocalizations.accessControlAllowDesc
         : appLocalizations.accessControlNotAllowDesc;
 
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      children: [
+    return NotificationListener<Notification>(
+      onNotification: (notification) {
+        if (notification is ScrollNotification ||
+            notification is ScrollMetricsNotification) {
+          return true;
+        }
+        return false;
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
         Flexible(
           flex: 0,
           child: Padding(
@@ -527,7 +536,7 @@ class _AccessViewState extends ConsumerState<AccessView>
                                              ),
                                              const SizedBox(width: 4),
                                              Icon(
-                                               Icons.info_outline_rounded,
+                                               FluentIcons.info_24_regular,
                                                size: 15,
                                                color: Theme.of(context)
                                                    .colorScheme
@@ -565,77 +574,90 @@ class _AccessViewState extends ConsumerState<AccessView>
                 ),
                 Expanded(
                   flex: 1,
-                  child: FutureBuilder(
-                    future: _completer.future,
-                    builder: (_, snapshot) {
-                      if (snapshot.connectionState != ConnectionState.done) {
-                        return Center(
-                          child: SpinKitFadingCircle(
-                            color: context.colorScheme.primary,
-                            size: 36,
-                          ),
-                        );
-                      }
-                      if (_packageListPermissionDenied) {
-                        return _buildPackageListPermissionDeniedView();
-                      }
-                      return packages.isEmpty
-                          ? NullStatus(
-                              label: appLocalizations.noData,
-                              illustration: NullStatusIllustration.apps,
-                            )
-                          : CommonScrollBar(
-                              controller: _controller,
-                              child: ListView.separated(
-                                controller: _controller,
-                                itemCount: packages.length,
-                                padding: const EdgeInsets.only(
-                                  bottom: 24,
-                                  top: 4,
-                                ),
-                                itemBuilder: (_, index) {
-                                  final package = packages[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: PackageListItem(
-                                      key: Key(package.packageName),
-                                      package: package,
-                                      value: valueList.contains(
-                                        package.packageName,
-                                      ),
-                                      isActive: accessControl.enable,
-                                      onChanged: (value) {
-                                        _handleSelected(
-                                          valueList,
-                                          package,
-                                          value,
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (context, _) => Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  child: Divider(
-                                    height: 1,
-                                    thickness: 1,
-                                    color: context.colorScheme.outlineVariant
-                                        .withValues(
-                                          alpha:
-                                              context.colorScheme.brightness ==
-                                                  Brightness.light
-                                              ? 0.3
-                                              : 0.2,
-                                        ),
-                                  ),
-                                ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: CommonScrollBar(
+                      controller: _controller,
+                      feather: true,
+                      child: FutureBuilder(
+                        future: _completer.future,
+                        builder: (_, snapshot) {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
+                            return Center(
+                              child: SpinKitFadingCircle(
+                                color: context.colorScheme.primary,
+                                size: 36,
                               ),
                             );
-                    },
+                          }
+                          if (_packageListPermissionDenied) {
+                            return _buildPackageListPermissionDeniedView();
+                          }
+                          return packages.isEmpty
+                              ? NullStatus(
+                                  label: appLocalizations.noData,
+                                  illustration: NullStatusIllustration.apps,
+                                )
+                              : CommonScrollBar(
+                                  controller: _controller,
+                                  feather: false,
+                                  child: ListView.separated(
+                                    controller: _controller,
+                                    itemCount: packages.length,
+                                    padding: const EdgeInsets.only(
+                                      bottom: 24,
+                                      top: 4,
+                                    ),
+                                    itemBuilder: (_, index) {
+                                      final package = packages[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                        ),
+                                        child: PackageListItem(
+                                          key: Key(package.packageName),
+                                          package: package,
+                                          value: valueList.contains(
+                                            package.packageName,
+                                          ),
+                                          isActive: accessControl.enable,
+                                          onChanged: (value) {
+                                            _handleSelected(
+                                              valueList,
+                                              package,
+                                              value,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder: (context, _) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Divider(
+                                        height: 1,
+                                        thickness: 1,
+                                        color: context
+                                            .colorScheme
+                                            .outlineVariant
+                                            .withValues(
+                                              alpha:
+                                                  context
+                                                          .colorScheme
+                                                          .brightness ==
+                                                      Brightness.light
+                                                  ? 0.3
+                                                  : 0.2,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -643,7 +665,8 @@ class _AccessViewState extends ConsumerState<AccessView>
           ),
         ),
       ],
-    );
+    ),
+  );
   }
 }
 
@@ -733,7 +756,7 @@ class PackageListItem extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
-        Icons.apps_rounded,
+        FluentIcons.apps_24_regular,
         size: 24,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
@@ -761,7 +784,7 @@ class AccessControlSearchDelegate extends SearchDelegate {
           }
           query = '';
         },
-        icon: const Icon(Icons.clear_rounded),
+        icon: const Icon(FluentIcons.dismiss_24_regular),
       ),
       const SizedBox(width: 8),
     ];
@@ -773,7 +796,7 @@ class AccessControlSearchDelegate extends SearchDelegate {
       onPressed: () {
         close(context, null);
       },
-      icon: const Icon(Icons.arrow_back_rounded),
+      icon: const Icon(FluentIcons.arrow_left_24_regular),
     );
   }
 
@@ -894,8 +917,8 @@ class AccessControlPanel extends ConsumerStatefulWidget {
 class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
   IconData _getIconWithAccessControlMode(AccessControlMode mode) {
     return switch (mode) {
-      AccessControlMode.acceptSelected => Icons.check_circle_outline_rounded,
-      AccessControlMode.rejectSelected => Icons.block_rounded,
+      AccessControlMode.acceptSelected => FluentIcons.checkmark_circle_24_regular,
+      AccessControlMode.rejectSelected => FluentIcons.dismiss_circle_24_regular,
     };
   }
 
@@ -916,9 +939,9 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
 
   IconData _getIconWithProxiesSortType(AccessSortType type) {
     return switch (type) {
-      AccessSortType.none => Icons.align_horizontal_left_rounded,
-      AccessSortType.installTime => Icons.install_mobile_rounded,
-      AccessSortType.updateTime => Icons.update_rounded,
+      AccessSortType.none => FluentIcons.text_align_left_24_regular,
+      AccessSortType.installTime => FluentIcons.phone_update_24_regular,
+      AccessSortType.updateTime => FluentIcons.history_24_regular,
     };
   }
 
@@ -1025,8 +1048,11 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
               return Wrap(
                 spacing: 16,
                 children: [
-                  SettingTextCard(
-                    appLocalizations.systemApp,
+                  SettingInfoCard(
+                    Info(
+                      label: appLocalizations.systemApp,
+                      iconData: FluentIcons.phone_tablet_24_regular,
+                    ),
                     isSelected: vm2.a == false,
                     onPressed: () {
                       ref
@@ -1038,8 +1064,11 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
                           );
                     },
                   ),
-                  SettingTextCard(
-                    appLocalizations.noNetworkApp,
+                  SettingInfoCard(
+                    Info(
+                      label: appLocalizations.noNetworkApp,
+                      iconData: FluentIcons.cellular_off_24_regular,
+                    ),
                     isSelected: vm2.b == false,
                     onPressed: () {
                       ref
@@ -1120,19 +1149,19 @@ class _AccessControlPanelState extends ConsumerState<AccessControlPanel> {
             spacing: 16,
             children: [
               CommonChip(
-                avatar: const Icon(Icons.auto_awesome_rounded),
+                avatar: const Icon(FluentIcons.sparkle_24_regular),
                 label: appLocalizations.intelligentSelected,
                 onPressed: () {
                   Navigator.of(context).pop(1);
                 },
               ),
               CommonChip(
-                avatar: const Icon(Icons.paste_rounded),
+                avatar: const Icon(FluentIcons.clipboard_paste_24_regular),
                 label: appLocalizations.clipboardImport,
                 onPressed: _pasteToClipboard,
               ),
               CommonChip(
-                avatar: const Icon(Icons.content_copy_rounded),
+                avatar: const Icon(FluentIcons.copy_24_regular),
                 label: appLocalizations.clipboardExport,
                 onPressed: _copyToClipboard,
               ),
