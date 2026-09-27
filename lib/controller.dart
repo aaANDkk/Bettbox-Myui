@@ -723,7 +723,7 @@ class AppController {
           globalState.showNotifier(err.toString());
         }
       }
-      _ref.read(logsProvider.notifier).value = FixedList(maxLength);
+      _ref.read(logsProvider.notifier).value = FixedList(maxLogLength);
       _ref.read(requestsProvider.notifier).value = FixedList(maxLength);
       globalState.computeHeightMapCache = {};
       addCheckIpNumDebounce();

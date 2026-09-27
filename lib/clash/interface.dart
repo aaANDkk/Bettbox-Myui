@@ -73,6 +73,10 @@ mixin ClashInterface {
 
   FutureOr<void> stopLog();
 
+  FutureOr<String> getLogs();
+
+  FutureOr<bool> clearLogs();
+
   Future<bool> crash();
 
   FutureOr<String> getConnections();
@@ -82,6 +86,14 @@ mixin ClashInterface {
   FutureOr<bool> closeConnections();
 
   FutureOr<bool> resetConnections();
+
+  FutureOr<void> startTrackRequests();
+
+  FutureOr<void> stopTrackRequests();
+
+  FutureOr<String> getRequests();
+
+  FutureOr<bool> clearRequests();
 
   Future<bool> setState(CoreState state);
 
@@ -388,6 +400,36 @@ abstract class ClashHandlerInterface with ClashInterface {
   @override
   stopLog() {
     invoke<bool>(method: ActionMethod.stopLog);
+  }
+
+  @override
+  FutureOr<String> getLogs() {
+    return invoke<String>(method: ActionMethod.getLogs);
+  }
+
+  @override
+  FutureOr<bool> clearLogs() {
+    return invoke<bool>(method: ActionMethod.clearLogs);
+  }
+
+  @override
+  startTrackRequests() {
+    invoke<bool>(method: ActionMethod.startTrackRequests);
+  }
+
+  @override
+  stopTrackRequests() {
+    invoke<bool>(method: ActionMethod.stopTrackRequests);
+  }
+
+  @override
+  FutureOr<String> getRequests() {
+    return invoke<String>(method: ActionMethod.getRequests);
+  }
+
+  @override
+  FutureOr<bool> clearRequests() {
+    return invoke<bool>(method: ActionMethod.clearRequests);
   }
 
   @override
