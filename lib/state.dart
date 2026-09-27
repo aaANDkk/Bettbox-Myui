@@ -607,15 +607,40 @@ class GlobalState {
   Future<void> _writeRunningConfig(Map<String, dynamic> clashConfig) async {
     final content = await encodeCompactYamlTask(clashConfig);
     final configPath = await appPath.configFilePath;
-    final tempFile = File('$configPath.${DateTime.now().microsecondsSinceEpoch}.tmp');
+    final tempFile =
+        File('$configPath.${DateTime.now().microsecondsSinceEpoch}.tmp');
     await tempFile.parent.create(recursive: true);
-    await tempFile.writeAsString(content, flush: true);
     try {
-      await tempFile.rename(configPath);
-    } catch (_) {
+      await tempFile.writeAsString(content, flush: true);
+      var success = false;
+      for (var attempt = 0; attempt < 3; attempt++) {
+        try {
+          await tempFile.rename(configPath);
+          success = true;
+          break;
+        } catch (_) {
+          try {
+            await tempFile.copy(configPath);
+            success = true;
+            break;
+          } catch (_) {
+            if (attempt < 2) {
+              await Future.delayed(Duration(milliseconds: 50 * (attempt + 1)));
+            }
+          }
+        }
+      }
+      if (!success) {
+        throw FileSystemException(
+          'Failed to write running config after retries',
+          configPath,
+        );
+      }
+    } finally {
       if (await tempFile.exists()) {
-        await tempFile.copy(configPath);
-        await tempFile.delete();
+        try {
+          await tempFile.delete();
+        } catch (_) {}
       }
     }
   }
