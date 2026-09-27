@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/metacubex/mihomo/component/age"
 )
@@ -38,6 +39,11 @@ func (result ActionResult) error(data interface{}) {
 }
 
 func handleAction(action *Action, result ActionResult) {
+	defer func() {
+		if r := recover(); r != nil {
+			result.error(fmt.Sprintf("panic: %v", r))
+		}
+	}()
 	switch action.Method {
 	case initClashMethod:
 		paramsString := action.Data.(string)

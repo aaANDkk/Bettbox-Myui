@@ -169,10 +169,7 @@ class AppController {
     }
 
     if (wasRunning) {
-      await globalState.handleStart([
-        updateRunTime,
-        updateTraffic,
-      ]);
+      await globalState.handleStart([updateRunTime, updateTraffic]);
       _scheduleCheckIpRefresh();
       _backgroundLoad();
     }
@@ -345,7 +342,10 @@ class AppController {
       return false;
     }
     await _initCore();
-    await currentProfile.checkAndUpdate();
+    final isFileExists = await currentProfile.check();
+    if (!isFileExists) {
+      await currentProfile.checkAndUpdate();
+    }
     final patchConfig = _ref.read(patchClashConfigProvider);
     final targetTun = enableTun ?? patchConfig.tun.enable;
 
@@ -402,8 +402,9 @@ class AppController {
 
   Future<bool> _shouldUpdateDashboardTick() async {
     if (system.isDesktop) {
-      final isPinned =
-          _ref.read(windowSettingProvider.select((s) => s.isPinned));
+      final isPinned = _ref.read(
+        windowSettingProvider.select((s) => s.isPinned),
+      );
       if (isPinned) return true;
       if (await window?.isVisible == false) return false;
       if (await window?.isMinimized == true) return false;
@@ -503,9 +504,9 @@ class AppController {
     _updatingProfileIds.add(profile.id);
     try {
       final newProfile = await profile.update(validate: validate);
-      _ref.read(profilesProvider.notifier).setProfile(
-            newProfile.copyWith(isUpdating: false),
-          );
+      _ref
+          .read(profilesProvider.notifier)
+          .setProfile(newProfile.copyWith(isUpdating: false));
       if (profile.id == _ref.read(currentProfileIdProvider)) {
         applyProfileDebounce(silence: true);
       }
@@ -1337,7 +1338,9 @@ class AppController {
     await updateGroups();
 
     autoLaunch?.updateStatus(_ref.read(appSettingProvider).autoLaunch);
-    autoUpdateProfiles();
+    Future.delayed(const Duration(seconds: 5), () {
+      autoUpdateProfiles();
+    });
     autoCheckUpdate();
 
     final isWindowVisible = await window?.isVisible ?? false;
@@ -1548,8 +1551,9 @@ class AppController {
         ageSecretKey: ageSecretKey,
       ).update();
       if (globalState.navigatorKey.currentState?.canPop() ?? false) {
-        globalState.navigatorKey.currentState
-            ?.popUntil((route) => route.isFirst);
+        globalState.navigatorKey.currentState?.popUntil(
+          (route) => route.isFirst,
+        );
       }
       toProfiles();
       await addProfile(profile);
@@ -2193,7 +2197,8 @@ class AppController {
           final vpnPropsJson = configJson['vpnProps'];
           if (vpnPropsJson != null && vpnPropsJson is Map) {
             final accessControlPropsJson = vpnPropsJson['accessControlProps'];
-            if (accessControlPropsJson != null && accessControlPropsJson is Map) {
+            if (accessControlPropsJson != null &&
+                accessControlPropsJson is Map) {
               accessControl = AccessControl.fromJson(
                 Map<String, dynamic>.from(accessControlPropsJson),
               );
@@ -2412,8 +2417,6 @@ class AppController {
     // Ensure current profile exists
     _ensureCurrentProfile(profiles);
   }
-
-
 
   Future<T?> safeRun<T>(
     FutureOr<T> Function() futureFunction, {
