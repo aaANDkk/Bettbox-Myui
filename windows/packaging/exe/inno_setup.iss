@@ -130,10 +130,11 @@ begin
   HelperPath := ExpandConstant('{app}\{{HELPER_EXECUTABLE_NAME}}');
   
   Exec('sc', 'stop ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  Exec('sc', 'delete ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  
-  Exec('sc', 'create ' + ServiceName + ' binPath= "' + HelperPath + '" start= auto', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  
+  Exec('sc', 'config ' + ServiceName + ' binPath= "' + HelperPath + '" start= auto', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  if ResultCode <> 0 then
+  begin
+    Exec('sc', 'create ' + ServiceName + ' binPath= "' + HelperPath + '" start= auto', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
   Exec('sc', 'start ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 

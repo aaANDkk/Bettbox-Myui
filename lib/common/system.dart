@@ -361,12 +361,6 @@ class Windows {
     await HelperAuthManager.ensureAuthKey();
     if (await isHelperHealthy()) return true;
 
-    final query = await Process.run('sc', ['query', appHelperService]);
-    if (query.exitCode == 0) {
-      await Process.run('sc', ['start', appHelperService]);
-      if (await _waitForHelperHealthy()) return true;
-    }
-
     if (!await _configureHelperService()) return false;
 
     return _waitForHelperHealthy();
@@ -434,15 +428,17 @@ class Windows {
   }
 
   Future<bool> _waitForHelperHealthy() async {
-    for (var attempt = 0; attempt < 8; attempt++) {
+    for (var attempt = 0; attempt < 20; attempt++) {
       await Future.delayed(const Duration(milliseconds: 250));
       if (await isHelperHealthy()) return true;
 
-      final check = await Process.run('sc', ['query', appHelperService]);
-      final output = check.stdout.toString();
-      if (output.contains('STOPPED') ||
-          (attempt >= 2 && output.contains('RUNNING'))) {
-        break;
+      if (attempt > 0 && attempt % 4 == 0) {
+        final check = await Process.run('sc', ['query', appHelperService]);
+        final output = check.stdout.toString();
+        if (output.contains('STOPPED')) {
+          commonPrint.log('Helper service stopped/failed, skipping wait');
+          break;
+        }
       }
     }
 
