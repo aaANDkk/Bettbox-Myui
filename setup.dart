@@ -321,6 +321,126 @@ class Build {
       print('Failed to copy file: $e');
     }
   }
+
+  static const List<AssetDownloadItem> assetDownloadItems = [
+    AssetDownloadItem(
+      url:
+          'https://github.com/appshubcc/bett-rules/releases/download/latest/geosite.dat',
+      fileName: 'GeoSite.dat',
+    ),
+    AssetDownloadItem(
+      url:
+          'https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.metadb',
+      fileName: 'geoip.metadb',
+    ),
+    AssetDownloadItem(
+      url:
+          'https://github.com/appshubcc/bett-rules/releases/download/latest/GeoLite2-ASN-lite.mmdb',
+      fileName: 'ASN.mmdb',
+    ),
+    AssetDownloadItem(
+      url:
+          'https://github.com/Zephyruso/zashboard/releases/download/v3.29.1/dist-no-fonts.zip',
+      fileName: 'zash.zip',
+    ),
+  ];
+
+  static Future<void> ensureAssets({bool force = false}) async {
+    final dataDir = Directory(join(current, 'assets', 'data'));
+    if (!dataDir.existsSync()) {
+      dataDir.createSync(recursive: true);
+    }
+
+    final now = DateTime.now();
+    final maxAge = const Duration(hours: 48);
+
+    for (final item in assetDownloadItems) {
+      final targetFile = File(join(dataDir.path, item.fileName));
+      var shouldDownload = force;
+
+      if (!shouldDownload) {
+        if (!targetFile.existsSync() || targetFile.lengthSync() == 0) {
+          shouldDownload = true;
+        } else {
+          final lastModified = targetFile.lastModifiedSync();
+          final age = now.difference(lastModified);
+          if (age >= maxAge) {
+            shouldDownload = true;
+          }
+        }
+      }
+
+      if (shouldDownload) {
+        print('Downloading ${item.fileName} from ${item.url} ...');
+        await _downloadAsset(item.url, targetFile.path);
+        print('Downloaded ${item.fileName} successfully.');
+      } else {
+        final ageHours = now.difference(targetFile.lastModifiedSync()).inHours;
+        print('${item.fileName} is up to date (${ageHours}h < 48h).');
+      }
+    }
+  }
+
+  static Future<void> _downloadAsset(
+    String url,
+    String destinationPath, {
+    int maxRetries = 3,
+  }) async {
+    final tempPath = '$destinationPath.tmp';
+    final tempFile = File(tempPath);
+    if (tempFile.existsSync()) {
+      tempFile.deleteSync();
+    }
+
+    for (var attempt = 1; attempt <= maxRetries; attempt++) {
+      final client = HttpClient();
+      client.connectionTimeout = const Duration(seconds: 30);
+      try {
+        final request = await client.getUrl(Uri.parse(url));
+        request.followRedirects = true;
+        request.maxRedirects = 10;
+        final response = await request.close();
+        if (response.statusCode != HttpStatus.ok) {
+          throw HttpException(
+            'Failed with status ${response.statusCode}',
+            uri: Uri.parse(url),
+          );
+        }
+        final sink = tempFile.openWrite();
+        await response.pipe(sink);
+        await sink.flush();
+        await sink.close();
+
+        final destinationFile = File(destinationPath);
+        if (destinationFile.existsSync()) {
+          destinationFile.deleteSync();
+        }
+        tempFile.renameSync(destinationPath);
+        File(destinationPath).setLastModifiedSync(DateTime.now());
+        return;
+      } catch (e) {
+        if (tempFile.existsSync()) {
+          try {
+            tempFile.deleteSync();
+          } catch (_) {}
+        }
+        if (attempt == maxRetries) {
+          rethrow;
+        }
+        print('Download failed ($e), retrying ($attempt/$maxRetries)...');
+        await Future.delayed(Duration(seconds: attempt * 2));
+      } finally {
+        client.close();
+      }
+    }
+  }
+}
+
+class AssetDownloadItem {
+  final String url;
+  final String fileName;
+
+  const AssetDownloadItem({required this.url, required this.fileName});
 }
 
 class BuildCommand extends Command {
@@ -615,6 +735,8 @@ class BuildCommand extends Command {
     final mode = target == Target.android ? Mode.lib : Mode.core;
     final String actualOut = out ?? (target.same ? 'app' : 'core');
     Build.isDev = dev;
+
+    await Build.ensureAssets();
 
     if (archName == 'auto') {
       if (target == Target.android) {
@@ -932,9 +1054,32 @@ class AutoBuildCommand extends Command {
   }
 }
 
+class AssetsCommand extends Command {
+  AssetsCommand() {
+    argParser.addFlag(
+      'force',
+      abbr: 'f',
+      help: 'Force download assets even if within 48 hours',
+    );
+  }
+
+  @override
+  String get description => 'Download or update assets if older than 48 hours';
+
+  @override
+  String get name => 'assets';
+
+  @override
+  Future<void> run() async {
+    final force = argResults?['force'] as bool? ?? false;
+    await Build.ensureAssets(force: force);
+  }
+}
+
 Future<void> main(Iterable<String> args) async {
   final runner = CommandRunner('setup', 'build Application');
   runner.addCommand(AutoBuildCommand());
+  runner.addCommand(AssetsCommand());
   runner.addCommand(BuildCommand(target: Target.android));
   runner.addCommand(BuildCommand(target: Target.linux));
   runner.addCommand(BuildCommand(target: Target.windows));
