@@ -1,3 +1,4 @@
+import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -15,7 +16,8 @@ class LogsView extends ConsumerStatefulWidget {
   ConsumerState<LogsView> createState() => _LogsViewState();
 }
 
-class _LogsViewState extends ConsumerState<LogsView> {
+class _LogsViewState extends ConsumerState<LogsView>
+    with WidgetsBindingObserver {
   late final ScrollController _scrollController;
   var _autoScrollToEnd = false;
 
@@ -23,10 +25,32 @@ class _LogsViewState extends ConsumerState<LogsView> {
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
+    WidgetsBinding.instance.addObserver(this);
+    _initLogs();
+  }
+
+  void _initLogs() async {
+    clashCore.startLog();
+    final history = await clashCore.getLogs();
+    if (!mounted) return;
+    if (history.isNotEmpty) {
+      ref.read(logsProvider.notifier).setLogs(history);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      clashCore.stopLog();
+    } else if (state == AppLifecycleState.resumed) {
+      _initLogs();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    clashCore.stopLog();
     _scrollController.dispose();
     super.dispose();
   }
@@ -93,6 +117,7 @@ class _LogsViewState extends ConsumerState<LogsView> {
 
   void _handleClearLogs() {
     ref.read(logsProvider.notifier).clearLogs();
+    clashCore.clearLogs();
   }
 
   @override

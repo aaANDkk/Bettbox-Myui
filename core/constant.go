@@ -133,6 +133,12 @@ const (
 	getModeMethod                         Method = "getMode"
 	parseExternalProviderContentMethod    Method = "parseExternalProviderContent"
 	getCoreStatusMethod                   Method = "getCoreStatus"
+	getRequestsMethod                     Method = "getRequests"
+	startTrackRequestsMethod              Method = "startTrackRequests"
+	stopTrackRequestsMethod               Method = "stopTrackRequests"
+	clearRequestsMethod                   Method = "clearRequests"
+	getLogsMethod                         Method = "getLogs"
+	clearLogsMethod                       Method = "clearLogs"
 )
 
 type Method string

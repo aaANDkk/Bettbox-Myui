@@ -123,7 +123,7 @@ class GlobalState {
       version: version,
       viewSize: Size.zero,
       requests: FixedList(maxLength),
-      logs: FixedList(maxLength),
+      logs: FixedList(maxLogLength),
       traffics: FixedList(30),
       totalTraffic: Traffic(),
       systemUiOverlayStyle: const SystemUiOverlayStyle(),

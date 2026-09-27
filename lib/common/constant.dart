@@ -137,6 +137,7 @@ double getWidgetHeight(num lines) {
 }
 
 const maxLength = 256;
+const maxLogLength = 512;
 
 final mainIsolate = 'BettboxMainIsolate';
 

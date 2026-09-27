@@ -240,16 +240,6 @@ Future<void> _service(List<String> flags) async {
           await vpn?.updateNotificationSpeed(profileName, '↑0B/s ↓0B/s');
         }
 
-        if (globalState.config.appSetting.openLogs) {
-          await clashLibHandler.invokeAction(
-            '{"id": "quickStartLog", "method": "startLog"}',
-          );
-        } else {
-          await clashLibHandler.invokeAction(
-            '{"id": "quickStopLog", "method": "stopLog"}',
-          );
-        }
-
         clashLibHandler.startListener();
       } catch (e) {
         commonPrint.log('Fatal error during service background start: $e');

@@ -130,6 +130,24 @@ func handleAction(action *Action, result ActionResult) {
 	case resetConnectionsMethod:
 		result.success(handleResetConnections())
 		return
+	case getRequestsMethod:
+		result.success(handleGetRequests())
+		return
+	case startTrackRequestsMethod:
+		result.success(handleStartTrackRequests())
+		return
+	case stopTrackRequestsMethod:
+		result.success(handleStopTrackRequests())
+		return
+	case clearRequestsMethod:
+		result.success(handleClearRequests())
+		return
+	case getLogsMethod:
+		result.success(handleGetLogs())
+		return
+	case clearLogsMethod:
+		result.success(handleClearLogs())
+		return
 	case getConfigMethod:
 		paramsString := action.Data.(string)
 		var params GetConfigParams

@@ -1,3 +1,4 @@
+import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
@@ -14,7 +15,8 @@ class RequestsView extends ConsumerStatefulWidget {
   ConsumerState<RequestsView> createState() => _RequestsViewState();
 }
 
-class _RequestsViewState extends ConsumerState<RequestsView> {
+class _RequestsViewState extends ConsumerState<RequestsView>
+    with WidgetsBindingObserver {
   late final ScrollController _scrollController;
   var _autoScrollToEnd = false;
 
@@ -22,10 +24,32 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
   void initState() {
     super.initState();
     _scrollController = ReverseScrollController();
+    WidgetsBinding.instance.addObserver(this);
+    _initRequests();
+  }
+
+  void _initRequests() async {
+    clashCore.startTrackRequests();
+    final history = await clashCore.getRequests();
+    if (!mounted) return;
+    if (history.isNotEmpty) {
+      ref.read(requestsProvider.notifier).setRequests(history);
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      clashCore.stopTrackRequests();
+    } else if (state == AppLifecycleState.resumed) {
+      _initRequests();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    clashCore.stopTrackRequests();
     _scrollController.dispose();
     super.dispose();
   }
@@ -63,6 +87,7 @@ class _RequestsViewState extends ConsumerState<RequestsView> {
         IconButton(
           onPressed: () {
             ref.read(requestsProvider.notifier).clearRequests();
+            clashCore.clearRequests();
           },
           tooltip: appLocalizations.clear,
           icon: const Icon(Icons.delete_sweep_outlined),

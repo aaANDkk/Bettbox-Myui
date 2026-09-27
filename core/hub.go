@@ -36,13 +36,20 @@ import (
 	"github.com/metacubex/mihomo/tunnel"
 	"github.com/metacubex/mihomo/tunnel/statistic"
 	"sync"
+	"sync/atomic"
 )
 
 var (
-	isInit            = false
-	externalProviders = map[string]cp.Provider{}
-	logSubscriber     observable.Subscription[log.Event]
-	ageMutex          sync.Mutex
+	isInit              = false
+	externalProviders   = map[string]cp.Provider{}
+	logSubscriber       observable.Subscription[log.Event]
+	ageMutex            sync.Mutex
+	requestHistoryLock  sync.RWMutex
+	requestHistory      []*statistic.TrackerInfo
+	isStreamingRequests atomic.Bool
+	logHistoryLock      sync.RWMutex
+	logHistory          []log.Event
+	isStreamingLogs     atomic.Bool
 )
 
 func handleInitClash(paramsString string) bool {
@@ -55,6 +62,7 @@ func handleInitClash(paramsString string) bool {
 	if !isInit {
 		constant.SetHomeDir(params.HomeDir)
 		isInit = true
+		ensureLogSubscriber()
 	}
 	return isInit
 }
@@ -95,6 +103,14 @@ func handleShutdown() bool {
 	stopListeners()
 	executor.Shutdown()
 	tryUnloadGeoData()
+	handleClearRequests()
+	handleClearLogs()
+	isStreamingRequests.Store(false)
+	isStreamingLogs.Store(false)
+	if logSubscriber != nil {
+		log.UnSubscribe(logSubscriber)
+		logSubscriber = nil
+	}
 	runtime.GC()
 	debug.FreeOSMemory()
 	isInit = false
@@ -495,16 +511,32 @@ func marshalInlineProviderContent(rawConfig *config.RawConfig, providerName stri
 	return yaml.Marshal(map[string]any{"proxies": payload})
 }
 
-func handleStartLog() {
+const maxLogHistory = 512
+
+func recordLogHistory(logData log.Event) {
+	logHistoryLock.Lock()
+	defer logHistoryLock.Unlock()
+	if len(logHistory) >= maxLogHistory {
+		logHistory = logHistory[1:]
+	}
+	logHistory = append(logHistory, logData)
+}
+
+func ensureLogSubscriber() {
 	if logSubscriber != nil {
-		log.UnSubscribe(logSubscriber)
-		logSubscriber = nil
+		return
 	}
 	logSubscriber = log.Subscribe()
 	go func() {
 		for logData := range logSubscriber {
 			if logData.LogLevel < log.Level() {
 				continue
+			}
+			recordLogHistory(logData)
+			if !isStreamingLogs.Load() {
+				if logData.LogLevel != log.ERROR {
+					continue
+				}
 			}
 			message := &Message{
 				Type: LogMessage,
@@ -515,11 +547,33 @@ func handleStartLog() {
 	}()
 }
 
+func handleStartLog() {
+	ensureLogSubscriber()
+	isStreamingLogs.Store(true)
+}
+
 func handleStopLog() {
-	if logSubscriber != nil {
-		log.UnSubscribe(logSubscriber)
-		logSubscriber = nil
+	isStreamingLogs.Store(false)
+}
+
+func handleGetLogs() string {
+	logHistoryLock.RLock()
+	defer logHistoryLock.RUnlock()
+	if len(logHistory) == 0 {
+		return "[]"
 	}
+	data, err := json.Marshal(logHistory)
+	if err != nil {
+		return "[]"
+	}
+	return string(data)
+}
+
+func handleClearLogs() bool {
+	logHistoryLock.Lock()
+	defer logHistoryLock.Unlock()
+	logHistory = nil
+	return true
 }
 
 func handleGetCountryCode(ip string, fn func(value string)) {
@@ -818,9 +872,14 @@ func init() {
 		})
 	}
 	statistic.DefaultRequestNotify = func(c statistic.Tracker) {
+		info := c.Info()
+		recordRequestHistory(info)
+		if !isStreamingRequests.Load() {
+			return
+		}
 		sendMessage(Message{
 			Type: RequestMessage,
-			Data: c.Info(),
+			Data: info,
 		})
 	}
 	executor.DefaultProviderLoadedHook = func(providerName string) {
@@ -830,3 +889,45 @@ func init() {
 		})
 	}
 }
+
+const maxRequestHistory = 256
+
+func recordRequestHistory(info *statistic.TrackerInfo) {
+	requestHistoryLock.Lock()
+	defer requestHistoryLock.Unlock()
+	if len(requestHistory) >= maxRequestHistory {
+		requestHistory = requestHistory[1:]
+	}
+	requestHistory = append(requestHistory, info)
+}
+
+func handleGetRequests() string {
+	requestHistoryLock.RLock()
+	defer requestHistoryLock.RUnlock()
+	if len(requestHistory) == 0 {
+		return "[]"
+	}
+	data, err := json.Marshal(requestHistory)
+	if err != nil {
+		return "[]"
+	}
+	return string(data)
+}
+
+func handleStartTrackRequests() bool {
+	isStreamingRequests.Store(true)
+	return true
+}
+
+func handleStopTrackRequests() bool {
+	isStreamingRequests.Store(false)
+	return true
+}
+
+func handleClearRequests() bool {
+	requestHistoryLock.Lock()
+	defer requestHistoryLock.Unlock()
+	requestHistory = nil
+	return true
+}
+

@@ -54,11 +54,6 @@ class ClashCore {
 
   Future<bool> init() async {
     await initGeo();
-    if (globalState.config.appSetting.openLogs) {
-      clashCore.startLog();
-    } else {
-      clashCore.stopLog();
-    }
     final homeDirPath = await appPath.homeDirPath;
     return await clashInterface.init(
       InitParams(homeDir: homeDirPath, version: globalState.appState.version),
@@ -354,6 +349,50 @@ class ClashCore {
 
   void stopLog() {
     clashInterface.stopLog();
+  }
+
+  Future<List<Log>> getLogs() async {
+    final res = await clashInterface.getLogs();
+    if (res.isEmpty) {
+      return [];
+    }
+    try {
+      final logsRaw = json.decode(res) as List? ?? [];
+      return logsRaw.map((e) => Log.fromJson(e)).toList();
+    } catch (e) {
+      commonPrint.log('Failed to parse logs: $e');
+      return [];
+    }
+  }
+
+  void clearLogs() {
+    clashInterface.clearLogs();
+  }
+
+  Future<List<TrackerInfo>> getRequests() async {
+    final res = await clashInterface.getRequests();
+    if (res.isEmpty) {
+      return [];
+    }
+    try {
+      final requestsRaw = json.decode(res) as List? ?? [];
+      return requestsRaw.map((e) => TrackerInfo.fromJson(e)).toList();
+    } catch (e) {
+      commonPrint.log('Failed to parse requests: $e');
+      return [];
+    }
+  }
+
+  void startTrackRequests() {
+    clashInterface.startTrackRequests();
+  }
+
+  void stopTrackRequests() {
+    clashInterface.stopTrackRequests();
+  }
+
+  void clearRequests() {
+    clashInterface.clearRequests();
   }
 
   Future<void> requestGc({bool forceFreeOSMemory = false}) async {
