@@ -741,6 +741,7 @@
   "mediaUnlockDetails": "Детали проверки доступности",
   "mediaUnlockDisplaySettings": "Настройки отображения",
   "mediaUnlockMiscSettings": "Прочие настройки",
+  "mediaUnlockMoreStreamingPlatforms": "Больше платформ стриминга",
   "mediaUnlockExtraDetails": "Показывать больше сведений об IP",
   "mediaUnlockRefreshOnNodeChange": "Автообновление при смене узла",
   "mediaUnlockColorfulIcons": "Показывать цветные значки по умолчанию",

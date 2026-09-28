@@ -739,6 +739,7 @@
   "mediaUnlockDetails": "接続性テスト詳細",
   "mediaUnlockDisplaySettings": "表示設定",
   "mediaUnlockMiscSettings": "その他の設定",
+  "mediaUnlockMoreStreamingPlatforms": "その他のストリーミング解除項目",
   "mediaUnlockExtraDetails": "IP の詳細情報を表示",
   "mediaUnlockRefreshOnNodeChange": "ノード変更時に自動更新",
   "mediaUnlockColorfulIcons": "既定でカラーアイコンを表示",

@@ -739,6 +739,7 @@
   "mediaUnlockDetails": "连通性测试详情",
   "mediaUnlockDisplaySettings": "显示设置",
   "mediaUnlockMiscSettings": "杂项设置",
+  "mediaUnlockMoreStreamingPlatforms": "更多流媒体解锁项目",
   "mediaUnlockExtraDetails": "返回更多 IP 详细信息",
   "mediaUnlockRefreshOnNodeChange": "节点变化时自动刷新检测",
   "mediaUnlockColorfulIcons": "默认显示彩色 ICON 图标",

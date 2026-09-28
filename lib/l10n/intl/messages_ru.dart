@@ -730,6 +730,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage(
       "Прочие настройки",
     ),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "Больше платформ стриминга",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "Можно выбрать до 4 элементов для закрепления в виджете",
     ),

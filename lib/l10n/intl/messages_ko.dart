@@ -564,6 +564,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP 상세 정보 더 보기",
     ),
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage("기타 설정"),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "더 많은 스트리밍 잠금 해제 항목",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "위젯에 고정 표시할 항목을 최대 4개 선택할 수 있습니다",
     ),

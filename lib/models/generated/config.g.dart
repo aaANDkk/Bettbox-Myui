@@ -26,6 +26,8 @@ _AppSettingProps _$AppSettingPropsFromJson(
   pinnedMediaPlatforms: json['pinnedMediaPlatforms'] == null
       ? defaultPinnedMediaPlatforms
       : pinnedMediaPlatformsSafeFromJson(json['pinnedMediaPlatforms'] as List?),
+  mediaUnlockMoreStreamingPlatforms:
+      json['mediaUnlockMoreStreamingPlatforms'] as bool? ?? false,
   mediaUnlockExtraDetails: json['mediaUnlockExtraDetails'] as bool? ?? false,
   mediaUnlockRefreshOnNodeChange:
       json['mediaUnlockRefreshOnNodeChange'] as bool? ?? true,
@@ -77,6 +79,8 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'pinnedMediaPlatforms': instance.pinnedMediaPlatforms
           .map((e) => _$MediaPlatformEnumMap[e]!)
           .toList(),
+      'mediaUnlockMoreStreamingPlatforms':
+          instance.mediaUnlockMoreStreamingPlatforms,
       'mediaUnlockExtraDetails': instance.mediaUnlockExtraDetails,
       'mediaUnlockRefreshOnNodeChange': instance.mediaUnlockRefreshOnNodeChange,
       'mediaUnlockColorfulIcons': instance.mediaUnlockColorfulIcons,
@@ -191,6 +195,11 @@ const _$MediaPlatformEnumMap = {
   MediaPlatform.kraken: 'kraken',
   MediaPlatform.cryptocom: 'cryptocom',
   MediaPlatform.phantom: 'phantom',
+  MediaPlatform.paypal: 'paypal',
+  MediaPlatform.mytvsuper: 'mytvsuper',
+  MediaPlatform.viutv: 'viutv',
+  MediaPlatform.hoytv: 'hoytv',
+  MediaPlatform.rthk: 'rthk',
 };
 
 _AccessControl _$AccessControlFromJson(Map<String, dynamic> json) =>

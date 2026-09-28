@@ -172,6 +172,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(defaultPinnedMediaPlatforms)
     @JsonKey(fromJson: pinnedMediaPlatformsSafeFromJson)
     List<MediaPlatform> pinnedMediaPlatforms,
+    @Default(false) bool mediaUnlockMoreStreamingPlatforms,
     @Default(false) bool mediaUnlockExtraDetails,
     @Default(true) bool mediaUnlockRefreshOnNodeChange,
     @Default(true) bool mediaUnlockColorfulIcons,

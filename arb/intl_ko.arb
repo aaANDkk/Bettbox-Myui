@@ -739,6 +739,7 @@
   "mediaUnlockDetails": "연결성 테스트 상세",
   "mediaUnlockDisplaySettings": "표시 설정",
   "mediaUnlockMiscSettings": "기타 설정",
+  "mediaUnlockMoreStreamingPlatforms": "더 많은 스트리밍 잠금 해제 항목",
   "mediaUnlockExtraDetails": "IP 상세 정보 더 보기",
   "mediaUnlockRefreshOnNodeChange": "노드 변경 시 자동 새로고침",
   "mediaUnlockColorfulIcons": "기본적으로 컬러 아이콘 표시",

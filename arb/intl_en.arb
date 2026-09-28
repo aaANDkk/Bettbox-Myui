@@ -738,6 +738,7 @@
   "mediaUnlockDetails": "Connectivity Test Details",
   "mediaUnlockDisplaySettings": "Display Settings",
   "mediaUnlockMiscSettings": "Misc Settings",
+  "mediaUnlockMoreStreamingPlatforms": "More Streaming Unlock Items",
   "mediaUnlockExtraDetails": "Show more IP details",
   "mediaUnlockRefreshOnNodeChange": "Auto refresh on node change",
   "mediaUnlockColorfulIcons": "Show colored icons by default",

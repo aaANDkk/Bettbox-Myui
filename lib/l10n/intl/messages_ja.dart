@@ -554,6 +554,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "IP の詳細情報を表示",
     ),
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage("その他の設定"),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "その他のストリーミング解除項目",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "ウィジェットに常駐表示する最大4項目を選択できます",
     ),
