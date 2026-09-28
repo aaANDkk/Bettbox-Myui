@@ -711,6 +711,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage(
       "تنظیمات متفرقه",
     ),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "موارد بیشتر آنلاک استریم",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "امکان انتخاب حداکثر ۴ مورد برای پین کردن در ویجت",
     ),

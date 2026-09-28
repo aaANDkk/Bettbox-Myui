@@ -249,8 +249,11 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                   ),
                                 ),
                               ),
-                              for (final platform in MediaPlatform.values
-                                  .where((p) => p.category == category))
+                              for (final platform in MediaPlatform.values.where(
+                                  (p) =>
+                                      p.category == category &&
+                                      (ref.read(appSettingProvider).mediaUnlockMoreStreamingPlatforms ||
+                                          !moreStreamingPlatforms.contains(p))))
                                 CheckboxListTile(
                                   dense: true,
                                   contentPadding: EdgeInsets.zero,
@@ -349,6 +352,18 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  ListItem.switchItem(
+                    title: Text(appLocalizations.mediaUnlockMoreStreamingPlatforms),
+                    delegate: SwitchDelegate(
+                      value: setting.mediaUnlockMoreStreamingPlatforms,
+                      onChanged: (value) {
+                        updateSetting(
+                          (s) => s.copyWith(mediaUnlockMoreStreamingPlatforms: value),
+                        );
+                      },
+                    ),
+                  ),
+                  divider,
                   ListItem.switchItem(
                     title: Text(appLocalizations.mediaUnlockExtraDetails),
                     delegate: SwitchDelegate(
@@ -757,11 +772,12 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
   @override
   Widget build(BuildContext context) {
     final isChinese = Localizations.localeOf(context).languageCode == 'zh';
-    final (showExtraDetails, refreshByCategory) = ref.watch(
+    final (showExtraDetails, refreshByCategory, showMoreStreaming) = ref.watch(
       appSettingProvider.select(
         (state) => (
           state.mediaUnlockExtraDetails,
           state.mediaUnlockRefreshByCategory,
+          state.mediaUnlockMoreStreamingPlatforms,
         ),
       ),
     );
@@ -773,11 +789,13 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
         final blockedList = <MediaPlatform>[];
         final otherList = <MediaPlatform>[];
 
-        final basePlatforms = isChinese
-            ? MediaPlatform.values
-            : MediaPlatform.values
-                .where((p) => p.category != MediaCategory.china)
-                .toList();
+        final basePlatforms = (isChinese
+                ? MediaPlatform.values
+                : MediaPlatform.values
+                    .where((p) => p.category != MediaCategory.china))
+            .where(
+                (p) => showMoreStreaming || !moreStreamingPlatforms.contains(p))
+            .toList();
 
         final effectiveCategory =
             (!isChinese && _selectedCategory == MediaCategory.china)

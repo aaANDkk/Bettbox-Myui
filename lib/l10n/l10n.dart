@@ -6024,6 +6024,16 @@ class AppLocalizations {
     );
   }
 
+  /// `More Streaming Unlock Items`
+  String get mediaUnlockMoreStreamingPlatforms {
+    return Intl.message(
+      'More Streaming Unlock Items',
+      name: 'mediaUnlockMoreStreamingPlatforms',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Show more IP details`
   String get mediaUnlockExtraDetails {
     return Intl.message(

@@ -514,6 +514,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "返回更多 IP 詳細資訊",
     ),
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage("雜項設定"),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "更多串流媒體解鎖項目",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "可選 4 個在小組件常駐展示的項目",
     ),

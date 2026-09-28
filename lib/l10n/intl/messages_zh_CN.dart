@@ -506,6 +506,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "返回更多 IP 详细信息",
     ),
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage("杂项设置"),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "更多流媒体解锁项目",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "可选 4 个在小部件常驻展示的项目",
     ),

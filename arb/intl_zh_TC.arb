@@ -740,6 +740,7 @@
   "mediaUnlockDetails": "連通性測試詳情",
   "mediaUnlockDisplaySettings": "顯示設定",
   "mediaUnlockMiscSettings": "雜項設定",
+  "mediaUnlockMoreStreamingPlatforms": "更多串流媒體解鎖項目",
   "mediaUnlockExtraDetails": "返回更多 IP 詳細資訊",
   "mediaUnlockRefreshOnNodeChange": "節點變化時自動重新整理檢測",
   "mediaUnlockColorfulIcons": "預設顯示彩色 ICON 圖示",

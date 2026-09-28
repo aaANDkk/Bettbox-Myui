@@ -709,6 +709,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mediaUnlockMiscSettings": MessageLookupByLibrary.simpleMessage(
       "Misc Settings",
     ),
+    "mediaUnlockMoreStreamingPlatforms": MessageLookupByLibrary.simpleMessage(
+      "More Streaming Unlock Items",
+    ),
     "mediaUnlockPinnedSettingsDesc": MessageLookupByLibrary.simpleMessage(
       "Select up to 4 items to pin on the widget",
     ),

@@ -80,7 +80,19 @@ enum MediaPlatform {
   kraken,
   cryptocom,
   phantom,
+  paypal,
+  mytvsuper,
+  viutv,
+  hoytv,
+  rthk,
 }
+
+const moreStreamingPlatforms = {
+  MediaPlatform.mytvsuper,
+  MediaPlatform.viutv,
+  MediaPlatform.hoytv,
+  MediaPlatform.rthk,
+};
 
 extension MediaPlatformExt on MediaPlatform {
   MediaCategory get category => switch (this) {
@@ -102,7 +114,11 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.iqiyi ||
     MediaPlatform.crunchyroll ||
     MediaPlatform.missav ||
-    MediaPlatform.ehentai => MediaCategory.streaming,
+    MediaPlatform.ehentai ||
+    MediaPlatform.mytvsuper ||
+    MediaPlatform.viutv ||
+    MediaPlatform.hoytv ||
+    MediaPlatform.rthk => MediaCategory.streaming,
     MediaPlatform.tencent ||
     MediaPlatform.alibaba ||
     MediaPlatform.netease ||
@@ -134,7 +150,8 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.okx ||
     MediaPlatform.kraken ||
     MediaPlatform.cryptocom ||
-    MediaPlatform.phantom => MediaCategory.crypto,
+    MediaPlatform.phantom ||
+    MediaPlatform.paypal => MediaCategory.crypto,
   };
 
   String get defaultName => switch (this) {
@@ -189,6 +206,11 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.kraken => 'Kraken',
     MediaPlatform.cryptocom => 'Crypto',
     MediaPlatform.phantom => 'Phantom',
+    MediaPlatform.paypal => 'PayPal',
+    MediaPlatform.mytvsuper => 'myTV SUPER',
+    MediaPlatform.viutv => 'ViuTV',
+    MediaPlatform.hoytv => 'HOY TV',
+    MediaPlatform.rthk => 'RTHK',
   };
 
   bool get isMonochrome => switch (this) {
@@ -219,7 +241,11 @@ extension MediaPlatformExt on MediaPlatform {
     MediaPlatform.okx => const Size(19, 19),
     MediaPlatform.netflix ||
     MediaPlatform.gemini ||
-    MediaPlatform.cloudflare => const Size(18, 18),
+    MediaPlatform.cloudflare ||
+    MediaPlatform.mytvsuper ||
+    MediaPlatform.viutv ||
+    MediaPlatform.hoytv ||
+    MediaPlatform.rthk => const Size(18, 18),
     MediaPlatform.ehentai ||
     MediaPlatform.npm ||
     MediaPlatform.unpkg ||

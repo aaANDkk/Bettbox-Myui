@@ -1698,8 +1698,13 @@ class MediaUnlockStateNotifier {
     bool force = false,
     List<MediaPlatform>? platforms,
   }) {
-    final targets = platforms ?? MediaPlatform.values;
-    final isFull = targets.length >= MediaPlatform.values.length;
+    final showMoreStreaming =
+        globalState.config.appSetting.mediaUnlockMoreStreamingPlatforms;
+    final allAvailable = MediaPlatform.values
+        .where((p) => showMoreStreaming || !moreStreamingPlatforms.contains(p))
+        .toList();
+    final targets = platforms ?? allAvailable;
+    final isFull = targets.length >= allAvailable.length;
     checkPlatforms(
       targets,
       force: force,
