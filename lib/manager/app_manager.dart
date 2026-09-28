@@ -187,20 +187,11 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       _scheduleMissedUpdateCheck();
       final isInit = await clashCore.isInit;
       if (isInit) {
-        globalState.appController.updateGroupsDebounce();
+        await globalState.appController.updateGroups();
       }
 
-      if (_wasPaused) {
-        _wasPaused = false;
-        final hasDetection = ref
-            .read(dashboardStateProvider)
-            .dashboardWidgets
-            .contains(DashboardWidget.networkDetection);
-        if (hasDetection) {
-          detectionState.tryStartCheck();
-        }
-        mediaUnlockState.tryStartCheck();
-      }
+      detectionState.checkOnForegroundResume();
+      mediaUnlockState.checkOnForegroundResume();
     }
     if (state == AppLifecycleState.resumed && system.isAndroid) {
       final hidden = ref.read(appSettingProvider.select((s) => s.hidden));
