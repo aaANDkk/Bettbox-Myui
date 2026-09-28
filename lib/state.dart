@@ -752,6 +752,8 @@ class GlobalState {
         ? const ['any:53']
         : dnsHijack;
     rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
+    rawConfig['tun']['congestion-controller'] =
+        realPatchConfig.tun.congestionController.name;
     rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
     rawConfig['tun']['route-exclude-address'] =
         realPatchConfig.tun.routeExcludeAddress;

@@ -512,6 +512,7 @@
   "onlyIcon": "Icon Only",
   "noIcon": "No Icon",
   "stackMode": "Stack Mode",
+  "congestionController": "Congestion Controller",
   "strictRoute": "Strict Route",
   "strictRouteDesc": "Use TUN strict routing mode",
   "icmpForwarding": "ICMP Forwarding",

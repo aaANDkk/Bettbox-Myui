@@ -116,6 +116,8 @@ enum ProxiesSortType { none, delay, name }
 
 enum TunStack { gvisor, system, mixed, mips }
 
+enum CongestionController { cubic, reno, bbr, bbr3 }
+
 enum AccessControlMode { acceptSelected, rejectSelected }
 
 enum AccessSortType { none, installTime, updateTime }

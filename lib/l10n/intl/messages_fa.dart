@@ -287,6 +287,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "حداکثر تعداد تست همزمان تاخیر",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("تایید"),
+    "congestionController": MessageLookupByLibrary.simpleMessage(
+      "کنترل ازدحام",
+    ),
     "connection": MessageLookupByLibrary.simpleMessage("اتصال فعال"),
     "connections": MessageLookupByLibrary.simpleMessage("اتصالات"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(

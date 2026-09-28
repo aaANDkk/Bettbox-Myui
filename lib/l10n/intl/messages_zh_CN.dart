@@ -206,6 +206,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "concurrencyLimit": MessageLookupByLibrary.simpleMessage("并发限制"),
     "concurrencyLimitDesc": MessageLookupByLibrary.simpleMessage("延迟测试的最大并发数量"),
     "confirm": MessageLookupByLibrary.simpleMessage("确定"),
+    "congestionController": MessageLookupByLibrary.simpleMessage("拥塞控制"),
     "connection": MessageLookupByLibrary.simpleMessage("活跃连接"),
     "connections": MessageLookupByLibrary.simpleMessage("连接"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage("查看当前连接数据"),

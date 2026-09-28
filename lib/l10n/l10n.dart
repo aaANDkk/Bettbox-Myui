@@ -4219,6 +4219,16 @@ class AppLocalizations {
     return Intl.message('Stack Mode', name: 'stackMode', desc: '', args: []);
   }
 
+  /// `Congestion Controller`
+  String get congestionController {
+    return Intl.message(
+      'Congestion Controller',
+      name: 'congestionController',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Strict Route`
   String get strictRoute {
     return Intl.message(

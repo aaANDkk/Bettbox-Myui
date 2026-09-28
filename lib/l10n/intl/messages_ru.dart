@@ -296,6 +296,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Максимальное количество параллельных тестов задержки",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Подтвердить"),
+    "congestionController": MessageLookupByLibrary.simpleMessage(
+      "Управление перегрузкой",
+    ),
     "connection": MessageLookupByLibrary.simpleMessage("Соединения"),
     "connections": MessageLookupByLibrary.simpleMessage("Соединения"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(

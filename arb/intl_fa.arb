@@ -512,6 +512,7 @@
   "onlyIcon": "فقط آیکون",
   "noIcon": "بدون آیکون",
   "stackMode": "حالت پشته",
+  "congestionController": "کنترل ازدحام",
   "strictRoute": "مسیریابی سخت‌گیرانه",
   "strictRouteDesc": "استفاده از حالت مسیریابی سخت‌گیرانه TUN",
   "icmpForwarding": "هدایت ICMP",

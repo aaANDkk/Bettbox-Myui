@@ -228,6 +228,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "レイテンシテストの最大並行数",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("確定"),
+    "congestionController": MessageLookupByLibrary.simpleMessage("輻輳制御"),
     "connection": MessageLookupByLibrary.simpleMessage("アクティブ接続"),
     "connections": MessageLookupByLibrary.simpleMessage("接続"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage("現在の通信接続データを表示"),

@@ -512,6 +512,7 @@
   "onlyIcon": "Только иконки",
   "noIcon": "Без иконок",
   "stackMode": "Режим стека",
+  "congestionController": "Управление перегрузкой",
   "strictRoute": "Строгая маршрутизация",
   "strictRouteDesc": "Использовать строгий режим маршрутизации TUN",
   "icmpForwarding": "Пересылка ICMP",
