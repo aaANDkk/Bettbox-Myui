@@ -7,9 +7,9 @@
   <strong>Another Better Mihomo Client，Forked form FlClash</strong>
 </p>
 
-**Bettbox 基于强大的 Mihomo(Clash Meta) 内核深度打造，是一款多平台的网络分流和调试工具，我们注重隐私安全以及更多的使用细节，致力于提供更好的体验**
+**Bettbox 是一款多平台的网络分流和 DNS 调试工具，基于强大的 Mihomo 内核深度打造，我们注重隐私、安全以及更多的功能使用细节，致力于提供更好的客户端体验（项目当前已率先通过 Signpath 开源基金会的人工审核安全溯源，Windows端已装载 OV 数字签名证书）**
 
-秉承“Better Experience更优体验”的原则，Bettbox在继承原版优秀界面的基础上，深度优化了诸多细节与实用功能/逻辑。核心特性及实现目标: 前台流畅高帧、后台省电无感，致力于成为体验更好、以少量资源消耗即可长期稳定运行的 Mihomo 客户端
+秉承“Better Experience更优体验”的原则，Bettbox 在继承原版优秀界面UI的基础上，深度优化了诸多细节与多个平台的实用功能、逻辑。核心特性及实现目标: 前台流畅、后台省电，致力于成为体验更好、以少量资源消耗即可长期稳定运行的 Mihomo 客户端
 
 Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱可用
 
@@ -73,8 +73,8 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
 **Linux Kernel 5.4+:** (x64/arm64)
 **macOS 10.15+:** (Intel/Apple Silicon)
 * **Android 8.0+:** Android (ARMv8/ ARMv7/ x86_64/ Universal) 
-* **Android TV:** 已完整适配，可选 ARMv7 32位
-* **鸿蒙 NEXT:** 可配合 [[卓易通]](https://harmonyos.cool/android-app) 使用
+* **Android TV:** 已完整适配，低内存设备可选 ARMv7 32位
+* **鸿蒙 NEXT:** 可配合 [[卓易通]](https://harmonyos.cool/android-app) 稳定使用
 
 **其他安装方式:**<br>
 **ArchLinux:** <code>yay -S bettbox-bin 或 paru -S bettbox-bin</code> (由[ lyj404 ](https://github.com/lyj404/bettbox-aur)维护)<br>
@@ -100,11 +100,11 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
    - **安装或更新时避开系统安全拦截**（[由于当前暂未购买 Apple 开发者证书](https://support.apple.com/en-us/102445)）：
      - **推荐**：进入“应用程序”文件夹，**右键 Bettbox 图标**，选择 **“打开”**，在确认弹窗中再次点击 **“打开”** 即可
      - **备选**：如果直接双击被阻止，请前往 Mac 系统“设置” -> “隐私与安全性”，找到 Bettbox 并点击 **“仍要打开”**
-   - 首次开启 TUN 模式时，系统会弹出密码授权窗口，请输入当前登录用户的密码以允许 Bettbox 配置网络
+   - 首次开启 TUN 模式时，系统会弹出密码授权窗口，**请输入当前登录用户的密码以允许 Bettbox 配置网络**
 
 4.  **无法导入订阅链接**：
    - **请务必先尝试重置链接**，确保链接正常后导入
-   - 其他问题如持续存在，请先联系服务商解决，如为APP原因，则提交ISSUE反馈
+   - 其他问题如持续存在，请先联系服务商解决，如DEBUG确定为APP原因，则提交ISSUE反馈
 
 ---
 
@@ -153,7 +153,7 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
 
 其他为本项目添砖加瓦的 [Contributors](https://github.com/appshubcc/Bettbox/graphs/contributors) 以及相关开源项目使用或参考
 
-[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
+[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 
 ---
 

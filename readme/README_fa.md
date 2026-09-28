@@ -7,9 +7,9 @@
   <strong>Another Better Mihomo Client, Forked from FlClash</strong>
 </p>
 
-**Bettbox یک ابزار چندسکویی برای مسیریابی ترافیک و دیباگ شبکه است که بر پایه هسته قدرتمند Mihomo (Clash Meta) به صورت عمیق توسعه یافته است. ما بر امنیت حریم خصوصی و جزئیات بیشتر در تجربه کاربری تمرکز داریم و متعهد به ارائه تجربه‌ای بهتر هستیم.**
+**برنامه Bettbox یک ابزار چندسکویی برای مسیریابی ترافیک و دیباگ DNS است که بر پایه هسته قدرتمند Mihomo به صورت عمیق توسعه یافته است. ما بر حریم خصوصی، امنیت و جزئیات بیشتر قابلیت‌ها تمرکز داریم و متعهد به ارائه تجربه کلاینت بهتری هستیم (این پروژه پیشگام در گذراندن بازبینی دستی و منبع امنیتی بنیاد متن‌باز Signpath است و نسخه ویندوز دارای گواهی امضای دیجیتال رسمی OV می‌باشد).**
 
-با پایبندی به اصل "Better Experience"، Bettbox ضمن حفظ رابط کاربری جذاب نسخه اصلی، جزئیات و منطق برنامه را عمیقاً بهینه‌سازی کرده است. ویژگی‌های کلیدی و اهداف تحقق: روانی با نرخ فریم بالا در پیش‌زمینه و عملکرد بی‌صدا و کم‌مصرف در پس‌زمینه — کلاینتی با تجربه کاربری بهتر که با مصرف منابع اندک، عملکرد پایدار و طولانی‌مدتی را برای Mihomo ارائه می‌دهد.
+با پایبندی به اصل "Better Experience"، برنامه Bettbox ضمن حفظ رابط کاربری UI جذاب نسخه اصلی، جزئیات متعدد و قابلیت‌ها و منطق‌های کاربردی را در پلتفرم‌های مختلف عمیقاً بهینه‌سازی کرده است. ویژگی‌های کلیدی و اهداف: روانی در پیش‌زمینه، مصرف بهینه باتری در پس‌زمینه — کلاینتی با تجربه کاربری بهتر که با مصرف منابع اندک، عملکرد پایدار و طولانی‌مدتی را برای Mihomo ارائه می‌دهد.
 
 Bettbox یعنی: Better Experience, Out of the box - تجربه برتر، آماده استفاده.
 
@@ -60,8 +60,8 @@ Bettbox یعنی: Better Experience, Out of the box - تجربه برتر، آم
 **Linux Kernel 5.4+:** (x64/arm64)
 **macOS 10.15+:** (Intel/Apple Silicon)
 * **اندروید 8.0+**: Android (ARMv8 / ARMv7 / x86_64 / Universal)
-* **تلویزیون اندروید (Android TV)**: پشتیبانی کامل، ARMv7 32-bit اختیاری
-* **سیستم‌عامل HarmonyOS NEXT**: لطفاً همراه با برنامه [[ZhuoYiTong]](https://harmonyos.cool/android-app) استفاده کنید.
+* **تلویزیون اندروید (Android TV)**: پشتیبانی کامل، نسخه اختیاری ARMv7 32-bit برای دستگاه‌های با حافظه کم
+* **سیستم‌عامل HarmonyOS NEXT**: قابل استفاده پایدار همراه با برنامه [[ZhuoYiTong]](https://harmonyos.cool/android-app)
 
 **سایر روش‌های نصب:**<br>
 **آرچ لینوکس (ArchLinux):** <code>yay -S bettbox-bin</code> یا <code>paru -S bettbox-bin</code> (نگهداری توسط [ lyj404 ](https://github.com/lyj404/bettbox-aur))<br>
@@ -87,11 +87,11 @@ Bettbox یعنی: Better Experience, Out of the box - تجربه برتر، آم
    - **میانبر زدن بلاک امنیتی Gatekeeper در هنگام نصب یا بروزرسانی** ([به دلیل عدم خرید گواهی رسمی توسعه‌دهنده اپل](https://support.apple.com/en-us/102445)):
      - **روش پیشنهادی**: در پوشه Applications، **روی آیکون Bettbox راست‌کلیک کنید**، گزینه **"Open"** را انتخاب کرده و مجدداً روی **"Open"** کلیک کنید.
      - **روش جایگزین**: در صورت مسدود بودن، به System Settings -> Privacy & Security رفته و روی **"Open Anyway"** کلیک کنید.
-   - در اولین فعال‌سازی حالت TUN، رمز عبور کاربر فعال سیستم مک خود را وارد کنید تا اجازه پیکربندی شبکه داده شود.
+   - در اولین فعال‌سازی حالت TUN، پنجره تایید رمز عبور نمایش داده می‌شود؛ **لطفاً رمز عبور کاربر فعال سیستم مک را وارد کنید تا به Bettbox اجازه پیکربندی شبکه داده شود**.
 
 4. **عدم امکان وارد کردن اشتراک**:
    - **لطفاً ابتدا لینک را ریست کنید** تا از فعال بودن آن مطمئن شوید.
-   - در صورت تداوم مشکل، ابتدا با ارائه‌دهنده سرویس خود تماس بگیرید؛ اگر مشکل از برنامه باشد، یک ISSUE ثبت کنید.
+   - در صورت تداوم مشکل، ابتدا با ارائه‌دهنده سرویس خود تماس بگیرید؛ در صورتی که از طریق DEBUG مشخص شد مشکل از برنامه است، یک ISSUE ثبت کنید.
 
 ---
 
@@ -140,7 +140,7 @@ Bettbox یعنی: Better Experience, Out of the box - تجربه برتر، آم
 
 تشکر ویژه از تمامی [مشارکت‌کنندگان](https://github.com/appshubcc/Bettbox/graphs/contributors) و پروژه‌های متن‌باز استفاده‌شده یا ارجاع‌داده‌شده:
 
-[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
+[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 
 ---
 

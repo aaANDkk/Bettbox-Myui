@@ -7,9 +7,9 @@
   <strong>Another Better Mihomo Client, Forked from FlClash</strong>
 </p>
 
-**Bettbox は強力な Mihomo（Clash Meta）カーネルをベースに深く作り込まれた、マルチプラットフォーム対応のトラフィック分流・ネットワークデバッグツールです。プライバシーとセキュリティ、そして細部の使い心地を重視し、より優れた体験の提供に尽力しています。**
+**Bettbox は強力な Mihomo カーネルをベースに深く作り込まれた、マルチプラットフォーム対応のトラフィック分流・DNS デバッグツールです。プライバシー、セキュリティ、そして細部の機能や使い心地を重視し、より優れたクライアント体験の提供に尽力しています（当プロジェクトは Signpath オープンソース財団による人的セキュリティ監査とトレーサビリティ検証をいち早く通過し、Windows 版には OV デジタル署名証明書が適用されています）。**
 
-「Better Experience（より良い体験）」を追求し、オリジナルの洗練された UI を継承しつつ、細部のデザインや実用ロジックを深層最適化。コア機能と実現目標：「フロントエンドは高フレームレートで滑らか、バックグラウンドは省電力で無感」。低リソースで長期にわたり安定動作する、より優れた Mihomo クライアントの実現に尽力しています。
+「Better Experience（より良い体験）」を追求し、オリジナルの洗練された UI を継承しつつ、細部のデザインや複数プラットフォーム向けの実用機能・ロジックを深層最適化。コア機能と実現目標：「フロントエンドは滑らか、バックグラウンドは省電力」。低リソースで長期にわたり安定動作する、より優れた Mihomo クライアントの実現に尽力しています。
 
 Bettbox：Better Experience, Out of the box - 優れた体験を、すぐに使える。
 
@@ -59,8 +59,8 @@ Bettbox：Better Experience, Out of the box - 優れた体験を、すぐに使�
 **Linux Kernel 5.4+:** (x64/arm64)
 **macOS 10.15+:** (Intel/Apple Silicon)
 * **Android 8.0+ 端末**: Android (ARMv8 / ARMv7 / x86_64 / Universal)
-* **Android TV**: 完全対応、ARMv7 32ビット版も選択可能
-* **HarmonyOS NEXT**: [[卓易通]](https://harmonyos.cool/android-app) と組み合わせてご利用ください
+* **Android TV**: 完全対応、低メモリ端末向けに ARMv7 32ビット版も選択可能
+* **HarmonyOS NEXT**: [[卓易通]](https://harmonyos.cool/android-app) と組み合わせて安定して利用可能
 
 **その他のインストール方法:**<br>
 **ArchLinux:** <code>yay -S bettbox-bin または paru -S bettbox-bin</code> ([ lyj404 ](https://github.com/lyj404/bettbox-aur) により維持)<br>
@@ -86,11 +86,11 @@ Bettbox：Better Experience, Out of the box - 優れた体験を、すぐに使�
    - **インストールまたはアップデート時の Gatekeeper 回避**（[現在 Apple デベロッパー証明書を購入していないため](https://support.apple.com/en-us/102445)）：
      - **推奨**：「Applications」フォルダ内で **Bettbox アイコンを右クリック**し、**「開く」** を選択後、確認ダイアログで再度 **「開く」** をクリックします。
      - **代替案**：ダブルクリックで開けない場合は、Mac「システム設定」 -> 「プライバシーとセキュリティ」から Bettbox を探して **「このまま開く」** をクリックします。
-   - 初めて TUN モードを有効にする際、現在ログインしている Mac ユーザーのパスワードを入力してネットワーク構成を許可してください。
+   - 初めて TUN モードを有効にする際、パスワード認証ウィンドウが表示されます。**現在ログインしているユーザーのパスワードを入力して Bettbox によるネットワーク構成を許可してください**。
 
 4. **購読リンクをインポートできない**：
    - **まずリンクをリセットして**、正常にアクセスできることを確認してからインポートしてください。
-   - 問題が解決しない場合は、まずプロバイダーにお問い合わせください。アプリ側の原因である場合は ISSUE を提出してください。
+   - 問題が解決しない場合は、まずプロバイダーにお問い合わせください。DEBUG によりアプリ側の原因であると確認された場合は ISSUE を提出してください。
 
 ---
 
@@ -139,7 +139,7 @@ Windows の例：
 
 すべての [コントリビューター](https://github.com/appshubcc/Bettbox/graphs/contributors) および利用・参考にしたオープンソースプロジェクトに感謝いたします：
 
-[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
+[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 
 ---
 
