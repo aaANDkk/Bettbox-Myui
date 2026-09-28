@@ -177,16 +177,11 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       _scheduleMissedUpdateCheck();
       final isInit = await clashCore.isInit;
       if (isInit) {
-        globalState.appController.updateGroupsDebounce();
+        await globalState.appController.updateGroups();
       }
 
-      final hasDetection = ref
-          .read(dashboardStateProvider)
-          .dashboardWidgets
-          .contains(DashboardWidget.networkDetection);
-      if (hasDetection) {
-        detectionState.tryStartCheck();
-      }
+      detectionState.checkOnForegroundResume();
+      mediaUnlockState.checkOnForegroundResume();
     }
     if (state == AppLifecycleState.resumed && system.isAndroid) {
       final hidden = ref.read(appSettingProvider.select((s) => s.hidden));
@@ -194,11 +189,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       SystemChrome.setSystemUIOverlayStyle(
         globalState.appState.systemUiOverlayStyle,
       );
-    }
-    if (state == AppLifecycleState.inactive) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        detectionState.tryStartCheck();
-      });
     }
     _updateDashboardRefreshState();
   }

@@ -95,6 +95,29 @@ class GlobalState {
     return widgets.contains(DashboardWidget.networkDetection);
   }
 
+  String getCurrentNodeSignature() {
+    final profileId = config.currentProfileId ?? '';
+    final mode = config.patchClashConfig.mode.name;
+    final selectedMap = config.currentProfile?.selectedMap ?? {};
+    final sortedEntries = selectedMap.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    final selectedStr =
+        sortedEntries.map((e) => '${e.key}:${e.value}').join(';');
+    String activeGroupsStr = '';
+    if (isInit && _appController != null) {
+      try {
+        final groups = appController.ref.read(groupsProvider);
+        if (groups.isNotEmpty) {
+          final sortedGroups = groups.toList()
+            ..sort((a, b) => a.name.compareTo(b.name));
+          activeGroupsStr =
+              sortedGroups.map((g) => '${g.name}:${g.realNow}').join(';');
+        }
+      } catch (_) {}
+    }
+    return '$profileId|$mode|$selectedStr|$activeGroupsStr';
+  }
+
   bool get isStart => startTime != null && startTime!.isBeforeNow;
 
   AppController get appController => _appController!;
@@ -1216,6 +1239,7 @@ class DetectionState {
   bool _isIpMasked = false;
   IpInfo? _rawIpInfo;
   bool _isFirstLaunch = true;
+  String? _lastCheckedNodeSignature;
 
   final state = ValueNotifier<NetworkDetectionState>(
     const NetworkDetectionState(
@@ -1261,6 +1285,7 @@ class DetectionState {
   void _onIpProgress(int requestId, IpInfo info) {
     if (requestId != _requestId) return;
     _rawIpInfo = info;
+    _lastCheckedNodeSignature = globalState.getCurrentNodeSignature();
     state.value = state.value.copyWith(
       isLoading: false,
       ipInfo: _maskIpInfo(_rawIpInfo),
@@ -1313,11 +1338,24 @@ class DetectionState {
   }
 
   void tryStartCheck() {
+    if (!globalState.hasNetworkDetectionWidget) return;
     if (!state.value.isLoading &&
         state.value.ipInfo == null &&
         (_preIsStart == null || state.value.errorMessage != null)) {
       startCheck();
     }
+  }
+
+  void checkOnForegroundResume() {
+    if (!globalState.hasNetworkDetectionWidget) return;
+    final currentSignature = globalState.getCurrentNodeSignature();
+    if (state.value.ipInfo != null &&
+        _lastCheckedNodeSignature == currentSignature &&
+        state.value.errorMessage == null) {
+      return;
+    }
+    _lastCheckedNodeSignature = currentSignature;
+    startCheck(showLoading: state.value.ipInfo == null);
   }
 
   void _cancelPreviousRequest() {
@@ -1348,7 +1386,8 @@ class DetectionState {
     }
 
     if (res.data != null) {
-      _rawIpInfo ??= res.data;
+      _rawIpInfo = res.data;
+      _lastCheckedNodeSignature = globalState.getCurrentNodeSignature();
     }
     state.value = state.value.copyWith(
       isLoading: false,
@@ -1393,7 +1432,7 @@ class DetectionState {
       );
     }
 
-    final timeout = const Duration(seconds: 5);
+    final timeout = const Duration(seconds: 8);
 
     final res = isStart
         ? await request.checkIp(
@@ -1437,26 +1476,7 @@ class MediaUnlockStateNotifier {
   bool? _preIsStart;
 
   String _getNodeSignature() {
-    final profileId = globalState.config.currentProfileId ?? '';
-    final mode = globalState.config.patchClashConfig.mode.name;
-    final selectedMap = globalState.config.currentProfile?.selectedMap ?? {};
-    final sortedEntries = selectedMap.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-    final selectedStr =
-        sortedEntries.map((e) => '${e.key}:${e.value}').join(';');
-    String activeGroupsStr = '';
-    if (globalState.isInit) {
-      try {
-        final groups = globalState.appController.ref.read(groupsProvider);
-        if (groups.isNotEmpty) {
-          final sortedGroups = groups.toList()
-            ..sort((a, b) => a.name.compareTo(b.name));
-          activeGroupsStr =
-              sortedGroups.map((g) => '${g.name}:${g.realNow}').join(';');
-        }
-      } catch (_) {}
-    }
-    return '$profileId|$mode|$selectedStr|$activeGroupsStr';
+    return globalState.getCurrentNodeSignature();
   }
 
   final state = ValueNotifier<MediaUnlockState>(
@@ -1757,6 +1777,30 @@ class MediaUnlockStateNotifier {
       );
       checkPinned(force: true);
     });
+  }
+
+  void checkOnForegroundResume() {
+    final isRunning = globalState.appState.runTime != null;
+    if (!isRunning) return;
+    if (!globalState.hasMediaUnlockWidget) return;
+    if (!globalState.config.appSetting.mediaUnlockRefreshOnNodeChange) return;
+    final currentSignature = globalState.getCurrentNodeSignature();
+    if (state.value.results.isNotEmpty &&
+        _lastCheckedNodeSignature == currentSignature) {
+      return;
+    }
+    _lastCheckedNodeSignature = currentSignature;
+    final nextResults =
+        Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
+    for (final p in pinnedPlatforms) {
+      nextResults.remove(p);
+    }
+    state.value = state.value.copyWith(
+      results: nextResults,
+      testingPlatforms: {},
+      isLoading: false,
+    );
+    checkPinned(force: true);
   }
 
   void tryStartCheck() {
