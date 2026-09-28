@@ -7,9 +7,9 @@
   <strong>Another Better Mihomo Client, Forked from FlClash</strong>
 </p>
 
-**Bettbox는 강력한 Mihomo(Clash Meta) 커널을 기반으로 깊이 있게 제작된 멀티플랫폼 트래픽 라우팅 및 네트워크 디버깅 도구입니다. 개인정보 보호와 보안, 세부적인 사용 경험에 집중하여 더 나은 사용자 경험을 제공하기 위해 노력하고 있습니다.**
+**Bettbox는 강력한 Mihomo 커널을 기반으로 깊이 있게 제작된 멀티플랫폼 트래픽 라우팅 및 DNS 디버깅 도구입니다. 개인정보 보호, 보안 및 세부 기능 사용 디테일에 집중하여 더 나은 클라이언트 경험을 제공하기 위해 노력하고 있습니다 (본 프로젝트는 Signpath 오픈소스 재단의 수동 보안 검증을 선도적으로 통과하였으며, Windows 버전에는 OV 디지털 서명 인증서가 적용되어 있습니다).**
 
-"Better Experience (더 나은 경험)"라는 원칙 아래 기존의 뛰어난 UI를 계승하면서 세부 인터랙션과 기능 로직을 한층 더 최적화했습니다. 핵심 기능 및 구현 목표: 부드러운 고프레임 화면, 전력 소비 없는 백그라운드 — 적은 리소스로 장기적으로 안정적인 실행을 유지하며 더 나은 경험을 제공하는 Mihomo 클라이언트입니다.
+"Better Experience (더 나은 경험)"라는 원칙 아래 기존의 뛰어난 UI를 계승하면서 세부 인터랙션과 여러 플랫폼의 실용적인 기능 및 로직을 한층 더 최적화했습니다. 핵심 기능 및 구현 목표: 부드러운 전면 화면, 전력 절약 백그라운드 — 적은 리소스로 장기적으로 안정적인 실행을 유지하며 더 나은 경험을 제공하는 Mihomo 클라이언트입니다.
 
 Bettbox: Better Experience, Out of the box - 뛰어난 경험, 설치 즉시 사용.
 
@@ -60,8 +60,8 @@ Bettbox: Better Experience, Out of the box - 뛰어난 경험, 설치 즉시 사
 **Linux Kernel 5.4+:** (x64/arm64)
 **macOS 10.15+:** (Intel/Apple Silicon)
 * **Android 8.0+ 기기**: Android (ARMv8 / ARMv7 / x86_64 / Universal)
-* **Android TV**: 완전 지원, ARMv7 32비트 버전 선택 가능
-* **HarmonyOS NEXT**: [[卓易通]](https://harmonyos.cool/android-app) 프로그램과 함께 사용하십시오.
+* **Android TV**: 완전 지원, 저용량 메모리 기기용 ARMv7 32비트 버전 선택 가능
+* **HarmonyOS NEXT**: [[卓易通]](https://harmonyos.cool/android-app) 프로그램과 함께 안정적으로 사용 가능
 
 **기타 설치 방법:**<br>
 **ArchLinux:** <code>yay -S bettbox-bin 또는 paru -S bettbox-bin</code> ([ lyj404 ](https://github.com/lyj404/bettbox-aur) 관리)<br>
@@ -87,11 +87,11 @@ Bettbox: Better Experience, Out of the box - 뛰어난 경험, 설치 즉시 사
    - **설치 또는 업데이트 시 Gatekeeper 보안 차단 우회 방법** ([현재 Apple 공식 개발자 인증서를 구매하지 않았기 때문](https://support.apple.com/en-us/102445)):
      - **추천**: 응용 프로그램 폴더로 이동한 후 **Bettbox 아이콘을 마우스 오른쪽 버튼으로 클릭**하고 **"열기"**를 선택한 다음, 확인 창에서 다시 **"열기"**를 클릭합니다.
      - **대안**: 더블 클릭으로 실행할 수 없는 경우, Mac 시스템 설정 -> "개인정보 보호 및 보안"으로 이동하여 Bettbox를 찾고 **"확인 없이 열기"**를 클릭합니다.
-   - 처음 TUN 모드를 활성화할 때 시스템 암호 입력을 요구하는 창이 뜹니다. 현재 로그인된 사용자의 암호를 입력하여 Bettbox의 네트워크 구성을 허용해 주십시오.
+   - 처음 TUN 모드를 활성화할 때 시스템 암호 입력을 요구하는 창이 뜹니다. **현재 로그인된 사용자의 암호를 입력하여 Bettbox의 네트워크 구성을 허용해 주십시오**.
 
 4. **구독 링크 가져오기 불가**:
    - **반드시 먼저 링크를 재설정하여** 링크가 정상인지 확인한 후 가져오십시오.
-   - 문제가 지속되면 먼저 서비스 제공업체에 문의해 주시고, 앱 문제인 경우 ISSUE를 제출해 주십시오.
+   - 문제가 지속되면 먼저 서비스 제공업체에 문의해 주시고, DEBUG를 통해 앱 문제로 확인된 경우 ISSUE를 제출해 주십시오.
 
 ---
 
@@ -140,7 +140,7 @@ Windows 환경을 예로 들면:
 
 프로젝트에 기여해 주신 모든 [기여자](https://github.com/appshubcc/Bettbox/graphs/contributors) 및 사용하거나 참고한 오픈소스 프로젝트에 감사드립니다:
 
-[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
+[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 
 ---
 

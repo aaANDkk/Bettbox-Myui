@@ -7,9 +7,9 @@
   <strong>Another Better Mihomo Client, Forked from FlClash</strong>
 </p>
 
-**Bettbox is a cross-platform traffic routing and network debugging tool deeply built on the powerful Mihomo (Clash Meta) core. We focus on privacy, security, and refined details, dedicated to providing a better experience.**
+**Bettbox is a cross-platform traffic routing and DNS debugging tool, deeply built on the powerful Mihomo core. We focus on privacy, security, and refined feature details, dedicated to delivering a better client experience (The project has already taken the lead in passing manual security provenance review by the SignPath Foundation, and the Windows client is signed with an OV digital certificate).**
 
-Guided by the principle of "Better Experience", Bettbox inherits the original sleek UI while deeply refining key details and feature logic. Core features and implementation goals: high-FPS fluid animations in the foreground, zero-impact power saving in the background — dedicated to delivering a better experience as a lightweight Mihomo client that runs stably and reliably over the long term with minimal resource consumption.
+Guided by the principle of "Better Experience", Bettbox inherits the original sleek UI while deeply optimizing numerous details along with practical features and logic across platforms. Core characteristics and goals: smooth foreground, power-saving background — dedicated to becoming a better Mihomo client that runs stably over the long term with minimal resource consumption.
 
 Bettbox stands for: Better Experience, Out of the box.
 
@@ -73,8 +73,8 @@ Please visit the **[[Releases]](https://github.com/appshubcc/Bettbox/releases)**
 **Linux Kernel 5.4+:** (x64/arm64)
 **macOS 10.15+:** (Intel/Apple Silicon)
 * **Android 8.0+:** Android (ARMv8/ ARMv7/ x86_64/ Universal) 
-* **Android TV:** Fully adapted, optional ARMv7 32-bit
-* **HarmonyOS NEXT:** Supported via [[ZhuoYiTong]](https://harmonyos.cool/android-app)
+* **Android TV:** Fully adapted, optional ARMv7 32-bit for low-memory devices
+* **HarmonyOS NEXT:** Can be stably used with [[ZhuoYiTong]](https://harmonyos.cool/android-app)
 
 **Other Installation Methods:**<br>
 **ArchLinux:** <code>yay -S bettbox-bin or paru -S bettbox-bin</code> (Maintained by [ lyj404 ](https://github.com/lyj404/bettbox-aur))<br>
@@ -100,11 +100,11 @@ Please visit the **[[Releases]](https://github.com/appshubcc/Bettbox/releases)**
    - **Bypassing system security checks during installation or updates** ([as Apple Developer Certificate is not currently purchased](https://support.apple.com/en-us/102445)):
      - **Recommended**: Open `Applications`, **right-click the Bettbox icon**, select **"Open"**, and click **"Open"** again in the confirmation prompt.
      - **Alternative**: If blocked, go to System Settings -> Privacy & Security, scroll to find Bettbox, and click **"Open Anyway"**.
-   - Upon enabling TUN mode for the first time, enter the password of the currently logged-in user when prompted to allow Bettbox to configure the network.
+   - Upon enabling TUN mode for the first time, a password authorization prompt will appear; **please enter the password of the currently logged-in user to allow Bettbox to configure the network**.
 
 4.  **Unable to Import Subscription Links**:
    - **Always try resetting the subscription link first** to ensure it is valid before importing.
-   - If issues persist, please contact your service provider first. If it is caused by the app, feel free to submit a GitHub Issue.
+   - If issues persist, please contact your service provider first. If debugging confirms it is caused by the app, please submit a GitHub Issue.
 
 ---
 
@@ -153,7 +153,7 @@ Custom Script UI Adaptation:
 
 Special thanks to all [Contributors](https://github.com/appshubcc/Bettbox/graphs/contributors) and open-source projects used or referenced:
 
-[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN)
+[Zashboard](https://github.com/Zephyruso/zashboard), [CMFA](https://github.com/MetaCubeX/ClashMetaForAndroid), [Sparkle](https://github.com/xishang0128/sparkle), [SFA](https://github.com/SagerNet/sing-box-for-android), [HUSI](https://github.com/xchacha20-poly1305/husi), [V2rayN](https://github.com/2dust/v2rayN), [Bett-rules](https://github.com/appshubcc/bett-rules)
 
 ---
 
