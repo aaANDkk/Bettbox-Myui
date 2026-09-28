@@ -632,7 +632,17 @@ class SyntaxHighlighter {
 
   bool get _supportsCStyleBlockComments {
     final id = languageId?.toLowerCase().trim();
-    return id == 'javascript' || id == 'js';
+    if (id != null) {
+      return id == 'javascript' || id == 'js';
+    }
+
+    final name = language.name?.toLowerCase().trim();
+    if (name == 'javascript' || name == 'js') return true;
+
+    return language.aliases?.any(
+          (a) => a.toLowerCase() == 'javascript' || a.toLowerCase() == 'js',
+        ) ??
+        false;
   }
 
   bool _isInsideBlockComment(int lineIndex) {

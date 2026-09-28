@@ -1100,6 +1100,9 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
     if (widget.readOnly != oldWidget.readOnly) {
       _readOnly = widget.readOnly;
     }
+    if (widget.languageId != oldWidget.languageId) {
+      _controller.languageId = widget.languageId;
+    }
   }
 
   @override
@@ -3044,9 +3047,11 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                                 language: _language,
                                                 extraLanguages:
                                                     widget.extraLanguages,
-                                                languageId: _controller
-                                                    .lspConfig
-                                                    ?.languageId,
+                                                languageId: widget.languageId ??
+                                                    _controller.languageId ??
+                                                    _controller
+                                                        .lspConfig
+                                                        ?.languageId,
                                                 lspConfig:
                                                     _controller.lspConfig,
                                                 semanticTokens: _semanticTokens,
@@ -4653,6 +4658,7 @@ class _CodeField extends LeafRenderObjectWidget {
       ..updateDiagnostics(diagnostics)
       ..updateScreenWidth()
       ..editorTheme = editorTheme
+      ..languageId = languageId
       ..language = language
       ..extraLanguages = extraLanguages
       ..textStyle = textStyle
@@ -4673,7 +4679,9 @@ class _CodeField extends LeafRenderObjectWidget {
 
 class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
   final CodeForgeController controller;
-  final String? languageId, filePath;
+  final String? filePath;
+  String? _languageId;
+  String? get languageId => _languageId;
   final ScrollController vscrollController, hscrollController;
   final FocusNode focusNode;
   final AnimationController caretBlinkController;
@@ -5114,7 +5122,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     required this.gutterBuilder,
     required this._selectionStyle,
     required this._diagnostics,
-    this.languageId,
+    String? languageId,
     this.lspConfig,
     this.filePath,
     this.matchHighlightStyle,
@@ -5127,7 +5135,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
        _gutterStyle = gutterStyle,
        _lineWrap = lineWrap,
        _innerPadding = innerPadding,
-       _matchHighlightStyle = matchHighlightStyle {
+       _matchHighlightStyle = matchHighlightStyle,
+       _languageId = languageId {
     final fontSize = _textStyle?.fontSize ?? 14.0;
     final fontFamily = _textStyle?.fontFamily;
     final color =
@@ -5430,6 +5439,33 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             editorTheme: editorTheme,
             baseTextStyle: textStyle,
             languageId: languageId,
+            getLineText: (line) =>
+                _lineTextCache[line] ?? controller.getLineText(line),
+          );
+    _preHighlightInitialized = false;
+    _paragraphCache.clear();
+    _lineNumberParaCache.clear();
+    _foldIconPainters.clear();
+    _foldIndicatorParagraph = null;
+    _bracketCache.clear();
+    markNeedsLayout();
+    markNeedsPaint();
+  }
+
+  set languageId(String? id) {
+    if (id == _languageId) return;
+    _languageId = id;
+    try {
+      _syntaxHighlighter?.dispose();
+    } catch (_) {}
+    _syntaxHighlighter = _language == null
+        ? null
+        : SyntaxHighlighter(
+            language: _language!,
+            extraLanguages: _extraLanguages,
+            editorTheme: editorTheme,
+            baseTextStyle: textStyle,
+            languageId: id,
             getLineText: (line) =>
                 _lineTextCache[line] ?? controller.getLineText(line),
           );
