@@ -289,6 +289,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Maximum concurrent delay tests",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
+    "congestionController": MessageLookupByLibrary.simpleMessage(
+      "Congestion Controller",
+    ),
     "connection": MessageLookupByLibrary.simpleMessage("Active"),
     "connections": MessageLookupByLibrary.simpleMessage("Connections"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage(

@@ -512,6 +512,7 @@
   "onlyIcon": "아이콘만",
   "noIcon": "아이콘 없음",
   "stackMode": "스택 모드",
+  "congestionController": "혼잡 제어",
   "strictRoute": "엄격한 라우팅",
   "strictRouteDesc": "TUN 엄격한 라우팅 모드 사용",
   "icmpForwarding": "ICMP 포워딩",

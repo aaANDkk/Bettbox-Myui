@@ -512,6 +512,7 @@
   "onlyIcon": "僅圖示",
   "noIcon": "無圖示",
   "stackMode": "堆疊模式",
+  "congestionController": "擁塞控制",
   "strictRoute": "嚴格路由",
   "strictRouteDesc": "使用 TUN 嚴格路由模式",
   "icmpForwarding": "ICMP 轉發",

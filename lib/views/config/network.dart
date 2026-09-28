@@ -332,6 +332,44 @@ class TunStackItem extends ConsumerWidget {
   }
 }
 
+class TunCongestionControllerItem extends ConsumerWidget {
+  const TunCongestionControllerItem({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final (stack, congestionController) = ref.watch(
+      patchClashConfigProvider.select(
+        (state) => (state.tun.stack, state.tun.congestionController),
+      ),
+    );
+
+    if (stack != TunStack.mips) {
+      return const SizedBox.shrink();
+    }
+
+    return ListItem.options(
+      title: Text(appLocalizations.congestionController),
+      subtitle: Text(congestionController.name),
+      delegate: OptionsDelegate<CongestionController>(
+        value: congestionController,
+        options: CongestionController.values,
+        textBuilder: (value) => value.name,
+        onChanged: (value) async {
+          if (value == null) {
+            return;
+          }
+          ref.read(patchClashConfigProvider.notifier).updateState(
+                (state) =>
+                    state.copyWith.tun(congestionController: value),
+              );
+          await _handleNetworkConfigChange(ref);
+        },
+        title: appLocalizations.congestionController,
+      ),
+    );
+  }
+}
+
 class MtuItem extends ConsumerWidget {
   const MtuItem({super.key});
 
@@ -646,6 +684,10 @@ class NetworkListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vpnSystemProxy = system.isAndroid &&
         ref.watch(vpnSettingProvider.select((state) => state.systemProxy));
+    final isMipsStack = ref.watch(
+      patchClashConfigProvider
+          .select((state) => state.tun.stack == TunStack.mips),
+    );
     final networkItems = [
       if (system.isAndroid) ...generateSection(items: const [VPNItem()]),
       if (system.isAndroid)
@@ -672,6 +714,7 @@ class NetworkListView extends ConsumerWidget {
           const DnsHijackItem(),
           const EndpointIndependentNatItem(),
           const TunStackItem(),
+          if (isMipsStack) const TunCongestionControllerItem(),
           const MtuItem(),
           const BypassPrivateRouteItem(),
         ],

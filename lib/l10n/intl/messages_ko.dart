@@ -238,6 +238,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "지연 시간 테스트 최대 동시 실행 수",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("확인"),
+    "congestionController": MessageLookupByLibrary.simpleMessage("혼잡 제어"),
     "connection": MessageLookupByLibrary.simpleMessage("활성 연결"),
     "connections": MessageLookupByLibrary.simpleMessage("연결"),
     "connectionsDesc": MessageLookupByLibrary.simpleMessage("현재 연결 데이터 보기"),

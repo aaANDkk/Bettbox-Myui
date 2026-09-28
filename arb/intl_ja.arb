@@ -512,6 +512,7 @@
   "onlyIcon": "アイコンのみ",
   "noIcon": "アイコンなし",
   "stackMode": "スタックモード",
+  "congestionController": "輻輳制御",
   "strictRoute": "厳格ルーティング",
   "strictRouteDesc": "TUNの厳格ルーティングモードを使用",
   "icmpForwarding": "ICMP転送",
