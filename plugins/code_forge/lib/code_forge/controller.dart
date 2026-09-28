@@ -2883,11 +2883,10 @@ class CodeForgeController implements DeltaTextInputClient {
   /// Toggles line comment on selected lines or current line (VS Code style Ctrl + /).
   ///
   /// Automatically adapts between `# ` (YAML) and `// ` (JS) based on language id or file extension.
-  String? _languageId;
-  set languageId(String? value) => _languageId = value;
+  String? languageId;
 
   bool get _isJsLikeFile {
-    final id = (_languageId ?? lspConfig?.languageId)?.toLowerCase().trim();
+    final id = (languageId ?? lspConfig?.languageId)?.toLowerCase().trim();
     if (id != null) {
       return id == 'javascript' ||
           id == 'js' ||
