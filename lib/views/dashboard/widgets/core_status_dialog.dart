@@ -47,7 +47,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     try {
       final status = await clashCore.getCoreStatus();
       if (!mounted) return;
-      if (status != null) {
+      if (status != null && status != _status) {
         setState(() {
           _status = status;
         });
@@ -242,31 +242,14 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final reclaimTextPainter = TextPainter(
-                  text: TextSpan(
-                    text:
-                        '${appLocalizations.reclaimableMemory} ($reclaimablePercent%)',
-                    style: context.textTheme.labelMedium,
-                  ),
-                  maxLines: 1,
-                  textDirection: Directionality.of(context),
-                )..layout();
-
-                final allocTextPainter = TextPainter(
-                  text: TextSpan(
-                    text:
-                        '${appLocalizations.allocatedMemory} ($allocatedPercent%)',
-                    style: context.textTheme.labelMedium,
-                  ),
-                  maxLines: 1,
-                  textDirection: Directionality.of(context),
-                )..layout();
-
-                final maxNeededWidth = max(
-                      reclaimTextPainter.width,
-                      allocTextPainter.width,
-                    ) +
-                    18;
+                final fontSize =
+                    context.textTheme.labelMedium?.fontSize ?? 12.0;
+                final reclaimText =
+                    '${appLocalizations.reclaimableMemory} ($reclaimablePercent%)';
+                final allocText =
+                    '${appLocalizations.allocatedMemory} ($allocatedPercent%)';
+                final maxChars = max(reclaimText.length, allocText.length);
+                final maxNeededWidth = maxChars * (fontSize * 0.85) + 18;
                 final isTight = maxNeededWidth > constraints.maxWidth;
 
                 return Column(

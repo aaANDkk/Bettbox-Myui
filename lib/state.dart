@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
@@ -165,10 +166,13 @@ class GlobalState {
 
   Future<String?> _calcCoreSHA256() async {
     try {
-      final file = File(appPath.corePath);
+      final path = appPath.corePath;
+      final file = File(path);
       if (!await file.exists()) return null;
-      final digest = await sha256.bind(file.openRead()).first;
-      return digest.toString();
+      return await Isolate.run(() async {
+        final digest = await sha256.bind(File(path).openRead()).first;
+        return digest.toString();
+      });
     } catch (e) {
       commonPrint.log('Failed to calculate core SHA256: $e');
       return null;
@@ -533,7 +537,7 @@ class GlobalState {
                 opacity: opacityAnimation,
                 child: ScaleTransition(
                   scale: scaleAnimation,
-                  child: child,
+                  child: RepaintBoundary(child: child),
                 ),
               ),
             ],

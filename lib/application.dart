@@ -163,7 +163,13 @@ class ApplicationState extends ConsumerState<Application>
         child: ConnectivityManager(
           onConnectivityChanged: (results) async {
             if (!results.contains(ConnectivityResult.vpn)) {
-              clashCore.closeConnections();
+              unawaited(
+                clashCore.closeConnections().then<void>(
+                  (_) {},
+                  onError: (Object e) =>
+                      commonPrint.log('closeConnections ignored: $e'),
+                ),
+              );
             }
             if (system.isMacOS) {
               // Wait for DHCP and the default route to settle before moving the
