@@ -194,6 +194,7 @@
   "systemProxy": "システムプロキシ",
   "project": "プロジェクト",
   "core": "カーネル",
+  "basic": "基本",
   "showStartSwitch": "単独スイッチ表示",
   "showStartSwitchDesc": "ホーム画面に独立したON/OFFボタンを表示",
   "desc": "Bettboxは柔軟で強力なMihomo(Clash.Meta)カーネルを搭載した、快適性を追求したプロキシクライアントです。私たちのビジョン：Connecting Open Source and AI, Accelerating Innovation",
@@ -670,6 +671,7 @@
   "openDashboard": "Zashboardを開く",
   "custom": "カスタム",
   "customScriptOptions": "カスタムルール",
+  "scriptOtherOptions": "その他の設定",
   "wakelock": "画面常時点灯",
   "wakelockDescription": "画面の自動消灯を防ぐ画面ウェイクロックを有効にします（CPUウェイクは使用しません）。バックグラウンド処理を維持したい場合に便利です。",
   "tunEnableRequireAdmin": "TUN仮想NIC機能の有効化には管理者（ROOT）権限が必要です",
@@ -812,5 +814,17 @@
   "addressInfo": "アドレス情報",
   "traffic": "トラフィック",
   "advancedInfo": "詳細情報",
+  "intranetAndGateway": "LANとゲートウェイ",
+  "networkType": "ネットワークの種類",
+  "defaultGateway": "ゲートウェイ",
+  "lanSharing": "LAN共有",
+  "sharedAddress": "共有アドレス",
+  "dnsResolution": "DNS解決",
+  "systemDns": "DNS",
+  "enabled": "有効",
+  "disabled": "無効",
+  "openRouterAdmin": "ゲートウェイを開く"
 }
+
+
 

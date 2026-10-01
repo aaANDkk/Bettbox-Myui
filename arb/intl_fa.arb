@@ -194,6 +194,7 @@
   "systemProxy": "پروکسی سیستم",
   "project": "پروژه",
   "core": "هسته",
+  "basic": "پایه",
   "showStartSwitch": "دکمه کلید سوئیچ",
   "showStartSwitchDesc": "نمایش دکمه مستقل روشن/خاموش در صفحه اصلی",
   "desc": "Bettbox یک کلاینت پروکسی بر پایه هسته قدرتمند و انعطاف‌پذیر Mihomo (Clash.Meta) با هدف تجربه کاربری برتر است. چشم‌انداز ما: Connecting Open Source and AI, Accelerating Innovation",
@@ -670,6 +671,7 @@
   "openDashboard": "باز کردن Zashboard",
   "custom": "سفارشی",
   "customScriptOptions": "قوانین سفارشی",
+  "scriptOtherOptions": "تنظیمات دیگر",
   "wakelock": "قفل روشن ماندن صفحه",
   "wakelockDescription": "جلوگیری از خاموش شدن خودکار صفحه نمایش برای فعال ماندن برنامه‌ها در پس‌زمینه.",
   "tunEnableRequireAdmin": "استفاده از حالت TUN نیازمند دسترسی Admin یا ROOT است",
@@ -812,5 +814,17 @@
   "addressInfo": "اطلاعات آدرس",
   "traffic": "ترافیک",
   "advancedInfo": "پیشرفته",
+  "intranetAndGateway": "شبکه محلی و گیت‌وی",
+  "networkType": "نوع شبکه",
+  "defaultGateway": "گیت‌وی",
+  "lanSharing": "اشتراک‌گذاری در شبکه محلی",
+  "sharedAddress": "آدرس اشتراکی",
+  "dnsResolution": "تفکیک DNS",
+  "systemDns": "DNS",
+  "enabled": "فعال",
+  "disabled": "غیرفعال",
+  "openRouterAdmin": "باز کردن گیت‌وی"
 }
+
+
 

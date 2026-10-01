@@ -81,8 +81,6 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
           final ipInfo = state.ipInfo;
           final isLoading = state.isLoading;
           final flagStyle = Theme.of(context).textTheme.titleMedium?.toLight;
-          // 旗帜行高按「一行标题」压缩：titleMedium 的默认行高 (24) 会把表头撑高，
-          // 导致旗帜 / 标题 / 右侧按钮一起下沉。用两个实测行高求比例，随字号缩放自适应。
           final flagLineHeight =
               (flagStyle?.height ?? 1.5) *
               globalState.measure.titleSmallHeight /
@@ -94,15 +92,12 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  // 右侧设置按钮不撑高表头：图标 / 旗帜 / 标题 / 按钮同处一行标题高度
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.networkDetection,
                     icon: ipInfo != null
                         ? EmojiText(
                             _countryCodeToEmoji(ipInfo.countryCode),
-                            // 旗帜行高按「一行标题」压缩：titleMedium 默认行高 (24)
-                            // 会把表头撑高，导致旗帜 / 标题 / 右侧按钮一起下沉
                             style: flagStyle?.copyWith(height: flagLineHeight),
                           )
                         : null,
@@ -175,5 +170,3 @@ class _NetworkDetectionState extends ConsumerState<NetworkDetection> {
     );
   }
 }
-
-

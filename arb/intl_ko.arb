@@ -194,6 +194,7 @@
   "systemProxy": "시스템 프록시",
   "project": "프로젝트",
   "core": "코어",
+  "basic": "기본",
   "showStartSwitch": "스위치 버튼 표시",
   "showStartSwitchDesc": "홈 화면에 독립된 시작/정지 스위치 표시",
   "desc": "Bettbox는 강력하고 유연한 Mihomo(Clash.Meta) 코어를 기반으로 개발된 사용자 친화적 프록시 클라이언트입니다. 우리의 비전: Connecting Open Source and AI, Accelerating Innovation",
@@ -670,6 +671,7 @@
   "openDashboard": "Zashboard 열기",
   "custom": "사용자 지정",
   "customScriptOptions": "커스텀 규칙",
+  "scriptOtherOptions": "기타 설정",
   "wakelock": "화면 켜짐 고정",
   "wakelockDescription": "화면 자동 꺼짐을 방지하는 스크린 웨이크록을 활성화합니다. 백그라운드 작업을 유지할 때 유용합니다.",
   "tunEnableRequireAdmin": "TUN 가상 어댑터 기능을 사용하려면 관리자(ROOT) 권한이 필요합니다",
@@ -812,5 +814,17 @@
   "addressInfo": "주소 정보",
   "traffic": "트래픽",
   "advancedInfo": "고급 정보",
+  "intranetAndGateway": "LAN 및 게이트웨이",
+  "networkType": "네트워크 유형",
+  "defaultGateway": "게이트웨이",
+  "lanSharing": "LAN 공유",
+  "sharedAddress": "공유 주소",
+  "dnsResolution": "DNS 확인",
+  "systemDns": "DNS",
+  "enabled": "사용 중",
+  "disabled": "사용 안 함",
+  "openRouterAdmin": "게이트웨이 열기"
 }
+
+
 

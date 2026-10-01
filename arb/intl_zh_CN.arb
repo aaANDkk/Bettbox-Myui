@@ -194,6 +194,7 @@
   "systemProxy": "系统代理",
   "project": "项目",
   "core": "内核",
+  "basic": "基础",
   "showStartSwitch": "联动开关",
   "showStartSwitchDesc": "首页显示独立的开关按钮",
   "desc": "Bettbox 基于强大灵活的 Mihomo (Clash.Meta) 代理内核，致力于更好的体验，我们的愿景: Connecting Open Source and AI，Accelerating Innovation",
@@ -670,6 +671,7 @@
   "openDashboard": "打开 Zashboard",
   "custom": "自定义",
   "customScriptOptions": "自定义规则开关",
+  "scriptOtherOptions": "其他设置",
   "wakelock": "亮屏锁",
   "wakelockDescription": "本功能不需要任何特殊权限，因为它仅启用屏幕唤醒锁，而不是任何 CPU 唤醒锁，应用会在后台保持必要的活跃，且屏幕不会自动熄灭，这在一些场景下会很有用",
   "tunEnableRequireAdmin": "启用 TUN 虚拟网卡功能需要管理员或 Root 权限",
@@ -812,5 +814,17 @@
   "addressInfo": "地址",
   "traffic": "流量",
   "advancedInfo": "高级",
+  "intranetAndGateway": "内网与网关",
+  "networkType": "网络类型",
+  "defaultGateway": "网关",
+  "lanSharing": "局域网共享",
+  "sharedAddress": "共享地址",
+  "dnsResolution": "DNS 解析",
+  "systemDns": "DNS",
+  "enabled": "已开启",
+  "disabled": "已关闭",
+  "openRouterAdmin": "打开后台网关"
 }
+
+
 
