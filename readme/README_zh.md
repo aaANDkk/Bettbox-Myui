@@ -125,6 +125,17 @@ Bettbox意为: Better Experience, Out of the box - 更好的体验，亦开箱�
 
 * Bettbox自v1.18.8版本起支持外置覆写脚本适配UI，例如以AIsouler的**[脚本/配置分享](https://github.com/AIsouler/MyClash)**为例，仅需要在脚本首行添加以下声明，即可直接使用Bettbox内置的可视化开关。
 * <code>const Compatible_With_Bettbox = { ruleOptionsEnable: true };</code>
+* 若脚本的开关中同时包含策略组开关与其他功能开关，可通过 `policyGroupOptions` 声明哪些开关属于策略组；未声明的开关会收进页面末尾的「⚙️ 其他设置」二级页面，策略组开关保持原有列表展示：
+
+```js
+const Compatible_With_Bettbox = {
+  ruleOptionsEnable: true,
+  // 声明属于策略组的开关名称，需与 ruleOptionsEnable 的键完全一致
+  policyGroupOptions: ['🚀 节点选择', '🛑 广告拦截'],
+};
+```
+
+* 未声明 `policyGroupOptions`、或声明的名称与开关不匹配时，展示效果与旧版本完全一致（所有开关平铺展示）。
 
 ---
 

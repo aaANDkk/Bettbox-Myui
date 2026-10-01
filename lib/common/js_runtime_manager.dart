@@ -90,7 +90,16 @@ class JavaScriptRuntimeManager {
                 }
               }
             }
-            return JSON.stringify({ options: options, icons: icons });
+            var policyGroupOptions = [];
+            if (typeof Compatible_With_Bettbox !== 'undefined' && Compatible_With_Bettbox && Array.isArray(Compatible_With_Bettbox.policyGroupOptions)) {
+              var declaredGroups = Compatible_With_Bettbox.policyGroupOptions;
+              for (var gi = 0; gi < declaredGroups.length; gi++) {
+                if (typeof declaredGroups[gi] === 'string') {
+                  policyGroupOptions.push(declaredGroups[gi]);
+                }
+              }
+            }
+            return JSON.stringify({ options: options, icons: icons, policyGroupOptions: policyGroupOptions });
           })();
         ''');
 

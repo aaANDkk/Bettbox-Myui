@@ -125,6 +125,17 @@ Custom Script UI Adaptation:
 
 * Starting from v1.18.8, Bettbox supports external override scripts for UI adaptation. Taking AIsouler's **[Script/Config Repository](https://github.com/AIsouler/MyClash)** as an example, simply add the following declaration on the first line of your script to enable Bettbox built-in visual toggles:
 * <code>const Compatible_With_Bettbox = { ruleOptionsEnable: true };</code>
+* If a script mixes policy group switches with other feature switches, declare which ones belong to policy groups via `policyGroupOptions`. Undeclared switches are collected into an "⚙️ Other Settings" second-level page at the end of the list, while policy group switches keep the original list layout:
+
+```js
+const Compatible_With_Bettbox = {
+  ruleOptionsEnable: true,
+  // Names of the switches that belong to policy groups; must match the keys of ruleOptionsEnable exactly
+  policyGroupOptions: ['🚀 Node Select', '🛑 Ad Block'],
+};
+```
+
+* Without `policyGroupOptions`, or when the declared names match no switch, the layout stays exactly the same as before (all switches in a single list).
 
 ---
 
