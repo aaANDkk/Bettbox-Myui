@@ -670,6 +670,7 @@
   "openDashboard": "باز کردن Zashboard",
   "custom": "سفارشی",
   "customScriptOptions": "قوانین سفارشی",
+  "scriptOtherOptions": "تنظیمات دیگر",
   "wakelock": "قفل روشن ماندن صفحه",
   "wakelockDescription": "جلوگیری از خاموش شدن خودکار صفحه نمایش برای فعال ماندن برنامه‌ها در پس‌زمینه.",
   "tunEnableRequireAdmin": "استفاده از حالت TUN نیازمند دسترسی Admin یا ROOT است",

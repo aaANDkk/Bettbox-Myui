@@ -919,6 +919,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveTip": MessageLookupByLibrary.simpleMessage("저장하시겠습니까?"),
     "script": MessageLookupByLibrary.simpleMessage("스크립트"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage("글로벌 오버라이드 스크립트 설정"),
+    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("기타 설정"),
     "search": MessageLookupByLibrary.simpleMessage("검색"),
     "seconds": MessageLookupByLibrary.simpleMessage("초"),
     "secretCopied": MessageLookupByLibrary.simpleMessage("비밀번호가 클립보드에 복사되었습니다"),

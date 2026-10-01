@@ -1144,6 +1144,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
       "Global override script config",
     ),
+    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
+      "Other Settings",
+    ),
     "search": MessageLookupByLibrary.simpleMessage("Search"),
     "seconds": MessageLookupByLibrary.simpleMessage("Seconds"),
     "secretCopied": MessageLookupByLibrary.simpleMessage(

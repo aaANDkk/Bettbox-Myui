@@ -670,6 +670,7 @@
   "openDashboard": "打开 Zashboard",
   "custom": "自定义",
   "customScriptOptions": "自定义规则开关",
+  "scriptOtherOptions": "其他设置",
   "wakelock": "亮屏锁",
   "wakelockDescription": "本功能不需要任何特殊权限，因为它仅启用屏幕唤醒锁，而不是任何 CPU 唤醒锁，应用会在后台保持必要的活跃，且屏幕不会自动熄灭，这在一些场景下会很有用",
   "tunEnableRequireAdmin": "启用 TUN 虚拟网卡功能需要管理员或 Root 权限",

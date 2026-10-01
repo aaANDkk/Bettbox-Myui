@@ -670,6 +670,7 @@
   "openDashboard": "Zashboard 열기",
   "custom": "사용자 지정",
   "customScriptOptions": "커스텀 규칙",
+  "scriptOtherOptions": "기타 설정",
   "wakelock": "화면 켜짐 고정",
   "wakelockDescription": "화면 자동 꺼짐을 방지하는 스크린 웨이크록을 활성화합니다. 백그라운드 작업을 유지할 때 유용합니다.",
   "tunEnableRequireAdmin": "TUN 가상 어댑터 기능을 사용하려면 관리자(ROOT) 권한이 필요합니다",

@@ -5479,6 +5479,16 @@ class AppLocalizations {
     );
   }
 
+  /// `Other Settings`
+  String get scriptOtherOptions {
+    return Intl.message(
+      'Other Settings',
+      name: 'scriptOtherOptions',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Wakelock`
   String get wakelock {
     return Intl.message('Wakelock', name: 'wakelock', desc: '', args: []);

@@ -1179,6 +1179,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
       "Настройка глобального скрипта переопределения",
     ),
+    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
+      "Другие настройки",
+    ),
     "search": MessageLookupByLibrary.simpleMessage("Поиск"),
     "seconds": MessageLookupByLibrary.simpleMessage("секунд"),
     "secretCopied": MessageLookupByLibrary.simpleMessage(

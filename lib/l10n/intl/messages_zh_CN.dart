@@ -817,6 +817,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveTip": MessageLookupByLibrary.simpleMessage("确定要保存吗？"),
     "script": MessageLookupByLibrary.simpleMessage("脚本"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage("配置全局覆写脚本"),
+    "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("其他设置"),
     "search": MessageLookupByLibrary.simpleMessage("搜索"),
     "seconds": MessageLookupByLibrary.simpleMessage("秒"),
     "secretCopied": MessageLookupByLibrary.simpleMessage("密码已复制到剪贴板"),
