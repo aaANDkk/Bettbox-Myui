@@ -344,11 +344,9 @@ const _$TrayClickBehaviorEnumMap = {
 _NetworkProps _$NetworkPropsFromJson(Map<String, dynamic> json) =>
     _NetworkProps(
       systemProxy: json['systemProxy'] as bool? ?? true,
-      bypassDomain:
-          (json['bypassDomain'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          defaultBypassDomain,
+      bypassDomain: json['bypassDomain'] == null
+          ? defaultBypassDomain
+          : bypassDomainSafeFromJson(json['bypassDomain'] as List?),
       bypassPrivateRoute: json['bypassPrivateRoute'] as bool? ?? true,
       bypassPrivateRouteAddress:
           (json['bypassPrivateRouteAddress'] as List<dynamic>?)
