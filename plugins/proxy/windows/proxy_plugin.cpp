@@ -39,10 +39,14 @@ void startProxy(const int port, const flutter::EncodableList& bypassDomain)
   wBypassList += L"<local>";
 
   for (const auto& domain : bypassDomain) {
+    const auto& domainStr = std::get<std::string>(domain);
+    if (domainStr == "::1") {
+      continue;
+    }
     if (!wBypassList.empty()) {
        wBypassList += L";";
     }
-    wBypassList += std::wstring(std::get<std::string>(domain).begin(), std::get<std::string>(domain).end());
+    wBypassList += std::wstring(domainStr.begin(), domainStr.end());
   }
 
   auto bypassAddr = new WCHAR[wBypassList.length() + 1];
