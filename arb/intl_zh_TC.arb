@@ -781,6 +781,18 @@
   "addUser": "新增用戶",
   "editUser": "編輯用戶",
   "userAuthEmpty": "未設定驗證用戶，局域網連線無需憑據",
-  "usernameCannotContainColon": "使用者名稱不能包含冒號"
+  "usernameCannotContainColon": "使用者名稱不能包含冒號",
+  "intranetAndGateway": "內網與閘道",
+  "networkType": "網路類型",
+  "defaultGateway": "閘道",
+  "lanSharing": "區域網路共享",
+  "sharedAddress": "共享位址",
+  "dnsResolution": "DNS 解析",
+  "systemDns": "DNS",
+  "enabled": "已開啟",
+  "disabled": "已關閉",
+  "openRouterAdmin": "開啟後台閘道"
 }
+
+
 

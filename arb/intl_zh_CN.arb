@@ -781,6 +781,18 @@
   "addUser": "添加用户",
   "editUser": "编辑用户",
   "userAuthEmpty": "未配置验证用户，局域网连接无需凭据",
-  "usernameCannotContainColon": "用户名不能包含冒号"
+  "usernameCannotContainColon": "用户名不能包含冒号",
+  "intranetAndGateway": "内网与网关",
+  "networkType": "网络类型",
+  "defaultGateway": "网关",
+  "lanSharing": "局域网共享",
+  "sharedAddress": "共享地址",
+  "dnsResolution": "DNS 解析",
+  "systemDns": "DNS",
+  "enabled": "已开启",
+  "disabled": "已关闭",
+  "openRouterAdmin": "打开后台网关"
 }
+
+
 

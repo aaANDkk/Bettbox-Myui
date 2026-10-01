@@ -783,5 +783,17 @@
   "addUser": "Добавить пользователя",
   "editUser": "Редактировать пользователя",
   "userAuthEmpty": "Пользователи аутентификации не настроены, подключение по LAN не требует учетных данных",
-  "usernameCannotContainColon": "Имя пользователя не может содержать двоеточие"
+  "usernameCannotContainColon": "Имя пользователя не может содержать двоеточие",
+  "intranetAndGateway": "LAN и шлюз",
+  "networkType": "Тип сети",
+  "defaultGateway": "Шлюз",
+  "lanSharing": "Общий доступ в LAN",
+  "sharedAddress": "Общий адрес",
+  "dnsResolution": "Разрешение DNS",
+  "systemDns": "DNS",
+  "enabled": "Включено",
+  "disabled": "Отключено",
+  "openRouterAdmin": "Открыть шлюз"
 }
+
+

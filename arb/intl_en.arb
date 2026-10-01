@@ -780,6 +780,18 @@
   "addUser": "Add User",
   "editUser": "Edit User",
   "userAuthEmpty": "No authentication configured, LAN connections do not require credentials",
-  "usernameCannotContainColon": "Username cannot contain colons"
+  "usernameCannotContainColon": "Username cannot contain colons",
+  "intranetAndGateway": "LAN & Gateway",
+  "networkType": "Network Type",
+  "defaultGateway": "Gateway",
+  "lanSharing": "LAN Sharing",
+  "sharedAddress": "Shared Address",
+  "dnsResolution": "DNS Resolution",
+  "systemDns": "DNS",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "openRouterAdmin": "Open Gateway"
 }
+
+
 

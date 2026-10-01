@@ -781,6 +781,18 @@
   "addUser": "افزودن کاربر",
   "editUser": "ویرایش کاربر",
   "userAuthEmpty": "کاربری برای احراز هویت تنظیم نشده، اتصال شبکه محلی نیازی به مشخصات ندارد",
-  "usernameCannotContainColon": "نام کاربری نباید شامل دونقطه (:) باشد"
+  "usernameCannotContainColon": "نام کاربری نباید شامل دونقطه (:) باشد",
+  "intranetAndGateway": "شبکه محلی و گیت‌وی",
+  "networkType": "نوع شبکه",
+  "defaultGateway": "گیت‌وی",
+  "lanSharing": "اشتراک‌گذاری در شبکه محلی",
+  "sharedAddress": "آدرس اشتراکی",
+  "dnsResolution": "تفکیک DNS",
+  "systemDns": "DNS",
+  "enabled": "فعال",
+  "disabled": "غیرفعال",
+  "openRouterAdmin": "باز کردن گیت‌وی"
 }
+
+
 

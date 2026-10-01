@@ -86,6 +86,10 @@ class Service {
         const [];
   }
 
+  Future<String?> getCurrentDns() =>
+      methodChannel.invokeMethod<String>('getCurrentDns');
+
+
   Future<bool?> setQuickResponse(bool enabled) async {
     return await methodChannel.invokeMethod<bool>('setQuickResponse', {
       'enabled': enabled,

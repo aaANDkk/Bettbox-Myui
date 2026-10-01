@@ -781,6 +781,18 @@
   "addUser": "ユーザーを追加",
   "editUser": "ユーザーを編集",
   "userAuthEmpty": "認証ユーザーが設定されていません。LAN接続には資格情報が不要です",
-  "usernameCannotContainColon": "ユーザー名にコロン（:）を含めることはできません"
+  "usernameCannotContainColon": "ユーザー名にコロン（:）を含めることはできません",
+  "intranetAndGateway": "LANとゲートウェイ",
+  "networkType": "ネットワークの種類",
+  "defaultGateway": "ゲートウェイ",
+  "lanSharing": "LAN共有",
+  "sharedAddress": "共有アドレス",
+  "dnsResolution": "DNS解決",
+  "systemDns": "DNS",
+  "enabled": "有効",
+  "disabled": "無効",
+  "openRouterAdmin": "ゲートウェイを開く"
 }
+
+
 

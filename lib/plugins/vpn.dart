@@ -77,6 +77,10 @@ class Vpn {
         const [];
   }
 
+  Future<String?> getCurrentDns() =>
+      methodChannel.invokeMethod<String>('getCurrentDns');
+
+
   Future<void> setSmartStopped(bool value) async {
     await methodChannel.invokeMethod<bool>('setSmartStopped', {'value': value});
   }

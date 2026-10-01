@@ -192,6 +192,10 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
                 result.success(getLocalGateways())
             }
 
+            "getCurrentDns" -> {
+                result.success(getCurrentDns())
+            }
+
             "setSmartStopped" -> {
                 val value = call.argument<Boolean>("value") ?: false
                 GlobalState.isSmartStopped = value
@@ -320,7 +324,7 @@ data object VpnPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         invokeDart("screenStateChanged", isOn)
     }
 
-    private fun getCurrentDns(): String {
+    fun getCurrentDns(): String {
         val dnsSet = when {
             networkDnsMap.isNotEmpty() -> networkDnsMap.values.flatMap { it }
             else -> {

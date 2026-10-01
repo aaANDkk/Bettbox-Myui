@@ -781,6 +781,18 @@
   "addUser": "사용자 추가",
   "editUser": "사용자 편집",
   "userAuthEmpty": "인증 사용자가 설정되지 않았습니다. LAN 연결에는 자격 증명이 필요하지 않습니다",
-  "usernameCannotContainColon": "사용자 이름에는 콜론(:)을 포함할 수 없습니다"
+  "usernameCannotContainColon": "사용자 이름에는 콜론(:)을 포함할 수 없습니다",
+  "intranetAndGateway": "LAN 및 게이트웨이",
+  "networkType": "네트워크 유형",
+  "defaultGateway": "게이트웨이",
+  "lanSharing": "LAN 공유",
+  "sharedAddress": "공유 주소",
+  "dnsResolution": "DNS 확인",
+  "systemDns": "DNS",
+  "enabled": "사용 중",
+  "disabled": "사용 안 함",
+  "openRouterAdmin": "게이트웨이 열기"
 }
+
+
 
