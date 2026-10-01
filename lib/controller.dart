@@ -667,7 +667,12 @@ class AppController {
   Future<void> _applyProfile() async {
     _invalidateCoreReads();
     _ref.read(delayDataSourceProvider.notifier).value = {};
-    unawaited(clashCore.requestGc());
+    unawaited(
+      clashCore.requestGc().then<void>(
+        (_) {},
+        onError: (Object e) => commonPrint.log('requestGc ignored: $e'),
+      ),
+    );
     final configured = await _setupCoreConfig();
     if (!configured) return;
     final providers = await clashCore.getExternalProviders();
@@ -1196,6 +1201,10 @@ class AppController {
   Future<void> _initCore() {
     return _initCoreFuture ??= () async {
       try {
+        if (!await _waitForCoreConnection()) {
+          commonPrint.log('core not connected yet, skipping init');
+          return;
+        }
         final isInit = await clashCore.isInit;
         if (!isInit) {
           await clashCore.init();
@@ -1205,6 +1214,17 @@ class AppController {
         _initCoreFuture = null;
       }
     }();
+  }
+
+  Future<bool> _waitForCoreConnection() async {
+    final completer = clashService?.socketCompleter;
+    if (completer == null || completer.isCompleted) return true;
+    try {
+      await completer.future.timeout(const Duration(seconds: 15));
+      return true;
+    } on TimeoutException {
+      return false;
+    }
   }
 
   void startWakelockAutoRecovery() {

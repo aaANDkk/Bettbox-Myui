@@ -44,9 +44,7 @@ class ClashService extends ClashHandlerInterface {
     _transportType = await PlatformChecker.getRecommendedTransport();
 
     if (_transportType == TransportType.unixSocket) {
-      final random = Random().nextInt(10000);
-      final tempDir = Directory.systemTemp.path;
-      _socketPath = p.join(tempDir, 'Bettbox_$random.sock');
+      _socketPath = _newSocketPath();
       commonPrint.log('Using Unix Domain Socket: $_socketPath');
     } else {
       _tcpPort = PlatformChecker.getRandomPort();
@@ -55,6 +53,23 @@ class ClashService extends ClashHandlerInterface {
 
     _initServer();
     reStart();
+  }
+
+  String _newSocketPath() {
+    final random = Random().nextInt(10000);
+    return p.join(Directory.systemTemp.path, 'Bettbox_$random.sock');
+  }
+
+  Future<void> _rebindTransport() async {
+    try {
+      await (await serverCompleter.future).close();
+    } catch (_) {}
+    serverCompleter = Completer();
+    if (_transportType == TransportType.unixSocket) {
+      _socketPath = _newSocketPath();
+      await _deleteSocketFile();
+    }
+    _initServer();
   }
 
   Future<void> _initServer() async {
@@ -170,7 +185,9 @@ class ClashService extends ClashHandlerInterface {
     environment['SAFE_PATHS'] = homeDirPath;
 
     if (system.isWindows) {
-      final serviceOk = await windows?.registerService() ?? false;
+      final serviceOk = AppIdentity.isDev
+          ? (await windows?.isHelperHealthy() ?? false)
+          : (await windows?.registerService() ?? false);
       if (serviceOk) {
         final started = await helperClient.startCore(
           corePath: appPath.corePath,
@@ -201,15 +218,27 @@ class ClashService extends ClashHandlerInterface {
       }
     }
 
-    process = await Process.start(appPath.corePath, [
-      arg,
-    ], environment: environment);
-    process?.stdout.listen((_) {});
-    process?.stderr.listen((e) {
-      final error = utf8.decode(e);
-      if (error.isNotEmpty) commonPrint.log(error);
-    });
-    await _waitForCoreReady();
+    if (system.isWindows && AppIdentity.isDev) {
+      try {
+        await Process.run('taskkill', [
+          '/F',
+          '/IM',
+          '${AppIdentity.coreExecutableName}.exe',
+        ]);
+      } catch (_) {}
+    }
+
+    var connected = await _startCoreDirectly(arg, environment);
+    if (!connected) {
+      commonPrint.log('core did not connect, retrying with a fresh transport');
+      process?.kill();
+      process = null;
+      await _rebindTransport();
+      final retryArg = _transportType == TransportType.unixSocket
+          ? _socketPath!
+          : '${(await serverCompleter.future).port}';
+      await _startCoreDirectly(retryArg, environment);
+    }
     isStarting = false;
     if (system.isWindows && globalState.config.appSetting.enableHighPriority) {
       unawaited(
@@ -223,11 +252,28 @@ class ClashService extends ClashHandlerInterface {
     }
   }
 
-  Future<void> _waitForCoreReady() async {
+  Future<bool> _startCoreDirectly(
+    String arg,
+    Map<String, String> environment,
+  ) async {
+    process = await Process.start(appPath.corePath, [
+      arg,
+    ], environment: environment);
+    process?.stdout.listen((_) {});
+    process?.stderr.listen((e) {
+      final error = utf8.decode(e);
+      if (error.isNotEmpty) commonPrint.log(error);
+    });
+    return _waitForCoreReady();
+  }
+
+  Future<bool> _waitForCoreReady() async {
     try {
       await socketCompleter.future.timeout(const Duration(seconds: 5));
-    } catch (_) {
+      return true;
+    } on TimeoutException {
       commonPrint.log('Core ready timeout after 5s');
+      return false;
     }
   }
 

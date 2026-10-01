@@ -176,8 +176,15 @@ class ClashCore {
     }
   }
 
+  void _forget(FutureOr<Object?> request, String name) {
+    Future.value(request).then<void>(
+      (_) {},
+      onError: (Object e) => commonPrint.log('$name ignored: $e'),
+    );
+  }
+
   void closeConnection(String id) {
-    clashInterface.closeConnection(id);
+    _forget(clashInterface.closeConnection(id), 'closeConnection');
   }
 
   Future<void> closeConnections() async {
@@ -185,7 +192,7 @@ class ClashCore {
   }
 
   void resetConnections() {
-    clashInterface.resetConnections();
+    _forget(clashInterface.resetConnections(), 'resetConnections');
   }
 
   Future<List<ExternalProvider>> getExternalProviders() async {
@@ -366,7 +373,7 @@ class ClashCore {
   }
 
   void clearLogs() {
-    clashInterface.clearLogs();
+    _forget(clashInterface.clearLogs(), 'clearLogs');
   }
 
   Future<List<TrackerInfo>> getRequests() async {
@@ -392,7 +399,7 @@ class ClashCore {
   }
 
   void clearRequests() {
-    clashInterface.clearRequests();
+    _forget(clashInterface.clearRequests(), 'clearRequests');
   }
 
   Future<void> requestGc({bool forceFreeOSMemory = false}) async {

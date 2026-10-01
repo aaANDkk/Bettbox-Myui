@@ -70,14 +70,21 @@ class HelperAuthManager {
   }
 
   static Map<String, String> generateAuthHeaders(String body) {
-    if (_authKey == null) {
+    final authKey = _authKey;
+    if (authKey == null) {
       return {};
     }
+    return generateAuthHeadersWithKey(body, authKey);
+  }
 
+  static Map<String, String> generateAuthHeadersWithKey(
+    String body,
+    String authKey,
+  ) {
     final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final message = '$timestamp:$body';
 
-    final keyBytes = _hexToBytes(_authKey!);
+    final keyBytes = _hexToBytes(authKey);
     final messageBytes = utf8.encode(message);
     final hmacSha256 = Hmac(sha256, keyBytes);
     final digest = hmacSha256.convert(messageBytes);

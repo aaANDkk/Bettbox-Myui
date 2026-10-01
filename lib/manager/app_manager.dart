@@ -175,9 +175,13 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       await globalState.resumeForegroundUpdates();
       await globalState.appController.syncWakelockIfNeeded();
       _scheduleMissedUpdateCheck();
-      final isInit = await clashCore.isInit;
-      if (isInit) {
-        await globalState.appController.updateGroups();
+      try {
+        final isInit = await clashCore.isInit;
+        if (isInit) {
+          await globalState.appController.updateGroups();
+        }
+      } catch (e) {
+        commonPrint.log('foreground core refresh skipped: $e');
       }
 
       detectionState.checkOnForegroundResume();

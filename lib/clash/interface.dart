@@ -190,6 +190,13 @@ abstract class ClashHandlerInterface with ClashInterface {
     );
   }
 
+  void _invokeAndForget(ActionMethod method, {dynamic data}) {
+    invoke(method: method, data: data).then<void>(
+      (_) {},
+      onError: (Object e) => commonPrint.log('${method.name} ignored: $e'),
+    );
+  }
+
   @override
   Future<bool> init(InitParams params) {
     return invoke<bool>(
@@ -389,17 +396,17 @@ abstract class ClashHandlerInterface with ClashInterface {
 
   @override
   resetTraffic() {
-    invoke(method: ActionMethod.resetTraffic);
+    _invokeAndForget(ActionMethod.resetTraffic);
   }
 
   @override
   startLog() {
-    invoke(method: ActionMethod.startLog);
+    _invokeAndForget(ActionMethod.startLog);
   }
 
   @override
   stopLog() {
-    invoke<bool>(method: ActionMethod.stopLog);
+    _invokeAndForget(ActionMethod.stopLog);
   }
 
   @override
@@ -414,12 +421,12 @@ abstract class ClashHandlerInterface with ClashInterface {
 
   @override
   startTrackRequests() {
-    invoke<bool>(method: ActionMethod.startTrackRequests);
+    _invokeAndForget(ActionMethod.startTrackRequests);
   }
 
   @override
   stopTrackRequests() {
-    invoke<bool>(method: ActionMethod.stopTrackRequests);
+    _invokeAndForget(ActionMethod.stopTrackRequests);
   }
 
   @override

@@ -272,7 +272,38 @@ class Build {
       target.name,
       '${Build.helperName}${target.executableExtensionName}',
     );
-    await File(outPath).copy(targetPath);
+    await _replaceFile(File(outPath), targetPath);
+  }
+
+  static Future<void> _replaceFile(File source, String destinationPath) async {
+    final staleFile = File('$destinationPath.old');
+    if (staleFile.existsSync()) {
+      try {
+        staleFile.deleteSync();
+      } catch (_) {}
+    }
+
+    try {
+      await source.copy(destinationPath);
+    } on PathExistsException catch (e) {
+      if (!Platform.isWindows || !File(destinationPath).existsSync()) {
+        rethrow;
+      }
+      print(
+        'Cannot replace $destinationPath (${e.osError?.message ?? e.message}), '
+        'renaming the running binary aside and retrying.',
+      );
+      await File(destinationPath).rename(staleFile.path);
+      await source.copy(destinationPath);
+    }
+
+    File(destinationPath).setLastModifiedSync(DateTime.now());
+
+    if (staleFile.existsSync()) {
+      try {
+        staleFile.deleteSync();
+      } catch (_) {}
+    }
   }
 
   static List<String> getExecutable(String command) {
@@ -680,17 +711,24 @@ class BuildCommand extends Command {
   }
 
   DateTime _windowsSourcesLastModified() {
-    final helperDir = Directory(Build._servicesDir);
-    if (!helperDir.existsSync()) {
-      return DateTime.fromMillisecondsSinceEpoch(0);
-    }
-    return _latestModified([
+    final sources = <FileSystemEntity>[
       File(join(current, 'setup.dart')),
-      ...helperDir.listSync(recursive: true).where((entity) {
+    ];
+
+    final helperDir = Directory(Build._servicesDir);
+    if (helperDir.existsSync()) {
+      sources.addAll(helperDir.listSync(recursive: true).where((entity) {
         return entity is File &&
             !isWithin(join(Build._servicesDir, 'target'), entity.path);
-      }),
-    ]);
+      }));
+    }
+
+    final coreDir = Directory(Build._coreDir);
+    if (coreDir.existsSync()) {
+      sources.addAll(coreDir.listSync(recursive: true).whereType<File>());
+    }
+
+    return _latestModified(sources);
   }
 
   bool _outputsAreFresh(Arch? arch) {
