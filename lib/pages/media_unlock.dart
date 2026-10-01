@@ -48,51 +48,54 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     final fabFgColor =
         fabTheme.foregroundColor ?? context.colorScheme.onPrimaryContainer;
 
-    return SizedBox(
-      height: 34,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: categories.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          final isSelected = _selectedCategory == cat;
-          final shape = RoundedSuperellipseBorder(
-            borderRadius: BorderRadius.circular(12),
-          );
-          return Material(
-            color: isSelected
-                ? fabBgColor
-                : context.colorScheme.surfaceContainerHigh,
-            shape: shape,
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              customBorder: shape,
-              onTap: () {
-                setState(() {
-                  _selectedCategory = cat;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                alignment: Alignment.center,
-                child: Text(
-                  _getCategoryLabel(cat),
-                  style: context.textTheme.labelMedium?.copyWith(
-                    color: isSelected
-                        ? fabFgColor
-                        : context.colorScheme.onSurfaceVariant,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
+    return RepaintBoundary(
+      child: SizedBox(
+        height: 34,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: categories.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final cat = categories[index];
+            final isSelected = _selectedCategory == cat;
+            final shape = RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.circular(12),
+            );
+            return Material(
+              key: ValueKey(cat),
+              color: isSelected
+                  ? fabBgColor
+                  : context.colorScheme.surfaceContainerHigh,
+              shape: shape,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                customBorder: shape,
+                onTap: () {
+                  setState(() {
+                    _selectedCategory = cat;
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  alignment: Alignment.center,
+                  child: Text(
+                    _getCategoryLabel(cat),
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: isSelected
+                          ? fabFgColor
+                          : context.colorScheme.onSurfaceVariant,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -198,7 +201,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     globalState.showCommonDialog<void>(
       child: StatefulBuilder(
         builder: (context, setDialogState) {
-          // 整行点击与右侧方块勾选共用同一份多选逻辑：最多 4 个、至少保留 1 个。
           void togglePinned(MediaPlatform platform) {
             final checked = currentPinned.contains(platform);
             if (!checked) {
@@ -318,9 +320,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                                     platform.defaultName,
                                     style: context.textTheme.bodyMedium,
                                   ),
-                                  // 可多选（最多 4 个）→ 方块勾选（Bettbox 原本的
-                                  // 样式）；右侧留 4，与标题栏右上角的设置按钮
-                                  // 右边线对齐（规范第 7 节）。
                                   trailing: Padding(
                                     padding: const EdgeInsets.only(right: 4),
                                     child: OptionCheckIcon(
@@ -573,16 +572,17 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
     final showIp =
         showExtraDetails && ip != null && ip.isNotEmpty ? ip : null;
 
-    return Container(
+    return RepaintBoundary(
       key: ValueKey(platform),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: ShapeDecoration(
-        color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: ShapeDecoration(
+          color: context.colorScheme.surfaceContainerLow,
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-      ),
       child: Row(
         children: [
           Container(
@@ -711,12 +711,14 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isTesting) ...[
-                  SizedBox(
-                    width: 10,
-                    height: 10,
-                    child: SpinKitFadingCircle(
-                      color: color,
-                      size: 10,
+                  RepaintBoundary(
+                    child: SizedBox(
+                      width: 10,
+                      height: 10,
+                      child: SpinKitFadingCircle(
+                        color: color,
+                        size: 10,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -761,8 +763,9 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   List<Widget> _buildStatusSectionSlivers({
     required String title,
@@ -887,12 +890,14 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                     },
               tooltip: appLocalizations.retry,
               icon: isCategoryLoading
-                  ? SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: SpinKitFadingCircle(
-                        color: context.colorScheme.primary,
-                        size: 16,
+                  ? RepaintBoundary(
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: SpinKitFadingCircle(
+                          color: context.colorScheme.primary,
+                          size: 16,
+                        ),
                       ),
                     )
                   : const Icon(FluentIcons.arrow_sync_24_regular),
@@ -902,8 +907,6 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
             slivers: [
               SliverToBoxAdapter(
                 child: _buildSummaryCard(
-                  // 形参顺序以上游为准：(unlocked, blocked, other, {isStreaming})；
-                  // isStreaming 保留我们的定制（streaming 与 AI 分类都算流媒体）
                   unlockedList.length,
                   blockedList.length,
                   otherList.length,
@@ -941,7 +944,9 @@ class _MediaUnlockPageState extends ConsumerState<MediaUnlockPage> {
                 state: state,
                 showExtraDetails: showExtraDetails,
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+              SliverToBoxAdapter(
+                child: SizedBox(height: globalState.isAndroidTV ? 48.0 : 24.0),
+              ),
             ],
           ),
         );

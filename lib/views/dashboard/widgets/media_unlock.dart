@@ -4,6 +4,7 @@ import 'package:bett_box/pages/pages.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -18,6 +19,43 @@ class MediaUnlock extends ConsumerStatefulWidget {
 }
 
 class _MediaUnlockState extends ConsumerState<MediaUnlock> {
+  MediaUnlockState? _lastState;
+  List<MediaPlatform>? _lastDisplayedPlatforms;
+  bool? _lastColorfulIcons;
+  Widget? _cachedCard;
+
+  bool _shouldRebuildCard({
+    required MediaUnlockState newState,
+    required List<MediaPlatform> displayedPlatforms,
+    required bool colorfulIcons,
+  }) {
+    if (_lastState == null ||
+        _cachedCard == null ||
+        _lastDisplayedPlatforms == null ||
+        _lastColorfulIcons == null) {
+      return true;
+    }
+    if (!listEquals(_lastDisplayedPlatforms, displayedPlatforms)) {
+      return true;
+    }
+    if (_lastColorfulIcons != colorfulIcons) {
+      return true;
+    }
+    if (_lastState!.isLoading != newState.isLoading) {
+      return true;
+    }
+    for (final p in displayedPlatforms) {
+      if (_lastState!.testingPlatforms.contains(p) !=
+          newState.testingPlatforms.contains(p)) {
+        return true;
+      }
+      if (_lastState!.results[p] != newState.results[p]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   String _getStatusText(MediaUnlockStatus status, [MediaPlatform? platform]) {
     switch (status) {
       case MediaUnlockStatus.unlocked:
@@ -194,9 +232,21 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
       child: ValueListenableBuilder<MediaUnlockState>(
         valueListenable: mediaUnlockState.state,
         builder: (context, state, _) {
+          final shouldRebuild = _shouldRebuildCard(
+            newState: state,
+            displayedPlatforms: displayedPlatforms,
+            colorfulIcons: colorfulIcons,
+          );
+          if (!shouldRebuild) {
+            return _cachedCard!;
+          }
+          _lastState = state;
+          _lastDisplayedPlatforms = displayedPlatforms;
+          _lastColorfulIcons = colorfulIcons;
+
           final isWidgetLoading =
               displayedPlatforms.any(state.testingPlatforms.contains);
-          return CommonCard(
+          final card = CommonCard(
             onPressed: () {
               showExtend(
                 context,
@@ -207,11 +257,8 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
-                    // 卡片标题用短标题键（英文只写 Connectivity，去掉后面的 Test）；
-                    // 解锁页面标题仍用 mediaUnlock
                     label: appLocalizations.mediaUnlockShort,
                     iconData: FluentIcons.link_24_regular,
                   ),
@@ -228,12 +275,14 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
                                   force: true,
                                 ),
                         icon: isWidgetLoading
-                            ? SizedBox(
-                                width: 16.ap,
-                                height: 16.ap,
-                                child: SpinKitFadingCircle(
-                                  color: context.colorScheme.primary,
-                                  size: 16.ap,
+                            ? RepaintBoundary(
+                                child: SizedBox(
+                                  width: 16.ap,
+                                  height: 16.ap,
+                                  child: SpinKitFadingCircle(
+                                    color: context.colorScheme.primary,
+                                    size: 16.ap,
+                                  ),
                                 ),
                               )
                             : Icon(
@@ -278,20 +327,15 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
               ],
             ),
           );
+          _cachedCard = card;
+          return card;
         },
       ),
     );
   }
 }
 
-/// 连通性测试小部件的延迟指示条。
 ///
-/// 优化要点（消除「结果出来后闪现再固定」）：
-/// - 底层轨道常驻不变，测试中与出结果之间不再整体替换控件；
-/// - 测试中叠加官方 `LinearProgressIndicator` 扫描动画（曲线/时序保持原样），
-///   仅通过 `borderRadius` 让两个扫描分段的左右两端都成为圆润端帽；
-/// - 结果条宽度由 [AnimationController] 从 0（或上一次的值）平滑生长到
-///   目标宽度，而不是瞬间跳到最终宽度，彻底消除闪现感。
 class _LatencyBar extends StatefulWidget {
   final MediaUnlockStatus status;
   final int? latency;
@@ -341,7 +385,6 @@ class _LatencyBarState extends State<_LatencyBar>
     return (0.10 + (latency / 1000) * 0.90).clamp(0.10, 1.0);
   }
 
-  /// 当前实际显示宽度比例（含缓动），动画被打断时也可平滑接管
   double get _currentFactor {
     final t = Curves.easeOutCubic.transform(_controller.value);
     return (_from + (_to - _from) * t).clamp(0.0, 1.0);
@@ -366,9 +409,6 @@ class _LatencyBarState extends State<_LatencyBar>
     final trackColor = context.colorScheme.primary.withValues(alpha: 0.12);
     final fillColor = context.colorScheme.primary.withValues(alpha: 0.6);
 
-    // 测试中：官方扫描动画（曲线/时序完全保持原样，仅显式指定 borderRadius
-    // 让两个扫描分段的左右两端都成为圆润端帽）；出结果：按延迟平滑生长。
-    // 两者尺寸完全一致（满宽 6.ap 轨道），因此淡入淡出重叠不会产生跳变。
     final Widget indicator = RepaintBoundary(
       key: ValueKey<bool>(isTesting),
       child: isTesting
@@ -385,7 +425,6 @@ class _LatencyBarState extends State<_LatencyBar>
                   child: FractionallySizedBox(
                     widthFactor: _currentFactor,
                     heightFactor: 1.0,
-                    // 填充条自身保持 3.ap 圆角：右端为圆润端帽而非直角
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: fillColor,

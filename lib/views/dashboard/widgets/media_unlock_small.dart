@@ -4,6 +4,7 @@ import 'package:bett_box/pages/pages.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -18,6 +19,43 @@ class MediaUnlockSmall extends ConsumerStatefulWidget {
 }
 
 class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
+  MediaUnlockState? _lastState;
+  List<MediaPlatform>? _lastDisplayedPlatforms;
+  bool? _lastColorfulIcons;
+  Widget? _cachedCard;
+
+  bool _shouldRebuildCard({
+    required MediaUnlockState newState,
+    required List<MediaPlatform> displayedPlatforms,
+    required bool colorfulIcons,
+  }) {
+    if (_lastState == null ||
+        _cachedCard == null ||
+        _lastDisplayedPlatforms == null ||
+        _lastColorfulIcons == null) {
+      return true;
+    }
+    if (!listEquals(_lastDisplayedPlatforms, displayedPlatforms)) {
+      return true;
+    }
+    if (_lastColorfulIcons != colorfulIcons) {
+      return true;
+    }
+    if (_lastState!.isLoading != newState.isLoading) {
+      return true;
+    }
+    for (final p in displayedPlatforms) {
+      if (_lastState!.testingPlatforms.contains(p) !=
+          newState.testingPlatforms.contains(p)) {
+        return true;
+      }
+      if (_lastState!.results[p] != newState.results[p]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Widget _buildPlatformRow(
     MediaPlatform platform,
     MediaUnlockResult? result,
@@ -92,17 +130,18 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
           ),
           SizedBox(width: 8.ap),
           SizedBox(
-            // 与表头右侧检测按钮同一 24 槽位，圆点才会和按钮严格对齐（原来 12 槽位会偏右 6px）
             width: 24.ap,
             height: 24.ap,
             child: Center(
               child: status == MediaUnlockStatus.testing
-                  ? SizedBox(
-                      width: 10.ap,
-                      height: 10.ap,
-                      child: SpinKitFadingCircle(
-                        color: context.colorScheme.primary,
-                        size: 10.ap,
+                  ? RepaintBoundary(
+                      child: SizedBox(
+                        width: 10.ap,
+                        height: 10.ap,
+                        child: SpinKitFadingCircle(
+                          color: context.colorScheme.primary,
+                          size: 10.ap,
+                        ),
                       ),
                     )
                   : Container(
@@ -138,9 +177,21 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
       child: ValueListenableBuilder<MediaUnlockState>(
         valueListenable: mediaUnlockState.state,
         builder: (context, state, _) {
+          final shouldRebuild = _shouldRebuildCard(
+            newState: state,
+            displayedPlatforms: displayedPlatforms,
+            colorfulIcons: colorfulIcons,
+          );
+          if (!shouldRebuild) {
+            return _cachedCard!;
+          }
+          _lastState = state;
+          _lastDisplayedPlatforms = displayedPlatforms;
+          _lastColorfulIcons = colorfulIcons;
+
           final isWidgetLoading =
               displayedPlatforms.any(state.testingPlatforms.contains);
-          return CommonCard(
+          final card = CommonCard(
             onPressed: () {
               showExtend(
                 context,
@@ -151,10 +202,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  // 右侧刷新按钮不撑高表头：图标 / 标题 / 按钮同处一行标题高度
                   actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
-                    // 与连通性测试大卡一致：短标题键（英文 Connectivity）
                     label: appLocalizations.mediaUnlockShort,
                     iconData: FluentIcons.link_24_regular,
                   ),
@@ -171,12 +220,14 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
                                   force: true,
                                 ),
                         icon: isWidgetLoading
-                            ? SizedBox(
-                                width: 16.ap,
-                                height: 16.ap,
-                                child: SpinKitFadingCircle(
-                                  color: context.colorScheme.primary,
-                                  size: 16.ap,
+                            ? RepaintBoundary(
+                                child: SizedBox(
+                                  width: 16.ap,
+                                  height: 16.ap,
+                                  child: SpinKitFadingCircle(
+                                    color: context.colorScheme.primary,
+                                    size: 16.ap,
+                                  ),
                                 ),
                               )
                             : Icon(
@@ -221,6 +272,8 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
               ],
             ),
           );
+          _cachedCard = card;
+          return card;
         },
       ),
     );
