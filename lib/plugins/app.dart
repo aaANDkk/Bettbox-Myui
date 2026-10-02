@@ -146,6 +146,13 @@ class App {
     final result = await methodChannel.invokeMethod<bool>('isAndroidTV');
     return result ?? false;
   }
+
+  Future<int> getDisplayCornerRadius() async {
+    final result = await methodChannel.invokeMethod<int>(
+      'getDisplayCornerRadius',
+    );
+    return result ?? 0;
+  }
 }
 
 final app = App();

@@ -1,6 +1,7 @@
 package com.appshub.bettbox.plugins
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.ComponentName
@@ -13,6 +14,7 @@ import android.net.VpnService
 import android.os.Build
 import android.provider.Settings
 import android.util.Base64
+import android.view.RoundedCorner
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -182,6 +184,26 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
         val uiMode = BettboxApplication.getAppContext().resources.configuration.uiMode
         return (uiMode and Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION
     }
+    @SuppressLint("DiscouragedApi")
+    private fun getDisplayCornerRadiusPx(): Int {
+        val activity = activityRef?.get()
+        val insets = activity?.window?.decorView?.rootWindowInsets
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && insets != null) {
+            val corner = insets.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)
+                ?: insets.getRoundedCorner(RoundedCorner.POSITION_TOP_RIGHT)
+                ?: insets.getRoundedCorner(RoundedCorner.POSITION_BOTTOM_LEFT)
+                ?: insets.getRoundedCorner(RoundedCorner.POSITION_BOTTOM_RIGHT)
+            val radius = corner?.radius ?: 0
+            if (radius > 0) return radius
+        }
+        val resources = BettboxApplication.getAppContext().resources
+        for (name in listOf("rounded_corner_radius_bottom", "rounded_corner_radius")) {
+            val id = resources.getIdentifier(name, "dimen", "android")
+            if (id > 0) return resources.getDimensionPixelSize(id)
+        }
+        return 0
+    }
+
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
@@ -262,6 +284,9 @@ class AppPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware 
             }
             "isAndroidTV" -> {
                 result.success(isAndroidTV())
+            }
+            "getDisplayCornerRadius" -> {
+                result.success(getDisplayCornerRadiusPx())
             }
             "openFcmDiagnostics" -> {
                 result.success(openFcmDiagnostics())
