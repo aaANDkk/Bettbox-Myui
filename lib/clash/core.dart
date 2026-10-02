@@ -40,15 +40,21 @@ class ClashCore {
       await homeDir.create(recursive: true);
     }
     const geoFileNameList = [mmdbFileName, geoSiteFileName, asnFileName, bundleMRSFileName];
-    try {
-      for (final geoFileName in geoFileNameList) {
-        final geoFile = File(join(homePath, geoFileName));
-        if (await geoFile.exists()) continue;
+    for (final geoFileName in geoFileNameList) {
+      final geoFile = File(join(homePath, geoFileName));
+      try {
         final data = await rootBundle.load('assets/data/$geoFileName');
-        await geoFile.writeAsBytes(data.buffer.asUint8List(), flush: true);
+        final bytes = data.buffer.asUint8List(
+          data.offsetInBytes,
+          data.lengthInBytes,
+        );
+        if (await geoFile.exists() && await geoFile.length() >= bytes.length) {
+          continue;
+        }
+        await geoFile.writeAsBytes(bytes, flush: true);
+      } catch (e) {
+        commonPrint.log('[Geo] prepare $geoFileName failed: $e');
       }
-    } catch (e) {
-      exit(0);
     }
   }
 

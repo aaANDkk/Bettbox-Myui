@@ -12,12 +12,9 @@ import 'config.dart';
 
 part 'generated/state.g.dart';
 
-/// 常驻悬浮按钮在代理页要触发的「测速当前策略组」动作：
-/// 代理页挂载时注册、销毁后自动失效，宿主按钮直接取用，避免复制页面业务逻辑。
 final residentProxyTestProvider = StateProvider<void Function()?>(
   (ref) => null,
 );
-
 
 List<Group> getVisibleGroups({
   required Mode mode,
@@ -587,8 +584,25 @@ int getProxiesColumns(Ref ref) {
   return utils.getProxiesColumns(viewWidth, proxiesLayout);
 }
 
+List<Group>? _proxyIndexGroups;
+Map<String, Proxy> _proxyIndex = const {};
+
+Map<String, Proxy> _proxyIndexOf(List<Group> groups) {
+  if (identical(_proxyIndexGroups, groups)) return _proxyIndex;
+  final index = <String, Proxy>{};
+  for (final group in groups) {
+    for (final proxy in group.all) {
+      index.putIfAbsent(proxy.name, () => proxy);
+    }
+  }
+  _proxyIndexGroups = groups;
+  _proxyIndex = index;
+  return index;
+}
+
 ProxyCardState _getProxyCardState(
   List<Group> groups,
+  Map<String, Proxy> proxyIndex,
   SelectedMap selectedMap,
   ProxyCardState proxyDelayState,
 ) {
@@ -597,16 +611,7 @@ ProxyCardState _getProxyCardState(
     (element) => element.name == proxyDelayState.proxyName,
   );
   if (index == -1) {
-    Proxy? proxy;
-    for (final group in groups) {
-      for (final p in group.all) {
-        if (p.name == proxyDelayState.proxyName) {
-          proxy = p;
-          break;
-        }
-      }
-      if (proxy != null) break;
-    }
+    final proxy = proxyIndex[proxyDelayState.proxyName];
     final now = proxy?.now;
     if (proxy != null &&
         proxy.type.toUpperCase() == 'REMATCH' &&
@@ -615,6 +620,7 @@ ProxyCardState _getProxyCardState(
         now != proxyDelayState.proxyName) {
       return _getProxyCardState(
         groups,
+        proxyIndex,
         selectedMap,
         proxyDelayState.copyWith(proxyName: now),
       );
@@ -630,6 +636,7 @@ ProxyCardState _getProxyCardState(
   }
   return _getProxyCardState(
     groups,
+    proxyIndex,
     selectedMap,
     proxyDelayState.copyWith(
       proxyName: currentSelectedName,
@@ -644,6 +651,7 @@ ProxyCardState getProxyCardState(Ref ref, String proxyName) {
   final selectedMap = ref.watch(selectedMapProvider);
   return _getProxyCardState(
     groups,
+    _proxyIndexOf(groups),
     selectedMap,
     ProxyCardState(proxyName: proxyName),
   );

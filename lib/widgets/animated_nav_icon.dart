@@ -160,8 +160,6 @@ class FluentSvgPainter extends CustomPainter {
     canvas.save();
     canvas.scale(size.width / 24.0, size.height / 24.0);
 
-    // 各图标墨迹范围不同（主页 18×19，更多 20×20），统一按包围盒归一 + 居中，
-    // 否则底栏每个图标看起来大小与居中程度不一致
     final Rect bounds = _boundsOf(regularPath);
     final double maxDim = math.max(bounds.width, bounds.height);
     if (maxDim > 0) {

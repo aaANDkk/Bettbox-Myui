@@ -26,7 +26,6 @@ class AppStateManager extends ConsumerStatefulWidget {
 class _AppStateManagerState extends ConsumerState<AppStateManager>
     with WidgetsBindingObserver {
   bool _isRefreshActive = false;
-  bool _wasPaused = false;
   Timer? _dashboardRefreshDebounceTimer;
   Timer? _missedUpdateCheckTimer;
   DateTime? _lastMissedUpdateCheck;
@@ -165,11 +164,6 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
-      _wasPaused = true;
-    }
-
     final isBackgroundState =
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||

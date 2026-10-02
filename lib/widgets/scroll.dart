@@ -14,7 +14,6 @@ class CommonScrollBar extends StatelessWidget {
   final bool trackVisibility;
   final bool thumbVisibility;
 
-  /// 把羽化层放进滚动条内侧：滑动指示条画在羽化之上，且羽化保持满宽
   final bool feather;
 
   const CommonScrollBar({

@@ -495,18 +495,26 @@ class AppController {
   }
 
   Future<void> updateProfile(Profile profile, {bool validate = true}) async {
+    final notifier = _ref.read(profilesProvider.notifier);
     if (_updatingProfileIds.contains(profile.id)) {
-      _ref
-          .read(profilesProvider.notifier)
-          .setProfile(profile.copyWith(isUpdating: false));
+      notifier.updateProfile(
+        profile.id,
+        (p) => p.copyWith(isUpdating: false),
+      );
       return;
     }
     _updatingProfileIds.add(profile.id);
     try {
       final newProfile = await profile.update(validate: validate);
-      _ref
-          .read(profilesProvider.notifier)
-          .setProfile(newProfile.copyWith(isUpdating: false));
+      notifier.updateProfile(
+        newProfile.id,
+        (current) => current.copyWith(
+          label: newProfile.label,
+          subscriptionInfo: newProfile.subscriptionInfo,
+          lastUpdateDate: newProfile.lastUpdateDate,
+          isUpdating: false,
+        ),
+      );
       if (profile.id == _ref.read(currentProfileIdProvider)) {
         applyProfileDebounce(silence: true);
       }
@@ -519,8 +527,22 @@ class AppController {
     _ref.read(profilesProvider.notifier).setProfile(profile);
   }
 
+  void setProfileUpdating(String profileId, bool isUpdating) {
+    _ref.read(profilesProvider.notifier).updateProfile(
+          profileId,
+          (p) => p.copyWith(isUpdating: isUpdating),
+        );
+  }
+
   void setProfileAndAutoApply(Profile profile) {
-    _ref.read(profilesProvider.notifier).setProfile(profile);
+    _ref.read(profilesProvider.notifier).updateProfile(
+          profile.id,
+          (current) => profile.copyWith(
+            selectedMap: current.selectedMap,
+            unfoldSet: current.unfoldSet,
+            groupSwitches: current.groupSwitches,
+          ),
+        );
     if (profile.id == _ref.read(currentProfileIdProvider)) {
       applyProfileDebounce(silence: true);
     }
@@ -586,7 +608,10 @@ class AppController {
     if (profile == null || profile.currentGroupName == groupName) {
       return;
     }
-    setProfile(profile.copyWith(currentGroupName: groupName));
+    _ref.read(profilesProvider.notifier).updateProfile(
+          profile.id,
+          (p) => p.copyWith(currentGroupName: groupName),
+        );
   }
 
   Future<void> updateClashConfig() {
@@ -701,7 +726,10 @@ class AppController {
 
   Future<void> handleChangeProfile({bool hardRestart = false}) {
     return _coreLifecycleLock.synchronized(() async {
-      if (hardRestart) {
+      final loading = _ref.read(loadingProvider.notifier);
+      loading.value = true;
+      try {
+        if (hardRestart) {
         _ref.read(isRestartingCoreProvider.notifier).state = true;
         try {
           await _restartCore();
@@ -732,6 +760,9 @@ class AppController {
       _ref.read(requestsProvider.notifier).value = FixedList(maxLength);
       globalState.computeHeightMapCache = {};
       addCheckIpNumDebounce();
+      } finally {
+        loading.value = false;
+      }
     });
   }
 
@@ -930,9 +961,10 @@ class AppController {
         }
 
         if (hasChanged) {
-          _ref
-              .read(profilesProvider.notifier)
-              .setProfile(currentProfile.copyWith(selectedMap: selectedMap));
+          _ref.read(profilesProvider.notifier).updateProfile(
+                currentProfile.id,
+                (p) => p.copyWith(selectedMap: selectedMap),
+              );
         }
       }
 
@@ -969,8 +1001,6 @@ class AppController {
 
       _ref.read(groupsProvider.notifier).value = newGroups;
 
-      // 主动预取策略组图标：配置（YAML）中新增或更换图标后立即拉取，
-      // 不再依赖组件可见时才懒加载，也无需重启应用即可生效。
       unawaited(
         CommonTargetIcon.prefetchAll(newGroups.map((group) => group.icon)),
       );
@@ -1072,8 +1102,6 @@ class AppController {
         }
       }
       stopWakelockAutoRecovery();
-      // 完全退出应用：主动释放系统亮屏锁，恢复系统默认息屏策略
-      // （偏好本身保留，下次启动按偏好自动恢复）
       try {
         await WakelockPlus.disable();
       } catch (e) {
@@ -1324,8 +1352,6 @@ class AppController {
     }
 
     try {
-      // 按用户上次的偏好恢复亮屏锁（避免每次启动都要手动开启）。
-      // 完全退出应用时会主动释放系统亮屏锁，因此不会影响系统默认息屏策略。
       final wakelockEnabled = await preferences.getWakelockEnabled();
       _ref.read(wakelockStateProvider.notifier).state = wakelockEnabled;
       if (wakelockEnabled) {
@@ -1660,25 +1686,23 @@ class AppController {
   }
 
   List<Proxy> _sortOfName(List<Proxy> proxies) {
-    return List.of(proxies)..sort(
-      (a, b) =>
-          utils.sortByChar(utils.getPinyin(a.name), utils.getPinyin(b.name)),
-    );
+    final keys = <String, String>{};
+    String key(Proxy proxy) =>
+        keys[proxy.name] ??= utils.getPinyin(proxy.name);
+    return List.of(proxies)
+      ..sort((a, b) => utils.sortByChar(key(a), key(b)));
   }
 
   int _delayValue(int? delay) =>
       (delay == null || delay == -1) ? 1 << 30 : delay;
 
   List<Proxy> _sortOfDelay({required List<Proxy> proxies, String? testUrl}) {
-    return List.of(proxies)..sort((a, b) {
-      final aDelay = _ref.read(
-        getDelayProvider(proxyName: a.name, testUrl: testUrl),
-      );
-      final bDelay = _ref.read(
-        getDelayProvider(proxyName: b.name, testUrl: testUrl),
-      );
-      return _delayValue(aDelay).compareTo(_delayValue(bDelay));
-    });
+    final keys = <String, int>{};
+    int key(Proxy proxy) =>
+        keys[proxy.name] ??= _delayValue(
+          _ref.read(getDelayProvider(proxyName: proxy.name, testUrl: testUrl)),
+        );
+    return List.of(proxies)..sort((a, b) => key(a).compareTo(key(b)));
   }
 
   List<Proxy> getSortProxies({
@@ -1743,25 +1767,26 @@ class AppController {
   }
 
   void updateCurrentSelectedMap(String groupName, String proxyName) {
-    final currentProfile = _ref.read(currentProfileProvider);
-    if (currentProfile != null &&
-        currentProfile.selectedMap[groupName] != proxyName) {
-      final SelectedMap selectedMap = Map.from(currentProfile.selectedMap)
-        ..[groupName] = proxyName;
-      _ref
-          .read(profilesProvider.notifier)
-          .setProfile(currentProfile.copyWith(selectedMap: selectedMap));
-    }
+    final currentProfileId = _ref.read(currentProfileIdProvider);
+    if (currentProfileId == null) return;
+    _ref.read(profilesProvider.notifier).updateProfile(
+      currentProfileId,
+      (profile) {
+        if (profile.selectedMap[groupName] == proxyName) return profile;
+        final selectedMap = Map<String, String>.from(profile.selectedMap)
+          ..[groupName] = proxyName;
+        return profile.copyWith(selectedMap: selectedMap);
+      },
+    );
   }
 
   void updateCurrentUnfoldSet(Set<String> value) {
-    final currentProfile = _ref.read(currentProfileProvider);
-    if (currentProfile == null) {
-      return;
-    }
-    _ref
-        .read(profilesProvider.notifier)
-        .setProfile(currentProfile.copyWith(unfoldSet: value));
+    final currentProfileId = _ref.read(currentProfileIdProvider);
+    if (currentProfileId == null) return;
+    _ref.read(profilesProvider.notifier).updateProfile(
+      currentProfileId,
+      (profile) => profile.copyWith(unfoldSet: value),
+    );
   }
 
   void changeMode(Mode mode) {

@@ -345,7 +345,6 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       ),
       textDirection: Directionality.of(context),
     )..layout();
-    // 左右内边距各 8dp，加上左右边框各 1dp
     return (painter.width + 16 + 2).ceilToDouble();
   }
 
@@ -578,8 +577,6 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
     final geodataUseText = status?.geodataUse ?? 'None';
 
     final metricItems = <_MetricItem>[
-      // 顺序与显示条件保持官方逻辑（路由规则在最前，两个「集」类指标按需出现），
-      // 仅保留本地挑选的图标
       _MetricItem(
         icon: FluentIcons.task_list_rtl_24_regular,
         label: appLocalizations.rulesCount,

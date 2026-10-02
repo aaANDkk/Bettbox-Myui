@@ -233,10 +233,8 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
       title:
-          ref.watch(customDashboardTitleProvider) ?? '⚡️Bettbox',
+          ref.watch(customDashboardTitleProvider) ?? '⚡️ Bettbox',
       actions: _buildActions(),
-      // 竖屏下启动按钮由全局常驻悬浮按钮承担（避免双按钮）；开启卡片开关后由卡片小部件承担；
-      // 非移动视图（横屏 / 桌面 / TV）且未开启卡片开关时保持悬浮按钮
       floatingActionButton:
           (isMobileView || showCardStartButton) ? null : const StartFab(),
       body: Align(
@@ -323,9 +321,6 @@ class _AddDashboardWidgetModal extends StatelessWidget {
                       onAdd: () {
                         onAdd(item);
                       },
-                      // 这里的预览全是"活"的小部件（图表 / 转圈该动的都在动）。
-                      // 不冻结 + 不隔离的话，每个预览的重绘都会把整块抽屉标记为脏，
-                      // 抽屉滑入时整块面板每帧重绘 → 全程掉帧（info / 当前配置这类纯内容抽屉就不会）。
                       child: RepaintBoundary(
                         child: TickerMode(enabled: false, child: child),
                       ),

@@ -206,7 +206,6 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
   }
 }
 
-/// 常驻悬浮按钮当前要显示的内容
 @immutable
 class _FabContent {
   const _FabContent({

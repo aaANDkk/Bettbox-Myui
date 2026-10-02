@@ -463,7 +463,7 @@ class AllowLanItem extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(7),
                   child: Icon(
-                    Icons.settings_outlined,
+                    FluentIcons.settings_24_regular,
                     size: 18,
                     color: context.colorScheme.onSurfaceVariant,
                   ),
@@ -739,21 +739,30 @@ class _SecretDialogState extends ConsumerState<_SecretDialog> {
   }
 }
 
-List<Widget> get generalItems => generateSection(
-  items: [
-    const LogLevelItem(),
-    const UaItem(),
-    if (system.isDesktop) const KeepAliveIntervalItem(),
-    const TestUrlItem(),
-    const PortItem(),
-    const Ipv6Item(),
-    const AllowLanItem(),
-    const UnifiedDelayItem(),
-    const FindProcessItem(),
-    const TcpConcurrentItem(),
-    const ExternalControllerItem(),
-  ],
-);
+List<Widget> get generalItems => [
+  ...generateSection(
+    title: appLocalizations.basic,
+    items: [
+      const LogLevelItem(),
+      const UaItem(),
+      if (system.isDesktop) const KeepAliveIntervalItem(),
+      const TestUrlItem(),
+    ],
+  ),
+  ...generateSection(
+    title: appLocalizations.connections,
+    items: const [Ipv6Item(), AllowLanItem(), PortItem()],
+  ),
+  ...generateSection(
+    title: appLocalizations.core,
+    items: const [
+      UnifiedDelayItem(),
+      FindProcessItem(),
+      TcpConcurrentItem(),
+      ExternalControllerItem(),
+    ],
+  ),
+];
 
 class GeneralListView extends StatelessWidget {
   const GeneralListView({super.key});

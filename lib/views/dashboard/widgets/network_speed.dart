@@ -7,11 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-/// 浏览器测速网站地址（网络速度小部件点击后跳转）
 const speedTestUrl = 'https://ptclspeed.speedtestcustom.com';
 
-/// 点击网络速度小部件时的确认弹窗：格式与「长按内存小部件」的强制 GC 弹窗一致，
-/// 确认后才跳转浏览器测速。
 Future<void> showSpeedTestConfirm(BuildContext context) async {
   final result = await globalState.showCommonDialog<bool>(
     child: CommonDialog(

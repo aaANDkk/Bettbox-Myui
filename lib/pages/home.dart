@@ -140,7 +140,6 @@ class _HomePageState extends State<HomePage> {
                     bottom: 0,
                     child: RepaintBoundary(child: navBar),
                   ),
-                  // 与底栏伴生的常驻悬浮按钮：只在首页/代理/配置三个根页面出现
                   Positioned(
                     right: 16,
                     bottom:
@@ -391,8 +390,6 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
 
     _currentPageIndex = index;
 
-    // 移动端：AnimatedSwitcher 淡入淡出（由 setState 驱动，不涉及 PageView 平移）；
-    // 桌面端：保持原生利落的 0ms 瞬间直切。
     if (isMobile) {
       if (_pageController.hasClients) {
         _pageController.jumpToPage(index);
@@ -433,7 +430,6 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
   Widget build(BuildContext context) {
     final isMobile = ref.watch(isMobileViewProvider);
 
-    // 移动端：仅保留淡入淡出的基础切换动效（不再使用 PageView 水平平移动画）
     if (isMobile) {
       final currentPageLabel = ref.watch(currentPageLabelProvider);
       final currentIndex = widget.navigationItems.indexWhere(
@@ -460,7 +456,6 @@ class _HomePageViewState extends ConsumerState<_HomePageView> {
       );
     }
 
-    // 桌面端：保持原生利落的 0ms 瞬间直切
     return PageView.builder(
       controller: _pageController,
       physics: const NeverScrollableScrollPhysics(),

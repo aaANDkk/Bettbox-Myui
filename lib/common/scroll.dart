@@ -46,7 +46,6 @@ class ShowBarScrollBehavior extends BaseScrollBehavior {
   }
 }
 
-/// 羽化 + 滚动条同层：羽化放在滚动条内侧，滑动指示条永远画在羽化之上（且羽化满宽）
 class FeatherBarScrollBehavior extends BaseScrollBehavior {
   const FeatherBarScrollBehavior();
 
@@ -155,7 +154,11 @@ class ReverseScrollPosition extends ScrollPositionWithSingleContext {
 
   @override
   bool applyContentDimensions(double minScrollExtent, double maxScrollExtent) {
-    if (!_isInit) {
+    // A fresh position is measured with an empty extent first; pinning there
+    // left the reversed list on its oldest entries (view anchored to the
+    // bottom, newest off-screen above, scrollbar at the top), so wait until
+    // the content is really scrollable before jumping to the tail.
+    if (!_isInit && maxScrollExtent > 0) {
       correctPixels(maxScrollExtent);
       _isInit = true;
     }

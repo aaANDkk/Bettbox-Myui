@@ -101,7 +101,6 @@ class _BlurModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     if (blurFilter == null) {
       return barrier;
     }
-    // 模糊层随动画淡入（恒定子树，压暗层在其上），与系统弹窗背景虚化同款过渡
     return Stack(
       fit: StackFit.expand,
       alignment: Alignment.topLeft,

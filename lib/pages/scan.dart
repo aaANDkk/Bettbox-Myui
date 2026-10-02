@@ -165,20 +165,20 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                 ValueListenableBuilder<MobileScannerState>(
                   valueListenable: controller,
                   builder: (context, state, _) {
-                    var icon = const Icon(FluentIcons.flash_off_24_regular);
+                    var icon = const Icon(FluentIcons.flashlight_off_24_regular);
                     var backgroundColor = Colors.black12;
                     switch (state.torchState) {
                       case TorchState.off:
-                        icon = const Icon(FluentIcons.flash_off_24_regular);
+                        icon = const Icon(FluentIcons.flashlight_off_24_regular);
                         backgroundColor = Colors.black12;
                       case TorchState.on:
-                        icon = const Icon(FluentIcons.flash_24_regular);
+                        icon = const Icon(FluentIcons.flashlight_24_regular);
                         backgroundColor = Colors.orange;
                       case TorchState.unavailable:
-                        icon = const Icon(FluentIcons.flash_off_24_regular);
+                        icon = const Icon(FluentIcons.flashlight_off_24_regular);
                         backgroundColor = Colors.transparent;
                       case TorchState.auto:
-                        icon = const Icon(FluentIcons.flash_auto_24_regular);
+                        icon = const Icon(FluentIcons.flashlight_24_regular);
                         backgroundColor = Colors.orange;
                     }
                     return Container(

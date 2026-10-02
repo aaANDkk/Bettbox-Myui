@@ -61,6 +61,7 @@ final filteredLogsProvider = Provider<List<Log>>((ref) {
   final query = ref.watch(logsSearchProvider).toLowerCase();
   final keywords = ref.watch(logsKeywordsProvider);
 
+  // Newest first, the same display order the connections list uses.
   return logs.where((item) {
     if (query.isNotEmpty) {
       final matchesQuery = item.payload.toLowerCase().contains(query) ||
@@ -74,7 +75,7 @@ final filteredLogsProvider = Provider<List<Log>>((ref) {
       if (!matchesKeywords) return false;
     }
     return true;
-  }).toList();
+  }).toList().reversed.toList();
 });
 
 @riverpod
@@ -117,6 +118,7 @@ final filteredRequestsProvider = Provider<List<TrackerInfo>>((ref) {
   final query = ref.watch(requestsSearchProvider).toLowerCase().trim();
   final keywords = ref.watch(requestsKeywordsProvider);
 
+  // Newest first, the same display order the connections list uses.
   return requests.where((item) {
     if (query.isNotEmpty) {
       final networkText = item.metadata.network.toLowerCase();
@@ -138,7 +140,7 @@ final filteredRequestsProvider = Provider<List<TrackerInfo>>((ref) {
       if (!matchesKeywords) return false;
     }
     return true;
-  }).toList();
+  }).toList().reversed.toList();
 });
 
 @riverpod

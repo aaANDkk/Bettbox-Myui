@@ -119,7 +119,6 @@ class _ScrollFeatherGradientOverlayState
   }
 }
 
-/// 标记：该滚动视图外层已经有「滚动条 + 羽化」且指示条画在羽化之上，不必再套一层
 class FeatherScope extends InheritedWidget {
   const FeatherScope({super.key, required super.child});
 

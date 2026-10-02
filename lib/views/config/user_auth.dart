@@ -5,6 +5,7 @@ import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class _UserAuthEntry {
   final TextEditingController usernameController;
@@ -130,7 +131,7 @@ class _UserAuthDialogState extends ConsumerState<UserAuthDialog> {
                 child: Center(
                   child: OutlinedButton.icon(
                     onPressed: _addEntry,
-                    icon: const Icon(Icons.add, size: 18),
+                    icon: const Icon(FluentIcons.add_24_regular, size: 18),
                     label: Text(appLocalizations.addUser),
                   ),
                 ),
@@ -152,7 +153,7 @@ class _UserAuthDialogState extends ConsumerState<UserAuthDialog> {
                       const SizedBox.shrink(),
                     IconButton(
                       visualDensity: VisualDensity.compact,
-                      icon: const Icon(Icons.delete_outline, size: 20),
+                      icon: const Icon(FluentIcons.delete_24_regular, size: 20),
                       onPressed: () => _removeEntry(i),
                       tooltip: appLocalizations.delete,
                     ),
@@ -162,7 +163,7 @@ class _UserAuthDialogState extends ConsumerState<UserAuthDialog> {
                   controller: _entries[i].usernameController,
                   decoration: InputDecoration(
                     labelText: appLocalizations.username,
-                    prefixIcon: const Icon(Icons.person_outline),
+                    prefixIcon: const Icon(FluentIcons.person_circle_24_regular),
                     isDense: true,
                   ),
                   validator: (value) {
@@ -191,13 +192,13 @@ class _UserAuthDialogState extends ConsumerState<UserAuthDialog> {
                   obscureText: _entries[i].obscurePassword,
                   decoration: InputDecoration(
                     labelText: appLocalizations.password,
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    prefixIcon: const Icon(FluentIcons.password_24_regular),
                     isDense: true,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _entries[i].obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                            ? FluentIcons.eye_off_24_regular
+                            : FluentIcons.eye_24_regular,
                       ),
                       onPressed: () {
                         setState(() {

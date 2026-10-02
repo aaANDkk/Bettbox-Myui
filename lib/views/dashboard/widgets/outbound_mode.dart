@@ -67,8 +67,6 @@ class OutboundMode extends StatelessWidget {
                                     ),
                                     child: Row(
                                       children: [
-                                        // FlClash 出站模式同款单选圆点（圆环 + 选中实心），
-                                        // 占位与原来的 Icon 一致（21×21），不改动任何布局
                                         OptionRadioIcon(
                                           selected: item == mode,
                                         ),
@@ -100,10 +98,7 @@ class OutboundMode extends StatelessWidget {
   }
 }
 
-/// FlClash 出站模式左侧的单选圆点（圆环 + 选中时实心圆点）。
 ///
-/// 外框 21×21，与原来 `Icon(size: 21)` 完全等大，因此不改变任何布局尺寸；
-/// 圆环 2 宽、选中时中心 9×9 实心，视觉与 FlClash 的 Material Radio 一致。
 
 class OutboundModeV2 extends StatelessWidget {
   const OutboundModeV2({super.key});

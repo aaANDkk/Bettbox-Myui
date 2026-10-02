@@ -139,6 +139,22 @@ class _StartButtonState extends ConsumerState<StartButton> {
     );
   }
 
+  Widget _buildLoading(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(2),
+      child: Center(
+        child: OverflowBox(
+          maxWidth: 30,
+          maxHeight: 16,
+          child: SpinKitThreeBounce(
+            color: context.colorScheme.primary,
+            size: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent(
     BuildContext context,
     WidgetRef ref,
@@ -149,19 +165,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
     bool showLoading,
   ) {
     if (showLoading && !isRestarting) {
-      return Container(
-        padding: const EdgeInsets.all(2),
-        child: Center(
-          child: OverflowBox(
-            maxWidth: 30,
-            maxHeight: 16,
-            child: SpinKitThreeBounce(
-              color: context.colorScheme.primary,
-              size: 16,
-            ),
-          ),
-        ),
-      );
+      return _buildLoading(context);
     }
 
     if (!state.hasProfile) {
@@ -174,21 +178,7 @@ class _StartButtonState extends ConsumerState<StartButton> {
     }
 
     if (isRestarting) {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: SizedBox(
-          width: 16,
-          height: 16,
-          child: OverflowBox(
-            maxWidth: 30,
-            maxHeight: 16,
-            child: SpinKitThreeBounce(
-              color: context.colorScheme.primary,
-              size: 16,
-            ),
-          ),
-        ),
-      );
+      return _buildLoading(context);
     }
 
     if (!isStart) {

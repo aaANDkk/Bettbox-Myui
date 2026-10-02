@@ -512,8 +512,6 @@ class IpInfo {
         );
       }
     }
-    // ip-api.com / api.ip.sb 格式: {"status":"success", "country":"...", "countryCode":"...", "regionName":"...", "city":"...", "isp":"...", "org":"...", "as":"...", "query":"..."}
-    // api.ip.sb 格式: {"ip":"...", "country_code":"...", "country":"...", "region":"...", "city":"...", "isp":"...", "asn":201217, "asn_organization":"...", "continent_code":"..."}
     if (json['query'] != null ||
         json['countryCode'] != null ||
         json['status'] != null ||
@@ -535,7 +533,6 @@ class IpInfo {
           ? org
           : (json['as_name']?.toString());
 
-      // 仅取最前面的 AS 号 (例如: "AS37963 Hangzhou Alibaba..." -> "AS37963" 或 201217 -> "AS201217")
       final rawAs = (json['as'] ?? json['asn'])?.toString() ?? '';
       final asnMatch =
           RegExp(r'^(?:AS)?(\d+)', caseSensitive: false).firstMatch(rawAs.trim());

@@ -80,6 +80,7 @@ class GlobalState {
   bool _isExecutingTasks = false;
   bool _needsTaskRestart = false;
   Timer? _backgroundCleanupTimer;
+  int _lifecycleToken = 0;
   final Lock _scriptEvaluateLock = Lock();
   bool isInit = false;
 
@@ -193,6 +194,13 @@ class GlobalState {
     if (system.isAndroid) {
       _isAndroidTV = await app.isAndroidTV();
     }
+    if (!system.isDesktop && _isAndroidTV != true) {
+      // Touch-only highlight: list tiles read the highlight mode while they
+      // build, and a stale "traditional" read leaves a focus tint that looks
+      // like a second press after tapping.
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTouch;
+    }
     config =
         await preferences.getConfig() ??
         Config(
@@ -278,9 +286,13 @@ class GlobalState {
   }
 
   Future<void> handleBackground() async {
+    final token = ++_lifecycleToken;
     if (system.isDesktop) {
       final isMinimized = await window?.isMinimized ?? false;
       final isVisible = await window?.isVisible ?? true;
+      if (token != _lifecycleToken) {
+        return;
+      }
       if (!isMinimized && isVisible) {
         return;
       }
@@ -304,6 +316,7 @@ class GlobalState {
   }
 
   void handleForeground() {
+    _lifecycleToken++;
     if (system.isDesktop) {
       animationEnabled.value = true;
     }
@@ -1872,4 +1885,3 @@ class MediaUnlockStateNotifier {
 }
 
 final mediaUnlockState = MediaUnlockStateNotifier();
-

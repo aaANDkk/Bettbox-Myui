@@ -132,19 +132,16 @@ class Preferences {
     }
   }
 
-  /// 读取「亮屏锁」开关的上次状态（默认关闭）
   Future<bool> getWakelockEnabled() async {
     final preferences = await sharedPreferencesCompleter.future;
     return preferences?.getBool(wakelockEnabledKey) ?? false;
   }
 
-  /// 记录「亮屏锁」开关状态，重启应用后自动恢复（完全退出时仍会释放系统锁）
   Future<void> setWakelockEnabled(bool value) async {
     final preferences = await sharedPreferencesCompleter.future;
     await preferences?.setBool(wakelockEnabledKey, value);
   }
 
-  /// 小型流量统计小部件显示上传还是下载数据（默认下载）
   Future<bool> getTrafficUsageShowUpload() async {
     final preferences = await sharedPreferencesCompleter.future;
     return preferences?.getBool(trafficUsageShowUploadKey) ?? false;

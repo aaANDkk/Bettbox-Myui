@@ -36,10 +36,10 @@ class ApplicationState extends ConsumerState<Application>
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
-      TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
-      TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+      TargetPlatform.android: PageTransitionBuilder(),
+      TargetPlatform.windows: PageTransitionBuilder(),
+      TargetPlatform.linux: PageTransitionBuilder(),
+      TargetPlatform.macOS: PageTransitionBuilder(),
     },
   );
 
@@ -74,6 +74,7 @@ class ApplicationState extends ConsumerState<Application>
       globalState.appController = AppController(currentContext, ref);
     }
     await globalState.appController.init();
+    unawaited(loadScreenCornerRadius());
     if (!appPath.isPortable) {
       try {
         await ExternalControl.start();
@@ -231,20 +232,28 @@ class ApplicationState extends ConsumerState<Application>
               builder: (_, child) {
                 return Directionality(
                   textDirection: TextDirection.ltr,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: globalState.animationEnabled,
-                    builder: (_, enabled, _) {
-                      return TickerMode(
-                        enabled: enabled,
-                        child: AppEnvManager(
-                          child: _buildApp(
-                            AppSidebarContainer(
-                              child: _buildPlatformApp(child!),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      ValueListenableBuilder<bool>(
+                        valueListenable: globalState.animationEnabled,
+                        builder: (_, enabled, _) {
+                          return TickerMode(
+                            enabled: enabled,
+                            child: AppEnvManager(
+                              child: _buildApp(
+                                _buildPlatformApp(
+                                  AppSidebarContainer(
+                                    child: child!,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
+                          );
+                        },
+                      ),
+                      const ThemePaletteWarmer(),
+                    ],
                   ),
                 );
               },
