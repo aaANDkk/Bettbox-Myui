@@ -248,7 +248,12 @@ class WindowHeaderContainer extends StatelessWidget {
                 Expanded(flex: 1, child: child!),
               ],
             ),
-            const WindowHeader(),
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: WindowHeader(),
+            ),
           ],
         );
       },
@@ -344,47 +349,64 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
             opacity: showButtons ? 1.0 : 0.0,
             child: IgnorePointer(
               ignoring: !showButtons,
-              child: Row(
-                children: [
-                  ValueListenableBuilder(
-                    valueListenable: isPinNotifier,
-                    builder: (_, value, _) {
-                      return IconButton(
-                        onPressed: _updatePin,
-                        icon: value
-                            ? const Icon(FluentIcons.pin_24_filled)
-                            : const Icon(FluentIcons.pin_24_regular),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      windowManager.minimize();
-                    },
-                    icon: const Icon(FluentIcons.subtract_24_regular),
-                  ),
-                  ValueListenableBuilder(
-                    valueListenable: isMaximizedNotifier,
-                    builder: (_, value, _) {
-                      return IconButton(
-                        onPressed: () async {
-                          _updateMaximized();
-                        },
-                        icon: value
-                            ? const Icon(FluentIcons.square_multiple_24_regular, size: 20)
-                            : const Icon(FluentIcons.square_24_regular),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      globalState.appController.unBackBlock();
-                      globalState.appController.handleBackOrExit();
-                    },
-                    icon: const Icon(FluentIcons.dismiss_24_regular),
-                  ),
-                ],
+              child: IconTheme(
+                data: IconThemeData(
+                  size: 15.6,
+                  color: context.colorScheme.onSurface,
+                ),
+                child: Row(
+                  children: [
+                    ValueListenableBuilder(
+                      valueListenable: isPinNotifier,
+                      builder: (_, value, _) {
+                        return IconButton(
+                          color: context.colorScheme.onSurface,
+                          iconSize: 15.6,
+                          onPressed: _updatePin,
+                          icon: value
+                              ? const Icon(FluentIcons.pin_24_filled)
+                              : const Icon(FluentIcons.pin_24_regular),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      color: context.colorScheme.onSurface,
+                      iconSize: 15.6,
+                      onPressed: () {
+                        windowManager.minimize();
+                      },
+                      icon: const Icon(FluentIcons.subtract_24_regular),
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: isMaximizedNotifier,
+                      builder: (_, value, _) {
+                        return IconButton(
+                          color: context.colorScheme.onSurface,
+                          iconSize: 15.6,
+                          onPressed: () async {
+                            _updateMaximized();
+                          },
+                          icon: value
+                              ? const Icon(
+                                  FluentIcons.square_multiple_24_regular,
+                                  size: 13.0,
+                                )
+                              : const Icon(FluentIcons.square_24_regular),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      color: context.colorScheme.onSurface,
+                      iconSize: 15.6,
+                      onPressed: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        globalState.appController.unBackBlock();
+                        globalState.appController.handleBackOrExit();
+                      },
+                      icon: const Icon(FluentIcons.dismiss_24_regular),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -396,30 +418,35 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          Positioned(
-            child: GestureDetector(
-              onPanStart: (_) {
-                windowManager.startDragging();
-              },
-              onDoubleTap: () {
-                _updateMaximized();
-              },
-              child: Container(
-                color: context.colorScheme.secondary.opacity15,
-                alignment: Alignment.centerLeft,
-                height: kHeaderHeight,
+      shape: Border(
+        bottom: BorderSide(color: context.colorScheme.outlineVariant),
+      ),
+      child: SizedBox(
+        height: kHeaderHeight,
+        child: Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onPanStart: (_) {
+                  windowManager.startDragging();
+                },
+                onDoubleTap: () {
+                  _updateMaximized();
+                },
+                child: Container(
+                  color: context.colorScheme.secondary.opacity15,
+                  alignment: Alignment.centerLeft,
+                ),
               ),
             ),
-          ),
-          if (system.isMacOS)
-            const Text(appName)
-          else ...[
-            Positioned(right: 0, child: _buildActions()),
+            if (system.isMacOS)
+              const Text(appName)
+            else ...[
+              Positioned(right: 0, child: _buildActions()),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
