@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class OverrideProfileView extends StatefulWidget {
@@ -28,19 +32,12 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
         final overrideData = ref.read(
           getProfileOverrideDataProvider(widget.profileId),
         );
-        final newOverrideData =
-            overrideData?.rule.type == OverrideRuleType.override &&
-                overrideData?.rule.overrideRules.isEmpty == true
-            ? overrideData?.copyWith(
-                rule: overrideData.rule.copyWith(overrideRules: snippet.rule),
-              )
-            : overrideData;
         ref
             .read(profileOverrideStateProvider.notifier)
             .updateState(
               (state) => state.copyWith(
                 snippet: snippet,
-                overrideData: newOverrideData,
+                overrideData: overrideData,
               ),
             );
       });
@@ -99,7 +96,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
       },
       child: LayoutBuilder(
         builder: (_, constraints) {
-          _currentMaxWidth = constraints.maxWidth - 104;
+          _currentMaxWidth = constraints.maxWidth - 144;
           return CommonScrollBar(
             controller: _controller,
             child: CustomScrollView(
@@ -173,12 +170,12 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
         },
         child: Consumer(
           builder: (_, ref, _) {
-            final editCount = ref.watch(
+            final selectCount = ref.watch(
               profileOverrideStateProvider.select(
                 (state) => state.selectedRules.length,
               ),
             );
-            final isEdit = editCount != 0;
+            final isSelectMode = selectCount != 0;
             final overrideData = ref.watch(
               getProfileOverrideDataProvider(widget.profileId),
             );
@@ -189,7 +186,7 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
             );
             final equals = overrideData == newOverrideData;
             final hasUnsavedChanges =
-                !isEdit && !equals && newOverrideData != null;
+                !isSelectMode && !equals && newOverrideData != null;
 
             return CommonPopScope(
               onPop: () async {
@@ -199,6 +196,9 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                 final res = await globalState.showMessage(
                   message: TextSpan(text: appLocalizations.saveChanges),
                 );
+                if (res == null) {
+                  return false;
+                }
                 if (res == true && context.mounted) {
                   _handleSave(ref, newOverrideData);
                 }
@@ -219,35 +219,20 @@ class _OverrideProfileViewState extends State<OverrideProfileView> {
                         }
                         _handleSave(ref, newOverrideData);
                       },
+                      tooltip: appLocalizations.save,
                       icon: Icon(Icons.save),
                     ),
-                  if (editCount == 1)
-                    IconButton(
-                      onPressed: () {
-                        final rule = ref.read(
-                          profileOverrideStateProvider.select((state) {
-                            return state.overrideData?.rule.rules.firstWhere(
-                              (item) => item.id == state.selectedRules.first,
-                            );
-                          }),
-                        );
-                        if (rule == null) {
-                          return;
-                        }
-                        globalState.appController.handleAddOrUpdate(ref, rule);
-                      },
-                      icon: Icon(Icons.edit),
-                    ),
-                  if (editCount > 0)
+                  if (selectCount > 0)
                     IconButton(
                       onPressed: () {
                         _handleDelete(ref);
                       },
+                      tooltip: appLocalizations.delete,
                       icon: Icon(Icons.delete),
                     ),
                 ],
                 editState: AppBarEditState(
-                  editCount: editCount,
+                  editCount: selectCount,
                   onExit: () {
                     ref.read(profileOverrideStateProvider.notifier).updateState(
                           (state) => state.copyWith(selectedRules: {}),
@@ -326,7 +311,7 @@ class RuleTitle extends ConsumerWidget {
         );
       }),
     );
-    final isEdit = vm3.a;
+    final isSelectMode = vm3.a;
     final isSelectAll = vm3.b;
     final isOverrideRule = vm3.c;
     return FilledButtonTheme(
@@ -351,16 +336,19 @@ class RuleTitle extends ConsumerWidget {
               : appLocalizations.addedOriginRules,
           space: 8,
           actions: [
-            if (!isEdit)
+            if (!isSelectMode)
               IconButton.filledTonal(
                 icon: Icon(
                   isOverrideRule ? Icons.edit_document : Icons.note_add,
                 ),
+                tooltip: isOverrideRule
+                    ? appLocalizations.addedOriginRules
+                    : appLocalizations.overrideOriginRules,
                 onPressed: () {
                   _handleChangeType(ref, isOverrideRule);
                 },
               ),
-            !isEdit
+            !isSelectMode
                 ? FilledButton.tonal(
                     onPressed: () {
                       globalState.appController.handleAddOrUpdate(ref);
@@ -401,60 +389,198 @@ class RuleTitle extends ConsumerWidget {
   }
 }
 
-class RuleContent extends ConsumerWidget {
-  final double maxWidth;
+class RuleRow extends StatefulWidget {
+  const RuleRow({
+    super.key,
+    required this.rule,
+    required this.index,
+    required this.isSelected,
+    required this.isSelectMode,
+    required this.onEdit,
+    required this.onTab,
+  });
 
-  const RuleContent({super.key, required this.maxWidth});
+  final Rule rule;
+  final int index;
+  final bool isSelected;
+  final bool isSelectMode;
+  final VoidCallback onEdit;
+  final VoidCallback onTab;
 
-  Widget _buildItem({
-    required Rule rule,
-    required bool isSelected,
-    required VoidCallback onTab,
-    required BuildContext context,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 4),
-        child: CommonCard(
-          padding: EdgeInsets.zero,
-          radius: 18,
-          type: CommonCardType.filled,
-          isSelected: isSelected,
-          // decoration: BoxDecoration(
-          //   color: isSelected
-          //       ? context.colorScheme.secondaryContainer.opacity80
-          //       : context.colorScheme.surfaceContainer,
-          //   borderRadius: BorderRadius.circular(18),
-          // ),
-          onPressed: () {
-            onTab();
-          },
-          child: ListTile(
-            minTileHeight: 0,
-            minVerticalPadding: 0,
-            titleTextStyle: context.textTheme.bodyMedium?.toJetBrainsMono,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            trailing: SizedBox(
-              width: 24,
-              height: 24,
-              child: CommonCheckBox(
-                value: isSelected,
-                isCircle: true,
-                onChanged: (_) {
-                  onTab();
-                },
+  @override
+  State<RuleRow> createState() => _RuleRowState();
+}
+
+class _RuleRowState extends State<RuleRow> {
+  static const _longPressDelay = kLongPressTimeout;
+
+  Timer? _hapticTimer;
+  Offset? _pressOrigin;
+  double _slop = kTouchSlop;
+  int? _iconDragPointer;
+  bool _hovered = false;
+
+  @override
+  void dispose() {
+    _cancelHaptic();
+    super.dispose();
+  }
+
+  void _cancelHaptic() {
+    _hapticTimer?.cancel();
+    _hapticTimer = null;
+    _pressOrigin = null;
+  }
+
+  void _startDrag(
+    PointerDownEvent event,
+    MultiDragGestureRecognizer recognizer,
+  ) {
+    final settings = MediaQuery.maybeGestureSettingsOf(context);
+    SliverReorderableList.maybeOf(context)?.startItemDragReorder(
+      index: widget.index,
+      event: event,
+      recognizer: recognizer..gestureSettings = settings,
+    );
+  }
+
+  void _handleCardPointerDown(PointerDownEvent event) {
+    if (!widget.isSelectMode || event.pointer == _iconDragPointer) {
+      return;
+    }
+    _cancelHaptic();
+    _pressOrigin = event.position;
+    _slop = computeHitSlop(
+      event.kind,
+      MediaQuery.maybeGestureSettingsOf(context),
+    );
+    _hapticTimer = Timer(_longPressDelay, HapticFeedback.selectionClick);
+    _startDrag(event, DelayedMultiDragGestureRecognizer());
+  }
+
+  void _handleIconPointerDown(PointerDownEvent event) {
+    if (event.kind != PointerDeviceKind.mouse) {
+      return;
+    }
+    _iconDragPointer = event.pointer;
+    _startDrag(event, ImmediateMultiDragGestureRecognizer());
+  }
+
+  void _handlePointerMove(PointerMoveEvent event) {
+    final origin = _pressOrigin;
+    if (origin != null && (event.position - origin).distance > _slop) {
+      _cancelHaptic();
+    }
+  }
+
+  void _handlePointerEnd(PointerEvent event) {
+    _cancelHaptic();
+    _iconDragPointer = null;
+  }
+
+  void _handleTap() {
+    if (widget.isSelectMode) {
+      widget.onTab();
+    } else {
+      widget.onEdit();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showControls = widget.isSelectMode || _hovered;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        if (!_hovered) {
+          setState(() => _hovered = true);
+        }
+      },
+      onExit: (_) {
+        if (_hovered) {
+          setState(() => _hovered = false);
+        }
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          child: CommonCard(
+            padding: EdgeInsets.zero,
+            radius: 18,
+            type: CommonCardType.filled,
+            isSelected: widget.isSelected,
+            onPressed: _handleTap,
+            onLongPress: widget.isSelectMode ? null : widget.onTab,
+            child: Listener(
+              behavior: HitTestBehavior.opaque,
+              onPointerDown: _handleCardPointerDown,
+              onPointerMove: _handlePointerMove,
+              onPointerUp: _handlePointerEnd,
+              onPointerCancel: _handlePointerEnd,
+              child: ListTile(
+                minTileHeight: 0,
+                minVerticalPadding: 0,
+                titleTextStyle: context.textTheme.bodyMedium?.toJetBrainsMono,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                leading: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: showControls
+                      ? Listener(
+                          behavior: HitTestBehavior.opaque,
+                          onPointerDown: _handleIconPointerDown,
+                          child: Tooltip(
+                            message: appLocalizations.sort,
+                            child: InkResponse(
+                              onTap: _handleTap,
+                              mouseCursor: SystemMouseCursors.move,
+                              radius: 20,
+                              child: Icon(
+                                Icons.drag_indicator,
+                                size: 20,
+                                color: context.colorScheme.outline,
+                              ),
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                title: EmojiText(widget.rule.value),
+                trailing: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {},
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: showControls
+                        ? CommonCheckBox(
+                            value: widget.isSelected,
+                            isCircle: true,
+                            onChanged: (_) {
+                              widget.onTab();
+                            },
+                          )
+                        : null,
+                  ),
+                ),
               ),
             ),
-            title: EmojiText(rule.value),
           ),
         ),
       ),
     );
   }
+}
+
+class RuleContent extends ConsumerWidget {
+  final double maxWidth;
+
+  const RuleContent({super.key, required this.maxWidth});
 
   void _handleSelect(WidgetRef ref, String ruleId) {
     ref.read(profileOverrideStateProvider.notifier).updateState((state) {
@@ -469,7 +595,7 @@ class RuleContent extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, ref) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final vm3 = ref.watch(
       profileOverrideStateProvider.select((state) {
         final overrideRule = state.overrideData?.rule;
@@ -483,6 +609,7 @@ class RuleContent extends ConsumerWidget {
     final rules = vm3.a;
     final type = vm3.b;
     final selectedRules = vm3.c;
+    final isSelectMode = selectedRules.isNotEmpty;
     if (rules.isEmpty) {
       return SliverToBoxAdapter(
         child: SizedBox(
@@ -515,17 +642,18 @@ class RuleContent extends ConsumerWidget {
       tag: CacheTag.rules,
       itemBuilder: (context, index) {
         final rule = rules[index];
-        return ReorderableDelayedDragStartListener(
+        return RuleRow(
           key: ObjectKey(rule),
+          rule: rule,
           index: index,
-          child: _buildItem(
-            rule: rule,
-            isSelected: selectedRules.contains(rule.id),
-            onTab: () {
-              _handleSelect(ref, rule.id);
-            },
-            context: context,
-          ),
+          isSelected: selectedRules.contains(rule.id),
+          isSelectMode: isSelectMode,
+          onEdit: () {
+            globalState.appController.handleAddOrUpdate(ref, rule);
+          },
+          onTab: () {
+            _handleSelect(ref, rule.id);
+          },
         );
       },
       proxyDecorator: proxyDecorator,
