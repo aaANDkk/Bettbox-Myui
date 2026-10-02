@@ -201,6 +201,10 @@ extension ProfileExtension on Profile {
 
   Future<Profile> saveFile(Uint8List bytes, {bool validate = true}) async {
     String content = utf8.decode(bytes);
+    final trimmed = content.trimLeft();
+    if (trimmed.isEmpty || trimmed.startsWith('<')) {
+      throw 'Invalid profile content (${bytes.length} bytes)';
+    }
     final key = ageSecretKey;
     if (key != null && key.isNotEmpty) {
       try {
