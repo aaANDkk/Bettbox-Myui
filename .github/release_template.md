@@ -1,3 +1,15 @@
-# Bettbox 正式版本发布
-**如遇问题请提交 issue [反馈](https://github.com/appshubcc/Bettbox/issues/new?template=bug_report.yml)。**
-
+# Bettbox-Myui 正式版本发布 (v1.19.4)
+## 📌 更新内容 / What's Changed
+⭐️安卓与官方签名不同，请先去（更多/备份与恢复/本地备份）备份数据再卸载安装导入！
+• 同步上游更新
+• 调整悬浮底栏高斯模糊，增大通透度（建议用深色模式，效果更好）
+• 调整二级界面竖屏时的进入动画（新增安卓圆角读取绘制在新界面进入的左上角及左下角，旧界面进行压暗处理）
+• 调整当前配置小部件，点击行为改为切换配置
+• 代理列表模式动画重构优化
+• 代理列表模式自动提取emoji作为图标，参考https://github.com/chenx-dust/FlClash-Patched
+• 优化windows顶栏样式
+• 调整请求，连接，日志页样式
+• 调整请求，日志逻辑
+• 换新 Flclash 主题自定义调色盘，兼容 Bettbox自定义取色数值输入
+• 各界面细节优化调整
+• Bug Fix
