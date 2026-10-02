@@ -20,23 +20,17 @@ class LogsView extends ConsumerStatefulWidget {
 class _LogsViewState extends ConsumerState<LogsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
-  var _autoScrollToEnd = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ReverseScrollController();
+    _scrollController = ScrollController();
     WidgetsBinding.instance.addObserver(this);
-    _initLogs();
-  }
-
-  void _initLogs() async {
+    // A filter left over from the last visit would hide rows and fake an
+    // empty state, so the page always opens unfiltered.
+    ref.read(logsSearchProvider.notifier).state = '';
+    ref.read(logsKeywordsProvider.notifier).state = [];
     clashCore.startLog();
-    final history = await clashCore.getLogs();
-    if (!mounted) return;
-    if (history.isNotEmpty) {
-      ref.read(logsProvider.notifier).setLogs(history);
-    }
   }
 
   @override
@@ -44,7 +38,7 @@ class _LogsViewState extends ConsumerState<LogsView>
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       clashCore.stopLog();
     } else if (state == AppLifecycleState.resumed) {
-      _initLogs();
+      clashCore.startLog();
     }
   }
 
@@ -62,20 +56,6 @@ class _LogsViewState extends ConsumerState<LogsView>
 
   void _onKeywordsUpdate(List<String> keywords) {
     ref.read(logsKeywordsProvider.notifier).state = keywords;
-  }
-
-  void _toggleAutoScroll() {
-    setState(() {
-      _autoScrollToEnd = !_autoScrollToEnd;
-    });
-  }
-
-  void _cancelAutoScroll() {
-    if (_autoScrollToEnd) {
-      setState(() {
-        _autoScrollToEnd = false;
-      });
-    }
   }
 
   Future<void> _handleLogLevelSettings() async {
@@ -124,25 +104,12 @@ class _LogsViewState extends ConsumerState<LogsView>
   @override
   Widget build(BuildContext context) {
     final logs = ref.watch(filteredLogsProvider);
-    final hasLogs = logs.isNotEmpty;
     return CommonScaffold(
       actions: [
         IconButton(
           onPressed: _handleLogLevelSettings,
           icon: const Icon(FluentIcons.settings_24_regular),
           tooltip: appLocalizations.logLevel,
-        ),
-        IconButton(
-          style: _autoScrollToEnd
-              ? ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    context.colorScheme.secondaryContainer,
-                  ),
-                )
-              : null,
-          onPressed: _toggleAutoScroll,
-          tooltip: appLocalizations.autoScroll,
-          icon: const Icon(FluentIcons.swipe_up_24_regular),
         ),
         Tooltip(
           message: appLocalizations.export,
@@ -160,48 +127,34 @@ class _LogsViewState extends ConsumerState<LogsView>
       onKeywordsUpdate: _onKeywordsUpdate,
       searchState: AppBarSearchState(onSearch: _onSearch),
       title: appLocalizations.logs,
-      body: !hasLogs
-          ? NullStatus(
-              label: appLocalizations.nullTip(appLocalizations.logs),
-              illustration: NullStatusIllustration.logs,
-            )
-          : ScrollToEndBox(
-              onCancelToEnd: _cancelAutoScroll,
-              controller: _scrollController,
-              enable: _autoScrollToEnd,
-              reverse: true,
-              dataSource: logs,
-              child: CommonScrollBar(
-                controller: _scrollController,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ListView.builder(
-                    physics: const NextClampingScrollPhysics(),
-                    reverse: true,
-                    shrinkWrap: logs.length < 20,
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 16, top: 8),
-                    itemExtentBuilder: (index, _) {
-                      return LogItem.height + 1;
-                    },
-                    itemBuilder: (context, index) {
-                      final log = logs[index];
-                      return LogItem(
-                        key: ValueKey(log.dateTime),
-                        index: index,
-                        count: logs.length,
-                        reversed: true,
-                        log: log,
-                        onClick: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
-                      );
-                    },
-                    itemCount: logs.length,
-                  ),
-                ),
-              ),
-            ),
+      body: NullStatusSwitcher(
+        isEmpty: logs.isEmpty,
+        nullStatus: NullStatus(
+          label: appLocalizations.nullTip(appLocalizations.logs),
+          illustration: NullStatusIllustration.logs,
+        ),
+        child: CommonScrollBar(
+          controller: _scrollController,
+          child: ListView.builder(
+            physics: const NextClampingScrollPhysics(),
+            controller: _scrollController,
+            padding: const EdgeInsets.only(bottom: 16, top: 8),
+            itemBuilder: (context, index) {
+              final log = logs[index];
+              return LogItem(
+                key: ValueKey(log.dateTime),
+                index: index,
+                count: logs.length,
+                log: log,
+                onClick: (value) {
+                  context.commonScaffoldState?.addKeyword(value);
+                },
+              );
+            },
+            itemCount: logs.length,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -212,16 +165,6 @@ class LogItem extends StatelessWidget {
   final int index;
   final int count;
   final bool reversed;
-
-  static double get height {
-    final measure = globalState.measure;
-    return measure.bodyLargeHeight * 2 +
-        8 +
-        24 +
-        measure.labelMediumHeight +
-        16 +
-        16;
-  }
 
   const LogItem({
     super.key,
@@ -239,6 +182,7 @@ class LogItem extends StatelessWidget {
         index: index,
         count: count,
         reversed: reversed,
+        standalone: true,
         child: ListItem(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           onTap: () {

@@ -203,6 +203,7 @@ class TrackerInfoItem extends ConsumerWidget {
         index: index,
         count: count,
         reversed: reversed,
+        standalone: true,
         child: listItem,
       ),
     );
@@ -368,7 +369,6 @@ class TrackerInfoDetailView extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(appLocalizations.proxyChains),
-          // 右侧标签流与标题保持 16px 安全间距，永不与文字发生触碰/重叠
           Flexible(
             child: Wrap(
               spacing: 6,
@@ -412,11 +412,6 @@ class TrackerInfoDetailView extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 这里必须再套一层 Flexible：RenderFlex 给"非 flex 子级"的主轴约束是无界的
-                // （_constraintsForNonFlexChild → maxWidth = infinity），pill 会按固有宽度排版，
-                // 里面那层 ellipsis 完全失效 —— 长 IPv6（如远程目标）会直接冲出卡片。
-                // 成为 flex 子级后 pill 才拿到有界宽度、省略号才生效；
-                // 端口是非 flex 子级、会先被布局，所以永远完整显示，pill 只取剩余宽度。
                 Flexible(
                   child: Material(
                     color: context.colorScheme.primary.withValues(alpha: 0.08),
@@ -483,8 +478,6 @@ class TrackerInfoDetailView extends ConsumerWidget {
       title: Row(
         spacing: 16,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // 值可能换行（如主机域名）：标题竖向居中，与右侧多行内容保持同一视觉中线，
-        // 与代理链一行（Wrap 多行标签）的排版一致
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
@@ -613,7 +606,6 @@ class TrackerInfoDetailView extends ConsumerWidget {
       },
     );
 
-    // Section 4: Advanced Info（代理链合并进本分区，与 DNS 模式等放在一起）
     final advancedItems = <Widget>[
       if (info.metadata.destinationGeoIP.isNotEmpty)
         _buildItem(

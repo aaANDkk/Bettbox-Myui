@@ -19,23 +19,34 @@ class RequestsView extends ConsumerStatefulWidget {
 class _RequestsViewState extends ConsumerState<RequestsView>
     with WidgetsBindingObserver {
   late final ScrollController _scrollController;
-  var _autoScrollToEnd = false;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ReverseScrollController();
+    _scrollController = ScrollController();
     WidgetsBinding.instance.addObserver(this);
-    _initRequests();
+    // A filter left over from the last visit would hide rows and fake an
+    // empty state, so the page always opens unfiltered.
+    ref.read(requestsSearchProvider.notifier).state = '';
+    ref.read(requestsKeywordsProvider.notifier).state = [];
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
+      await _updateRequests();
+    });
   }
 
-  void _initRequests() async {
+  Future<void> _updateRequests() async {
     clashCore.startTrackRequests();
     final history = await clashCore.getRequests();
-    if (!mounted) return;
-    if (history.isNotEmpty) {
-      ref.read(requestsProvider.notifier).setRequests(history);
-    }
+    if (!mounted || history.isEmpty) return;
+    final newest = history.last.start;
+    final pending = ref
+        .read(requestsProvider)
+        .list
+        .where((item) => item.start.isAfter(newest));
+    ref.read(requestsProvider.notifier).setRequests([...history, ...pending]);
   }
 
   @override
@@ -43,7 +54,7 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       clashCore.stopTrackRequests();
     } else if (state == AppLifecycleState.resumed) {
-      _initRequests();
+      clashCore.startTrackRequests();
     }
   }
 
@@ -63,24 +74,9 @@ class _RequestsViewState extends ConsumerState<RequestsView>
     ref.read(requestsKeywordsProvider.notifier).state = keywords;
   }
 
-  void _toggleAutoScroll() {
-    setState(() {
-      _autoScrollToEnd = !_autoScrollToEnd;
-    });
-  }
-
-  void _cancelAutoScroll() {
-    if (_autoScrollToEnd) {
-      setState(() {
-        _autoScrollToEnd = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final requests = ref.watch(filteredRequestsProvider);
-    final hasRequests = requests.isNotEmpty;
 
     return CommonScaffold(
       title: appLocalizations.requests,
@@ -93,65 +89,42 @@ class _RequestsViewState extends ConsumerState<RequestsView>
           tooltip: appLocalizations.clear,
           icon: const Icon(FluentIcons.delete_dismiss_24_regular),
         ),
-        IconButton(
-          style: _autoScrollToEnd
-              ? ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                    context.colorScheme.secondaryContainer,
-                  ),
-                )
-              : null,
-          onPressed: _toggleAutoScroll,
-          tooltip: appLocalizations.autoScroll,
-          icon: const Icon(FluentIcons.swipe_up_24_regular),
-        ),
       ],
       searchState: AppBarSearchState(onSearch: _onSearch),
       onKeywordsUpdate: _onKeywordsUpdate,
-      body: !hasRequests
-          ? NullStatus(
-              label: appLocalizations.nullTip(appLocalizations.requests),
-              illustration: NullStatusIllustration.requests,
-            )
-          : CommonScrollBar(
-              trackVisibility: false,
-              controller: _scrollController,
-              child: ScrollToEndBox(
-                controller: _scrollController,
-                dataSource: requests,
-                enable: _autoScrollToEnd,
-                reverse: true,
-                onCancelToEnd: _cancelAutoScroll,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ListView.builder(
-                    reverse: true,
-                    shrinkWrap: requests.length < 20,
-                    physics: const NextClampingScrollPhysics(),
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(bottom: 16, top: 8),
-                    itemBuilder: (context, index) {
-                      final trackerInfo = requests[index];
-                      return TrackerInfoItem(
-                        key: ValueKey(trackerInfo.id),
-                        index: index,
-                        count: requests.length,
-                        reversed: true,
-                        trackerInfo: trackerInfo,
-                        onClickKeyword: (value) {
-                          context.commonScaffoldState?.addKeyword(value);
-                        },
-                        detailTitle: appLocalizations.details,
-                      );
-                    },
-                    itemExtentBuilder: (index, _) {
-                      return TrackerInfoItem.height + 1;
-                    },
-                    itemCount: requests.length,
-                  ),
-                ),
-              ),
-            ),
+      body: NullStatusSwitcher(
+        isEmpty: requests.isEmpty,
+        nullStatus: NullStatus(
+          label: appLocalizations.nullTip(appLocalizations.requests),
+          illustration: NullStatusIllustration.requests,
+        ),
+        child: CommonScrollBar(
+          trackVisibility: false,
+          controller: _scrollController,
+          child: ListView.builder(
+            physics: const NextClampingScrollPhysics(),
+            controller: _scrollController,
+            padding: const EdgeInsets.only(bottom: 16, top: 8),
+            itemBuilder: (context, index) {
+              final trackerInfo = requests[index];
+              return TrackerInfoItem(
+                key: ValueKey(trackerInfo.id),
+                index: index,
+                count: requests.length,
+                trackerInfo: trackerInfo,
+                onClickKeyword: (value) {
+                  context.commonScaffoldState?.addKeyword(value);
+                },
+                detailTitle: appLocalizations.details,
+              );
+            },
+            itemExtentBuilder: (index, _) {
+              return TrackerInfoItem.height + 8;
+            },
+            itemCount: requests.length,
+          ),
+        ),
+      ),
     );
   }
 }

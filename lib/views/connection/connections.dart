@@ -52,7 +52,10 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
         unawaited(_syncUpdateTimer());
       }
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await waitRouteSettled(context);
+      if (!mounted) return;
       unawaited(_syncUpdateTimer());
     });
   }
@@ -239,46 +242,45 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
       body: Consumer(
         builder: (_, ref, _) {
           final connections = ref.watch(filteredConnectionsProvider);
-          final hasConnections = connections.isNotEmpty;
 
-          if (!hasConnections) {
-            return NullStatus(
+          return NullStatusSwitcher(
+            isEmpty: connections.isEmpty,
+            nullStatus: NullStatus(
               label: appLocalizations.nullTip(appLocalizations.connections),
               illustration: NullStatusIllustration.connections,
-            );
-          }
-
-          return CommonScrollBar(
-            controller: _scrollController,
-            child: ListView.builder(
+            ),
+            child: CommonScrollBar(
               controller: _scrollController,
-              padding: const EdgeInsets.only(bottom: 16, top: 8),
-              itemBuilder: (context, index) {
-                final trackerInfo = connections[index];
-                return TrackerInfoItem(
-                  key: ValueKey(trackerInfo.id),
-                  index: index,
-                  count: connections.length,
-                  trackerInfo: trackerInfo,
-                  onClickKeyword: (value) {
-                    context.commonScaffoldState?.addKeyword(value);
-                  },
-                  trailing: IconButton(
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
-                    style: const ButtonStyle(
-                      minimumSize: WidgetStatePropertyAll(Size.zero),
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.only(bottom: 16, top: 8),
+                itemBuilder: (context, index) {
+                  final trackerInfo = connections[index];
+                  return TrackerInfoItem(
+                    key: ValueKey(trackerInfo.id),
+                    index: index,
+                    count: connections.length,
+                    trackerInfo: trackerInfo,
+                    onClickKeyword: (value) {
+                      context.commonScaffoldState?.addKeyword(value);
+                    },
+                    trailing: IconButton(
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      style: const ButtonStyle(
+                        minimumSize: WidgetStatePropertyAll(Size.zero),
+                      ),
+                      icon: const Icon(FluentIcons.prohibited_24_regular),
+                      onPressed: () => _handleBlockConnection(trackerInfo.id),
                     ),
-                    icon: const Icon(FluentIcons.prohibited_24_regular),
-                    onPressed: () => _handleBlockConnection(trackerInfo.id),
-                  ),
-                  detailTitle: appLocalizations.details,
-                );
-              },
-              itemExtentBuilder: (index, _) {
-                return TrackerInfoItem.height + 1;
-              },
-              itemCount: connections.length,
+                    detailTitle: appLocalizations.details,
+                  );
+                },
+                itemExtentBuilder: (index, _) {
+                  return TrackerInfoItem.height + 8;
+                },
+                itemCount: connections.length,
+              ),
             ),
           );
         },
