@@ -63,6 +63,7 @@ func handleInitClash(paramsString string) bool {
 		constant.SetHomeDir(params.HomeDir)
 		isInit = true
 		ensureLogSubscriber()
+		initPermissionGuard(params.HomeDir)
 	}
 	return isInit
 }
@@ -198,7 +199,6 @@ func handleChangeProxy(data string, fn func(string string)) {
 		}
 
 		fn("")
-		return
 	}()
 }
 
