@@ -1119,6 +1119,70 @@ class GlobalState {
       }
     }
 
+    if (targetProfile.selectedMap['GLOBAL'] == null &&
+        rawConfig['proxy-groups'] is List) {
+      final proxyGroups = rawConfig['proxy-groups'] as List;
+      final groupNames = proxyGroups
+          .whereType<Map>()
+          .map((g) => g['name']?.toString())
+          .whereType<String>()
+          .where((name) => name != 'GLOBAL' && name != 'DIRECT' && name != 'REJECT')
+          .toSet();
+
+      String? firstValidGroup;
+      for (final g in proxyGroups) {
+        if (g is Map && g['name'] is String) {
+          final name = g['name'] as String;
+          if (groupNames.contains(name)) {
+            firstValidGroup = name;
+            break;
+          }
+        }
+      }
+
+      String? matchTarget;
+      if (firstValidGroup == null) {
+        for (final rule in rules) {
+          if (rule is String) {
+            final parsed = ParsedRule.parseString(rule);
+            if (parsed.ruleAction == RuleAction.MATCH &&
+                parsed.ruleTarget != null &&
+                parsed.ruleTarget!.isNotEmpty &&
+                parsed.ruleTarget != 'DIRECT' &&
+                parsed.ruleTarget != 'REJECT') {
+              if (groupNames.contains(parsed.ruleTarget)) {
+                matchTarget = parsed.ruleTarget;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      final defaultTarget = firstValidGroup ?? matchTarget;
+      if (defaultTarget != null) {
+        final updatedSelectedMap = Map<String, String>.from(targetProfile.selectedMap)
+          ..['GLOBAL'] = defaultTarget;
+        final updatedProfile = targetProfile.copyWith(selectedMap: updatedSelectedMap);
+        if (_appController != null) {
+          _appController!.setProfile(updatedProfile);
+        } else {
+          final profiles = List<Profile>.from(config.profiles);
+          final idx = profiles.indexWhere((p) => p.id == updatedProfile.id);
+          if (idx != -1) {
+            profiles[idx] = updatedProfile;
+            config = config.copyWith(profiles: profiles);
+          }
+        }
+      }
+    }
+
+    if (rawConfig['proxy-groups'] is List) {
+      (rawConfig['proxy-groups'] as List).removeWhere(
+        (g) => g is Map && g['name'] == 'GLOBAL',
+      );
+    }
+
     rawConfig.remove('rule');
     rawConfig['rules'] = rules;
     return rawConfig;

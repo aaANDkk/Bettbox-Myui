@@ -115,21 +115,38 @@ class ClashCore {
       }
 
       final globalProxy = allProxies[UsedProxy.GLOBAL.name];
-      if (globalProxy == null) return [];
+      final groupNames = <String>[];
+      final seenGroupNames = <String>{};
 
-      final allList = globalProxy['all'] as List?;
-      if (allList == null) return [];
+      if (globalProxy != null) {
+        groupNames.add(UsedProxy.GLOBAL.name);
+        seenGroupNames.add(UsedProxy.GLOBAL.name);
 
-      final groupNames = [
-        UsedProxy.GLOBAL.name,
-        ...allList.where((e) {
-          final proxy = allProxies[e];
-          if (proxy is Map) {
-            return GroupTypeExtension.valueList.contains(proxy['type']);
+        final allList = globalProxy['all'] as List?;
+        if (allList != null) {
+          for (final item in allList) {
+            final name = item.toString();
+            final proxy = allProxies[name];
+            if (proxy is Map &&
+                GroupTypeExtension.valueList.contains(proxy['type'])) {
+              if (seenGroupNames.add(name)) {
+                groupNames.add(name);
+              }
+            }
           }
-          return false;
-        }),
-      ];
+        }
+      }
+
+      for (final entry in allProxies.entries) {
+        final proxy = entry.value;
+        if (proxy is Map &&
+            GroupTypeExtension.valueList.contains(proxy['type'])) {
+          final name = entry.key;
+          if (seenGroupNames.add(name)) {
+            groupNames.add(name);
+          }
+        }
+      }
       final groupsRaw = groupNames.map((groupName) {
         final proxyData = allProxies[groupName] as Map?;
         if (proxyData == null) return null;
