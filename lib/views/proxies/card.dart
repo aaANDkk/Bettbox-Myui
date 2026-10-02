@@ -89,8 +89,10 @@ class ProxyCard extends StatelessWidget {
             return const SizedBox(height: 0, width: 0);
           }
 
+          final Widget child;
           if (delay == 0) {
-            return SizedBox(
+            child = SizedBox(
+              key: const ValueKey('delayAnimation'),
               height: measure.labelSmallHeight,
               width: measure.labelSmallHeight,
               child: DelayAnimation(
@@ -99,10 +101,9 @@ class ProxyCard extends StatelessWidget {
                 color: context.colorScheme.primary,
               ),
             );
-          }
-
-          if (delay == null) {
-            return SizedBox(
+          } else if (delay == null) {
+            child = SizedBox(
+              key: const ValueKey('delayTest'),
               height: measure.labelSmallHeight,
               width: measure.labelSmallHeight,
               child: IconButton(
@@ -113,17 +114,24 @@ class ProxyCard extends StatelessWidget {
                 onPressed: _handleTestCurrentDelay,
               ),
             );
+          } else {
+            child = GestureDetector(
+              key: const ValueKey('delayValue'),
+              onTap: _handleTestCurrentDelay,
+              child: Text(
+                delay > 0 ? '$delay ms' : 'Timeout',
+                style: context.textTheme.labelSmall?.copyWith(
+                  overflow: TextOverflow.ellipsis,
+                  color: utils.getDelayColor(delay),
+                ),
+              ),
+            );
           }
 
-          return GestureDetector(
-            onTap: _handleTestCurrentDelay,
-            child: Text(
-              delay > 0 ? '$delay ms' : 'Timeout',
-              style: context.textTheme.labelSmall?.copyWith(
-                overflow: TextOverflow.ellipsis,
-                color: utils.getDelayColor(delay),
-              ),
-            ),
+          return FadeBox(
+            alignment: Alignment.centerRight,
+            sequential: true,
+            child: child,
           );
         },
       ),
