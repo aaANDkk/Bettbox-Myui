@@ -65,6 +65,20 @@ class System {
     }
 
     if (Platform.isLinux) {
+      if (appPath.isAppImage) {
+        await appPath.ensureAppImageCoreSynced();
+      }
+
+      for (final cmd in ['getcap', '/sbin/getcap', '/usr/sbin/getcap']) {
+        try {
+          final res = await Process.run(cmd, [corePath]);
+          if (res.exitCode == 0 &&
+              res.stdout.toString().contains('cap_net_admin')) {
+            return true;
+          }
+        } catch (_) {}
+      }
+
       final result = await Process.run('stat', ['-c', '%U:%G %A', corePath]);
       final output = result.stdout.trim();
       final parts = output.split(' ');
@@ -132,14 +146,52 @@ class System {
     }
 
     if (Platform.isLinux) {
+      if (appPath.isAppImage) {
+        await appPath.ensureAppImageCoreSynced();
+      }
       final escapedCorePath = _shellEscape(appPath.corePath);
+      final homeDir = await appPath.homeDirPath;
+      final escapedHomeDir = _shellEscape(homeDir);
+
+      var chownLegacy = '';
+      try {
+        final uidRes = await Process.run('id', ['-u']);
+        final gidRes = await Process.run('id', ['-g']);
+        if (uidRes.exitCode == 0 && gidRes.exitCode == 0) {
+          final uid = int.tryParse(uidRes.stdout.toString().trim());
+          final gid = int.tryParse(gidRes.stdout.toString().trim());
+          if (uid != null && gid != null) {
+            chownLegacy =
+                'if [ -d $escapedHomeDir ]; then chown -R $uid:$gid $escapedHomeDir 2>/dev/null || true; fi';
+          }
+        }
+      } catch (_) {}
+
+      final script = [
+        'SETCAP_CMD=""',
+        'for cmd in setcap /sbin/setcap /usr/sbin/setcap; do',
+        '  if command -v "\$cmd" >/dev/null 2>&1; then',
+        '    SETCAP_CMD="\$cmd"',
+        '    break',
+        '  fi',
+        'done',
+        'if [ -n "\$SETCAP_CMD" ] && "\$SETCAP_CMD" \'cap_net_admin,cap_net_bind_service,cap_net_raw=+ep\' $escapedCorePath 2>/dev/null; then',
+        '  sync',
+        'else',
+        '  chown root:root $escapedCorePath && chmod u+s $escapedCorePath && sync',
+        'fi',
+        'for pdir in /etc/polkit-1/rules.d /usr/share/polkit-1/rules.d; do',
+        '  if [ -d "\$pdir" ]; then',
+        '    echo \'polkit.addRule(function(action, subject) { if (action.id.indexOf("org.freedesktop.resolve1.") === 0 && subject.local && subject.active) { return polkit.Result.YES; } });\' > "\$pdir/99-bettbox.rules"',
+        '    chmod 0644 "\$pdir/99-bettbox.rules" 2>/dev/null || true',
+        '    break',
+        '  fi',
+        'done',
+        if (chownLegacy.isNotEmpty) chownLegacy,
+      ].join('\n');
 
       try {
-        final pkexecResult = await Process.run('pkexec', [
-          'sh',
-          '-c',
-          'chown root:root $escapedCorePath && chmod u+s $escapedCorePath && sync',
-        ]);
+        final pkexecResult = await Process.run('pkexec', ['sh', '-c', script]);
         if (pkexecResult.exitCode == 0) {
           return AuthorizeCode.success;
         }
@@ -165,9 +217,10 @@ class System {
         return AuthorizeCode.error;
       }
       final escapedPassword = _shellEscape(password);
+      final escapedScript = _shellEscape(script);
       final result = await Process.run(shell, [
         '-c',
-        'echo $escapedPassword | sudo -S chown root:root $escapedCorePath && echo $escapedPassword | sudo -S chmod u+s $escapedCorePath && sync',
+        'echo $escapedPassword | sudo -S sh -c $escapedScript',
       ]);
       if (result.exitCode != 0) {
         globalState.showNotifier(appLocalizations.tunEnableRequireAdmin);

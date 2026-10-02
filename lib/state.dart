@@ -137,6 +137,9 @@ class GlobalState {
 
   Future<void> initApp(int version) async {
     isExiting = false;
+    if (system.isLinux && appPath.isAppImage) {
+      await appPath.ensureAppImageCoreSynced();
+    }
     coreSHA256 = const String.fromEnvironment('CORE_SHA256');
     if (system.isWindows && (coreSHA256 == null || coreSHA256!.isEmpty)) {
       coreSHA256 = await _calcCoreSHA256();

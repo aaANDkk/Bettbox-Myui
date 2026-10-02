@@ -256,6 +256,9 @@ class ClashService extends ClashHandlerInterface {
     String arg,
     Map<String, String> environment,
   ) async {
+    if (system.isLinux && appPath.isAppImage) {
+      await appPath.ensureAppImageCoreSynced();
+    }
     process = await Process.start(appPath.corePath, [
       arg,
     ], environment: environment);

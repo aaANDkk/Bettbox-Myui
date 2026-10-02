@@ -123,9 +123,6 @@ class AppPackageMakerPacman extends AppPackageMaker {
       '${packagingDirectory.path}/usr/share/${makeConfig.appBinaryName}/',
     ]);
 
-    // Ensure the core binary has setuid bit set before packaging so that
-    // .MTREE records the elevated permissions. The postinstall script will
-    // re-apply ownership on the target system as a safety net.
     final coreFile = File(
       path.join(
         packagingDirectory.path,
@@ -135,7 +132,7 @@ class AppPackageMakerPacman extends AppPackageMaker {
       ),
     );
     if (coreFile.existsSync()) {
-      await $('chmod', ['+sx', coreFile.path]);
+      await $('chmod', ['0755', coreFile.path]);
     }
 
     // MTREE Metadata using bsdtar wrapped in fakeroot so uid/gid are recorded

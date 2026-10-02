@@ -570,7 +570,7 @@ class BuildCommand extends Command {
     final coreFile = File('libclash/linux/BettboxCore');
     if (!coreFile.existsSync()) return;
     try {
-      await Process.run('chmod', ['+sx', coreFile.path]);
+      await Process.run('chmod', ['0755', coreFile.path]);
     } catch (_) {}
   }
 

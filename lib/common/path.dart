@@ -13,10 +13,13 @@ class AppPath {
   Completer<Directory> tempDir = Completer();
   late String appDirPath;
 
+  String? _resolvedDataDirPath;
+
   AppPath._internal() {
     appDirPath = join(dirname(Platform.resolvedExecutable));
     final portableDir = Directory(join(appDirPath, 'portable'));
     if (system.isWindows && portableDir.existsSync()) {
+      _resolvedDataDirPath = portableDir.path;
       dataDir.complete(portableDir);
       final portableTempDir = Directory(join(portableDir.path, 'temp'));
       if (!portableTempDir.existsSync()) {
@@ -26,10 +29,13 @@ class AppPath {
     } else {
       getApplicationSupportDirectory().then((value) {
         if (system.isWindows && AppIdentity.isDev) {
-          dataDir.complete(
-            Directory(join(value.parent.path, AppIdentity.dataDirName)),
+          final dir = Directory(
+            join(value.parent.path, AppIdentity.dataDirName),
           );
+          _resolvedDataDirPath = dir.path;
+          dataDir.complete(dir);
         } else {
+          _resolvedDataDirPath = value.path;
           dataDir.complete(value);
         }
       });
@@ -59,7 +65,24 @@ class AppPath {
     return dirname(currentExecutablePath);
   }
 
-  String get corePath {
+  bool get isAppImage =>
+      Platform.isLinux &&
+      (Platform.environment.containsKey('APPIMAGE') ||
+          executableDirPath.contains('/.mount_'));
+
+  String get _linuxUserDataDirPath {
+    if (_resolvedDataDirPath != null) return _resolvedDataDirPath!;
+    final xdgData = Platform.environment['XDG_DATA_HOME'];
+    final baseDir = (xdgData != null && xdgData.isNotEmpty)
+        ? xdgData
+        : join(Platform.environment['HOME'] ?? '', '.local', 'share');
+    return join(
+      baseDir,
+      AppIdentity.isDev ? '${AppIdentity.packageId}.dev' : AppIdentity.packageId,
+    );
+  }
+
+  String get bundledCorePath {
     final devWorkspacePath = _devWorkspacePath;
     if (devWorkspacePath != null) {
       final corePath = join(
@@ -77,6 +100,56 @@ class AppPath {
       executableDirPath,
       '${AppIdentity.coreExecutableName}$executableExtension',
     );
+  }
+
+  String get corePath {
+    if (isAppImage) {
+      return join(
+        _linuxUserDataDirPath,
+        'core',
+        '${AppIdentity.coreExecutableName}$executableExtension',
+      );
+    }
+    return bundledCorePath;
+  }
+
+  Future<void> ensureAppImageCoreSynced() async {
+    if (!isAppImage) return;
+
+    final bundled = File(bundledCorePath);
+    if (!bundled.existsSync()) return;
+
+    final external = File(corePath);
+    final stampFile = File(join(external.parent.path, '.core_stamp'));
+
+    final bundledStat = bundled.statSync();
+    final currentStamp =
+        '${bundledStat.size}_${bundledStat.modified.millisecondsSinceEpoch}';
+
+    if (external.existsSync() && stampFile.existsSync()) {
+      try {
+        final recordedStamp = stampFile.readAsStringSync().trim();
+        if (recordedStamp == currentStamp) {
+          return;
+        }
+      } catch (_) {}
+    }
+
+    try {
+      if (!external.parent.existsSync()) {
+        external.parent.createSync(recursive: true);
+      }
+      final tempFile = File('${external.path}.tmp');
+      if (tempFile.existsSync()) {
+        tempFile.deleteSync();
+      }
+      bundled.copySync(tempFile.path);
+      tempFile.renameSync(external.path);
+      Process.runSync('chmod', ['0755', external.path]);
+      stampFile.writeAsStringSync(currentStamp);
+    } catch (e) {
+      commonPrint.log('Failed to sync AppImage core: $e');
+    }
   }
 
   String get helperPath {

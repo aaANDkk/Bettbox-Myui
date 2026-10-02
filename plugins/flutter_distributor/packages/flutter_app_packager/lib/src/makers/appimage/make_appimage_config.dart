@@ -39,6 +39,7 @@ class MakeAppImageConfig extends MakeConfig {
     this.actions = const [],
     this.include = const [],
     this.startupNotify = true,
+    this.startupWMClass,
     this.genericName = 'A Flutter Application',
   });
   factory MakeAppImageConfig.fromJson(Map<String, dynamic> map) {
@@ -49,6 +50,7 @@ class MakeAppImageConfig extends MakeConfig {
       keywords: (map['keywords'] as List<dynamic>? ?? []).cast<String>(),
       categories: (map['categories'] as List<dynamic>? ?? []).cast<String>(),
       startupNotify: map['startup_notify'] as bool? ?? false,
+      startupWMClass: map['startup_wm_class'] as String?,
       genericName: map['generic_name'] as String? ?? 'A Flutter Application',
       actions: (map['actions'] as List? ?? [])
           .map(
@@ -65,6 +67,7 @@ class MakeAppImageConfig extends MakeConfig {
   final List<String> categories;
   final List<AppImageAction> actions;
   final bool startupNotify;
+  final String? startupWMClass;
   final String genericName;
   final String displayName;
   final List<String> include;
@@ -77,6 +80,7 @@ class MakeAppImageConfig extends MakeConfig {
       'Icon': appName,
       'Type': 'Application',
       'StartupNotify': startupNotify ? 'true' : 'false',
+      if (startupWMClass != null) 'StartupWMClass': startupWMClass!,
       if (categories.isNotEmpty) 'Categories': categories.join(';'),
       if (keywords.isNotEmpty) 'Keywords': keywords.join(';'),
       if (this.actions.isNotEmpty)

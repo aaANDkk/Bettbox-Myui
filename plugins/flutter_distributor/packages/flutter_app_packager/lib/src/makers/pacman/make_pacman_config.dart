@@ -111,6 +111,7 @@ class MakePacmanConfig extends MakeLinuxPackageConfig {
     this.optDependencies,
     this.options,
     this.startupNotify = false,
+    this.startupWMClass,
     this.groups = const ['default'],
     this.licenses = const ['unknown'],
     this.icon,
@@ -177,6 +178,7 @@ class MakePacmanConfig extends MakeLinuxPackageConfig {
           ? List.castFrom<dynamic, String>(map['categories'])
           : null,
       startupNotify: map['startup_notify'],
+      startupWMClass: map['startup_wm_class'],
       genericName: map['generic_name'],
       installedSize: map['installed_size'],
       icon: map['icon'],
@@ -195,6 +197,7 @@ class MakePacmanConfig extends MakeLinuxPackageConfig {
   String? metainfo;
   String? genericName;
   bool startupNotify;
+  String? startupWMClass;
   List<String>? options;
   List<String>? dependencies;
   List<String>? optDependencies;
@@ -264,6 +267,7 @@ class MakePacmanConfig extends MakeLinuxPackageConfig {
             ? '${keywords!.join(';')};'
             : null,
         'StartupNotify': startupNotify,
+        'StartupWMClass': startupWMClass,
       }..removeWhere((key, value) => value == null),
     };
   }
