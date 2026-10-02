@@ -46,9 +46,13 @@ class ThemeView extends ConsumerWidget {
       themeSettingProvider.select((state) => state.useCustomFont),
     );
 
-    final toggleItems = [
+    final invertItems = [
+      if (brightness == Brightness.dark) _PrueBlackItem(),
       if (system.isAndroid) const _DarkIconItem(),
       if (system.isWindows) _TrayIconInvertItem(),
+    ];
+
+    final styleItems = [
       _TextScaleFactorItem(),
       const _CustomFontItem(),
       if (useCustomFont) const _SelectCustomFontItem(),
@@ -58,8 +62,8 @@ class ThemeView extends ConsumerWidget {
     final items = [
       _ThemeModeItem(),
       _PrimaryColorItem(),
-      if (brightness == Brightness.dark) _PrueBlackItem(),
-      if (toggleItems.isNotEmpty) ...generateSection(items: toggleItems),
+      if (invertItems.isNotEmpty) ...generateSection(items: invertItems),
+      if (styleItems.isNotEmpty) ...generateSection(items: styleItems),
     ];
     return generateListView(items);
   }
@@ -175,10 +179,6 @@ class _PrimaryColorItem extends ConsumerStatefulWidget {
 class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
   int? _removablePrimaryColor;
 
-  int _calcColumns(double maxWidth) {
-    return max((maxWidth / 96).ceil(), 3);
-  }
-
   Future<void> _handleReset() async {
     final res = await globalState.showMessage(
       message: TextSpan(text: appLocalizations.resetTip),
@@ -230,7 +230,11 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
 
   Future<void> _handleAdd() async {
     final res = await globalState.showCommonDialog<int>(
-      child: _PaletteDialog(),
+      child: _PaletteDialog(
+        initialColor: ref.read(
+          themeSettingProvider.select((state) => state.primaryColor),
+        ),
+      ),
     );
     if (res == null) {
       return;
@@ -306,8 +310,8 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
         return true;
       },
       child: ItemCard(
-        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.paint_brush_24_regular),
-        actions: genActions([
+        info: Info(label: appLocalizations.themeColor, iconData: FluentIcons.color_24_regular),
+        actions: [
           if (_removablePrimaryColor == null)
             FilledButton(
               style: FilledButton.styleFrom(
@@ -325,11 +329,7 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
                 foregroundColor: fabFgColor,
                 visualDensity: VisualDensity.compact,
               ),
-              onPressed: () {
-                setState(() {
-                  _removablePrimaryColor = null;
-                });
-              },
+              onPressed: _clearRemovable,
               child: Text(appLocalizations.cancel),
             ),
           if (_removablePrimaryColor == null && !isEquals)
@@ -340,102 +340,153 @@ class _PrimaryColorItemState extends ConsumerState<_PrimaryColorItem> {
               onPressed: _handleReset,
               icon: Icon(FluentIcons.arrow_repeat_all_24_regular),
             ),
-        ], space: 8),
+        ].separated(const SizedBox(width: 8)).toList(),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: LayoutBuilder(
-            builder: (_, constraints) {
-              final columns = _calcColumns(constraints.maxWidth);
-              final itemWidth =
-                  (constraints.maxWidth - (columns - 1) * 16) / columns;
-              return Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  for (final color in primaryColors)
-                    Container(
-                      clipBehavior: Clip.none,
-                      width: itemWidth,
-                      height: itemWidth,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        clipBehavior: Clip.none,
-                        children: [
-                          EffectGestureDetector(
-                            onLongPress: () {
-                              setState(() {
-                                _removablePrimaryColor = color;
-                              });
-                            },
-                            child: ColorSchemeBox(
-                              isSelected: color == primaryColor,
-                              primaryColor: color != null ? Color(color) : null,
-                              onLongPress: () {
-                                setState(() {
-                                  _removablePrimaryColor = color;
-                                });
-                              },
-                              onPressed: () {
-                                setState(() {
-                                  _removablePrimaryColor = null;
-                                });
-                                ref
-                                    .read(themeSettingProvider.notifier)
-                                    .updateState(
-                                      (state) =>
-                                          state.copyWith(primaryColor: color),
-                                    );
-                              },
-                            ),
-                          ),
-                          if (_removablePrimaryColor != null &&
-                              _removablePrimaryColor == color)
-                            Container(
-                              color: Colors.white.opacity0,
-                              padding: EdgeInsets.all(8),
-                              child: IconButton.filledTonal(
-                                style: IconButton.styleFrom(
-                                  visualDensity: VisualDensity.compact,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  shape: const CircleBorder(),
-                                ),
-                                onPressed: _handleDel,
-                                padding: const EdgeInsets.all(12),
-                                iconSize: 30,
-                                icon: Icon(
-                                  color: context.colorScheme.primary,
-                                  FluentIcons.delete_24_regular,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  if (_removablePrimaryColor == null)
-                    Container(
-                      width: itemWidth,
-                      height: itemWidth,
-                      padding: const EdgeInsets.all(4),
-                      child: IconButton.filledTonal(
-                        style: IconButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: const CircleBorder(),
-                        ),
-                        onPressed: _handleAdd,
-                        iconSize: 32,
-                        icon: Icon(
-                          color: context.colorScheme.primary,
-                          FluentIcons.add_24_regular,
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
+          child: _PrimaryColorGrid(
+            colors: primaryColors,
+            selectedColor: primaryColor,
+            removableColor: _removablePrimaryColor,
+            onSelect: _handleSelectColor,
+            onRequestRemove: _markRemovable,
+            onDelete: _handleDel,
+            onAdd: _handleAdd,
           ),
         ),
       ),
+    );
+  }
+
+  void _clearRemovable() {
+    setState(() {
+      _removablePrimaryColor = null;
+    });
+  }
+
+  void _markRemovable(int? color) {
+    setState(() {
+      _removablePrimaryColor = color;
+    });
+  }
+
+  void _handleSelectColor(int? color) {
+    _clearRemovable();
+    ref
+        .read(themeSettingProvider.notifier)
+        .updateState((state) => state.copyWith(primaryColor: color));
+  }
+}
+
+// Column stride of the swatch grid: on a phone this lands on six per row, and
+// the tile size stays roughly constant as the width changes.
+const double _swatchStride = 58;
+
+class _PrimaryColorGrid extends StatelessWidget {
+  const _PrimaryColorGrid({
+    required this.colors,
+    required this.selectedColor,
+    required this.removableColor,
+    required this.onSelect,
+    required this.onRequestRemove,
+    required this.onDelete,
+    required this.onAdd,
+  });
+
+  final List<int?> colors;
+  final int? selectedColor;
+  final int? removableColor;
+  final void Function(int? color) onSelect;
+  final void Function(int? color) onRequestRemove;
+  final VoidCallback onDelete;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (_, constraints) {
+        final columns = max((constraints.maxWidth / _swatchStride).ceil(), 3);
+        final itemWidth = (constraints.maxWidth - (columns - 1) * 16) / columns;
+        return Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: [
+            for (final color in colors)
+              _PrimaryColorTile(
+                color: color,
+                size: itemWidth,
+                isSelected: color == selectedColor,
+                isRemovable: removableColor != null && removableColor == color,
+                onSelect: () => onSelect(color),
+                onRequestRemove: () => onRequestRemove(color),
+                onDelete: onDelete,
+              ),
+            if (removableColor == null)
+              SizedBox.square(
+                dimension: itemWidth,
+                child: IconButton.filledTonal(
+                  onPressed: onAdd,
+                  icon: const Icon(FluentIcons.add_24_regular),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _PrimaryColorTile extends StatelessWidget {
+  const _PrimaryColorTile({
+    required this.color,
+    required this.size,
+    required this.isSelected,
+    required this.isRemovable,
+    required this.onSelect,
+    required this.onRequestRemove,
+    required this.onDelete,
+  });
+
+  final int? color;
+  final double size;
+  final bool isSelected;
+  final bool isRemovable;
+  final VoidCallback onSelect;
+  final VoidCallback onRequestRemove;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Stack(
+      children: [
+        EffectGestureDetector(
+          onLongPress: onRequestRemove,
+          child: ColorSchemeBox(
+            isSelected: isSelected,
+            primaryColor: color != null ? Color(color!) : null,
+            onPressed: onSelect,
+            size: size,
+          ),
+        ),
+        if (isRemovable)
+          Positioned.fill(
+            child: Material(
+              color: colorScheme.errorContainer.withValues(alpha: 0.9),
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: onDelete,
+                child: Center(
+                  child: Icon(
+                    FluentIcons.delete_24_regular,
+                    color: colorScheme.onErrorContainer,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -726,12 +777,6 @@ class _DarkIconItem extends ConsumerWidget {
           color: context.colorScheme.onSurfaceVariant,
         ),
       ),
-      subtitle: Text(
-        appLocalizations.darkIconDesc,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
-        ),
-      ),
       delegate: SwitchDelegate(
         value: useDarkIcon,
         onChanged: (value) async {
@@ -760,12 +805,6 @@ class _TrayIconInvertItem extends ConsumerWidget {
         appLocalizations.trayIconInvert,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
           color: context.colorScheme.onSurfaceVariant,
-        ),
-      ),
-      subtitle: Text(
-        appLocalizations.trayIconInvertDesc,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: context.colorScheme.onSurfaceVariant.withOpacity(0.7),
         ),
       ),
       delegate: SwitchDelegate(
@@ -861,53 +900,29 @@ class _TextScaleFactorItem extends ConsumerWidget {
 }
 
 class _PaletteDialog extends StatefulWidget {
-  const _PaletteDialog();
+  final int? initialColor;
+
+  const _PaletteDialog({this.initialColor});
 
   @override
   State<_PaletteDialog> createState() => _PaletteDialogState();
 }
 
 class _PaletteDialogState extends State<_PaletteDialog> {
-  final _controller = ValueNotifier<ui.Color>(const Color(defaultPrimaryColor));
+  late final ValueNotifier<Color> _controller;
 
-  ui.Color? _parseColor(String input) {
-    final cleanInput = input.trim().replaceAll(' ', '').toLowerCase();
+  @override
+  void initState() {
+    super.initState();
+    _controller = ValueNotifier<Color>(
+      Color(widget.initialColor ?? defaultPrimaryColor),
+    );
+  }
 
-    // Hex: #RRGGBB or RRGGBB
-    if (RegExp(r'^#?[0-9a-f]{6}$').hasMatch(cleanInput)) {
-      final hexString = cleanInput.startsWith('#')
-          ? cleanInput.substring(1)
-          : cleanInput;
-      return ui.Color(int.parse('FF$hexString', radix: 16));
-    }
-
-    // Hex with alpha: #AARRGGBB or AARRGGBB
-    if (RegExp(r'^#?[0-9a-f]{8}$').hasMatch(cleanInput)) {
-      final hexString = cleanInput.startsWith('#')
-          ? cleanInput.substring(1)
-          : cleanInput;
-      return ui.Color(int.parse(hexString, radix: 16));
-    }
-
-    // RGB/RGBA: rgb(255,255,255) or rgba(255,255,255,1.0)
-    final rgbMatch = RegExp(
-      r'^rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)$',
-    ).firstMatch(cleanInput);
-    if (rgbMatch != null) {
-      final r = int.parse(rgbMatch.group(1)!);
-      final g = int.parse(rgbMatch.group(2)!);
-      final b = int.parse(rgbMatch.group(3)!);
-      final aStr = rgbMatch.group(4);
-      final a = aStr != null ? double.parse(aStr) : 1.0;
-
-      final alphaVal = (a * 255).round().clamp(0, 255);
-      final rVal = r.clamp(0, 255);
-      final gVal = g.clamp(0, 255);
-      final bVal = b.clamp(0, 255);
-      return ui.Color.fromARGB(alphaVal, rVal, gVal, bVal);
-    }
-
-    return null;
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -928,57 +943,9 @@ class _PaletteDialogState extends State<_PaletteDialog> {
           child: Text(appLocalizations.confirm),
         ),
       ],
-      child: Column(
-        children: [
-          SizedBox(height: 8),
-          SizedBox(
-            width: 250,
-            height: 250,
-            child: Palette(controller: _controller),
-          ),
-          SizedBox(height: 24),
-          ValueListenableBuilder(
-            valueListenable: _controller,
-            builder: (_, color, _) {
-              return FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: color,
-                  foregroundColor: color.computeLuminance() > 0.5
-                      ? Colors.black
-                      : Colors.white,
-                ),
-                onPressed: () async {
-                  final customColorStr = await globalState
-                      .showCommonDialog<String>(
-                        child: InputDialog(
-                          title: appLocalizations.color,
-                          value: _controller.value.hex,
-                          hintText: '#000000 / rgb(0,0,0)',
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return appLocalizations.emptyTip(
-                                appLocalizations.color,
-                              );
-                            }
-                            if (_parseColor(value) == null) {
-                              return appLocalizations.formatError;
-                            }
-                            return null;
-                          },
-                        ),
-                      );
-                  if (customColorStr != null) {
-                    final newColor = _parseColor(customColorStr);
-                    if (newColor != null) {
-                      _controller.value = newColor;
-                    }
-                  }
-                },
-                child: Text(color.hex),
-              );
-            },
-          ),
-        ],
+      child: SizedBox(
+        width: 310,
+        child: Palette(controller: _controller),
       ),
     );
   }
