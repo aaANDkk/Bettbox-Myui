@@ -120,13 +120,39 @@ begin
   DeleteFile(TempScriptPath);
 end;
 
+function GenerateAuthKey: String;
+var
+  i: Integer;
+  HexChars: String;
+begin
+  HexChars := '0123456789abcdef';
+  Result := '';
+  for i := 1 to 64 do
+  begin
+    Result := Result + Copy(HexChars, Random(16) + 1, 1);
+  end;
+end;
+
 procedure RegisterHelperService;
 var
   ResultCode: Integer;
   HelperPath: String;
   ServiceName: String;
+  PipeName: String;
+  AuthKey: String;
+  ExistingEnv: String;
+  EnvData: String;
+  P: Integer;
 begin
   ServiceName := '{{HELPER_SERVICE_NAME}}';
+  PipeName := '{{HELPER_PIPE_NAME}}';
+  if (PipeName = '') or (Pos('{' + '{', PipeName) > 0) then
+  begin
+    if Pos('Dev', ServiceName) > 0 then
+      PipeName := '\\.\pipe\BettboxDev.Helper'
+    else
+      PipeName := '\\.\pipe\Bettbox.Helper';
+  end;
   HelperPath := ExpandConstant('{app}\{{HELPER_EXECUTABLE_NAME}}');
   
   Exec('sc', 'stop ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
@@ -135,6 +161,28 @@ begin
   begin
     Exec('sc', 'create ' + ServiceName + ' binPath= "' + HelperPath + '" start= auto', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
+
+  AuthKey := '';
+  if RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Services\' + ServiceName, 'Environment', ExistingEnv) then
+  begin
+    P := Pos('HELPER_AUTH_KEY=', ExistingEnv);
+    if P > 0 then
+    begin
+      AuthKey := Copy(ExistingEnv, P + Length('HELPER_AUTH_KEY='), 64);
+    end;
+  end;
+
+  if Length(AuthKey) <> 64 then
+  begin
+    AuthKey := GenerateAuthKey;
+  end;
+
+  EnvData := 'HELPER_AUTH_KEY=' + AuthKey + #0 +
+             'HELPER_SERVICE_NAME=' + ServiceName + #0 +
+             'HELPER_PIPE_NAME=' + PipeName;
+
+  RegWriteMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Services\' + ServiceName, 'Environment', EnvData);
+
   Exec('sc', 'start ' + ServiceName, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 

@@ -95,6 +95,9 @@ class InnoSetupScript {
     final helperServiceName = isDev
         ? 'BettboxDevHelperService'
         : 'BettboxHelperService';
+    final helperPipeName = isDev
+        ? r'\\.\pipe\BettboxDev.Helper'
+        : r'\\.\pipe\Bettbox.Helper';
     final taskName = isDev ? 'Bettbox Dev' : 'Bettbox';
     Map<String, dynamic> variables = {
       'APP_ID': makeConfig.appId,
@@ -118,6 +121,7 @@ class InnoSetupScript {
       'CORE_EXECUTABLE_NAME': coreExecutableName,
       'HELPER_EXECUTABLE_NAME': helperExecutableName,
       'HELPER_SERVICE_NAME': helperServiceName,
+      'HELPER_PIPE_NAME': helperPipeName,
       'TASK_NAME': taskName,
     }..removeWhere((key, value) => value == null);
 

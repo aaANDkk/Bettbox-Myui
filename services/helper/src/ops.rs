@@ -29,7 +29,59 @@ pub mod core {
         hash: String,
     }
 
-    static PROCESS: Lazy<Arc<Mutex<Option<std::process::Child>>>> =
+    #[cfg(windows)]
+    struct CoreJob(windows::Win32::Foundation::HANDLE);
+
+    #[cfg(windows)]
+    impl CoreJob {
+        fn bind(child: &std::process::Child) -> Result<Self, std::io::Error> {
+            use std::os::windows::io::AsRawHandle;
+            use windows::Win32::Foundation::{CloseHandle, HANDLE};
+            use windows::Win32::System::JobObjects::{
+                AssignProcessToJobObject, CreateJobObjectW, JobObjectExtendedLimitInformation,
+                SetInformationJobObject, JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
+                JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+            };
+
+            unsafe {
+                let job = CreateJobObjectW(None, None)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+                let mut limits: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = std::mem::zeroed();
+                limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+                if let Err(e) = SetInformationJobObject(
+                    job,
+                    JobObjectExtendedLimitInformation,
+                    &limits as *const _ as *const _,
+                    std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32,
+                ) {
+                    let _ = CloseHandle(job);
+                    return Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()));
+                }
+                if let Err(e) = AssignProcessToJobObject(job, HANDLE(child.as_raw_handle() as isize)) {
+                    let _ = CloseHandle(job);
+                    return Err(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()));
+                }
+                Ok(Self(job))
+            }
+        }
+    }
+
+    #[cfg(windows)]
+    impl Drop for CoreJob {
+        fn drop(&mut self) {
+            unsafe {
+                let _ = windows::Win32::Foundation::CloseHandle(self.0);
+            }
+        }
+    }
+
+    struct ManagedProcess {
+        child: std::process::Child,
+        #[cfg(windows)]
+        _job: Option<CoreJob>,
+    }
+
+    static PROCESS: Lazy<Arc<Mutex<Option<ManagedProcess>>>> =
         Lazy::new(|| Arc::new(Mutex::new(None)));
     static FILE_HASH_CACHE: Lazy<Arc<Mutex<Option<CachedFileHash>>>> =
         Lazy::new(|| Arc::new(Mutex::new(None)));
@@ -87,10 +139,16 @@ pub mod core {
 
         match command.spawn() {
             Ok(child) => {
-                *process = Some(child);
+                #[cfg(windows)]
+                let job = CoreJob::bind(&child).ok();
+                *process = Some(ManagedProcess {
+                    child,
+                    #[cfg(windows)]
+                    _job: job,
+                });
 
-                if let Some(ref mut child) = *process {
-                    if let Some(stderr) = child.stderr.take() {
+                if let Some(ref mut managed) = *process {
+                    if let Some(stderr) = managed.child.stderr.take() {
                         let reader = std::io::BufReader::new(stderr);
                         thread::spawn(move || {
                             for line in reader.lines() {
@@ -126,12 +184,12 @@ pub mod core {
             thread::sleep(Duration::from_millis(500));
 
             let mut process = PROCESS.lock().unwrap_or_else(|e| e.into_inner());
-            let Some(child) = process.as_mut() else {
+            let Some(managed) = process.as_mut() else {
                 WATCHER_STARTED.store(false, Ordering::SeqCst);
                 break;
             };
 
-            match child.try_wait() {
+            match managed.child.try_wait() {
                 Ok(Some(status)) => {
                     log_message(format!("Core process exited: {}", status));
                     *process = None;
@@ -189,9 +247,9 @@ pub mod core {
 
     pub fn stop_core() -> String {
         let mut process = PROCESS.lock().unwrap_or_else(|e| e.into_inner());
-        if let Some(mut child) = process.take() {
-            let _ = child.kill();
-            let _ = child.wait();
+        if let Some(mut managed) = process.take() {
+            let _ = managed.child.kill();
+            let _ = managed.child.wait();
         }
         *process = None;
         "".to_string()

@@ -66,6 +66,7 @@ void main(List<String> arguments) async {
   final coreExecutableName = isDev ? 'BettboxDevCore.exe' : 'BettboxCore.exe';
   final helperExecutableName = isDev ? 'BettboxDevHelperService.exe' : 'BettboxHelperService.exe';
   final helperServiceName = isDev ? 'BettboxDevHelperService' : 'BettboxHelperService';
+  final helperPipeName = isDev ? r'\\.\pipe\BettboxDev.Helper' : r'\\.\pipe\Bettbox.Helper';
   final taskName = isDev ? 'Bettbox Dev' : 'Bettbox';
   
   // Format locales - resolve file paths to absolute to avoid Inno Setup relative path issues
@@ -102,6 +103,7 @@ void main(List<String> arguments) async {
     'CORE_EXECUTABLE_NAME': coreExecutableName,
     'HELPER_EXECUTABLE_NAME': helperExecutableName,
     'HELPER_SERVICE_NAME': helperServiceName,
+    'HELPER_PIPE_NAME': helperPipeName,
     'TASK_NAME': taskName,
   };
 
