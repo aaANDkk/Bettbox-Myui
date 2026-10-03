@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -461,11 +462,42 @@ class CustomContextMenu {
   });
 }
 
-/// Use it to display error lints (wavy underlines) in [CodeForge].
 class DiagnosticLine extends LspErrors {
   DiagnosticLine({
     required super.severity,
     required super.range,
     required super.message,
+  });
+}
+
+class CodeForgeContextMenuRequest {
+  final Offset globalPosition;
+  final bool hasSelection;
+  final bool isAllSelected;
+  final bool readOnly;
+  final VoidCallback copy;
+  final VoidCallback cut;
+  final VoidCallback paste;
+  final VoidCallback selectAll;
+
+  const CodeForgeContextMenuRequest({
+    required this.globalPosition,
+    required this.hasSelection,
+    required this.isAllSelected,
+    required this.readOnly,
+    required this.copy,
+    required this.cut,
+    required this.paste,
+    required this.selectAll,
+  });
+}
+
+class CodeForgeScrollbarDetails {
+  final ScrollController controller;
+  final ValueListenable<int> firstVisibleLine;
+
+  const CodeForgeScrollbarDetails({
+    required this.controller,
+    required this.firstVisibleLine,
   });
 }

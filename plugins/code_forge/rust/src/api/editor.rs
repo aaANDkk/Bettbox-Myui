@@ -749,9 +749,10 @@ fn find_matching_bracket_in_rope(rope: &RustRope, target_offset: usize) -> Optio
         if target_offset == 0 {
             return None;
         }
-        let prefix = rope.slice(0..target_offset).to_string();
-        for (i, ch) in prefix.chars().rev().enumerate() {
-            let idx = target_offset - 1 - i;
+        let mut idx = target_offset;
+        while idx > 0 {
+            idx -= 1;
+            let ch = rope.char(idx);
             if ch == start_ch {
                 depth += 1;
             } else if ch == matcher {

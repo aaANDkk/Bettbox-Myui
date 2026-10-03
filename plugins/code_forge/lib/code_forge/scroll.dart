@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
-import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A custom two-dimensional viewport for the code editor.
 ///
@@ -141,15 +143,28 @@ class CustomScrollbar extends RawScrollbar {
 }
 
 class _CustomScrollbarState extends RawScrollbarState<CustomScrollbar> {
+  late final AnimationController _expansionController;
+  late final CurvedAnimation _expansionCurve;
   bool _isDragging = false;
+
   @override
   void initState() {
     super.initState();
+    _expansionController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    )..addListener(updateScrollbarPainter);
+    _expansionCurve = CurvedAnimation(
+      parent: _expansionController,
+      curve: Curves.easeOutCubic,
+    );
     widget.lineNumberNotifier.addListener(_onLineNumberChanged);
   }
 
   @override
   void dispose() {
+    _expansionCurve.dispose();
+    _expansionController.dispose();
     widget.lineNumberNotifier.removeListener(_onLineNumberChanged);
     super.dispose();
   }
@@ -165,35 +180,56 @@ class _CustomScrollbarState extends RawScrollbarState<CustomScrollbar> {
   void handleThumbPressStart(Offset localPosition) {
     super.handleThumbPressStart(localPosition);
     setState(() => _isDragging = true);
+    _expansionController.forward();
+    unawaited(HapticFeedback.selectionClick());
   }
 
   @override
   void handleThumbPressEnd(Offset localPosition, Velocity velocity) {
     super.handleThumbPressEnd(localPosition, velocity);
     setState(() => _isDragging = false);
+    _expansionController.reverse();
   }
 
   @override
   void updateScrollbarPainter() {
+    final t = _expansionCurve.value;
+    final baseThickness = widget.thickness ?? 6.0;
+    final activeThickness = math.max(baseThickness * 1.8, 12.0);
+    final currentThickness =
+        ui.lerpDouble(baseThickness, activeThickness, t) ?? baseThickness;
+
+    final baseColor = widget.thumbColor ?? Colors.grey.withAlpha(100);
+    final currentColor = Color.lerp(
+          baseColor.withValues(alpha: (baseColor.a * 0.75).clamp(0.0, 1.0)),
+          baseColor.withValues(alpha: math.min(1.0, baseColor.a * 1.4)),
+          t,
+        ) ??
+        baseColor;
+
     scrollbarPainter
-      ..color = widget.thumbColor ?? Colors.grey.withAlpha(100)
+      ..color = currentColor
       ..textDirection = Directionality.of(context)
-      ..thickness = widget.thickness ?? 8.0
+      ..thickness = currentThickness
       ..shape = _CustomThumbBorder(
-        isDragging: _isDragging,
+        isDragging: _isDragging || t > 0.05,
+        dragProgress: t,
         showLineNumberIndicator: widget.showLineNumberIndicator,
-        color: widget.thumbColor ?? Colors.grey.withAlpha(100),
+        color: currentColor,
         lineNumber: widget.lineNumberNotifier.value,
         lineNumberStyle: widget.lineNumberStyle,
-        borderRadius: widget.borderRadius,
+        borderRadius: widget.borderRadius == BorderRadius.zero
+            ? BorderRadius.circular(currentThickness / 2)
+            : widget.borderRadius,
         textDirection: widget.textDirection,
-        thickness: widget.thickness ?? 15,
+        thickness: currentThickness,
       );
   }
 }
 
 class _CustomThumbBorder extends RoundedRectangleBorder {
   final bool isDragging, showLineNumberIndicator;
+  final double dragProgress;
   final Color color;
   final int lineNumber;
   final TextStyle lineNumberStyle;
@@ -204,6 +240,7 @@ class _CustomThumbBorder extends RoundedRectangleBorder {
 
   _CustomThumbBorder({
     required this.isDragging,
+    this.dragProgress = 1.0,
     required this.color,
     required this.lineNumber,
     required this.lineNumberStyle,
@@ -225,44 +262,64 @@ class _CustomThumbBorder extends RoundedRectangleBorder {
 
   @override
   void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
-    if (!showLineNumberIndicator || _lineNumberPainter == null) return;
-    final painter = _lineNumberPainter;
-
-    final double w = max(painter.width + 10, 100);
-    final double h = max(painter.height + 3, 30);
-
-    final paint = Paint()..color = color;
-
-    if (isDragging) {
-      final isLtr = this.textDirection == TextDirection.ltr;
-      final bubbleRect = Rect.fromLTWH(
-        isLtr
-            ? rect.center.dx - (105 + thickness)
-            : rect.center.dx + thickness + 10,
-        rect.center.dy - 15,
-        w,
-        h,
-      );
-
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(bubbleRect, Radius.circular(15)),
-        paint,
-      );
-
-      painter.paint(
-        canvas,
-        Offset(
-          bubbleRect.left + (bubbleRect.width - painter.width) / 2,
-          bubbleRect.top + (bubbleRect.height - painter.height) / 2,
-        ),
-      );
+    if (!showLineNumberIndicator || _lineNumberPainter == null || !isDragging) {
+      return;
     }
+    final painter = _lineNumberPainter;
+    final opacity = dragProgress.clamp(0.0, 1.0);
+    if (opacity <= 0.01) return;
+
+    final double bubbleWidth = math.max(painter.width + 20.0, 42.0);
+    final double bubbleHeight = painter.height + 10.0;
+
+    final isLtr = this.textDirection == TextDirection.ltr;
+    final bubbleOffset = 12.0;
+    final bubbleLeft = isLtr
+        ? rect.left - bubbleWidth - bubbleOffset
+        : rect.right + bubbleOffset;
+    final bubbleTop = (rect.center.dy - bubbleHeight / 2);
+
+    final bubbleRect = Rect.fromLTWH(
+      bubbleLeft,
+      bubbleTop,
+      bubbleWidth,
+      bubbleHeight,
+    );
+    final rrect = RRect.fromRectAndRadius(
+      bubbleRect,
+      Radius.circular(bubbleHeight / 2),
+    );
+
+    final bgPaint = Paint()
+      ..color = color.withValues(alpha: (color.a * 0.95 * opacity).clamp(0.0, 1.0))
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(rrect, bgPaint);
+
+    final borderPaint = Paint()
+      ..color = Colors.white.withValues(alpha: (0.18 * opacity).clamp(0.0, 1.0))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    canvas.drawRRect(rrect, borderPaint);
+
+    canvas.saveLayer(
+      bubbleRect,
+      Paint()..color = Color.fromRGBO(0, 0, 0, opacity),
+    );
+    painter.paint(
+      canvas,
+      Offset(
+        bubbleRect.left + (bubbleRect.width - painter.width) / 2,
+        bubbleRect.top + (bubbleRect.height - painter.height) / 2,
+      ),
+    );
+    canvas.restore();
   }
 
   @override
   bool operator ==(Object other) {
     return other is _CustomThumbBorder &&
         other.isDragging == isDragging &&
+        other.dragProgress == dragProgress &&
         other.showLineNumberIndicator == showLineNumberIndicator &&
         other.color == color &&
         other.lineNumber == lineNumber &&
@@ -273,6 +330,7 @@ class _CustomThumbBorder extends RoundedRectangleBorder {
   @override
   int get hashCode => Object.hash(
     isDragging,
+    dragProgress,
     showLineNumberIndicator,
     color,
     lineNumber,

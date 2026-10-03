@@ -518,10 +518,9 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                       scrollbarDecoration: ScrollbarDecoration(
                         showLineNumberIndicator: false,
                         thumbVisibility: false,
-                        thickness: 8,
-                        thumbColor: context.colorScheme.onSurface.withAlpha(
-                          100,
-                        ),
+                        thickness: 6,
+                        minThumbLength: 48,
+                        thumbColor: context.colorScheme.primary.withAlpha(160),
                       ),
                     ),
                   ),

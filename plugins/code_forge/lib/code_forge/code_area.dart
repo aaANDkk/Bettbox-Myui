@@ -33,7 +33,6 @@ final List<String> kEmojiFontFallback =
 const double _kSelectionHandleHitPadding = 20.0;
 const double _kCaretHandleHitPadding = 24.0;
 const double _kMobileHandleDragSlop = 8.0;
-const MethodChannel _hapticsChannel = MethodChannel('code_forge/haptics');
 const String _wordCharPattern =
     r'[\w\u0600-\u06FF\u08A0-\u08FF\u0590-\u05FF'
     r'\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF\-]';
@@ -277,6 +276,12 @@ class CodeForge extends StatefulWidget {
   /// Include custom items in the context menu (The menu appearson right click).
   final List<CustomContextMenu>? customContextMenuItems;
 
+  /// Callback triggered when a context menu is requested (e.g. right-click on desktop or handle tap on mobile).
+  final void Function(
+    BuildContext context,
+    CodeForgeContextMenuRequest request,
+  )? onContextMenu;
+
   /// If set to true, deleting the first line of a folded block will delete the entire folded region,
   /// else only the first line gets deleted and the rest of the block stays safe.
   /// Defauts to false.
@@ -315,6 +320,7 @@ class CodeForge extends StatefulWidget {
     this.keyboardShotcuts = const CodeForgeKeyboardShortcuts(),
     this.customCodeSnippets,
     this.customContextMenuItems,
+    this.onContextMenu,
     this.readOnly = false,
     this.autoFocus = false,
     this.lineWrap = false,
@@ -397,6 +403,7 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
   final _isWindows = Platform.isWindows;
   DateTime? _lastCtrlUpTime;
   final GlobalKey _codeFieldKey = GlobalKey();
+  final GlobalKey _editorStackKey = GlobalKey();
   TextInputConnection? _connection;
   StreamSubscription? _lspResponsesSubscription;
   bool _isHovering = false, _isSignatureInvoked = false;
@@ -453,7 +460,8 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
     _hoverContentNotifier = ValueNotifier(null);
     _aiNotifier = ValueNotifier(null);
     _aiOffsetNotifier = ValueNotifier(null);
-    _contextMenuOffsetNotifier = ValueNotifier(const Offset(-1, -1));
+    _contextMenuOffsetNotifier = ValueNotifier(const Offset(-1, -1))
+      ..addListener(_handleContextMenuRequest);
     _selectionActiveNotifier = ValueNotifier(false);
     _isHoveringPopup = ValueNotifier<bool>(false);
     _controller.userCodeAction = _fetchCodeActionsForCurrentPosition;
@@ -1233,6 +1241,30 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
     });
   }
 
+  void _handleContextMenuRequest() {
+    final onContextMenu = widget.onContextMenu;
+    final offset = _contextMenuOffsetNotifier.value;
+    if (onContextMenu == null || offset.dx < 0 || offset.dy < 0) return;
+    _contextMenuOffsetNotifier.value = const Offset(-1, -1);
+    final stack = _editorStackKey.currentContext?.findRenderObject();
+    if (stack is! RenderBox || !stack.attached) return;
+    final selection = _controller.selection;
+    onContextMenu(
+      context,
+      CodeForgeContextMenuRequest(
+        globalPosition: stack.localToGlobal(offset),
+        hasSelection: !selection.isCollapsed,
+        isAllSelected:
+            selection.start == 0 && selection.end == _controller.length,
+        readOnly: _readOnly,
+        copy: _controller.copy,
+        cut: _controller.cut,
+        paste: () => _controller.paste(),
+        selectAll: _controller.selectAll,
+      ),
+    );
+  }
+
   Widget _buildContextMenu() {
     return ValueListenableBuilder<Offset>(
       valueListenable: _contextMenuOffsetNotifier,
@@ -1245,14 +1277,14 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
         if (_isMobile) {
           Offset anchorAbove = offset;
           Offset anchorBelow = Offset(offset.dx, offset.dy + 40);
-          if (hasSelection) {
-            final renderObject = _codeFieldKey.currentContext
-                ?.findRenderObject();
-            if (renderObject is _CodeFieldRenderer) {
+          final renderObject =
+              _codeFieldKey.currentContext?.findRenderObject();
+          if (renderObject is _CodeFieldRenderer) {
+            final lineHeight = renderObject._lineHeight;
+            if (hasSelection) {
               final rects = renderObject.getSelectionHandleRects();
               final startRect = rects.startHandle;
               final endRect = rects.endHandle;
-              final lineHeight = rects.lineHeight;
               if (startRect != null && endRect != null && lineHeight > 0) {
                 final handleRadius = (lineHeight / 2).clamp(6.0, 12.0);
                 final centerX = (startRect.center.dx + endRect.center.dx) / 2;
@@ -1265,6 +1297,10 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                 anchorAbove = Offset(centerX, minY - lineHeight - handleRadius);
                 anchorBelow = Offset(centerX, maxY - handleRadius);
               }
+            } else if (lineHeight > 0) {
+              final handleRadius = (lineHeight / 2).clamp(6.0, 12.0);
+              anchorAbove = Offset(offset.dx, offset.dy - lineHeight - handleRadius);
+              anchorBelow = Offset(offset.dx, offset.dy + handleRadius + 4);
             }
           }
           return TextSelectionToolbar(
@@ -1746,6 +1782,7 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
               ),
             Expanded(
               child: Stack(
+                key: _editorStackKey,
                 children: [
                   Directionality(
                     textDirection: widget.textDirection,
@@ -1802,9 +1839,22 @@ class _CodeForgeState extends State<CodeForge> with TickerProviderStateMixin {
                                     ..scaleByVector3(Vector3(-1.0, 1.0, 1.0)))
                                 : Matrix4.identity(),
                             child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
                               onTap: () {
-                                if (_isMobile) return;
-                                _focusNode.requestFocus();
+                                if (!_focusNode.hasFocus) {
+                                  _focusNode.requestFocus();
+                                }
+                                if (_controller.selection.start !=
+                                    _controller.selection.end) {
+                                  _controller.selection =
+                                      TextSelection.collapsed(
+                                        offset: _controller.selection.extentOffset,
+                                      );
+                                }
+                                if (_contextMenuOffsetNotifier.value.dx >= 0) {
+                                  _contextMenuOffsetNotifier.value =
+                                      const Offset(-1, -1);
+                                }
                               },
                               onDoubleTapDown: (details) {
                                 if (_controller.text.isNotEmpty) return;
@@ -4813,6 +4863,18 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
   TextSelection? _lastSelectionForAi;
   ui.Paragraph? _cachedMagnifiedParagraph;
   int? _cachedMagnifiedLine, _cachedMagnifiedOffset;
+  double _measuredCharWidth = 0.0;
+  double get _charWidth {
+    if (_measuredCharWidth > 0) return _measuredCharWidth;
+    final b = ui.ParagraphBuilder(_paragraphStyle)
+      ..pushStyle(_uiTextStyle)
+      ..addText('W');
+    final p = b.build()
+      ..layout(const ui.ParagraphConstraints(width: double.infinity));
+    _measuredCharWidth =
+        p.longestLine > 0 ? p.longestLine : (_textStyle?.fontSize ?? 14.0) * 0.7;
+    return _measuredCharWidth;
+  }
   int? _ghostTextAnchorLine, _highlightedLine;
   int _lastAppliedSemanticVersion = -1, _lastDocumentVersion = -1;
   bool _suspendBracketHighlight = false;
@@ -5072,6 +5134,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     int lineIndex,
     String text, {
     double? width,
+    bool allowSynchronousHighlight = false,
+    bool forcePlainText = false,
   }) {
     final h = _syntaxHighlighter;
     if (h == null) return _buildParagraph(text, width: width);
@@ -5084,6 +5148,8 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       fontSize,
       fontFamily,
       width: width,
+      allowSynchronousHighlight: allowSynchronousHighlight,
+      forcePlainText: forcePlainText,
     );
   }
 
@@ -5482,6 +5548,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
   set textStyle(TextStyle? style) {
     if (identical(style, _textStyle)) return;
     _textStyle = style;
+    _measuredCharWidth = 0.0;
 
     final fontSize = style?.fontSize ?? 14.0;
     final fontFamily = style?.fontFamily;
@@ -7846,11 +7913,21 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     }
 
     final lineText = controller.getLineText(lineIndex);
+    if (lineText.isEmpty) {
+      _lineHeightCache[lineIndex] = _lineHeight;
+      _lineTextCache[lineIndex] = lineText;
+      return _lineHeight;
+    }
+
+    if (_wrapWidth > 0 && lineText.length * _charWidth <= _wrapWidth) {
+      _lineHeightCache[lineIndex] = _lineHeight;
+      _lineTextCache[lineIndex] = lineText;
+      return _lineHeight;
+    }
 
     final builder = ui.ParagraphBuilder(_paragraphStyle);
     builder.pushStyle(_uiTextStyle);
-    final textToMeasure = lineText.isEmpty ? ' ' : lineText;
-    builder.addText(textToMeasure);
+    builder.addText(lineText);
 
     final para = builder.build();
     para.layout(ui.ParagraphConstraints(width: _wrapWidth));
@@ -8153,16 +8230,36 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
     _scheduleVisibleSemanticTokens(firstVisibleLine, lastVisibleLine);
     final h = _syntaxHighlighter;
     if (h != null) {
-      final forceIsolate = !_preHighlightInitialized;
-      _preHighlightInitialized = true;
-      unawaited(
-        h.preHighlightLines(
-          firstVisibleLine,
-          lastVisibleLine,
-          controller.getLineText,
-          forceIsolate: forceIsolate,
-        ),
-      );
+      var needsSyntaxHighlight = false;
+      for (int i = firstVisibleLine; i <= lastVisibleLine; i++) {
+        if (hasActiveFolds && _isLineFolded(i)) continue;
+        final lineText = _lineTextCache[i] ?? controller.getLineText(i);
+        if (!h.hasCachedLineSpan(i, lineText)) {
+          needsSyntaxHighlight = true;
+          break;
+        }
+      }
+      if (needsSyntaxHighlight) {
+        final forceIsolate = !_preHighlightInitialized;
+        _preHighlightInitialized = true;
+        unawaited(
+          h
+              .preHighlightLines(
+                firstVisibleLine,
+                lastVisibleLine,
+                controller.getLineText,
+                forceIsolate: forceIsolate,
+              )
+              .then((_) {
+                _paragraphCache.removeWhere(
+                  (line, _) =>
+                      line >= firstVisibleLine && line <= lastVisibleLine,
+                );
+                if (lineWrap && attached) markNeedsLayout();
+                if (attached) markNeedsPaint();
+              }),
+        );
+      }
     }
 
     _drawSearchHighlights(
@@ -8269,6 +8366,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             i,
             bufferLineText,
             width: pw,
+            allowSynchronousHighlight: true,
           );
           _bufferParagraphLine = i;
           _bufferParagraphTextHash = textHash;
@@ -8293,6 +8391,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             i,
             lineText,
             width: paragraphWidth,
+            allowSynchronousHighlight: false,
           );
           _paragraphCache[i] = paragraph;
 
@@ -11990,28 +12089,12 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
 
   Future<void> _hapticHandleMove() async {
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (Platform.isAndroid) {
-      try {
-        await _hapticsChannel.invokeMethod('handleMove');
-      } catch (_) {
-        HapticFeedback.selectionClick();
-      }
-    } else {
-      HapticFeedback.selectionClick();
-    }
+    HapticFeedback.selectionClick();
   }
 
   Future<void> _hapticLongPress() async {
     if (!Platform.isAndroid && !Platform.isIOS) return;
-    if (Platform.isAndroid) {
-      try {
-        await _hapticsChannel.invokeMethod('longPress');
-      } catch (_) {
-        HapticFeedback.heavyImpact();
-      }
-    } else {
-      HapticFeedback.mediumImpact();
-    }
+    HapticFeedback.mediumImpact();
   }
 
   @override
@@ -12170,6 +12253,14 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             lspActionNotifier.value = null;
             lspActionOffsetNotifier.value = null;
           }
+
+          if (!_isDragging) {
+            controller.selection = TextSelection.collapsed(offset: textOffset);
+            if (!readOnly && (controller.connection?.attached ?? false)) {
+              controller.connection!.show();
+            }
+            markNeedsPaint();
+          }
         };
 
         if (controller.selection.start != controller.selection.end) {
@@ -12203,6 +12294,7 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
             _dragStartOffset = controller.selection.extentOffset;
             _pointerDownPosition = localPosition;
             _onetap.onTap = null;
+            markNeedsPaint();
             return;
           }
         }
@@ -12462,10 +12554,9 @@ class _CodeFieldRenderer extends RenderBox implements MouseTrackerAnnotation {
       if (event is PointerUpEvent &&
           !_isDragging &&
           isMobile &&
-          !_selectionActive &&
-          !readOnly) {
+          !_selectionActive) {
         controller.selection = TextSelection.collapsed(offset: textOffset);
-        if (controller.connection?.attached ?? false) {
+        if (!readOnly && (controller.connection?.attached ?? false)) {
           controller.connection?.show();
         }
       }

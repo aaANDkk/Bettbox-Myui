@@ -248,13 +248,13 @@ class ScrollbarDecoration {
   final BorderRadius borderRadius;
 
   const ScrollbarDecoration({
-    this.showLineNumberIndicator = true,
+    this.showLineNumberIndicator = false,
     this.lineNumberStyle,
     this.thumbColor,
     this.thickness,
     this.thumbVisibility,
     this.borderRadius = BorderRadius.zero,
-    this.minThumbLength = 18.0,
+    this.minThumbLength = 48.0,
     this.minOverscrollLength,
     this.trackVisibility,
     this.trackRadius,
