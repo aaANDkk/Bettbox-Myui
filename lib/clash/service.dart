@@ -11,6 +11,7 @@ import 'package:bett_box/models/core.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/utils/frame_codec.dart';
 import 'package:bett_box/utils/platform_check.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 class ClashService extends ClashHandlerInterface {
@@ -197,7 +198,8 @@ class ClashService extends ClashHandlerInterface {
         if (started) {
           await _waitForCoreReady();
           isStarting = false;
-          if (system.isWindows && globalState.config.appSetting.enableHighPriority) {
+          if (system.isWindows &&
+              globalState.config.appSetting.enableHighPriority) {
             unawaited(
               helperClient
                   .setProcessPriority(
@@ -252,6 +254,13 @@ class ClashService extends ClashHandlerInterface {
     }
   }
 
+  Duration get _coreReadyTimeout {
+    if (kDebugMode || AppIdentity.isDev) {
+      return const Duration(seconds: 15);
+    }
+    return const Duration(seconds: 6);
+  }
+
   Future<bool> _startCoreDirectly(
     String arg,
     Map<String, String> environment,
@@ -267,15 +276,27 @@ class ClashService extends ClashHandlerInterface {
       final error = utf8.decode(e);
       if (error.isNotEmpty) commonPrint.log(error);
     });
-    return _waitForCoreReady();
+    return _waitForCoreReady(process);
   }
 
-  Future<bool> _waitForCoreReady() async {
+  Future<bool> _waitForCoreReady([Process? targetProcess]) async {
+    final timeout = _coreReadyTimeout;
     try {
-      await socketCompleter.future.timeout(const Duration(seconds: 5));
+      if (targetProcess != null) {
+        final result = await Future.any<bool>([
+          socketCompleter.future.then((_) => true),
+          targetProcess.exitCode.then((code) {
+            commonPrint.log('Core process exited prematurely with code: $code');
+            return false;
+          }),
+        ]).timeout(timeout);
+        return result;
+      }
+
+      await socketCompleter.future.timeout(timeout);
       return true;
     } on TimeoutException {
-      commonPrint.log('Core ready timeout after 5s');
+      commonPrint.log('Core ready timeout after ${timeout.inSeconds}s');
       return false;
     }
   }

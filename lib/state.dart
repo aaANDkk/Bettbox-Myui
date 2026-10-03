@@ -165,11 +165,40 @@ class GlobalState {
     return coreSHA256;
   }
 
+  Future<String?> _calcNativeSHA256(String path) async {
+    try {
+      ProcessResult result;
+      if (Platform.isWindows) {
+        result = await Process.run('certutil', ['-hashfile', path, 'SHA256']);
+      } else if (Platform.isMacOS) {
+        result = await Process.run('shasum', ['-a', '256', path]);
+      } else if (Platform.isLinux) {
+        result = await Process.run('sha256sum', [path]);
+      } else {
+        return null;
+      }
+
+      if (result.exitCode != 0) return null;
+      final output = result.stdout.toString();
+      final clean = output.replaceAll(' ', '');
+      final match = RegExp(r'[0-9a-fA-F]{64}').firstMatch(clean);
+      return match?.group(0)?.toLowerCase();
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<String?> _calcCoreSHA256() async {
     try {
       final path = appPath.corePath;
       final file = File(path);
       if (!await file.exists()) return null;
+
+      final nativeHash = await _calcNativeSHA256(path);
+      if (nativeHash != null && nativeHash.isNotEmpty) {
+        return nativeHash;
+      }
+
       return await Isolate.run(() async {
         final digest = await sha256.bind(File(path).openRead()).first;
         return digest.toString();
