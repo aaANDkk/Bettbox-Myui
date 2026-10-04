@@ -4,6 +4,7 @@ import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,80 +77,93 @@ class _HomePageState extends State<HomePage> {
         focusNav();
         return true;
       },
-      child: Material(
-        color: context.colorScheme.surface,
+      child: Consumer(
+        builder: (context, ref, child) {
+          final (isMobile, navigationItems, currentIndex) = ref.watch(
+            navigationStateProvider.select(
+              (state) => (
+                state.viewMode == ViewMode.mobile,
+                state.navigationItems,
+                state.currentIndex,
+              ),
+            ),
+          );
+          final bottomNavigationBar = globalState.isAndroidTV
+              ? _buildTVBottomNavBar(
+                  context,
+                  navigationItems: navigationItems,
+                  currentIndex: currentIndex,
+                )
+              : GoogleBottomNavBar(
+                  navigationItems: navigationItems,
+                  selectedIndex: currentIndex,
+                  onTabChange: (index) {
+                    globalState.appController.toPage(
+                      navigationItems[index].label,
+                    );
+                  },
+                );
+          if (child == null) {
+            return const SizedBox();
+          }
+          Widget bodyWidget = child;
+          if (isMobile) {
+            final pageContent = MediaQuery.removePadding(
+              removeTop: false,
+              removeBottom: false,
+              removeLeft: true,
+              removeRight: true,
+              context: context,
+              child: child,
+            );
+            final navBar = MediaQuery.removePadding(
+              removeTop: true,
+              removeBottom: false,
+              removeLeft: true,
+              removeRight: true,
+              context: context,
+              child: bottomNavigationBar,
+            );
+            bodyWidget = Stack(
+              children: [
+                Positioned.fill(
+                  child: RepaintBoundary(child: pageContent),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: RepaintBoundary(child: navBar),
+                ),
+              ],
+            );
+          }
+          return Material(
+            color: isMobile
+                ? context.colorScheme.surfaceContainer
+                : Colors.transparent,
+            child: bodyWidget,
+          );
+        },
         child: Consumer(
-          builder: (context, ref, child) {
-            final state = ref.watch(navigationStateProvider);
-            final isMobile = state.viewMode == ViewMode.mobile;
-            final navigationItems = state.navigationItems;
-            final currentIndex = state.currentIndex;
-            final bottomNavigationBar = globalState.isAndroidTV
-                ? _buildTVBottomNavBar(
-                    context,
-                    navigationItems: navigationItems,
-                    currentIndex: currentIndex,
-                  )
-                : GoogleBottomNavBar(
-                    navigationItems: navigationItems,
-                    selectedIndex: currentIndex,
-                    onTabChange: (index) {
-                      globalState.appController.toPage(
-                        navigationItems[index].label,
-                      );
-                    },
-                  );
-            if (isMobile) {
-              final pageContent = MediaQuery.removePadding(
-                removeTop: false,
-                removeBottom: false,
-                removeLeft: true,
-                removeRight: true,
-                context: context,
-                child: child!,
-              );
-              final navBar = MediaQuery.removePadding(
-                removeTop: true,
-                removeBottom: false,
-                removeLeft: true,
-                removeRight: true,
-                context: context,
-                child: bottomNavigationBar,
-              );
-              return Stack(
-                children: [
-                  Positioned.fill(child: pageContent),
-                  Positioned(left: 0, right: 0, bottom: 0, child: navBar),
-                ],
-              );
-            }
-            return child!;
+          builder: (_, ref, _) {
+            final navigationItems = ref
+                .watch(currentNavigationItemsStateProvider)
+                .value;
+            final isMobile = ref.watch(isMobileViewProvider);
+            return _HomePageView(
+              navigationItems: navigationItems,
+              pageBuilder: (_, index) {
+                final navigationItem = navigationItems[index];
+                return _NavigationPage(
+                  key: ValueKey(navigationItem.label),
+                  item: navigationItem,
+                  isMobile: isMobile,
+                  view: navigationItem.builder(context),
+                );
+              },
+            );
           },
-          child: Consumer(
-            builder: (_, ref, _) {
-              final navigationItems = ref
-                  .watch(currentNavigationItemsStateProvider)
-                  .value;
-              final isMobile = ref.watch(isMobileViewProvider);
-              return _HomePageView(
-                navigationItems: navigationItems,
-                pageBuilder: (_, index) {
-                  final navigationItem = navigationItems[index];
-                  final navigationView = navigationItem.builder(context);
-                  return KeepScope(
-                    key: ValueKey(navigationItem.label),
-                    keep: navigationItem.keep,
-                    child: isMobile
-                        ? navigationView
-                        : Navigator(
-                            pages: [MaterialPage(child: navigationView)],
-                            onDidRemovePage: (_) {},
-                          ),
-                  );
-                },
-              );
-            },
-          ),
         ),
       ),
     );
@@ -291,6 +305,49 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+class _NavigationPage extends StatelessWidget {
+  const _NavigationPage({
+    super.key,
+    required this.item,
+    required this.isMobile,
+    required this.view,
+  });
+
+  final NavigationItem item;
+  final bool isMobile;
+  final Widget view;
+
+  @override
+  Widget build(BuildContext context) {
+    final keptView = KeepScope(
+      key: ValueKey(item.label),
+      keep: item.keep,
+      child: isMobile
+          ? view
+          : Navigator(
+              key: ValueKey('${item.label.name}_navigator'),
+              pages: [MaterialPage(child: view)],
+              onDidRemovePage: (_) {},
+            ),
+    );
+    return Consumer(
+      builder: (_, ref, child) {
+        final isActive = ref.watch(
+          currentPageLabelProvider.select((label) => label == item.label),
+        );
+        return TickerMode(
+          enabled: isActive,
+          child: ExcludeFocus(
+            excluding: !isActive,
+            child: child!,
+          ),
+        );
+      },
+      child: keptView,
+    );
+  }
+}
+
 class _HomePageView extends ConsumerStatefulWidget {
   final IndexedWidgetBuilder pageBuilder;
   final List<NavigationItem> navigationItems;
@@ -304,106 +361,212 @@ class _HomePageView extends ConsumerStatefulWidget {
   ConsumerState createState() => _HomePageViewState();
 }
 
-class _HomePageViewState extends ConsumerState<_HomePageView> {
-  late PageController _pageController;
+class _HomePageViewState extends ConsumerState<_HomePageView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
   late final ProviderSubscription<PageLabel> _pageLabelSubscription;
-  int _currentPageIndex = 0;
+  late int _currentIndex;
+  int _previousIndex = 0;
+  bool _animating = false;
+  bool _preparing = false;
+  final Set<int> _mountedPages = {};
+  int _warmUpCursor = 0;
+  final Map<int, Widget> _pageCache = {};
+  bool? _cacheIsMobile;
+  List<PageLabel> _cacheLabels = const [];
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    _currentPageIndex = _pageIndex;
-    _pageController = PageController(initialPage: _currentPageIndex);
+    _currentIndex = _pageIndex;
+    _previousIndex = _currentIndex;
+    _mountedPages.add(_currentIndex);
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+      value: 1.0,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed && _animating) {
+          setState(() {
+            _animating = false;
+            _prunePages();
+          });
+        }
+      });
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _pageLabelSubscription = ref.listenManual(currentPageLabelProvider, (
       prev,
       next,
     ) {
       if (prev != next) {
         _toPage(next);
+        if (next == PageLabel.dashboard && !system.isDesktop) {
+          dashboardRefreshManager.triggerImmediateTick();
+          globalState.appController.updateTraffic();
+        }
       }
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _warmUpStep());
+  }
+
+  void _warmUpStep() {
+    if (!mounted) return;
+    if (_animating || _preparing) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _warmUpStep());
+      return;
+    }
+    if (!ref.read(isMobileViewProvider)) return;
+    final items = widget.navigationItems;
+    while (_warmUpCursor < items.length &&
+        (_mountedPages.contains(_warmUpCursor) ||
+            !items[_warmUpCursor].keep)) {
+      _warmUpCursor++;
+    }
+    if (_warmUpCursor >= items.length) return;
+    setState(() => _mountedPages.add(_warmUpCursor));
+    _warmUpCursor++;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _warmUpStep());
   }
 
   @override
   void didUpdateWidget(covariant _HomePageView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.navigationItems.length != widget.navigationItems.length) {
-      _updatePageController();
+    final oldLabels = [
+      for (final item in oldWidget.navigationItems) item.label,
+    ];
+    final newLabels = [for (final item in widget.navigationItems) item.label];
+    if (!listEquals(oldLabels, newLabels)) {
+      _animating = false;
+      _preparing = false;
+      _controller.value = 1.0;
+      _currentIndex = _pageIndex;
+      _previousIndex = _currentIndex;
+      _mountedPages
+        ..clear()
+        ..add(_currentIndex);
+      _pageCache.clear();
+      _warmUpCursor = 0;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _warmUpStep());
     }
   }
 
   int get _pageIndex {
-    return widget.navigationItems.indexWhere(
-      (item) => item.label == globalState.appState.pageLabel,
-    );
-  }
-
-  Future<void> _toPage(
-    PageLabel pageLabel, [
-    bool ignoreAnimateTo = false,
-  ]) async {
-    if (!mounted) {
-      return;
-    }
+    final pageLabel = ref.read(currentPageLabelProvider);
     final index = widget.navigationItems.indexWhere(
       (item) => item.label == pageLabel,
     );
-    if (index == -1) {
-      return;
-    }
+    return index < 0 ? 0 : index;
+  }
+
+  void _toPage(PageLabel pageLabel, [bool ignoreAnimateTo = false]) {
+    if (!mounted) return;
+    final index = widget.navigationItems.indexWhere(
+      (item) => item.label == pageLabel,
+    );
+    if (index == -1 || index == _currentIndex) return;
 
     if (!globalState.isAndroidTV) {
       FocusManager.instance.primaryFocus?.unfocus();
     }
 
-    if (ref.read(isMobileViewProvider)) {
-      if (_currentPageIndex != index) {
-        setState(() {
-          _currentPageIndex = index;
-        });
-      }
+    final isMobile = ref.read(isMobileViewProvider);
+    final animate = isMobile && !ignoreAnimateTo;
+    setState(() {
+      _previousIndex = _currentIndex;
+      _currentIndex = index;
+      _mountedPages.add(index);
+      _animating = false;
+      _preparing = animate;
+    });
+    if (!animate) {
+      _controller.value = 1.0;
+      _prunePages();
       return;
     }
-
-    _pageController.jumpToPage(index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_preparing) return;
+      setState(() {
+        _preparing = false;
+        _animating = true;
+      });
+      _controller.forward(from: 0);
+    });
   }
 
-  void _updatePageController() {
-    final pageLabel = ref.read(currentPageLabelProvider);
-    _toPage(pageLabel, true);
+  void _prunePages() {
+    _mountedPages.removeWhere((index) {
+      if (index == _currentIndex) return false;
+      final prune =
+          index >= widget.navigationItems.length ||
+          !widget.navigationItems[index].keep;
+      if (prune) _pageCache.remove(index);
+      return prune;
+    });
   }
 
   @override
   void dispose() {
     _pageLabelSubscription.close();
-    _pageController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (ref.watch(isMobileViewProvider)) {
-      final index = _pageIndex < 0 ? 0 : _pageIndex;
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
-        transitionBuilder: (child, animation) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        child: KeyedSubtree(
-          key: ValueKey(widget.navigationItems[index].label),
-          child: widget.pageBuilder(context, index),
-        ),
-      );
+    final items = widget.navigationItems;
+    final direction = (_currentIndex - _previousIndex).sign.toDouble();
+    final isMobile = ref.read(isMobileViewProvider);
+    final labels = [for (final item in items) item.label];
+    if (_cacheIsMobile != isMobile || !listEquals(_cacheLabels, labels)) {
+      _pageCache.clear();
+      _cacheIsMobile = isMobile;
+      _cacheLabels = labels;
     }
-    return PageView.builder(
-      controller: _pageController,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.navigationItems.length,
-      itemBuilder: (context, index) {
-        return widget.pageBuilder(context, index);
-      },
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        for (final index in _mountedPages)
+          if (index < items.length)
+            IgnorePointer(
+              key: ValueKey(items[index].label),
+              ignoring: index != _currentIndex,
+              child: AnimatedBuilder(
+                animation: _animation,
+                child: _pageCache.putIfAbsent(
+                  index,
+                  () => RepaintBoundary(
+                    child: widget.pageBuilder(context, index),
+                  ),
+                ),
+                builder: (context, child) {
+                  final progress = _animating
+                      ? _animation.value
+                      : (_preparing ? 0.0 : 1.0);
+                  final bool visible;
+                  final double dx;
+                  if (index == _currentIndex) {
+                    visible = true;
+                    dx = direction * (1 - progress);
+                  } else if ((_animating || _preparing) &&
+                      index == _previousIndex) {
+                    visible = true;
+                    dx = -direction * progress;
+                  } else {
+                    visible = false;
+                    dx = 0;
+                  }
+                  return Offstage(
+                    offstage: !visible,
+                    child: FractionalTranslation(
+                      translation: Offset(dx, 0),
+                      child: child,
+                    ),
+                  );
+                },
+              ),
+            ),
+      ],
     );
   }
 }
@@ -424,6 +587,11 @@ class HomeBackScope extends ConsumerWidget {
           (state) => state.value.map((item) => item.label).toSet(),
         ),
       );
+      final morePageLabels = ref.watch(
+        moreToolsSelectorStateProvider.select(
+          (state) => state.navigationItems.map((item) => item.label).toSet(),
+        ),
+      );
       final isCurrentRootPage = rootPageLabels.contains(currentPage);
 
       return PopScope(
@@ -439,7 +607,11 @@ class HomeBackScope extends ConsumerWidget {
           }
 
           if (!isCurrentRootPage) {
-            globalState.appController.toPage(PageLabel.dashboard);
+            globalState.appController.toPage(
+              morePageLabels.contains(currentPage)
+                  ? PageLabel.tools
+                  : PageLabel.dashboard,
+            );
             return;
           }
           if (navigatorState != null && navigatorState.canPop()) {

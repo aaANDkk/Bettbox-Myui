@@ -67,12 +67,10 @@ class NetworkSpeed extends ConsumerWidget {
                         right: 0,
                         bottom: 0,
                       ),
-                      child: RepaintBoundary(
-                        child: LineChart(
-                          gradient: true,
-                          color: primaryColor,
-                          points: points,
-                        ),
+                      child: LineChart(
+                        gradient: true,
+                        color: primaryColor,
+                        points: points,
                       ),
                     ),
                   ),

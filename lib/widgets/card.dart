@@ -77,44 +77,6 @@ class InfoHeader extends StatelessWidget {
   }
 }
 
-class SmoothRoundedRectangleBorder extends RoundedRectangleBorder {
-  const SmoothRoundedRectangleBorder({
-    super.side,
-    super.borderRadius = BorderRadius.zero,
-  });
-
-  @override
-  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
-    switch (side.style) {
-      case BorderStyle.none:
-        break;
-      case BorderStyle.solid:
-        final borderRect = borderRadius.resolve(textDirection).toRRect(rect);
-        if (side.width <= 0.0) {
-          canvas.drawRRect(borderRect, side.toPaint());
-        } else {
-          final strokeRect = borderRect.deflate(side.width / 2.0);
-          final paint = side.toPaint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = side.width
-            ..isAntiAlias = true;
-          canvas.drawRRect(strokeRect, paint);
-        }
-    }
-  }
-
-  @override
-  SmoothRoundedRectangleBorder copyWith({
-    BorderSide? side,
-    BorderRadiusGeometry? borderRadius,
-  }) {
-    return SmoothRoundedRectangleBorder(
-      side: side ?? this.side,
-      borderRadius: borderRadius ?? this.borderRadius,
-    );
-  }
-}
-
 class CommonCard extends StatelessWidget {
   const CommonCard({
     super.key,
@@ -148,16 +110,16 @@ class CommonCard extends StatelessWidget {
 
   BorderSide getBorderSide(BuildContext context, Set<WidgetState> states) {
     final colorScheme = context.colorScheme;
-    if (type == CommonCardType.filled) {
-      return BorderSide.none;
-    }
     final hoverColor = isSelected
         ? colorScheme.primary.opacity80
         : colorScheme.primary.opacity60;
     if (states.contains(WidgetState.hovered) ||
         states.contains(WidgetState.focused) ||
         states.contains(WidgetState.pressed)) {
-      return BorderSide(color: hoverColor);
+      return BorderSide(
+        color: hoverColor,
+        strokeAlign: BorderSide.strokeAlignInside,
+      );
     }
     final isLight = colorScheme.brightness == Brightness.light;
     return BorderSide(
@@ -166,21 +128,25 @@ class CommonCard extends StatelessWidget {
           : colorScheme.outlineVariant.withValues(
               alpha: isLight ? 0.45 : 0.25,
             ),
+      strokeAlign: BorderSide.strokeAlignInside,
     );
   }
 
   Color? getBackgroundColor(BuildContext context, Set<WidgetState> states) {
     final colorScheme = context.colorScheme;
-    if (type == CommonCardType.filled) {
-      if (isSelected) {
-        return colorScheme.secondaryContainer.opacity80;
-      }
-      return colorScheme.surfaceContainer;
-    }
     if (isSelected) {
-      return colorScheme.secondaryContainer;
+      return type == CommonCardType.filled
+          ? colorScheme.secondaryContainer.opacity80
+          : colorScheme.secondaryContainer;
     }
-    return colorScheme.surfaceContainerLow;
+    final isLight = colorScheme.brightness == Brightness.light;
+    return isLight
+        ? Color.lerp(
+            colorScheme.surface,
+            colorScheme.surfaceContainerLowest,
+            0.5,
+          )
+        : colorScheme.surfaceContainerHigh;
   }
 
   @override
@@ -208,6 +174,15 @@ class CommonCard extends StatelessWidget {
       childWidget = Stack(children: children);
     }
 
+    Widget contentWidget = childWidget;
+    if (clipBehavior != Clip.none) {
+      contentWidget = ClipRRect(
+        borderRadius: BorderRadius.circular(actualRadius),
+        clipBehavior: clipBehavior,
+        child: childWidget,
+      );
+    }
+
     final isInteractive = onPressed != null || onLongPress != null;
     final card = OutlinedButton(
       onLongPress: onLongPress,
@@ -215,7 +190,7 @@ class CommonCard extends StatelessWidget {
       style: ButtonStyle(
         padding: const WidgetStatePropertyAll(EdgeInsets.zero),
         shape: WidgetStatePropertyAll(
-          SmoothRoundedRectangleBorder(
+          RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(actualRadius),
           ),
         ),
@@ -231,7 +206,7 @@ class CommonCard extends StatelessWidget {
         tapTargetSize: isInteractive ? null : MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: onPressed,
-      child: childWidget,
+      child: contentWidget,
     );
 
     return switch (enterAnimated) {

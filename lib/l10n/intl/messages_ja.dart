@@ -613,9 +613,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "nameserverPolicyDesc": MessageLookupByLibrary.simpleMessage(
       "特定ドメイン用のDNSポリシーを指定",
     ),
-    "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage("触覚フィードバック"),
+    "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage(
+      "アニメーションフィードバック",
+    ),
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
-      "ボトムナビゲーション切り替え時の振動フィードバック",
+      "ボトムナビゲーションのアニメーションおよび振動フィードバック",
     ),
     "navConnections": MessageLookupByLibrary.simpleMessage("接続"),
     "navTools": MessageLookupByLibrary.simpleMessage("ツール"),

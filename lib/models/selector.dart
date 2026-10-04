@@ -212,14 +212,6 @@ extension PackageListSelectorStateExt on PackageListSelectorState {
 }
 
 @freezed
-abstract class ProxiesListHeaderSelectorState with _$ProxiesListHeaderSelectorState {
-  const factory ProxiesListHeaderSelectorState({
-    required double offset,
-    required int currentIndex,
-  }) = _ProxiesListHeaderSelectorState;
-}
-
-@freezed
 abstract class ProxiesActionsState with _$ProxiesActionsState {
   const factory ProxiesActionsState({
     required PageLabel pageLabel,

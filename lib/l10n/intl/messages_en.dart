@@ -771,10 +771,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Specify domain-specific nameservers",
     ),
     "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage(
-      "Haptic Feedback",
+      "Animation Feedback",
     ),
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
-      "Vibrate on navigation tab switch",
+      "Bottom navigation bar animation and haptic feedback",
     ),
     "navConnections": MessageLookupByLibrary.simpleMessage("Active"),
     "navTools": MessageLookupByLibrary.simpleMessage("More"),

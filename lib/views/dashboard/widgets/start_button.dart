@@ -98,60 +98,54 @@ class _StartButtonState extends ConsumerState<StartButton> {
     final hasNoProfile =
         state.isInit && !state.hasProfile && !_isDisabled && !isSmartStopped;
     final isRestarting = ref.watch(isRestartingCoreProvider);
+    final isStart =
+        ref.watch(runTimeProvider.select((time) => time != null));
+    final displayStart =
+        isSmartStopped ? false : (_optimisticStart ?? isStart);
 
-    return ValueListenableBuilder<int>(
-      valueListenable: dashboardRefreshManager.tick1s,
-      builder: (_, _, _) {
-        final runTime = ref.read(runTimeProvider);
-        final isStart = runTime != null;
-        final displayStart =
-            isSmartStopped ? false : (_optimisticStart ?? isStart);
-        return SizedBox(
-          height: getWidgetHeight(1),
-          child: CommonCard(
-            info: Info(
-              label: isSmartStopped
-                  ? appLocalizations.coreSuspended
-                  : isRestarting
-                  ? appLocalizations.restartCoreTitle
-                  : displayStart
-                  ? appLocalizations.runTime
-                  : appLocalizations.powerSwitch,
-              iconData: Icons.power_settings_new,
-            ),
-            onPressed: canPress
-                ? _handleStart
-                : hasNoProfile
-                    ? _handleShowAddProfile
-                    : null,
-            onLongPress: canPress ? _handleLongPress : null,
-            child: Container(
-              padding: baseInfoEdgeInsets.copyWith(top: 0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    height: globalState.measure.bodyMediumHeight + 2,
-                    child: FadeThroughBox(
-                      child: _buildContent(
-                        context,
-                        ref,
-                        state,
-                        isStart,
-                        runTime,
-                        isRestarting,
-                        _isDisabled,
-                        isSmartStopped,
-                      ),
-                    ),
+    return SizedBox(
+      height: getWidgetHeight(1),
+      child: CommonCard(
+        info: Info(
+          label: isSmartStopped
+              ? appLocalizations.coreSuspended
+              : isRestarting
+              ? appLocalizations.restartCoreTitle
+              : displayStart
+              ? appLocalizations.runTime
+              : appLocalizations.powerSwitch,
+          iconData: Icons.power_settings_new,
+        ),
+        onPressed: canPress
+            ? _handleStart
+            : hasNoProfile
+                ? _handleShowAddProfile
+                : null,
+        onLongPress: canPress ? _handleLongPress : null,
+        child: Container(
+          padding: baseInfoEdgeInsets.copyWith(top: 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                height: globalState.measure.bodyMediumHeight + 2,
+                child: FadeThroughBox(
+                  child: _buildContent(
+                    context,
+                    ref,
+                    state,
+                    isStart,
+                    isRestarting,
+                    _isDisabled,
+                    isSmartStopped,
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -160,7 +154,6 @@ class _StartButtonState extends ConsumerState<StartButton> {
     WidgetRef ref,
     StartButtonSelectorState state,
     bool isStart,
-    int? runTime,
     bool isRestarting,
     bool isDisabled,
     bool isSmartStopped,
@@ -232,20 +225,25 @@ class _StartButtonState extends ConsumerState<StartButton> {
       );
     }
 
-    // Started state: show pause icon + run time
-    final timeText = _formatRunTime(runTime);
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Icon(Icons.pause, size: 16, color: context.colorScheme.primary),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
         Text('  ', style: context.textTheme.bodyMedium?.toLight.adjustSize(1)),
         Expanded(
-          child: Text(
-            timeText,
-            style: context.textTheme.bodyMedium?.toLight.adjustSize(1),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          child: ValueListenableBuilder<int>(
+            valueListenable: dashboardRefreshManager.tick1s,
+            builder: (_, _, _) {
+              final runTime = ref.read(runTimeProvider);
+              final timeText = _formatRunTime(runTime);
+              return Text(
+                timeText,
+                style: context.textTheme.bodyMedium?.toLight.adjustSize(1),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              );
+            },
           ),
         ),
       ],

@@ -117,6 +117,7 @@ extension ColorSchemeExtension on ColorScheme {
       ? copyWith(
           surface: Colors.black,
           surfaceContainer: surfaceContainer.darken(5),
+          surfaceContainerLow: Colors.black,
         )
       : this;
 }

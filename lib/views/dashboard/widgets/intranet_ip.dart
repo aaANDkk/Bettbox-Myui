@@ -12,9 +12,7 @@ class IntranetIP extends StatelessWidget {
   const IntranetIP({super.key});
 
   void _showMoreIpInfoDialog(BuildContext context) {
-    globalState.showCommonDialog(
-      child: const _IntranetIpInfoDialog(),
-    );
+    globalState.showCommonDialog(child: const _IntranetIpInfoDialog());
   }
 
   @override
@@ -215,18 +213,15 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
                     ],
                   )
                 : (customValue ??
-                    SelectableText(
-                      value,
-                      style: context.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                    )),
+                      SelectableText(
+                        value,
+                        style: context.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                      )),
           ),
-          if (action != null) ...[
-            const SizedBox(width: 4),
-            action,
-          ],
+          if (action != null) ...[const SizedBox(width: 4), action],
         ],
       ),
     );
@@ -285,7 +280,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
                         color: allowLan
                             ? context.colorScheme.primaryContainer
                             : context.colorScheme.surfaceContainerHighest
-                                .withValues(alpha: 0.5),
+                                  .withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(12),
                         border: allowLan
                             ? null
@@ -311,8 +306,9 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 18,
-                      color: context.colorScheme.onSurfaceVariant
-                          .withValues(alpha: 0.7),
+                      color: context.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ],
                 ),
@@ -479,7 +475,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
             if (allowLan) ...[
               const SizedBox(height: 8),
               _buildStatTile(
-                icon: Icons.hub_rounded,
+                icon: Icons.cable_rounded,
                 iconColor: context.colorScheme.primary,
                 value: sharedAddress,
                 action: localIp.isNotEmpty
@@ -491,9 +487,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
                             ClipboardData(text: sharedAddress),
                           );
                           if (context.mounted) {
-                            context.showNotifier(
-                              appLocalizations.copySuccess,
-                            );
+                            context.showNotifier(appLocalizations.copySuccess);
                           }
                         },
                       )

@@ -286,7 +286,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         title: appLocalizations.basicConfig,
         subtitle: appLocalizations.basicConfigDesc,
         category: settingsCategory,
-        leading: const Icon(Icons.edit),
+        leading: const Icon(Icons.developer_board_rounded),
         onTap: (context, _) => _pushPage(
           context,
           appLocalizations.basicConfig,
@@ -1450,7 +1450,9 @@ class _LocaleItem extends ConsumerWidget {
 
   static List<Locale> _getOrderedLocales() {
     final priority = ['zh_CN', 'zh_TC', 'en', 'ru', 'fa', 'ja', 'ko'];
-    final locales = List<Locale>.from(AppLocalizations.delegate.supportedLocales);
+    final locales = List<Locale>.from(
+      AppLocalizations.delegate.supportedLocales,
+    );
     locales.sort((a, b) {
       final aKey = a.toString();
       final bKey = b.toString();
@@ -1591,7 +1593,7 @@ class _ConfigItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListItem.next(
-      leading: const Icon(Icons.edit),
+      leading: const Icon(Icons.developer_board_rounded),
       title: Text(appLocalizations.basicConfig),
       subtitle: Text(appLocalizations.basicConfigDesc),
       delegate: NextDelegate(

@@ -13,10 +13,9 @@ class OnlinePanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return RepaintBoundary(
-      child: SizedBox(
-        height: getWidgetHeight(1),
-        child: CommonCard(
+    return SizedBox(
+      height: getWidgetHeight(1),
+      child: CommonCard(
           info: Info(
             label: appLocalizations.onlinePanel,
             iconData: Icons.launch,
@@ -83,7 +82,6 @@ class OnlinePanel extends ConsumerWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

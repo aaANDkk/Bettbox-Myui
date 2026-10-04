@@ -28,6 +28,7 @@ export 'donut_chart.dart';
 export 'activate_box.dart';
 export 'wave.dart';
 export 'scroll.dart';
+export 'sliver_sticky_header.dart';
 export 'dialog.dart';
 export 'effect.dart';
 export 'palette.dart';

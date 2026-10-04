@@ -113,21 +113,26 @@ class AdaptiveSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = context.colorScheme.surface;
     final bottomSheet = type == SheetType.bottomSheet;
     final sideSheet = type == SheetType.sideSheet;
+    final backgroundColor = bottomSheet
+        ? context.colorScheme.surfaceContainerHigh
+        : (sideSheet ? context.colorScheme.surfaceContainer : null);
     final appBar = AppBar(
-      forceMaterialTransparency: bottomSheet ? true : false,
+      forceMaterialTransparency: bottomSheet,
       automaticallyImplyLeading: bottomSheet
           ? false
           : actions.isEmpty && sideSheet
           ? false
           : true,
       centerTitle: bottomSheet,
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       title: EmojiText(title),
       actions: genActions([
-        if (actions.isEmpty && sideSheet) CloseButton(),
+        if (actions.isEmpty && sideSheet) const CloseButton(),
         ...actions,
       ]),
     );

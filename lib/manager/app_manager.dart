@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bett_box/clash/core.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
-import 'package:bett_box/manager/window_manager.dart';
 import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
@@ -11,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
 class AppStateManager extends ConsumerStatefulWidget {
   final Widget child;
@@ -111,7 +111,8 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
       }
       isMinimized = await window?.isMinimized ?? false;
     }
-    final isPinned = system.isDesktop &&
+    final isPinned =
+        system.isDesktop &&
         ref.read(windowSettingProvider.select((s) => s.isPinned));
     final shouldRun = system.isDesktop
         ? (isPinned || (isVisible && !isMinimized))
@@ -236,222 +237,686 @@ class AppEnvManager extends StatelessWidget {
   }
 }
 
+final sidebarCollapsedProvider =
+    StateNotifierProvider<SidebarCollapsedNotifier, bool>((ref) {
+      return SidebarCollapsedNotifier();
+    });
+
+class SidebarCollapsedNotifier extends StateNotifier<bool> {
+  SidebarCollapsedNotifier() : super(false) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    final prefs = await preferences.sharedPreferencesCompleter.future;
+    state = prefs?.getBool(sidebarCollapsedKey) ?? false;
+  }
+
+  Future<void> toggle() async {
+    final next = !state;
+    state = next;
+    final prefs = await preferences.sharedPreferencesCompleter.future;
+    await prefs?.setBool(sidebarCollapsedKey, next);
+  }
+
+  Future<void> setCollapsed(bool value) async {
+    state = value;
+    final prefs = await preferences.sharedPreferencesCompleter.future;
+    await prefs?.setBool(sidebarCollapsedKey, value);
+  }
+}
+
+const _sidebarAnimDuration = Duration(milliseconds: 200);
+const _sidebarAnimCurve = Curves.easeOutCubic;
+
+class _SidebarToggleButton extends StatefulWidget {
+  final VoidCallback onTap;
+  final bool isCollapsed;
+
+  const _SidebarToggleButton({
+    required this.onTap,
+    this.isCollapsed = false,
+  });
+
+  @override
+  State<_SidebarToggleButton> createState() => _SidebarToggleButtonState();
+}
+
+class _SidebarToggleButtonState extends State<_SidebarToggleButton> {
+  bool _isHovering = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    final isLight = colorScheme.brightness == Brightness.light;
+    final iconColor = (_isHovering || _isPressed)
+        ? colorScheme.onSurface
+        : colorScheme.onSurfaceVariant;
+    final bgColor = _isPressed
+        ? colorScheme.onSurface.withValues(alpha: isLight ? 0.16 : 0.22)
+        : (_isHovering
+              ? colorScheme.onSurface.withValues(alpha: isLight ? 0.08 : 0.12)
+              : Colors.transparent);
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() {
+        _isHovering = false;
+        _isPressed = false;
+      }),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: widget.onTap,
+        child: AnimatedScale(
+          scale: _isPressed ? 0.92 : 1.0,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeOutCubic,
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            alignment: Alignment.center,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(
+                end: widget.isCollapsed ? 1.0 : 0.0,
+              ),
+              duration: _sidebarAnimDuration,
+              curve: _sidebarAnimCurve,
+              builder: (context, progress, _) {
+                return _SidebarIcon(
+                  color: iconColor,
+                  width: 15,
+                  height: 13,
+                  progress: progress,
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarIcon extends StatelessWidget {
+  final Color color;
+  final double width;
+  final double height;
+  final double progress;
+
+  const _SidebarIcon({
+    required this.color,
+    this.width = 15,
+    this.height = 13,
+    this.progress = 0.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: CustomPaint(
+        painter: _SidebarIconPainter(
+          color: color,
+          progress: progress,
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarIconPainter extends CustomPainter {
+  final Color color;
+  final double progress;
+
+  const _SidebarIconPainter({
+    required this.color,
+    this.progress = 0.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final strokeWidth = size.width * (1.35 / 16.5);
+    final halfStroke = strokeWidth / 2;
+    final rect = Rect.fromLTWH(
+      halfStroke,
+      halfStroke,
+      size.width - strokeWidth,
+      size.height - strokeWidth,
+    );
+    final radius = Radius.circular(size.width * (2.8 / 16.5));
+    final rrect = RRect.fromRectAndRadius(rect, radius);
+
+    final outerPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeJoin = StrokeJoin.round;
+
+    canvas.drawRRect(rrect, outerPaint);
+
+    final topInset = rect.height * 0.23 * progress;
+    final bottomInset = rect.height * 0.23 * progress;
+    final lineTop = rect.top + topInset;
+    final lineBottom = rect.bottom - bottomInset;
+    final dividerX = rect.left + rect.width * (0.30 - 0.05 * progress);
+
+    final linePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = progress > 0.04 ? StrokeCap.round : StrokeCap.butt;
+
+    canvas.drawLine(
+      Offset(dividerX, lineTop),
+      Offset(dividerX, lineBottom),
+      linePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _SidebarIconPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.progress != progress;
+  }
+}
+
+class _SidebarOverlay extends StatefulWidget {
+  final Widget child;
+
+  const _SidebarOverlay({required this.child});
+
+  @override
+  State<_SidebarOverlay> createState() => _SidebarOverlayState();
+}
+
+class _SidebarOverlayState extends State<_SidebarOverlay> {
+  late final OverlayEntry _entry = OverlayEntry(
+    builder: (context) => widget.child,
+  );
+
+  @override
+  void didUpdateWidget(_SidebarOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _entry.markNeedsBuild();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Overlay(initialEntries: [_entry]);
+  }
+}
+
 class AppSidebarContainer extends ConsumerWidget {
   final Widget child;
 
   const AppSidebarContainer({super.key, required this.child});
 
-  Widget _buildLoading() {
+  double get _headerHeight => 46.0;
+
+  Widget _buildLoading({
+    required bool isCollapsed,
+    required bool needSafeArea,
+  }) {
     return Consumer(
       builder: (_, ref, _) {
         final loading = ref.watch(loadingProvider);
         final isMobileView = ref.watch(isMobileViewProvider);
-        return loading && !isMobileView
-            ? RotatedBox(
-                quarterTurns: 1,
-                child: const LinearProgressIndicator(),
-              )
-            : Container();
+        if (!loading || isMobileView) {
+          return const SizedBox.shrink();
+        }
+        return SafeArea(
+          left: false,
+          top: needSafeArea,
+          right: false,
+          bottom: needSafeArea,
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: _sidebarAnimDuration,
+                curve: _sidebarAnimCurve,
+                height: isCollapsed ? _headerHeight : 0,
+              ),
+              const Expanded(
+                child: RepaintBoundary(
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: LinearProgressIndicator(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 
   Widget _buildBackground({
     required BuildContext context,
+    required bool isCollapsed,
     required Widget child,
   }) {
-    final isLight = context.colorScheme.brightness == Brightness.light;
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerHigh,
-        border: Border(
-          right: BorderSide(
-            color: context.colorScheme.outlineVariant.withValues(
-              alpha: isLight ? 0.6 : 0.45,
+    return AnimatedContainer(
+      duration: _sidebarAnimDuration,
+      curve: _sidebarAnimCurve,
+      width: isCollapsed ? 56 : 152,
+      child: ClipRect(
+        child: Material(color: Colors.transparent, child: child),
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context, {
+    required VoidCallback onToggle,
+    required bool isCollapsed,
+  }) {
+    final dragArea = Positioned.fill(
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onPanStart: (_) {
+          windowManager.startDragging();
+        },
+        onDoubleTap: () async {
+          final isMax = await windowManager.isMaximized();
+          if (isMax) {
+            await windowManager.unmaximize();
+          } else {
+            await windowManager.maximize();
+          }
+        },
+      ),
+    );
+
+    if (system.isMacOS) {
+      return SizedBox(
+        height: _headerHeight,
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            dragArea,
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 80,
+                right: 10,
+                top: 7,
+                bottom: 11,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _SidebarToggleButton(
+                    onTap: onToggle,
+                    isCollapsed: isCollapsed,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return SizedBox(
+      height: _headerHeight,
+      child: Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          if (system.isDesktop) dragArea,
+          Padding(
+            padding: const EdgeInsets.only(left: 14, right: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppIdentity.productName,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.5,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  child: _SidebarToggleButton(
+                    onTap: onToggle,
+                    isCollapsed: isCollapsed,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+        ],
       ),
-      child: Material(color: Colors.transparent, child: child),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final navigationState = ref.watch(navigationStateProvider);
-    final navigationItems = navigationState.navigationItems;
-    final isMobileView = navigationState.viewMode == ViewMode.mobile;
+    final (navigationItems, isMobileView, currentIndex) = ref.watch(
+      navigationStateProvider.select(
+        (state) => (
+          state.navigationItems,
+          state.viewMode == ViewMode.mobile,
+          state.currentIndex,
+        ),
+      ),
+    );
     if (isMobileView) {
       return child;
     }
-    final currentIndex = navigationState.currentIndex;
-    final showLabel = ref.watch(appSettingProvider).showLabel;
-    return Row(
-      children: [
-        Stack(
-          alignment: Alignment.topRight,
-          children: [
-            _buildBackground(
-              context: context,
-              child: SafeArea(
-                left: true,
-                top: true,
-                right: false,
-                bottom: false,
-                child: Column(
-                  children: [
-                    if (system.isMacOS) const SizedBox(height: 22),
-                    const SizedBox(height: 16),
-                    if (!system.isMacOS) ...[
-                      const AppIcon(),
-                      const SizedBox(height: 12),
-                    ],
-                    Expanded(
-                      child: ScrollConfiguration(
-                        behavior: HiddenBarScrollBehavior(),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight,
-                                ),
-                                child: IntrinsicHeight(
-                                  child: CallbackShortcuts(
-                                    bindings: <ShortcutActivator, VoidCallback>{
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.arrowUp,
-                                      ): () {
-                                        if (currentIndex > 0) {
-                                          globalState.appController.toPage(
-                                            navigationItems[currentIndex - 1]
-                                                .label,
-                                          );
-                                        }
-                                      },
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.arrowDown,
-                                      ): () {
-                                        if (currentIndex <
-                                            navigationItems.length - 1) {
-                                          globalState.appController.toPage(
-                                            navigationItems[currentIndex + 1]
-                                                .label,
-                                          );
-                                        }
-                                      },
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.select,
-                                      ): () {},
-                                      const SingleActivator(
-                                        LogicalKeyboardKey.enter,
-                                      ): () {},
-                                    },
-                                    child: Focus(
-                                      autofocus: true,
-                                      child: NavigationRail(
-                                        backgroundColor: Colors.transparent,
-                                        indicatorColor:
-                                            context.colorScheme.primary
-                                                .withValues(
-                                                  alpha:
-                                                      context
-                                                              .colorScheme
-                                                              .brightness ==
-                                                          Brightness.light
-                                                      ? 0.20
-                                                      : 0.26,
-                                                ),
-                                        indicatorShape:
-                                            const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(16),
-                                              ),
-                                            ),
-                                        selectedIconTheme: IconThemeData(
-                                          color: context.colorScheme.primary,
-                                        ),
-                                        unselectedIconTheme: IconThemeData(
-                                          color:
-                                              context.colorScheme.onSurfaceVariant,
-                                        ),
-                                        selectedLabelTextStyle: context
-                                            .textTheme
-                                            .labelLarge!
-                                            .copyWith(
-                                              color: context.colorScheme.primary,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                        unselectedLabelTextStyle: context
-                                            .textTheme
-                                            .labelLarge!
-                                            .copyWith(
-                                              color: context
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                        destinations: navigationItems
-                                            .map(
-                                              (e) => NavigationRailDestination(
-                                                icon: e.icon,
-                                                label: Text(
-                                                  e.label.localizedName,
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                        onDestinationSelected: (index) {
-                                          final label =
-                                              navigationItems[index].label;
-                                          if (currentIndex == index) {
-                                            final pageContext = GlobalObjectKey(
-                                              label,
-                                            ).currentContext;
-                                            if (pageContext != null) {
-                                              Navigator.of(
-                                                pageContext,
-                                              ).popUntil(
-                                                (route) => route.isFirst,
-                                              );
-                                            }
+    final needSafeArea = !system.isDesktop;
+    final isCollapsed = ref.watch(sidebarCollapsedProvider);
+    final onToggle = ref.read(sidebarCollapsedProvider.notifier).toggle;
+    final isLight = context.colorScheme.brightness == Brightness.light;
+    final pureBlack = ref.watch(
+      themeSettingProvider.select((s) => s.pureBlack),
+    );
+    final bgGradient = LinearGradient(
+      begin: const Alignment(-1.0, -0.3),
+      end: const Alignment(1.0, 0.4),
+      colors: isLight
+          ? [
+              context.colorScheme.surfaceContainer,
+              Color.lerp(
+                context.colorScheme.surfaceContainer,
+                context.colorScheme.surfaceContainerLowest,
+                0.85,
+              )!,
+            ]
+          : (!pureBlack
+                ? [
+                    context.colorScheme.surfaceContainer,
+                    Color.lerp(
+                      context.colorScheme.surfaceContainer,
+                      context.colorScheme.surfaceContainerHigh,
+                      0.35,
+                    )!,
+                  ]
+                : [
+                    context.colorScheme.surfaceContainer,
+                    context.colorScheme.surfaceContainer,
+                  ]),
+    );
+    return _SidebarOverlay(
+      child: DecoratedBox(
+        decoration: BoxDecoration(gradient: bgGradient),
+        child: Material(
+          color: Colors.transparent,
+          child: Stack(
+            children: [
+              Row(
+                children: [
+                  RepaintBoundary(
+                    child: Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        _buildBackground(
+                          context: context,
+                          isCollapsed: isCollapsed,
+                          child: SafeArea(
+                            left: true,
+                            top: needSafeArea,
+                            right: false,
+                            bottom: needSafeArea,
+                            child: Column(
+                              children: [
+                                SizedBox(height: _headerHeight),
+                                Expanded(
+                                  child: ScrollConfiguration(
+                                    behavior: HiddenBarScrollBehavior(),
+                                    child: CallbackShortcuts(
+                                      bindings: <ShortcutActivator, VoidCallback>{
+                                        const SingleActivator(
+                                          LogicalKeyboardKey.arrowUp,
+                                        ): () {
+                                          if (currentIndex > 0) {
+                                            globalState.appController.toPage(
+                                              navigationItems[currentIndex - 1]
+                                                  .label,
+                                            );
                                           }
-                                          globalState.appController.toPage(
-                                            label,
-                                          );
                                         },
-                                        extended: showLabel,
-                                        selectedIndex: currentIndex,
-                                        labelType: showLabel
-                                            ? NavigationRailLabelType.none
-                                            : NavigationRailLabelType.all,
+                                        const SingleActivator(
+                                          LogicalKeyboardKey.arrowDown,
+                                        ): () {
+                                          if (currentIndex <
+                                              navigationItems.length - 1) {
+                                            globalState.appController.toPage(
+                                              navigationItems[currentIndex + 1]
+                                                  .label,
+                                            );
+                                          }
+                                        },
+                                        const SingleActivator(
+                                          LogicalKeyboardKey.select,
+                                        ): () {},
+                                        const SingleActivator(
+                                          LogicalKeyboardKey.enter,
+                                        ): () {},
+                                      },
+                                      child: Focus(
+                                        autofocus: true,
+                                        child: ListView.separated(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          itemCount: navigationItems.length,
+                                          separatorBuilder: (_, _) =>
+                                              const SizedBox(height: 3),
+                                          itemBuilder: (context, index) {
+                                            final item = navigationItems[index];
+                                            final isSelected =
+                                              currentIndex == index;
+                                            return _SidebarItem(
+                                              icon: item.icon,
+                                              label: item.label.localizedName,
+                                              isSelected: isSelected,
+                                              isCollapsed: isCollapsed,
+                                              onTap: () {
+                                                if (currentIndex == index) {
+                                                  final pageContext =
+                                                      GlobalObjectKey(
+                                                        item.label,
+                                                      ).currentContext;
+                                                  if (pageContext != null) {
+                                                    Navigator.of(
+                                                      pageContext,
+                                                    ).popUntil(
+                                                      (route) => route.isFirst,
+                                                    );
+                                                  }
+                                                }
+                                                globalState.appController
+                                                    .toPage(item.label);
+                                              },
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                                const SizedBox(height: 8),
+                              ],
+                            ),
+                          ),
+                        ),
+                        _buildLoading(
+                          isCollapsed: isCollapsed,
+                          needSafeArea: needSafeArea,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: RepaintBoundary(
+                      child: ClipRect(
+                        child: MediaQuery.removePadding(
+                          context: context,
+                          removeLeft: true,
+                          removeTop: system.isMacOS,
+                          child: child,
                         ),
                       ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                width: 152,
+                height: _headerHeight +
+                    (needSafeArea ? MediaQuery.paddingOf(context).top : 0),
+                child: RepaintBoundary(
+                  child: SafeArea(
+                    left: true,
+                    top: needSafeArea,
+                    right: false,
+                    bottom: false,
+                    child: _buildHeader(
+                      context,
+                      onToggle: onToggle,
+                      isCollapsed: isCollapsed,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarItem extends StatefulWidget {
+  final Widget icon;
+  final String label;
+  final bool isSelected;
+  final bool isCollapsed;
+  final VoidCallback onTap;
+
+  const _SidebarItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    this.isCollapsed = false,
+    required this.onTap,
+  });
+
+  @override
+  State<_SidebarItem> createState() => _SidebarItemState();
+}
+
+class _SidebarItemState extends State<_SidebarItem> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    final isLight = colorScheme.brightness == Brightness.light;
+    final isSelected = widget.isSelected;
+    final isCollapsed = widget.isCollapsed;
+
+    final backgroundColor = isSelected
+        ? (isLight
+              ? colorScheme.primary.withValues(alpha: 0.12)
+              : colorScheme.primary.withValues(alpha: 0.20))
+        : (_isHovering
+              ? colorScheme.onSurface.withValues(alpha: isLight ? 0.05 : 0.08)
+              : Colors.transparent);
+
+    final foregroundColor = isSelected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
+
+    final iconWidget = IconTheme(
+      data: IconThemeData(color: foregroundColor, size: 19),
+      child: widget.icon,
+    );
+
+    final content = AnimatedContainer(
+      duration: _sidebarAnimDuration,
+      curve: _sidebarAnimCurve,
+      height: 36,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 36, height: 36, child: Center(child: iconWidget)),
+          Expanded(
+            child: ClipRect(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 150),
+                  opacity: isCollapsed ? 0.0 : 1.0,
+                  curve: _sidebarAnimCurve,
+                  child: Text(
+                    widget.label,
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                    style: context.textTheme.labelLarge?.copyWith(
+                      color: foregroundColor,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ),
             ),
-            _buildLoading(),
-          ],
-        ),
-        Expanded(
-          flex: 1,
-          child: ClipRect(
-            child: MediaQuery.removePadding(
-              context: context,
-              removeLeft: true,
-              child: child,
-            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+
+    final itemWidget = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: content,
+      ),
+    );
+
+    if (isCollapsed) {
+      return Tooltip(
+        message: widget.label,
+        waitDuration: const Duration(milliseconds: 350),
+        positionDelegate: (context) {
+          final x = context.target.dx + context.targetSize.width / 2 + 12;
+          final y = (context.target.dy - context.tooltipSize.height / 2).clamp(
+            8.0,
+            context.overlaySize.height - context.tooltipSize.height - 8.0,
+          );
+          return Offset(x, y);
+        },
+        child: itemWidget,
+      );
+    }
+
+    return itemWidget;
   }
 }

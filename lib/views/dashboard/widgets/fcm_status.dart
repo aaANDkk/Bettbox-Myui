@@ -99,10 +99,9 @@ class _FcmStatusState extends State<FcmStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: SizedBox(
-        height: getWidgetHeight(1),
-        child: CommonCard(
+    return SizedBox(
+      height: getWidgetHeight(1),
+      child: CommonCard(
           onLongPress: system.isAndroid ? () => app.openFcmDiagnostics() : null,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,7 +187,6 @@ class _FcmStatusState extends State<FcmStatus> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }

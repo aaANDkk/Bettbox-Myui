@@ -35,17 +35,14 @@ const mmdbFileName = 'geoip.metadb';
 const asnFileName = 'ASN.mmdb';
 const geoSiteFileName = 'GeoSite.dat';
 const bundleMRSFileName = 'BundleMRS.7z';
-final double kHeaderHeight = system.isDesktop
-    ? !system.isMacOS
-          ? 40
-          : 28
-    : 0;
+final double kHeaderHeight = system.isDesktop ? 40 : 0;
 const profilesDirectoryName = 'profiles';
 const localhost = '127.0.0.1';
 const clashConfigKey = 'clash_config';
 const configKey = 'config';
 const customSidebarIconKey = 'custom_sidebar_icon';
 const customDashboardTitleKey = 'custom_dashboard_title';
+const sidebarCollapsedKey = 'sidebar_collapsed';
 const double dialogCommonWidth = 300;
 const repository = 'appshubcc/Bettbox';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');

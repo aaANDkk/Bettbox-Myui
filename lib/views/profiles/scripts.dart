@@ -219,87 +219,106 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
         }
         return CommonScrollBar(
           controller: null,
-          child: ListView.builder(
-            padding: kMaterialListPadding.copyWith(bottom: 16 + 64),
-            itemCount: scripts.length,
-            itemBuilder: (_, index) {
-              final script = scripts[index];
-              final isSelected = script.id == currentId;
-              return Container(
-                padding: kTabLabelPadding,
-                margin: EdgeInsets.symmetric(vertical: 6),
-                child: CommonCard(
-                  type: CommonCardType.filled,
-                  radius: 16,
-                  child: ListItem(
-                    padding: const EdgeInsets.only(left: 12, right: 12),
-                    title: EmojiText(script.label),
-                    leading: Switch(
-                      value: isSelected,
-                      onChanged: (value) {
-                        if (value) {
-                          ref.read(scriptStateProvider.notifier).setId(script.id);
-                        } else if (isSelected) {
-                          ref.read(scriptStateProvider.notifier).setId(script.id);
-                        }
-                      },
-                    ),
-                    trailing: CommonPopupBox(
-                      targetBuilder: (open) {
-                        return IconButton(
-                          onPressed: () {
-                            open();
-                          },
-                          tooltip: appLocalizations.more,
-                          icon: Icon(Icons.more_vert),
-                        );
-                      },
-                      popup: CommonPopupMenu(
-                        items: [
-                          PopupMenuItemData(
-                            icon: Icons.edit,
-                            label: appLocalizations.edit,
-                            onPressed: () {
-                              _handleToEditor(script: script);
+          child: ListView(
+            padding: const EdgeInsets.all(16).copyWith(bottom: 16 + 64),
+            children: [
+              CommonCard(
+                type: CommonCardType.filled,
+                radius: 16,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var i = 0; i < scripts.length; i++) ...[
+                      Builder(
+                        builder: (_) {
+                          final script = scripts[i];
+                          final isSelected = script.id == currentId;
+                          return ListItem(
+                            onTap: () {
+                              ref
+                                  .read(scriptStateProvider.notifier)
+                                  .setId(script.id);
                             },
-                          ),
-                          if (script.isCompatibleWithBettbox)
-                            PopupMenuItemData(
-                              icon: Icons.tune,
-                              label: appLocalizations.custom,
-                              onPressed: () {
-                                _handleCustomOptions(script);
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            title: EmojiText(script.label),
+                            leading: Switch(
+                              value: isSelected,
+                              onChanged: (_) {
+                                ref
+                                    .read(scriptStateProvider.notifier)
+                                    .setId(script.id);
                               },
                             ),
-                          if (script.url != null && script.url!.isNotEmpty)
-                            PopupMenuItemData(
-                              icon: Icons.sync,
-                              label: appLocalizations.sync,
-                              onPressed: () {
-                                _handleSyncScript(script.id);
+                            trailing: CommonPopupBox(
+                              targetBuilder: (open) {
+                                return IconButton(
+                                  onPressed: () {
+                                    open();
+                                  },
+                                  tooltip: appLocalizations.more,
+                                  icon: const Icon(Icons.more_vert),
+                                );
                               },
+                              popup: CommonPopupMenu(
+                                items: [
+                                  PopupMenuItemData(
+                                    icon: Icons.edit,
+                                    label: appLocalizations.edit,
+                                    onPressed: () {
+                                      _handleToEditor(script: script);
+                                    },
+                                  ),
+                                  if (script.isCompatibleWithBettbox)
+                                    PopupMenuItemData(
+                                      icon: Icons.tune,
+                                      label: appLocalizations.custom,
+                                      onPressed: () {
+                                        _handleCustomOptions(script);
+                                      },
+                                    ),
+                                  if (script.url != null &&
+                                      script.url!.isNotEmpty)
+                                    PopupMenuItemData(
+                                      icon: Icons.sync,
+                                      label: appLocalizations.sync,
+                                      onPressed: () {
+                                        _handleSyncScript(script.id);
+                                      },
+                                    ),
+                                  PopupMenuItemData(
+                                    icon: Icons.file_copy_outlined,
+                                    label: appLocalizations.exportFile,
+                                    onPressed: () {
+                                      _handleExportFile(script);
+                                    },
+                                  ),
+                                  PopupMenuItemData(
+                                    icon: Icons.delete,
+                                    label: appLocalizations.delete,
+                                    onPressed: () {
+                                      _handleDelScript(script.label);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                          PopupMenuItemData(
-                            icon: Icons.file_copy_outlined,
-                            label: appLocalizations.exportFile,
-                            onPressed: () {
-                              _handleExportFile(script);
-                            },
-                          ),
-                          PopupMenuItemData(
-                            icon: Icons.delete,
-                            label: appLocalizations.delete,
-                            onPressed: () {
-                              _handleDelScript(script.label);
-                            },
-                          ),
-                        ],
+                          );
+                        },
                       ),
-                    ),
-                  ),
+                      if (i != scripts.length - 1)
+                        const Divider(
+                          height: 1,
+                          indent: 16,
+                          endIndent: 16,
+                        ),
+                    ],
+                  ],
                 ),
-              );
-            },
+              ),
+            ],
           ),
         );
       },

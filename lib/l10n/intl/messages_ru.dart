@@ -796,10 +796,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Указать политику DNS для конкретных доменов",
     ),
     "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage(
-      "Тактильная отдача",
+      "Анимация и отклик",
     ),
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
-      "Вибрация при переключении нижней панели навигации",
+      "Анимация нижней панели навигации и тактильный отклик",
     ),
     "navConnections": MessageLookupByLibrary.simpleMessage("Соединения"),
     "navTools": MessageLookupByLibrary.simpleMessage("Еще"),

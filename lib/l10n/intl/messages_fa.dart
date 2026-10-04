@@ -777,10 +777,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "تعیین سیاست DNS برای دامنه‌ها",
     ),
     "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage(
-      "بازخورد لمسی",
+      "بازخورد انیمیشن",
     ),
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
-      "لرزش هنگام تغییر زبانه‌های نوار پایین",
+      "انیمیشن نوار ناوبری پایین و بازخورد لمسی",
     ),
     "navConnections": MessageLookupByLibrary.simpleMessage("اتصالات"),
     "navTools": MessageLookupByLibrary.simpleMessage("ابزارها"),

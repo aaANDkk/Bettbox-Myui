@@ -563,9 +563,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nameserverPolicyDesc": MessageLookupByLibrary.simpleMessage(
       "指定對應網域名稱伺服器策略",
     ),
-    "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage("觸覺回饋"),
+    "navBarHapticFeedback": MessageLookupByLibrary.simpleMessage("動畫回饋"),
     "navBarHapticFeedbackDesc": MessageLookupByLibrary.simpleMessage(
-      "底部導覽列切換震動回饋",
+      "底部導覽列動畫及震動回饋",
     ),
     "navConnections": MessageLookupByLibrary.simpleMessage("連線"),
     "navTools": MessageLookupByLibrary.simpleMessage("更多"),

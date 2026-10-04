@@ -278,7 +278,7 @@ class ApplicationSettingView extends StatelessWidget {
           const AlwaysShowTitleBarItem(),
       ],
       const ShowStartSwitchItem(),
-      if (system.isAndroid) ...[NavBarHapticFeedbackItem()],
+      const NavBarHapticFeedbackItem(),
       if (system.isMacOS) const KeepDockIconItem(),
       CloseConnectionsItem(),
       UsageItem(),

@@ -290,6 +290,10 @@ class CommonScaffoldState extends State<CommonScaffold> {
                 builder: (_, state, _) {
                   return _buildAppBarWrap(
                     AppBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      scrolledUnderElevation: 0,
+                      surfaceTintColor: Colors.transparent,
                       centerTitle: widget.centerTitle ?? false,
                       leading: _buildLeading(),
                       title: _buildTitle(state.searchState),
@@ -351,28 +355,39 @@ class CommonScaffoldState extends State<CommonScaffold> {
               );
             },
           ),
-          Expanded(child: widget.body),
+          Expanded(
+            child: widget.body,
+          ),
         ],
       ),
     );
     return DesktopBackShortcutWrapper(
-      child: Scaffold(
-        appBar: _buildAppBar(),
-        body: body,
-        resizeToAvoidBottomInset: true,
-        backgroundColor: widget.backgroundColor,
-        floatingActionButton:
-            widget.floatingActionButton ??
-            ValueListenableBuilder<Widget?>(
-              valueListenable: _floatingActionButton,
-              builder: (_, value, _) {
-                return IntrinsicWidth(
-                  child: IntrinsicHeight(
-                    child: FadeScaleBox(child: value ?? SizedBox()),
-                  ),
-                );
-              },
-            ),
+      child: Consumer(
+        builder: (context, ref, _) {
+          final isMobileView = ref.watch(isMobileViewProvider);
+          return Scaffold(
+            appBar: _buildAppBar(),
+            body: body,
+            resizeToAvoidBottomInset: true,
+            backgroundColor:
+                widget.backgroundColor ??
+                (isMobileView
+                    ? context.colorScheme.surfaceContainer
+                    : Colors.transparent),
+            floatingActionButton:
+                widget.floatingActionButton ??
+                ValueListenableBuilder<Widget?>(
+                  valueListenable: _floatingActionButton,
+                  builder: (_, value, _) {
+                    return IntrinsicWidth(
+                      child: IntrinsicHeight(
+                        child: FadeScaleBox(child: value ?? const SizedBox()),
+                      ),
+                    );
+                  },
+                ),
+          );
+        },
       ),
     );
   }
