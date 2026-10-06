@@ -273,9 +273,7 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
                   detailTitle: appLocalizations.details,
                 );
               },
-              itemExtentBuilder: (index, _) {
-                return TrackerInfoItem.height + 1;
-              },
+              itemExtent: TrackerInfoItem.height + 1,
               itemCount: connections.length,
             ),
           );

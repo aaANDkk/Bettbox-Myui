@@ -282,6 +282,7 @@ class _ProcessIconState extends State<_ProcessIcon> {
           height: 42,
           alignment: Alignment.center,
           child: FutureBuilder<Uint8List?>(
+            initialData: _iconCache[widget.process],
             future: _iconFuture,
             builder: (context, snapshot) {
               final iconBytes = snapshot.data;

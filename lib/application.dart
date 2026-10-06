@@ -12,6 +12,7 @@ import 'package:bett_box/plugins/app.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,6 +52,9 @@ class ApplicationState extends ConsumerState<Application>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (system.isAndroid) {
+      unawaited(SystemNavigator.setFrameworkHandlesBack(true));
+    }
     globalState.backgroundMode.addListener(_syncAutoUpdateTasks);
     _syncAutoUpdateTasks();
     globalState.appController = AppController(context, ref);

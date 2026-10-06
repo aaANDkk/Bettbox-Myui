@@ -62,6 +62,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
   void _requestStartSwitchFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _startSwitchKey.currentState?.requestFocus();
     });
   }
@@ -181,6 +182,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       return;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final dashboardWidgets = children
           .map((item) => DashboardWidget.getDashboardWidget(item))
           .toList();
@@ -213,6 +215,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .map((item) => item.widget),
     ];
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _addedWidgetsNotifier.value = DashboardWidget.values
           .where(
             (item) =>

@@ -2,6 +2,7 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/app.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 
 class BaseNavigator {
   static Future<T?> push<T>(
@@ -37,10 +38,33 @@ class _CleanCupertinoPageRoute<T> extends CupertinoPageRoute<T> {
     super.settings,
     super.fullscreenDialog,
     super.maintainState,
-  }) : super(allowSnapshotting: false);
+  });
 
   @override
   Color? get barrierColor => null;
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        child,
+      );
+    }
+    return CupertinoPageTransition(
+      primaryRouteAnimation: animation,
+      secondaryRouteAnimation: secondaryAnimation,
+      linearTransition: false,
+      child: child,
+    );
+  }
 }
 
 class CommonDesktopRoute<T> extends PageRoute<T> {
