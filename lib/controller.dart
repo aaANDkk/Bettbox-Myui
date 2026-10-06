@@ -400,20 +400,7 @@ class AppController {
   }
 
   Future<bool> _shouldUpdateDashboardTick() async {
-    if (system.isDesktop) {
-      final isPinned = _ref.read(
-        windowSettingProvider.select((s) => s.isPinned),
-      );
-      if (isPinned) return true;
-      if (await window?.isVisible == false) return false;
-      if (await window?.isMinimized == true) return false;
-      return true;
-    }
-
-    final lifecycleState = WidgetsBinding.instance.lifecycleState;
-    if (lifecycleState != AppLifecycleState.resumed) return false;
-
-    return true;
+    return dashboardRefreshManager.isActive();
   }
 
   Future<void> updateTraffic() async {

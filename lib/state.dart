@@ -96,27 +96,24 @@ class GlobalState {
     return widgets.contains(DashboardWidget.networkDetection);
   }
 
-  String getCurrentNodeSignature() {
-    final profileId = config.currentProfileId ?? '';
-    final mode = config.patchClashConfig.mode.name;
-    final selectedMap = config.currentProfile?.selectedMap ?? {};
-    final sortedEntries = selectedMap.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-    final selectedStr =
-        sortedEntries.map((e) => '${e.key}:${e.value}').join(';');
-    String activeGroupsStr = '';
-    if (isInit && _appController != null) {
-      try {
-        final groups = appController.ref.read(groupsProvider);
-        if (groups.isNotEmpty) {
-          final sortedGroups = groups.toList()
-            ..sort((a, b) => a.name.compareTo(b.name));
-          activeGroupsStr =
-              sortedGroups.map((g) => '${g.name}:${g.realNow}').join(';');
-        }
-      } catch (_) {}
+  String getCurrentOutboundNode() {
+    final mode = config.patchClashConfig.mode;
+    if (mode == Mode.direct) {
+      return 'DIRECT';
     }
-    return '$profileId|$mode|$selectedStr|$activeGroupsStr';
+    final currentProfile = config.currentProfile;
+    if (currentProfile == null) {
+      return mode.name;
+    }
+    final selectedMap = currentProfile.selectedMap;
+    if (mode == Mode.global) {
+      return 'GLOBAL:${selectedMap['GLOBAL'] ?? ''}';
+    }
+    final currentGroup = currentProfile.currentGroupName;
+    final node = (currentGroup != null && selectedMap.containsKey(currentGroup))
+        ? selectedMap[currentGroup]
+        : (selectedMap['GLOBAL'] ?? selectedMap.values.firstOrNull);
+    return 'RULE:${currentGroup ?? ''}:${node ?? ''}';
   }
 
   bool get isStart => startTime != null && startTime!.isBeforeNow;
@@ -1273,6 +1270,8 @@ class DashboardRefreshManager {
 
   bool get isRunning => _isRunning;
 
+  Future<bool> isActive() => _isActive();
+
   Future<bool> _isActive() async {
     if (system.isDesktop) {
       final isPinned = globalState.config.windowProps.isPinned;
@@ -1292,7 +1291,16 @@ class DashboardRefreshManager {
     if (lifecycleState != null && lifecycleState != AppLifecycleState.resumed) {
       return false;
     }
+
+    if (globalState.appState.pageLabel != PageLabel.dashboard) {
+      return false;
+    }
+
     return true;
+  }
+
+  void triggerImmediateTick() {
+    _tryTick(_tickToken);
   }
 
   Future<void> _tryTick(int token) async {
@@ -1339,7 +1347,7 @@ class DetectionState {
   bool _isIpMasked = false;
   IpInfo? _rawIpInfo;
   bool _isFirstLaunch = true;
-  String? _lastCheckedNodeSignature;
+  String? _lastCheckedOutboundNode;
 
   final state = ValueNotifier<NetworkDetectionState>(
     const NetworkDetectionState(
@@ -1385,7 +1393,7 @@ class DetectionState {
   void _onIpProgress(int requestId, IpInfo info) {
     if (requestId != _requestId) return;
     _rawIpInfo = info;
-    _lastCheckedNodeSignature = globalState.getCurrentNodeSignature();
+    _lastCheckedOutboundNode = globalState.getCurrentOutboundNode();
     state.value = state.value.copyWith(
       isLoading: false,
       ipInfo: _maskIpInfo(_rawIpInfo),
@@ -1448,13 +1456,13 @@ class DetectionState {
 
   void checkOnForegroundResume() {
     if (!globalState.hasNetworkDetectionWidget) return;
-    final currentSignature = globalState.getCurrentNodeSignature();
+    final currentNode = globalState.getCurrentOutboundNode();
     if (state.value.ipInfo != null &&
-        _lastCheckedNodeSignature == currentSignature &&
+        _lastCheckedOutboundNode == currentNode &&
         state.value.errorMessage == null) {
       return;
     }
-    _lastCheckedNodeSignature = currentSignature;
+    _lastCheckedOutboundNode = currentNode;
     startCheck(showLoading: state.value.ipInfo == null);
   }
 
@@ -1487,7 +1495,7 @@ class DetectionState {
 
     if (res.data != null) {
       _rawIpInfo = res.data;
-      _lastCheckedNodeSignature = globalState.getCurrentNodeSignature();
+      _lastCheckedOutboundNode = globalState.getCurrentOutboundNode();
     }
     state.value = state.value.copyWith(
       isLoading: false,
@@ -1572,12 +1580,8 @@ class MediaUnlockStateNotifier {
   int _requestId = 0;
   Timer? _nodeChangeTimer;
   static const _nodeChangeDelay = Duration(milliseconds: 800);
-  String? _lastCheckedNodeSignature;
+  String? _lastCheckedOutboundNode;
   bool? _preIsStart;
-
-  String _getNodeSignature() {
-    return globalState.getCurrentNodeSignature();
-  }
 
   final state = ValueNotifier<MediaUnlockState>(
     const MediaUnlockState(),
@@ -1748,7 +1752,7 @@ class MediaUnlockStateNotifier {
               status: MediaUnlockStatus.failed,
             );
       }
-      _lastCheckedNodeSignature = _getNodeSignature();
+      _lastCheckedOutboundNode = globalState.getCurrentOutboundNode();
       state.value = state.value.copyWith(
         isLoading: isFullCheck ? false : state.value.isLoading,
         results: nextResults,
@@ -1769,7 +1773,7 @@ class MediaUnlockStateNotifier {
           ),
         );
       }
-      _lastCheckedNodeSignature = _getNodeSignature();
+      _lastCheckedOutboundNode = globalState.getCurrentOutboundNode();
       state.value = state.value.copyWith(
         isLoading: isFullCheck ? false : state.value.isLoading,
         results: fallbackResults,
@@ -1854,7 +1858,7 @@ class MediaUnlockStateNotifier {
         testingPlatforms: {},
         isLoading: false,
       );
-      _lastCheckedNodeSignature = _getNodeSignature();
+      _lastCheckedOutboundNode = globalState.getCurrentOutboundNode();
       checkPinned(force: true);
       return;
     }
@@ -1864,12 +1868,12 @@ class MediaUnlockStateNotifier {
       if (globalState.appState.runTime == null) return;
       if (globalState.backgroundMode.value) return;
 
-      final currentSignature = _getNodeSignature();
-      if (_lastCheckedNodeSignature == currentSignature &&
+      final currentNode = globalState.getCurrentOutboundNode();
+      if (_lastCheckedOutboundNode == currentNode &&
           state.value.results.isNotEmpty) {
         return;
       }
-      _lastCheckedNodeSignature = currentSignature;
+      _lastCheckedOutboundNode = currentNode;
       final nextResults =
           Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
       for (final p in pinnedPlatforms) {
@@ -1889,12 +1893,14 @@ class MediaUnlockStateNotifier {
     if (!isRunning) return;
     if (!globalState.hasMediaUnlockWidget) return;
     if (!globalState.config.appSetting.mediaUnlockRefreshOnNodeChange) return;
-    final currentSignature = globalState.getCurrentNodeSignature();
+    if (state.value.isLoading || state.value.testingPlatforms.isNotEmpty) return;
+
+    final currentNode = globalState.getCurrentOutboundNode();
     if (state.value.results.isNotEmpty &&
-        _lastCheckedNodeSignature == currentSignature) {
+        _lastCheckedOutboundNode == currentNode) {
       return;
     }
-    _lastCheckedNodeSignature = currentSignature;
+    _lastCheckedOutboundNode = currentNode;
     final nextResults =
         Map<MediaPlatform, MediaUnlockResult>.from(state.value.results);
     for (final p in pinnedPlatforms) {
