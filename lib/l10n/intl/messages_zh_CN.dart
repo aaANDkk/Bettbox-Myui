@@ -500,6 +500,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "logsTest": MessageLookupByLibrary.simpleMessage("日志测试"),
     "loopback": MessageLookupByLibrary.simpleMessage("回环解锁工具"),
     "loopbackDesc": MessageLookupByLibrary.simpleMessage("用于 UWP 回环解锁"),
+    "loopbackProtection": MessageLookupByLibrary.simpleMessage("回环保护"),
+    "loopbackProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "阻断网络错误引起的回环流量",
+    ),
     "loose": MessageLookupByLibrary.simpleMessage("宽松"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("重新获取 IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),

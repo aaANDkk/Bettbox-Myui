@@ -277,6 +277,7 @@ abstract class VpnProps with _$VpnProps {
     @Default('') String smartAutoStopNetworks,
     @Default(false) bool storeFix,
     @Default(false) bool networkFix,
+    @Default(true) bool loopbackProtection,
     @Default(false) bool disableQuic,
     @Default(false) bool highPriorityNotification,
     @Default(false) bool networkSpeedNotification,

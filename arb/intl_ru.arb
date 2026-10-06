@@ -51,6 +51,8 @@
   "dozeSuspendDesc": "Синхронизация с режимом сна Android",
   "storeFix": "Исправление Google Play",
   "storeFixDesc": "Исправляет проблемы загрузки Google Play",
+  "loopbackProtection": "Защита от закольцовки",
+  "loopbackProtectionDesc": "Блокировать закольцованный трафик из-за ошибок сети",
   "disableQuic": "Отключить QUIC",
   "disableQuicDesc": "Отключить QUIC для решения сетевых проблем",
   "notificationHighPriority": "Высокий приоритет",

@@ -1,11 +1,18 @@
 import 'dart:io';
 
-import 'package:bett_box/common/common.dart';
 import 'package:bett_box/state.dart';
 
 class BettboxHttpOverrides extends HttpOverrides {
+  static bool _isLoopback(String host) {
+    if (host.isEmpty) return true;
+    final normalized = host.toLowerCase();
+    if (normalized == 'localhost') return true;
+    final ip = InternetAddress.tryParse(normalized);
+    return ip != null && ip.isLoopback;
+  }
+
   static String handleFindProxy(Uri url) {
-    if ([localhost].contains(url.host)) {
+    if (_isLoopback(url.host)) {
       return 'DIRECT';
     }
     final port = globalState.config.patchClashConfig.mixedPort;

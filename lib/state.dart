@@ -1073,6 +1073,30 @@ class GlobalState {
       }
     }
 
+    if (config.vpnProps.loopbackProtection) {
+      final loopbackRules = <String>[];
+      final targetPorts = <int>{
+        if (realPatchConfig.mixedPort > 0) realPatchConfig.mixedPort,
+        if (realPatchConfig.port > 0) realPatchConfig.port,
+        if (realPatchConfig.socksPort > 0) realPatchConfig.socksPort,
+        if (realPatchConfig.redirPort > 0) realPatchConfig.redirPort,
+        if (realPatchConfig.tproxyPort > 0) realPatchConfig.tproxyPort,
+        if (rawConfig['mixed-port'] is int &&
+            (rawConfig['mixed-port'] as int) > 0)
+          rawConfig['mixed-port'] as int,
+      };
+      for (final port in targetPorts) {
+        loopbackRules
+            .add('AND,((IP-CIDR,127.0.0.0/8,no-resolve),(DST-PORT,$port)),REJECT');
+        loopbackRules
+            .add('AND,((IP-CIDR,::1/128,no-resolve),(DST-PORT,$port)),REJECT');
+      }
+      if (system.isAndroid) {
+        loopbackRules.add('AND,((IN-TYPE,TUN),(DST-PORT,853)),REJECT');
+      }
+      rules = [...loopbackRules, ...rules];
+    }
+
     if (config.vpnProps.disableQuic) {
       final isRussian =
           config.appSetting.locale?.toLowerCase().startsWith('ru') ?? false;

@@ -51,6 +51,8 @@
   "dozeSuspendDesc": "همگام‌سازی با حالت خواب سیستم (Doze)",
   "storeFix": "ترمیم استور",
   "storeFixDesc": "رفع مشکلات دانلود Google Play Store",
+  "loopbackProtection": "محافظت در برابر لوپ‌بک",
+  "loopbackProtectionDesc": "مسدودسازی ترافیک لوپ‌بک ناشی از خطای شبکه",
   "disableQuic": "غیرفعال‌سازی QUIC",
   "disableQuicDesc": "غیرفعال‌سازی QUIC برای رفع مشکلات شبکه",
   "notificationHighPriority": "اولویت بالا",

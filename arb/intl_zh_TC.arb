@@ -51,6 +51,8 @@
   "dozeSuspendDesc": "開啟後同步系統 Doze 休眠模式",
   "storeFix": "商店修復",
   "storeFixDesc": "修復 Google Play 商店下載異常",
+  "loopbackProtection": "迴環保護",
+  "loopbackProtectionDesc": "阻斷網路錯誤引起的迴環流量",
   "disableQuic": "禁用QUIC",
   "disableQuicDesc": "停用 QUIC 以解決特定網路問題",
   "notificationHighPriority": "高優先級",

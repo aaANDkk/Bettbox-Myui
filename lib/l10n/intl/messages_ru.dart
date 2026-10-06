@@ -722,6 +722,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "loopbackDesc": MessageLookupByLibrary.simpleMessage(
       "Инструмент для разблокировки UWP loopback",
     ),
+    "loopbackProtection": MessageLookupByLibrary.simpleMessage(
+      "Защита от закольцовки",
+    ),
+    "loopbackProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Блокировать закольцованный трафик из-за ошибок сети",
+    ),
     "loose": MessageLookupByLibrary.simpleMessage("Максимальная"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("Обновить IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("Развернуть"),

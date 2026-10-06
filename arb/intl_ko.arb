@@ -51,6 +51,8 @@
   "dozeSuspendDesc": "시스템 Doze 절전 모드와 동기화",
   "storeFix": "스토어 복구",
   "storeFixDesc": "Google Play 스토어 다운로드 오류 복구",
+  "loopbackProtection": "루프백 보호",
+  "loopbackProtectionDesc": "네트워크 오류로 인한 루프백 차단",
   "disableQuic": "QUIC 비활성화",
   "disableQuicDesc": "특정 네트워크 문제를 해결하기 위해 QUIC 비활성화",
   "notificationHighPriority": "높은 우선순위",

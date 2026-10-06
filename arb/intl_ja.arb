@@ -51,6 +51,8 @@
   "dozeSuspendDesc": "OSのDozeスリープモードに同期",
   "storeFix": "ストア修復",
   "storeFixDesc": "Google Playストアのダウンロード問題を修復",
+  "loopbackProtection": "ループバック保護",
+  "loopbackProtectionDesc": "ネットワークエラーによるループバックを遮断",
   "disableQuic": "QUIC無効化",
   "disableQuicDesc": "特定の通信問題を解決するためQUICを無効化",
   "notificationHighPriority": "高優先度",

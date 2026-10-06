@@ -51,6 +51,8 @@
   "dozeSuspendDesc": "Sync with system Doze mode",
   "storeFix": "Store Fix",
   "storeFixDesc": "Fix Play Store download issues",
+  "loopbackProtection": "Loopback Protection",
+  "loopbackProtectionDesc": "Block loopback traffic from network errors",
   "disableQuic": "Disable QUIC",
   "disableQuicDesc": "Disable QUIC to resolve specific network issues",
   "notificationHighPriority": "High Priority",

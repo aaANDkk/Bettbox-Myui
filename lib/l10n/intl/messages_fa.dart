@@ -705,6 +705,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "loopbackDesc": MessageLookupByLibrary.simpleMessage(
       "رفع محدودیت Loopback برای برنامه‌های UWP",
     ),
+    "loopbackProtection": MessageLookupByLibrary.simpleMessage(
+      "محافظت در برابر لوپ‌بک",
+    ),
+    "loopbackProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "مسدودسازی ترافیک لوپ‌بک ناشی از خطای شبکه",
+    ),
     "loose": MessageLookupByLibrary.simpleMessage("باز"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("دریافت مجدد IP"),
     "maximize": MessageLookupByLibrary.simpleMessage("بزرگ کردن"),

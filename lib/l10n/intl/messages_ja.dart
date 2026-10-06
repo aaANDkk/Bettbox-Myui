@@ -556,6 +556,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "logsTest": MessageLookupByLibrary.simpleMessage("ログテスト"),
     "loopback": MessageLookupByLibrary.simpleMessage("ループバック解除ツール"),
     "loopbackDesc": MessageLookupByLibrary.simpleMessage("UWPアプリのループバック制限を解除"),
+    "loopbackProtection": MessageLookupByLibrary.simpleMessage("ループバック保護"),
+    "loopbackProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "ネットワークエラーによるループバックを遮断",
+    ),
     "loose": MessageLookupByLibrary.simpleMessage("ルーズ"),
     "manualRefreshIp": MessageLookupByLibrary.simpleMessage("IPを再取得"),
     "maximize": MessageLookupByLibrary.simpleMessage("最大化"),

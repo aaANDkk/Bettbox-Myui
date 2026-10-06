@@ -601,6 +601,16 @@ class _ToolViewState extends ConsumerState<ToolsView> {
           ),
         ),
       _SearchItem(
+        title: appLocalizations.loopbackProtection,
+        subtitle: appLocalizations.loopbackProtectionDesc,
+        category: otherSettingsCategory,
+        onTap: (context, _) => _pushPage(
+          context,
+          appLocalizations.otherSettings,
+          const OtherSettingView(),
+        ),
+      ),
+      _SearchItem(
         title: appLocalizations.disableQuic,
         subtitle: appLocalizations.disableQuicDesc,
         category: otherSettingsCategory,
