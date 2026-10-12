@@ -16,7 +16,7 @@ import 'card.dart';
 import 'common.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-const _listRevealDuration = Duration(milliseconds: 153);
+const _listRevealDuration = Duration(milliseconds: 176);
 
 class ProxiesListView extends ConsumerWidget {
   const ProxiesListView({super.key});
@@ -69,7 +69,8 @@ class _ProxyGroupsList extends ConsumerStatefulWidget {
 
 final Set<String> _mountedRows = <String>{};
 
-class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
+class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList>
+    with RouteSettledMixin {
   final ScrollController _scrollController = ScrollController();
   GroupOffsets _groupOffsets = GroupOffsets.empty;
   double _containerHeight = 0;
@@ -78,6 +79,13 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
   int _toggleToken = 0;
   int _viewGeneration = 0;
   late Set<String> _unfoldSet;
+
+  @override
+  void didSettleRoute() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
@@ -275,20 +283,22 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
     return SliverMainAxisGroup(
       slivers: [
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-            child: SizedBox(
-              height: 64.0,
-              child: _GroupHeader(
-                key: ValueKey('header_${group.name}'),
-                group: group,
-                isExpand: isExpand,
-                enterAnimated: enterAnimated,
-                collapsing: isCollapsing,
-                onToggle: () => _handleToggle(group.name),
-                cardType: cardType,
-                columns: columns,
-                onScrollToSelected: () => _scrollToSelected(group.name),
+          child: RepaintBoundary(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+              child: SizedBox(
+                height: 64.0,
+                child: _GroupHeader(
+                  key: ValueKey('header_${group.name}'),
+                  group: group,
+                  isExpand: isExpand,
+                  enterAnimated: enterAnimated,
+                  collapsing: isCollapsing,
+                  onToggle: () => _handleToggle(group.name),
+                  cardType: cardType,
+                  columns: columns,
+                  onScrollToSelected: () => _scrollToSelected(group.name),
+                ),
               ),
             ),
           ),
@@ -341,7 +351,7 @@ class _ProxyGroupsListState extends ConsumerState<_ProxyGroupsList> {
           child: CustomScrollView(
             key: const PageStorageKey<String>('proxies_list'),
             controller: _scrollController,
-            cacheExtent: 150.0,
+            cacheExtent: arrivalScrollCacheExtent(routeSettled, 150.0),
             slivers: [
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
               for (var i = 0; i < widget.groups.length; i++)
@@ -414,8 +424,8 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
     );
     _reveal = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOutCubic,
-      reverseCurve: Curves.easeInOutCubic.flipped,
+      curve: Curves.fastOutSlowIn,
+      reverseCurve: Curves.fastOutSlowIn.flipped,
     );
     _controller.addStatusListener(_handleStatus);
     _syncList();
@@ -575,11 +585,13 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-      child: SizedBox(
-        height: getItemHeight(widget.cardType),
-        child: Row(children: rowChildren),
+    return RepaintBoundary(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+        child: SizedBox(
+          height: getItemHeight(widget.cardType),
+          child: Row(children: rowChildren),
+        ),
       ),
     );
   }
@@ -602,7 +614,7 @@ class _GroupProxyListSliverState extends State<_GroupProxyListSliver>
           clipContent: clipContent,
           veil: veil <= 0
               ? null
-              : context.colorScheme.surface.withValues(alpha: veil),
+              : context.colorScheme.surfaceContainer.withValues(alpha: veil),
           child: list!,
         );
       },
@@ -804,6 +816,7 @@ class _GroupHeader extends ConsumerWidget {
   static const _expandButtonWidth = 32.0;
   static const _actionsGap = 6.0;
   static const _actionsRightOffset = _expandButtonWidth + _actionsGap;
+  static const _actionsWidth = _expandButtonWidth * 2 + 2;
 
   static const _actionsDuration = Duration(milliseconds: 160);
 
@@ -819,23 +832,19 @@ class _GroupHeader extends ConsumerWidget {
   }
 
   Widget _wrapAction({required Widget child, required String key}) {
-    if (collapsing) {
-      return TweenAnimationBuilder<double>(
-        tween: Tween<double>(begin: 1.0, end: 0.0),
-        duration: _actionsDuration,
-        curve: Curves.fastOutSlowIn,
-        child: child,
-        builder: (_, value, c) => _buildActionTransition(value, c),
-      );
-    }
-    if (!enterAnimated) return child;
+    final bool visible = isExpand && !collapsing;
+    final double end = visible ? 1.0 : 0.0;
+    final double begin = visible && enterAnimated ? 0.0 : end;
     return TweenAnimationBuilder<double>(
       key: ValueKey(key),
-      tween: Tween<double>(begin: 0.0, end: 1.0),
+      tween: Tween<double>(begin: begin, end: end),
       duration: _actionsDuration,
       curve: Curves.fastOutSlowIn,
-      builder: (_, value, c) => _buildActionTransition(value, c),
       child: child,
+      builder: (_, value, c) => IgnorePointer(
+        ignoring: value < 1.0,
+        child: _buildActionTransition(value, c),
+      ),
     );
   }
 
@@ -858,6 +867,8 @@ class _GroupHeader extends ConsumerWidget {
       proxyIconProvider(selectedProxyName),
     );
 
+    // Lives in the stack overlay instead of this row so the buttons (and the
+    // running delay spinner) keep their state while collapsing.
     final actions = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -954,10 +965,8 @@ class _GroupHeader extends ConsumerWidget {
             ],
           ),
         ),
-        if (isExpand && !collapsing) ...[
-          actions,
-          const SizedBox(width: _actionsGap),
-        ],
+        if (isExpand && !collapsing)
+          const SizedBox(width: _actionsWidth + _actionsGap),
         IconButton.filledTonal(
           key: ValueKey('expand_${group.name}'),
           style: _circleFilledTonalStyle,
@@ -969,7 +978,7 @@ class _GroupHeader extends ConsumerWidget {
     );
 
     return CommonCard(
-      radius: 20,
+      radius: 22,
       type: CommonCardType.filled,
       onPressed: onToggle,
       child: Padding(
@@ -977,13 +986,12 @@ class _GroupHeader extends ConsumerWidget {
         child: Stack(
           children: [
             headerRow,
-            if (collapsing)
-              Positioned(
-                top: 0,
-                bottom: 0,
-                right: _actionsRightOffset,
-                child: Center(child: actions),
-              ),
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: _actionsRightOffset,
+              child: Center(child: actions),
+            ),
           ],
         ),
       ),
@@ -1013,7 +1021,7 @@ class _GroupHeader extends ConsumerWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.all(6),
         decoration: ShapeDecoration(
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           color: context.colorScheme.secondaryContainer,

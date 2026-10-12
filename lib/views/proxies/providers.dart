@@ -17,65 +17,91 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 typedef UpdatingMap = Map<String, bool>;
 
-class ProvidersView extends ConsumerStatefulWidget {
+Future<void> updateExternalProviders(
+  WidgetRef ref,
+  BuildContext context, {
+  String? type,
+}) async {
+  final allProviders = ref.read(providersProvider);
+  final providers = type == null
+      ? allProviders
+      : allProviders.where((p) => p.type == type).toList();
+
+  if (providers.isEmpty) return;
+
+  final providersNotifier = ref.read(providersProvider.notifier);
+  final messages = [];
+  final updateProviders = providers.map<Future>((provider) async {
+    providersNotifier.setProvider(provider.copyWith(isUpdating: true));
+    final message = await clashCore.updateExternalProvider(
+      providerName: provider.name,
+    );
+    if (message.isNotEmpty) {
+      messages.add('${provider.name}: $message \n');
+    }
+    providersNotifier.setProvider(
+      await clashCore.getExternalProvider(provider.name),
+    );
+  });
+  final titleMedium = context.textTheme.titleMedium;
+  await Future.wait(updateProviders);
+  globalState.appController.updateGroupsDebounce();
+  final hasRuleProvider = providers.any((p) => p.type == 'Rule');
+  if (hasRuleProvider) {
+    globalState.appController.applyProfileDebounce(silence: true);
+  }
+  if (messages.isNotEmpty) {
+    globalState.showMessage(
+      title: appLocalizations.tip,
+      message: TextSpan(
+        children: [
+          for (final message in messages)
+            TextSpan(text: message, style: titleMedium),
+        ],
+      ),
+      cancelable: false,
+    );
+  }
+}
+
+class ProvidersView extends ConsumerWidget {
   final SheetType type;
 
   const ProvidersView({super.key, required this.type});
 
   @override
-  ConsumerState<ProvidersView> createState() => _ProvidersViewState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return RepaintBoundary(
+      child: AdaptiveSheetScaffold(
+        actions: [
+          IconButton(
+            onPressed: () => updateExternalProviders(ref, context),
+            tooltip: appLocalizations.update,
+            icon: const Icon(FluentIcons.arrow_sync_24_regular),
+          ),
+        ],
+        type: type,
+        body: const ProvidersBody(),
+        title: appLocalizations.providers,
+      ),
+    );
+  }
 }
 
-class _ProvidersViewState extends ConsumerState<ProvidersView> {
+class ProvidersBody extends ConsumerStatefulWidget {
+  const ProvidersBody({super.key});
+
+  @override
+  ConsumerState<ProvidersBody> createState() => _ProvidersBodyState();
+}
+
+class _ProvidersBodyState extends ConsumerState<ProvidersBody> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       globalState.appController.updateProviders();
     });
-  }
-
-  Future<void> _updateProviders({String? type}) async {
-    final allProviders = ref.read(providersProvider);
-    final providers = type == null
-        ? allProviders
-        : allProviders.where((p) => p.type == type).toList();
-
-    if (providers.isEmpty) return;
-
-    final providersNotifier = ref.read(providersProvider.notifier);
-    final messages = [];
-    final updateProviders = providers.map<Future>((provider) async {
-      providersNotifier.setProvider(provider.copyWith(isUpdating: true));
-      final message = await clashCore.updateExternalProvider(
-        providerName: provider.name,
-      );
-      if (message.isNotEmpty) {
-        messages.add('${provider.name}: $message \n');
-      }
-      providersNotifier.setProvider(
-        await clashCore.getExternalProvider(provider.name),
-      );
-    });
-    final titleMedium = context.textTheme.titleMedium;
-    await Future.wait(updateProviders);
-    globalState.appController.updateGroupsDebounce();
-    final hasRuleProvider = providers.any((p) => p.type == 'Rule');
-    if (hasRuleProvider) {
-      globalState.appController.applyProfileDebounce(silence: true);
-    }
-    if (messages.isNotEmpty) {
-      globalState.showMessage(
-        title: appLocalizations.tip,
-        message: TextSpan(
-          children: [
-            for (final message in messages)
-              TextSpan(text: message, style: titleMedium),
-          ],
-        ),
-        cancelable: false,
-      );
-    }
   }
 
   @override
@@ -92,85 +118,70 @@ class _ProvidersViewState extends ConsumerState<ProvidersView> {
         (
           title: appLocalizations.proxyProviders,
           providers: proxyProviders,
-          onSync: () => _updateProviders(type: 'Proxy'),
+          onSync: () => updateExternalProviders(ref, context, type: 'Proxy'),
         ),
       if (ruleProviders.isNotEmpty)
         (
           title: appLocalizations.ruleProviders,
           providers: ruleProviders,
-          onSync: () => _updateProviders(type: 'Rule'),
+          onSync: () => updateExternalProviders(ref, context, type: 'Rule'),
         ),
     ];
 
-    return RepaintBoundary(
-      child: AdaptiveSheetScaffold(
-        actions: [
-          IconButton(
-            onPressed: _updateProviders,
-            tooltip: appLocalizations.update,
-            icon: const Icon(FluentIcons.arrow_sync_24_regular),
-          ),
-        ],
-        type: widget.type,
-        body: Builder(
-          builder: (context) {
-            final bottomPadding = MediaQuery.of(context).padding.bottom;
-            final itemCount = sections.fold<int>(
-              0,
-              (sum, section) => sum + 1 + section.providers.length,
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final itemCount = sections.fold<int>(
+      0,
+      (sum, section) => sum + 1 + section.providers.length,
+    );
+    return ListView.builder(
+      padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        var current = 0;
+        for (final section in sections) {
+          if (index == current) {
+            return ListHeader(
+              title: section.title,
+              padding: sectionHeaderPadding(isFirst: current == 0),
+              actions: [
+                IconButton(
+                  onPressed: section.onSync,
+                  tooltip: appLocalizations.update,
+                  icon: const Icon(FluentIcons.arrow_sync_24_regular),
+                  iconSize: 20,
+                  splashRadius: 20,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
             );
-            return ListView.builder(
-              padding: EdgeInsets.only(bottom: 24 + bottomPadding, top: 12),
-              itemCount: itemCount,
-              itemBuilder: (context, index) {
-                var current = 0;
-                for (final section in sections) {
-                  if (index == current) {
-                    return ListHeader(
-                      title: section.title,
-                      padding: current == 0
-                          ? const EdgeInsets.only(
-                              left: 24,
-                              right: 8,
-                              top: 8,
-                              bottom: 8,
-                            )
-                          : null,
-                      actions: [
-                        IconButton(
-                          onPressed: section.onSync,
-                          tooltip: appLocalizations.update,
-                          icon: const Icon(FluentIcons.arrow_sync_24_regular),
-                          iconSize: 20,
-                          splashRadius: 20,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    );
-                  }
-                  current++;
-                  if (index < current + section.providers.length) {
-                    final providerIndex = index - current;
-                    final provider = section.providers[providerIndex];
-                    return ContinuousListItem(
-                      index: providerIndex,
-                      count: section.providers.length,
-                      child: ProviderItem(
-                        key: ValueKey(provider.name),
-                        provider: provider,
-                      ),
-                    );
-                  }
-                  current += section.providers.length;
-                }
-                return const SizedBox.shrink();
-              },
+          }
+          current++;
+          if (index < current + section.providers.length) {
+            final providerIndex = index - current;
+            final provider = section.providers[providerIndex];
+            // Mirror SectionContainer's 5dp inset around the card.
+            return Padding(
+              padding: EdgeInsets.only(
+                top: providerIndex == 0 ? 5 : 0,
+                bottom: providerIndex == section.providers.length - 1
+                    ? 5
+                    : 0,
+              ),
+              child: ContinuousListItem(
+                index: providerIndex,
+                count: section.providers.length,
+                child: ProviderItem(
+                  key: ValueKey(provider.name),
+                  provider: provider,
+                ),
+              ),
             );
-          },
-        ),
-        title: appLocalizations.providers,
-      ),
+          }
+          current += section.providers.length;
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }
@@ -262,25 +273,27 @@ class ProviderItem extends StatelessWidget {
     return Row(
       children: [
         Flexible(
-          child: EmojiText(
-            provider.name,
-            style: context.textTheme.titleMedium,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          child: Transform.translate(
+            offset: const Offset(0, 1),
+            child: EmojiText(
+              provider.name,
+              style: context.textTheme.titleMedium,
+              strutStyle: StrutStyle.fromTextStyle(
+                context.textTheme.titleMedium!,
+                forceStrutHeight: true,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
         if (subtitleText != null && subtitleText.isNotEmpty) ...[
-          const SizedBox(width: 6),
-          Text(
-            '·',
-            style: context.textTheme.labelMedium?.toLight,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            subtitleText,
-            style: context.textTheme.labelMedium?.toLight,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(width: 8),
+          Flexible(
+            child: CommonInfoCapsule(
+              subtitleText,
+              style: context.textTheme.labelMedium,
+            ),
           ),
         ],
       ],

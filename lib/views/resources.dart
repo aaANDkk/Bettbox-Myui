@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:bett_box/clash/clash.dart';
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
+import 'package:bett_box/providers/app.dart';
 import 'package:bett_box/providers/config.dart';
+import 'proxies/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +30,15 @@ class GeoItem {
   });
 }
 
-class ResourcesView extends ConsumerWidget {
+class ResourcesView extends ConsumerStatefulWidget {
   const ResourcesView({super.key});
+
+  @override
+  ConsumerState<ResourcesView> createState() => _ResourcesViewState();
+}
+
+class _ResourcesViewState extends ConsumerState<ResourcesView> {
+  bool? _showProviders;
 
   static const geoItems = <GeoItem>[
     GeoItem(label: 'GeoSite', fileName: geoSiteFileName, key: 'geosite'),
@@ -38,7 +47,7 @@ class ResourcesView extends ConsumerWidget {
     GeoItem(label: 'MRS', fileName: bundleMRSFileName, key: 'mrs'),
   ];
 
-  Future<void> _handleSyncAll(WidgetRef ref) async {
+  Future<void> _handleSyncAll() async {
     final updatingKeysNotifier = ref.read(geoUpdatingKeysProvider.notifier);
     if (updatingKeysNotifier.state.isNotEmpty) return;
 
@@ -82,7 +91,7 @@ class ResourcesView extends ConsumerWidget {
     }
   }
 
-  Future<void> _handleResetAll(WidgetRef ref) async {
+  Future<void> _handleResetAll() async {
     final res = await globalState.showMessage(
       title: appLocalizations.reset,
       message: TextSpan(text: appLocalizations.resetTip),
@@ -96,18 +105,82 @@ class ResourcesView extends ConsumerWidget {
     await globalState.appController.setupClashConfig();
   }
 
+  Widget _buildTitleItem(String label, bool showProviders) {
+    final isCurrent = _showProviders == showProviders;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: isCurrent
+          ? null
+          : () {
+              setState(() {
+                _showProviders = showProviders;
+              });
+            },
+      child: Text(
+        label,
+        style: isCurrent
+            ? null
+            : TextStyle(
+                color: context.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.5,
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildTitleItem(appLocalizations.providers, true),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            '|',
+            style: TextStyle(
+              color: context.colorScheme.onSurfaceVariant.withValues(
+                alpha: 0.5,
+              ),
+            ),
+          ),
+        ),
+        _buildTitleItem(appLocalizations.resources, false),
+      ],
+    );
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final isUpdating = ref.watch(
       geoUpdatingKeysProvider.select((keys) => keys.isNotEmpty),
     );
+    final hasProviders = ref.watch(
+      providersProvider.select((state) => state.isNotEmpty),
+    );
+    final showProviders = hasProviders && (_showProviders ??= true);
+
+    if (showProviders) {
+      return CommonScaffold(
+        titleWidget: _buildTitle(),
+        actions: [
+          IconButton(
+            onPressed: () => updateExternalProviders(ref, context),
+            tooltip: appLocalizations.update,
+            icon: const Icon(FluentIcons.arrow_sync_24_regular),
+          ),
+        ],
+        body: const ProvidersBody(),
+      );
+    }
 
     return CommonScaffold(
-      title: appLocalizations.resources,
+      title: hasProviders ? null : appLocalizations.resources,
+      titleWidget: hasProviders ? _buildTitle() : null,
       actions: [
         IconButton(
           icon: const Icon(FluentIcons.arrow_repeat_all_24_regular),
-          onPressed: () => _handleResetAll(ref),
+          onPressed: _handleResetAll,
           tooltip: appLocalizations.reset,
         ),
         IconButton(
@@ -120,7 +193,7 @@ class ResourcesView extends ConsumerWidget {
                   ),
                 )
               : const Icon(FluentIcons.arrow_sync_24_regular),
-          onPressed: isUpdating ? null : () => _handleSyncAll(ref),
+          onPressed: isUpdating ? null : _handleSyncAll,
           tooltip: appLocalizations.syncAll,
         ),
       ],
@@ -128,7 +201,7 @@ class ResourcesView extends ConsumerWidget {
         padding: EdgeInsets.only(
           bottom: (globalState.isAndroidTV ? 48.0 : 16.0) +
               MediaQuery.of(context).padding.bottom,
-          top: 8,
+          top: 12,
         ),
         children: [
           ...generateSection(

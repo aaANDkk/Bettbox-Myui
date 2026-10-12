@@ -15,7 +15,7 @@ class ProxiesAdvancedSettings extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(top: 12, bottom: 20),
       children: generateSection(
         items: [
           const _NodeExclusionWithInverseItem(),

@@ -107,7 +107,14 @@ Future<Delay> _testProxyDelay(DelayTestTarget target) {
   return _delayTestRequestPool.run(target, () async {
     final appController = globalState.appController;
     appController.setDelay(Delay(url: target.url, name: target.name, value: 0));
-    final delay = await clashCore.getDelay(target.url, target.name);
+    Delay delay;
+    try {
+      delay = await clashCore.getDelay(target.url, target.name);
+    } catch (_) {
+      // Never leave the node on its "testing" value, or the spinner keeps
+      // running forever.
+      delay = Delay(url: target.url, name: target.name, value: -1);
+    }
     appController.setDelay(delay);
     return delay;
   });

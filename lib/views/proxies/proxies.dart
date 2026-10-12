@@ -1,8 +1,6 @@
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/enum/enum.dart';
-import 'package:bett_box/models/common.dart';
-import 'package:bett_box/models/config.dart';
-import 'package:bett_box/models/widget.dart';
+import 'package:bett_box/models/models.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/views/proxies/list.dart';
@@ -10,6 +8,7 @@ import 'package:bett_box/views/proxies/providers.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../profiles/scripts.dart'
     show showGroupSwitchOptions, showScriptCustomOptions;
@@ -34,15 +33,11 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
     final showHiddenItems = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.showHiddenItems),
     );
-    final (scriptOn, compatible) = ref.watch(
-      scriptStateProvider.select(
-        (s) => (s.currentId != null, s.currentScript?.isCompatibleWithBettbox ?? false),
-      ),
-    );
-    final profileOverride = ref.watch(
-      currentProfileProvider.select((p) => p?.useScriptOverride ?? false),
-    );
-    final hasScriptCustom = scriptOn && compatible && profileOverride;
+    final currentProfile = ref.watch(currentProfileProvider);
+    final scriptProps = ref.watch(scriptStateProvider);
+    final effectiveScript = currentProfile?.getEffectiveScript(scriptProps);
+    final hasScriptCustom =
+        effectiveScript != null && effectiveScript.isCompatibleWithBettbox;
     final hasGroupCustom =
         !hasScriptCustom && ref.read(currentProfileIdProvider) != null;
     final hasCustom = hasScriptCustom || hasGroupCustom;
@@ -118,6 +113,7 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
                         type: type,
                         body: const _IconConfigView(),
                         title: appLocalizations.iconConfiguration,
+                        actions: const [_IconRefreshAction()],
                       );
                     },
                   );
@@ -190,11 +186,11 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   }
 
   Future<void> _handleCustomOptions() async {
-    final profileOverride =
-        ref.read(currentProfileProvider)?.useScriptOverride ?? false;
-    final script = ref.read(scriptStateProvider).currentScript;
-    if (script != null && script.isCompatibleWithBettbox && profileOverride) {
-      await showScriptCustomOptions(context, ref, script: script);
+    final currentProfile = ref.read(currentProfileProvider);
+    final scriptProps = ref.read(scriptStateProvider);
+    final effectiveScript = currentProfile?.getEffectiveScript(scriptProps);
+    if (effectiveScript != null && effectiveScript.isCompatibleWithBettbox) {
+      await showScriptCustomOptions(context, ref, script: effectiveScript);
       return;
     }
     final profileId = ref.read(currentProfileIdProvider);
@@ -295,6 +291,48 @@ class _IconConfigView extends ConsumerWidget {
             .read(proxiesStyleSettingProvider.notifier)
             .updateState((state) => state.copyWith(iconMap: value));
       },
+    );
+  }
+}
+
+class _IconRefreshAction extends ConsumerStatefulWidget {
+  const _IconRefreshAction();
+
+  @override
+  ConsumerState<_IconRefreshAction> createState() => _IconRefreshActionState();
+}
+
+class _IconRefreshActionState extends ConsumerState<_IconRefreshAction> {
+  bool _isRefreshing = false;
+
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return;
+    setState(() => _isRefreshing = true);
+    try {
+      await CommonTargetIcon.refreshAll(
+        ref.read(proxiesStyleSettingProvider).iconMap.values,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: _isRefreshing ? null : _handleRefresh,
+      tooltip: appLocalizations.update,
+      icon: _isRefreshing
+          ? SizedBox.square(
+              dimension: 18,
+              child: SpinKitFadingCircle(
+                color: context.colorScheme.primary,
+                size: 18,
+              ),
+            )
+          : const Icon(FluentIcons.arrow_sync_24_regular),
     );
   }
 }
