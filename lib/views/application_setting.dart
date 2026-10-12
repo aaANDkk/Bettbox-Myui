@@ -191,48 +191,6 @@ class ShowStartSwitchItem extends ConsumerWidget {
   }
 }
 
-class ShowCardStartButtonItem extends ConsumerWidget {
-  const ShowCardStartButtonItem({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final showCardStartButton = ref.watch(
-      appSettingProvider.select((state) => state.showCardStartButton),
-    );
-    return ListItem.switchItem(
-      title: Text(appLocalizations.cardStartButton),
-      subtitle: Text(appLocalizations.cardStartButtonDesc),
-      delegate: SwitchDelegate(
-        value: showCardStartButton,
-        onChanged: (value) {
-          ref.read(appSettingProvider.notifier).updateState((state) {
-            if (value) {
-              final mobile = [
-                ...state.mobileDashboardWidgets.where(
-                  (w) => w != DashboardWidget.startButton,
-                ),
-                DashboardWidget.startButton,
-              ];
-              final desktop = [
-                ...state.desktopDashboardWidgets.where(
-                  (w) => w != DashboardWidget.startButton,
-                ),
-                DashboardWidget.startButton,
-              ];
-              return state.copyWith(
-                showCardStartButton: true,
-                mobileDashboardWidgets: mobile,
-                desktopDashboardWidgets: desktop,
-              );
-            } else {
-              return state.copyWith(showCardStartButton: false);
-            }
-          });
-        },
-      ),
-    );
-  }
-}
 
 class AlwaysShowTitleBarItem extends ConsumerWidget {
   const AlwaysShowTitleBarItem({super.key});
@@ -322,7 +280,6 @@ class ApplicationSettingView extends StatelessWidget {
           const AlwaysShowTitleBarItem(),
       ],
       const ShowStartSwitchItem(),
-      const ShowCardStartButtonItem(),
       if (system.isAndroid) ...[NavBarHapticFeedbackItem()],
       if (system.isMacOS) const KeepDockIconItem(),
       CloseConnectionsItem(),

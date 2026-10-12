@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:bett_box/common/common.dart';
 import 'package:bett_box/models/models.dart';
@@ -117,7 +118,10 @@ class _StartButtonState extends ConsumerState<StartButton> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
-                    height: globalState.measure.bodyMediumHeight + 2,
+                    height: math.max(
+                      globalState.measure.bodyMediumHeight + 2,
+                      20.0,
+                    ),
                     child: FadeThroughBox(
                       child: _buildContent(
                         context,
@@ -184,13 +188,14 @@ class _StartButtonState extends ConsumerState<StartButton> {
     if (!isStart) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
-            Icons.play_arrow_rounded,
-            size: 16,
-            color: context.colorScheme.primary,
+            FluentIcons.play_circle_24_filled,
+            size: 20,
+            color: globalState.theme.darken2SecondaryContainer,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               appLocalizations.serviceReady,
@@ -206,14 +211,14 @@ class _StartButtonState extends ConsumerState<StartButton> {
     final timeText = _formatRunTime(runTime);
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Icon(
-          Icons.pause_rounded,
-          size: 16,
-          color: context.colorScheme.primary,
+          FluentIcons.pause_circle_24_filled,
+          size: 20,
+          color: globalState.theme.darken2SecondaryContainer,
         ),
-        const SizedBox(width: 4),
-        const Text('  '),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             timeText,
