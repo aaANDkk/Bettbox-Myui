@@ -7,6 +7,7 @@ class IconsExt {
   static const IconData storageMin = IconData(0xe902, fontFamily: 'Icons');
   static const IconData calendarAgendaClock =
       IconData(0xe903, fontFamily: 'Icons');
+  static const IconData cowork = IconData(0xe904, fontFamily: 'Icons');
 }
 
 
