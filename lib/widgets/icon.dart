@@ -20,8 +20,11 @@ class _IconFileManager {
 
   static final Map<String, Future<File?>> _inFlightDownloads = {};
 
+  // Bumped to invalidate every cache path at once.
+  static int _epoch = 0;
+
   static Future<File> getCacheFile(String url) async {
-    final hash = md5.convert(utf8.encode(url)).toString();
+    final hash = md5.convert(utf8.encode('$url#$_epoch')).toString();
     final tempDir = await appPath.tempPath;
     final ext = url.isSvg ? '.svg' : '.img';
     final dir = Directory(path.join(tempDir, 'icon_raw_cache'));
@@ -90,6 +93,21 @@ class _IconFileManager {
       }
     } catch (_) {}
   }
+
+  /// Drops every downloaded icon together with its resized variant.
+  static Future<void> clearAll() async {
+    _epoch++;
+    _inFlightDownloads.clear();
+    try {
+      final tempDir = await appPath.tempPath;
+      for (final name in ['icon_raw_cache', 'resized_icons']) {
+        final dir = Directory(path.join(tempDir, name));
+        if (dir.existsSync()) {
+          await dir.delete(recursive: true);
+        }
+      }
+    } catch (_) {}
+  }
 }
 
 class CommonTargetIcon extends StatefulWidget {
@@ -108,6 +126,23 @@ class CommonTargetIcon extends StatefulWidget {
         await _IconFileManager.downloadFile(src);
       } catch (_) {}
     }
+  }
+
+  /// Bumped whenever the icon cache is dropped, so mounted icons reload.
+  static final ValueNotifier<int> cacheGeneration = ValueNotifier<int>(0);
+
+  /// Drops every cached icon and downloads [srcs] again.
+  static Future<void> refreshAll(Iterable<String> srcs) async {
+    final targets = <String>{};
+    for (final raw in srcs) {
+      final src = raw.trim();
+      if (src.isEmpty || src.getBase64 != null) continue;
+      targets.add(src);
+    }
+    _CommonTargetIconState.clearCache();
+    await _IconFileManager.clearAll();
+    cacheGeneration.value++;
+    await prefetchAll(targets);
   }
 
   @override
@@ -138,6 +173,35 @@ class _CommonTargetIconState extends State<CommonTargetIcon> {
     while (_moduleSvgValidCache.length > _maxCacheEntries) {
       _moduleSvgValidCache.remove(_moduleSvgValidCache.keys.first);
     }
+  }
+
+  static void clearCache() {
+    _moduleFileCache.clear();
+    _moduleSvgValidCache.clear();
+    _moduleFailureCache.clear();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    CommonTargetIcon.cacheGeneration.addListener(_handleCacheInvalidated);
+  }
+
+  @override
+  void dispose() {
+    CommonTargetIcon.cacheGeneration.removeListener(_handleCacheInvalidated);
+    super.dispose();
+  }
+
+  void _handleCacheInvalidated() {
+    if (!mounted) return;
+    setState(() {
+      _file = null;
+      _cachedSrc = null;
+      _cachedSize = null;
+      _didSyncCheck = true;
+    });
+    _syncCheckAndInit();
   }
 
   bool _shouldRetry(String mKey) {

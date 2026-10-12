@@ -266,26 +266,31 @@ class ListItem<T> extends StatelessWidget {
     Widget? leading,
     bool enabled = true,
   }) {
-    return ListTile(
-      key: key,
-      dense: dense,
-      enabled: enabled,
-      focusColor:
-          FocusManager.instance.highlightMode == FocusHighlightMode.traditional
-          ? context.colorScheme.primary.withValues(alpha: 0.18)
-          : Colors.transparent,
-      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(16)),
-      titleTextStyle: titleTextStyle,
-      subtitleTextStyle: subtitleTextStyle,
-      leading: leading ?? this.leading,
-      horizontalTitleGap: horizontalTitleGap,
-      title: title,
-      minVerticalPadding: 12,
-      subtitle: subtitle,
-      titleAlignment: tileTitleAlignment,
-      onTap: onTap,
-      trailing: trailing ?? this.trailing,
-      contentPadding: padding,
+    // Desktop defaults to a compact density, which squeezes the trailing
+    // controls; keep the row height identical on every platform.
+    return Theme(
+      data: Theme.of(context).copyWith(visualDensity: VisualDensity.standard),
+      child: ListTile(
+        key: key,
+        dense: dense,
+        enabled: enabled,
+        focusColor:
+            FocusManager.instance.highlightMode == FocusHighlightMode.traditional
+            ? context.colorScheme.primary.withValues(alpha: 0.18)
+            : Colors.transparent,
+        shape: SuperellipseBorder(borderRadius: BorderRadius.circular(16)),
+        titleTextStyle: titleTextStyle,
+        subtitleTextStyle: subtitleTextStyle,
+        leading: leading ?? this.leading,
+        horizontalTitleGap: horizontalTitleGap,
+        title: title,
+        minVerticalPadding: 12,
+        subtitle: subtitle,
+        titleAlignment: tileTitleAlignment,
+        onTap: onTap,
+        trailing: trailing ?? this.trailing,
+        contentPadding: padding,
+      ),
     );
   }
 
@@ -474,6 +479,13 @@ class ListItem<T> extends StatelessWidget {
   }
 }
 
+/// Padding of the first section title: its left edge lands on the corner.
+EdgeInsets? sectionHeaderPadding({required bool isFirst}) {
+  return isFirst
+      ? const EdgeInsets.only(left: 34, right: 34, top: 8, bottom: 8)
+      : null;
+}
+
 class ListHeader extends StatelessWidget {
   final String title;
   final String? subTitle;
@@ -496,7 +508,7 @@ class ListHeader extends StatelessWidget {
       alignment: Alignment.centerLeft,
       padding:
           padding ??
-          const EdgeInsets.only(left: 24, right: 8, top: 24, bottom: 8),
+          const EdgeInsets.only(left: 34, right: 34, top: 24, bottom: 8),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -524,10 +536,23 @@ class ListHeader extends StatelessWidget {
               ],
             ),
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [...genActions(actions, space: space)],
+          IconButtonTheme(
+            // Header action icons must not stretch the header: their default
+            // 48dp tap target would push the title away from the card below.
+            data: IconButtonThemeData(
+              style: ButtonStyle(
+                minimumSize: const WidgetStatePropertyAll(Size.zero),
+                padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              // No trailing spacer here: the actions must end exactly at the
+              // header's right padding, mirroring the title's left padding.
+              children: [...actions.separated(SizedBox(width: space ?? 4))],
+            ),
           ),
         ],
       ),
@@ -557,9 +582,7 @@ class SectionContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerPadding = isFirst
-        ? const EdgeInsets.only(left: 24, right: 8, top: 8, bottom: 8)
-        : null;
+    final headerPadding = sectionHeaderPadding(isFirst: isFirst);
 
     if (plain) {
       final genItems = separated
@@ -589,7 +612,7 @@ class SectionContainer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           child: CommonCard(
             type: CommonCardType.filled,
-            radius: radius ?? 20.0,
+            radius: radius ?? 22.0,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -618,6 +641,116 @@ class SectionContainer extends StatelessWidget {
   }
 }
 
+/// Outline of one row inside a continuous card pack.
+///
+/// Every row owns its own rounded box, so a plain outline would draw a line
+/// between rows as well. Each row therefore clips the outline of its own box to
+/// the edges that belong to the pack: both vertical edges at full height (so
+/// neighbouring rows join without a seam) plus the top / bottom edge with its
+/// whole corner region when the row is the first or the last of the pack.
+///
+/// The corner is deliberately taken from the shape itself instead of being
+/// rebuilt from the radius: a rounded superellipse is a superellipse whose
+/// corners are replaced by circular arcs, so its straight edge ends well before
+/// the radius (about 0.86–0.96 × radius depending on the radius / side ratio).
+/// Drawing a straight line down to `radius` from the corner therefore leaves a
+/// small stub sticking out of the curve.
+class ContinuousCardBorder extends SuperellipseBorder {
+  final bool topEdge;
+  final bool bottomEdge;
+  final double cornerRadius;
+
+  const ContinuousCardBorder({
+    super.side,
+    super.borderRadius,
+    this.topEdge = true,
+    this.bottomEdge = true,
+    this.cornerRadius = 0,
+  });
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
+    if (rect.isEmpty || side.style != BorderStyle.solid) {
+      return;
+    }
+    final half = side.width / 2;
+    final paint = Paint()
+      ..color = side.color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = side.width
+      ..isAntiAlias = true;
+    final path = getOuterPath(
+      rect.deflate(half),
+      textDirection: textDirection,
+    );
+    if (topEdge && bottomEdge) {
+      canvas.drawPath(path, paint);
+      return;
+    }
+    // Rects added to one path merge into a single clip region.
+    final edge = side.width + 0.5;
+    final band = (cornerRadius * 2 > rect.height
+            ? rect.height / 2
+            : cornerRadius) +
+        1;
+    final clip = Path()
+      ..addRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.top - 1,
+          rect.left + edge,
+          rect.bottom + 1,
+        ),
+      )
+      ..addRect(
+        Rect.fromLTRB(
+          rect.right - edge,
+          rect.top - 1,
+          rect.right + 1,
+          rect.bottom + 1,
+        ),
+      );
+    if (topEdge) {
+      clip.addRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.top - 1,
+          rect.right + 1,
+          rect.top + band,
+        ),
+      );
+    }
+    if (bottomEdge) {
+      clip.addRect(
+        Rect.fromLTRB(
+          rect.left - 1,
+          rect.bottom - band,
+          rect.right + 1,
+          rect.bottom + 1,
+        ),
+      );
+    }
+    canvas.save();
+    canvas.clipPath(clip);
+    canvas.drawPath(path, paint);
+    canvas.restore();
+  }
+
+  @override
+  ContinuousCardBorder copyWith({
+    BorderSide? side,
+    BorderRadiusGeometry? borderRadius,
+  }) {
+    return ContinuousCardBorder(
+      side: side ?? this.side,
+      borderRadius: borderRadius ?? this.borderRadius,
+      topEdge: topEdge,
+      bottomEdge: bottomEdge,
+      cornerRadius: cornerRadius,
+    );
+  }
+}
+
 class ContinuousListItem extends StatelessWidget {
   final Widget child;
   final int index;
@@ -632,19 +765,25 @@ class ContinuousListItem extends StatelessWidget {
     required this.index,
     required this.count,
     this.reversed = false,
-    this.radius = 20.0,
+    this.radius = 22.0,
     this.standalone = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    final isLight = colorScheme.brightness == Brightness.light;
+    final cardColor = commonCardColor(context);
+    final borderSide = commonCardBorderSide(context);
+
     if (standalone) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: ShapeDecoration(
-          color: context.colorScheme.surfaceContainer,
-          shape: RoundedSuperellipseBorder(
+          color: cardColor,
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(radius),
+            side: borderSide,
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -657,19 +796,23 @@ class ContinuousListItem extends StatelessWidget {
 
     final isFirst = reversed ? index == count - 1 : index == 0;
     final isLast = reversed ? index == 0 : index == count - 1;
-    final dividerColor = context.colorScheme.outlineVariant.withValues(
-      alpha: context.colorScheme.brightness == Brightness.light ? 0.6 : 0.45,
+    final dividerColor = colorScheme.outlineVariant.withValues(
+      alpha: isLight ? 0.6 : 0.45,
     );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: ShapeDecoration(
-        color: context.colorScheme.surfaceContainer,
-        shape: RoundedSuperellipseBorder(
+        color: cardColor,
+        shape: ContinuousCardBorder(
           borderRadius: BorderRadius.vertical(
             top: isFirst ? Radius.circular(radius) : Radius.zero,
             bottom: isLast ? Radius.circular(radius) : Radius.zero,
           ),
+          topEdge: isFirst,
+          bottomEdge: isLast,
+          cornerRadius: radius,
+          side: borderSide,
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -733,7 +876,7 @@ Widget generateSectionV2({
       if (items.isNotEmpty && title != null)
         ListHeader(title: title, actions: actions),
       CommonCard(
-        radius: 20,
+        radius: 22,
         type: CommonCardType.filled,
         child: Column(children: [...items]),
       ),
@@ -789,12 +932,7 @@ Widget generateListView(List<Widget> items) {
               return ListHeader(
                 title: item.title,
                 subTitle: item.subTitle,
-                padding: const EdgeInsets.only(
-                  left: 24,
-                  right: 8,
-                  top: 8,
-                  bottom: 8,
-                ),
+                padding: sectionHeaderPadding(isFirst: true),
                 actions: item.actions,
                 space: item.space,
               );

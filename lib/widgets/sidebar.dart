@@ -9,12 +9,12 @@ import 'package:bett_box/widgets/sidebar_toggle_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-const _compactWidth = 48.0;
+const _compactWidth = 62.4;
 const _itemSize = 40.0;
 const _itemGap = 4.0;
 const _toggleGap = 8.0;
 const _verticalInset = 4.0;
-const _maxSideInset = 12.0;
+const _maxSideInset = 16.0;
 const _iconSize = 24.0;
 const _labelGap = 12.0;
 const _indicatorWidth = 3.0;
@@ -22,7 +22,7 @@ const _indicatorHeight = 16.0;
 const _expandDuration = Duration(milliseconds: 250);
 const _indicatorDuration = Duration(milliseconds: 320);
 
-final _itemShape = const RoundedSuperellipseBorder(
+final _itemShape = const SuperellipseBorder(
   borderRadius: BorderRadius.all(Radius.circular(10)),
 );
 
@@ -46,8 +46,8 @@ class NavigationSidebar extends StatelessWidget {
 
   double _calculateExpandedWidth(BuildContext context) {
     final labelStyle =
-        context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600) ??
-        const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
+        context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal) ??
+        const TextStyle(fontSize: 14, fontWeight: FontWeight.normal);
 
     final textScaler = MediaQuery.textScalerOf(context);
     double maxTextWidth = 0.0;
@@ -73,7 +73,7 @@ class NavigationSidebar extends StatelessWidget {
     final iconInset = (compactWidth - sideInset * 2 - _iconSize) / 2;
     final total =
         sideInset * 2 + iconInset + _iconSize + _labelGap * 2 + maxTextWidth;
-    final clamped = math.max(123.0, math.min(240.0, total));
+    final clamped = math.max(137.4, math.min(240.0, total));
     return (clamped * dpr).ceil() / dpr;
   }
 
@@ -102,8 +102,8 @@ class NavigationSidebar extends StatelessWidget {
 
 class _SidebarColors {
   _SidebarColors(ColorScheme scheme)
-    : selectedFill = scheme.onSurface.withValues(alpha: 0.08),
-      selectedHoverFill = scheme.onSurface.withValues(alpha: 0.12),
+    : selectedFill = navSelectedColor(scheme),
+      selectedHoverFill = navSelectedColor(scheme, hovered: true),
       pressedFill = scheme.onSurface.withValues(alpha: 0.08),
       hoverFill = scheme.onSurface.withValues(alpha: 0.06),
       icon = scheme.onSurfaceVariant,
@@ -334,7 +334,7 @@ class _DestinationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveStyle = style?.copyWith(
       color: iconColor,
-      fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+      fontWeight: FontWeight.normal,
     );
 
     return ClipRect(

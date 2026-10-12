@@ -8,12 +8,14 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
 class Info {
   final String label;
+  final Widget? labelWidget;
   final IconData? iconData;
   final Widget? icon;
   final TextStyle? style;
 
   const Info({
-    required this.label,
+    this.label = '',
+    this.labelWidget,
     this.iconData,
     this.icon,
     this.style,
@@ -60,20 +62,21 @@ class InfoHeader extends StatelessWidget {
                 ],
                 Flexible(
                   flex: 1,
-                  child: TooltipText(
-                    text: EmojiText(
-                      info.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style:
-                          (info.style ?? Theme.of(context).textTheme.titleSmall)
-                              ?.copyWith(
-                                color:
-                                    info.style?.color ??
-                                    context.colorScheme.onSurfaceVariant,
-                              ),
-                    ),
-                  ),
+                  child: info.labelWidget ??
+                      TooltipText(
+                        text: EmojiText(
+                          info.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              (info.style ?? Theme.of(context).textTheme.titleSmall)
+                                  ?.copyWith(
+                                    color:
+                                        info.style?.color ??
+                                        context.colorScheme.onSurfaceVariant,
+                                  ),
+                        ),
+                      ),
                 ),
               ],
             ),
@@ -95,42 +98,19 @@ class InfoHeader extends StatelessWidget {
   }
 }
 
-class SmoothRoundedRectangleBorder extends RoundedRectangleBorder {
-  const SmoothRoundedRectangleBorder({
-    super.side,
-    super.borderRadius = BorderRadius.zero,
-  });
-
-  @override
-  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
-    switch (side.style) {
-      case BorderStyle.none:
-        break;
-      case BorderStyle.solid:
-        final borderRect = borderRadius.resolve(textDirection).toRRect(rect);
-        if (side.width <= 0.0) {
-          canvas.drawRRect(borderRect, side.toPaint());
-        } else {
-          final strokeRect = borderRect.deflate(side.width / 2.0);
-          final paint = side.toPaint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = side.width
-            ..isAntiAlias = true;
-          canvas.drawRRect(strokeRect, paint);
-        }
-    }
-  }
-
-  @override
-  SmoothRoundedRectangleBorder copyWith({
-    BorderSide? side,
-    BorderRadiusGeometry? borderRadius,
-  }) {
-    return SmoothRoundedRectangleBorder(
-      side: side ?? this.side,
-      borderRadius: borderRadius ?? this.borderRadius,
-    );
-  }
+/// Outline of every card surface ([CommonCard] and hand built cards).
+BorderSide commonCardBorderSide(
+  BuildContext context, {
+  bool isSelected = false,
+}) {
+  final colorScheme = context.colorScheme;
+  final isLight = colorScheme.brightness == Brightness.light;
+  return BorderSide(
+    color: isSelected
+        ? colorScheme.primary
+        : colorScheme.outlineVariant.withValues(alpha: isLight ? 0.45 : 0.25),
+    strokeAlign: BorderSide.strokeAlignInside,
+  );
 }
 
 class CommonCard extends StatelessWidget {
@@ -147,11 +127,15 @@ class CommonCard extends StatelessWidget {
     this.enterAnimated = false,
     this.info,
     this.actions,
+    this.isOption = false,
     this.clipBehavior = Clip.antiAlias,
   }) : isSelected = isSelected ?? false;
 
   final bool enterAnimated;
   final bool isSelected;
+  /// Selectable option/segment: its idle surface uses [optionCardColor] so it
+  /// does not look like an ordinary card.
+  final bool isOption;
   final void Function()? onPressed;
   final void Function()? onLongPress;
   final Widget? selectWidget;
@@ -168,44 +152,35 @@ class CommonCard extends StatelessWidget {
 
   BorderSide getBorderSide(BuildContext context, Set<WidgetState> states) {
     final colorScheme = context.colorScheme;
-    if (type == CommonCardType.filled) {
-      return BorderSide.none;
-    }
     final hoverColor = isSelected
         ? colorScheme.primary.opacity80
         : colorScheme.primary.opacity60;
     if (states.contains(WidgetState.hovered) ||
         states.contains(WidgetState.focused) ||
         states.contains(WidgetState.pressed)) {
-      return BorderSide(color: hoverColor);
+      return BorderSide(
+        color: hoverColor,
+        strokeAlign: BorderSide.strokeAlignInside,
+      );
     }
-    final isLight = colorScheme.brightness == Brightness.light;
-    return BorderSide(
-      color: isSelected
-          ? colorScheme.primary
-          : colorScheme.outlineVariant.withValues(
-              alpha: isLight ? 0.45 : 0.25,
-            ),
-    );
+    return commonCardBorderSide(context, isSelected: isSelected);
   }
 
   Color? getBackgroundColor(BuildContext context, Set<WidgetState> states) {
-    final colorScheme = context.colorScheme;
-    if (type == CommonCardType.filled) {
-      if (isSelected) {
-        return colorScheme.secondaryContainer.opacity80;
-      }
-      return colorScheme.surfaceContainer;
-    }
     if (isSelected) {
-      return colorScheme.secondaryContainer;
+      return type == CommonCardType.filled
+          ? context.colorScheme.secondaryContainer.opacity80
+          : context.colorScheme.secondaryContainer;
     }
-    return colorScheme.surfaceContainerLow;
+    if (isOption) {
+      return optionCardColor(context);
+    }
+    return commonCardColor(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final actualRadius = radius ?? 20.0;
+    final actualRadius = radius ?? (isOption ? optionRadius : 22.0);
     var childWidget = child;
 
     if (info != null) {
@@ -236,7 +211,7 @@ class CommonCard extends StatelessWidget {
       style: ButtonStyle(
         padding: const WidgetStatePropertyAll(EdgeInsets.zero),
         shape: WidgetStatePropertyAll(
-          RoundedSuperellipseBorder(
+          SuperellipseBorder(
             borderRadius: BorderRadius.circular(actualRadius),
           ),
         ),

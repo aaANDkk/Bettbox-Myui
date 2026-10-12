@@ -101,20 +101,25 @@ class _BlurModalBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     if (blurFilter == null) {
       return barrier;
     }
-    return Stack(
-      fit: StackFit.expand,
-      alignment: Alignment.topLeft,
-      clipBehavior: Clip.none,
-      children: [
-        FadeTransition(
-          opacity: animation!.drive(CurveTween(curve: barrierCurve)),
-          child: BackdropFilter(
-            filter: blurFilter,
-            child: const SizedBox.expand(),
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.topLeft,
+        clipBehavior: Clip.none,
+        children: [
+          FadeTransition(
+            opacity: animation!.drive(CurveTween(curve: barrierCurve)),
+            child: AnimatedBuilder(
+              animation: animation!,
+              builder: (_, _) => BackdropFilter(
+                filter: CommonFilters.blurAt(animation!.value),
+                child: const SizedBox.expand(),
+              ),
+            ),
           ),
-        ),
-        barrier,
-      ],
+          barrier,
+        ],
+      ),
     );
   }
 }
@@ -211,9 +216,16 @@ class AdaptiveSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = context.colorScheme.surface;
     final bottomSheet = type == SheetType.bottomSheet;
     final sideSheet = type == SheetType.sideSheet;
+    final isDark = context.colorScheme.brightness == Brightness.dark;
+    // In dark mode the card surface equals surfaceContainerHigh, so a bottom
+    // sheet using that tier would swallow the cards inside it.
+    final backgroundColor = bottomSheet
+        ? (isDark
+              ? context.colorScheme.surfaceContainer
+              : context.colorScheme.surfaceContainerHigh)
+        : context.colorScheme.surfaceContainer;
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     final implyLeading = !bottomSheet && (!(actions.isEmpty && sideSheet));
     final hasLeading = leading != null || (implyLeading && canPop);
@@ -229,11 +241,12 @@ class AdaptiveSheetScaffold extends StatelessWidget {
             )
           : null,
       leadingWidth: hasLeading ? 58.0 : null,
-      forceMaterialTransparency: bottomSheet ? true : false,
+      forceMaterialTransparency: bottomSheet,
       automaticallyImplyLeading: false,
       titleSpacing: hasLeading ? 0.0 : (bottomSheet ? null : 18.0),
       centerTitle: bottomSheet,
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0.0,
       title: EmojiText(
@@ -248,7 +261,7 @@ class AdaptiveSheetScaffold extends StatelessWidget {
         ? Material(
             color: backgroundColor,
             clipBehavior: Clip.antiAlias,
-            shape: const RoundedSuperellipseBorder(
+            shape: const SuperellipseBorder(
               borderRadius: BorderRadius.vertical(
                 top: Radius.circular(35.0),
               ),
@@ -264,8 +277,10 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                       alignment: Alignment.center,
                       height: 4,
                       width: 32,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
+                      decoration: ShapeDecoration(
+                        shape: const SuperellipseBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(2)),
+                        ),
                         color: context.colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -273,12 +288,15 @@ class AdaptiveSheetScaffold extends StatelessWidget {
                   appBar,
                   Flexible(
                     flex: 1,
-                    child: (showScrollGradient ?? true)
-                        ? ScrollConfiguration(
-                            behavior: const FeatherBarScrollBehavior(),
-                            child: body,
-                          )
-                        : body,
+                    child: ScrollFeatherTheme(
+                      surfaceColor: backgroundColor,
+                      child: (showScrollGradient ?? true)
+                          ? ScrollConfiguration(
+                              behavior: const FeatherBarScrollBehavior(),
+                              child: body,
+                            )
+                          : body,
+                    ),
                   ),
                 ],
               ),

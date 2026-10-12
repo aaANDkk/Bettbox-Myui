@@ -138,6 +138,7 @@ class _ThemeModeItem extends ConsumerWidget {
             final themeModeItem = themeModeItems[index];
             return CommonCard(
               isSelected: themeModeItem.themeMode == themeMode,
+              isOption: true,
               onPressed: () {
                 ref
                     .read(themeSettingProvider.notifier)
@@ -543,7 +544,7 @@ class _CustomFontItem extends ConsumerWidget {
         }
 
         return ListItem.switchItem(
-          leading: const Icon(FluentIcons.text_font_24_regular),
+          leading: const Icon(FluentIcons.text_effects_24_regular),
           horizontalTitleGap: 12,
           title: Text(
             appLocalizations.customFont,
@@ -690,7 +691,9 @@ class _EmojiStyleDialog extends StatelessWidget {
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
+                    customBorder: const SuperellipseBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
                     onTap: () async {
                       await EmojiManager.setStyle(style);
                       if (context.mounted) {
@@ -961,7 +964,7 @@ class _SliderDefaultsM3 extends SliderThemeData {
   Color? get activeTrackColor => _colors.primary;
 
   @override
-  Color? get inactiveTrackColor => _colors.secondaryContainer;
+  Color? get inactiveTrackColor => _colors.outlineVariant;
 
   @override
   Color? get secondaryActiveTrackColor => _colors.primary.withOpacity(0.54);

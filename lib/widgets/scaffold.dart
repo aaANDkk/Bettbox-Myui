@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'chip.dart';
+import 'keyboard_inset_hold.dart';
 import 'text.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
@@ -66,8 +67,9 @@ class _ScrollFeatherGradientOverlayState
 
   @override
   Widget build(BuildContext context) {
-    final surface =
-        widget.surfaceColor ?? Theme.of(context).colorScheme.surface;
+    final surface = widget.surfaceColor ??
+        ScrollFeatherTheme.maybeOf(context) ??
+        Theme.of(context).colorScheme.surfaceContainer;
     return NotificationListener<Notification>(
       onNotification: (notification) {
         if (notification is ScrollNotification) {
@@ -78,6 +80,7 @@ class _ScrollFeatherGradientOverlayState
         return false;
       },
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           widget.child,
           ValueListenableBuilder<double>(
@@ -85,10 +88,10 @@ class _ScrollFeatherGradientOverlayState
             builder: (context, progress, _) {
               if (progress <= 0) return const SizedBox.shrink();
               return Positioned(
-                top: 0,
+                top: -3.0,
                 left: 0,
                 right: 0,
-                height: widget.height,
+                height: widget.height + 3.0,
                 child: IgnorePointer(
                   child: Opacity(
                     opacity: progress,
@@ -99,12 +102,12 @@ class _ScrollFeatherGradientOverlayState
                           end: Alignment.bottomCenter,
                           colors: [
                             surface,
-                            surface.withValues(alpha: 0.85),
-                            surface.withValues(alpha: 0.50),
-                            surface.withValues(alpha: 0.18),
+                            surface,
+                            surface.withValues(alpha: 0.70),
+                            surface.withValues(alpha: 0.25),
                             surface.withValues(alpha: 0.0),
                           ],
-                          stops: const [0.0, 0.25, 0.55, 0.80, 1.0],
+                          stops: const [0.0, 0.15, 0.45, 0.75, 1.0],
                         ),
                       ),
                     ),
@@ -129,11 +132,29 @@ class FeatherScope extends InheritedWidget {
   bool updateShouldNotify(FeatherScope oldWidget) => false;
 }
 
+class ScrollFeatherTheme extends InheritedWidget {
+  final Color surfaceColor;
+
+  const ScrollFeatherTheme({
+    super.key,
+    required this.surfaceColor,
+    required super.child,
+  });
+
+  static Color? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ScrollFeatherTheme>()?.surfaceColor;
+
+  @override
+  bool updateShouldNotify(ScrollFeatherTheme oldWidget) =>
+      surfaceColor != oldWidget.surfaceColor;
+}
+
 class CommonScaffold extends StatefulWidget {
   final AppBar? appBar;
   final Widget body;
   final Color? backgroundColor;
   final String? title;
+  final Widget? titleWidget;
   final Widget? leading;
   final List<Widget>? actions;
   final bool? centerTitle;
@@ -151,6 +172,7 @@ class CommonScaffold extends StatefulWidget {
     this.backgroundColor,
     this.leading,
     this.title,
+    this.titleWidget,
     this.actions,
     this.centerTitle,
     this.editState,
@@ -210,7 +232,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
     return Theme(
       data: theme.copyWith(
         appBarTheme: theme.appBarTheme.copyWith(
-          backgroundColor: widget.backgroundColor ?? colorScheme.surface,
+          backgroundColor:
+              widget.backgroundColor ?? colorScheme.surfaceContainer,
           surfaceTintColor: Colors.transparent,
           scrolledUnderElevation: 0,
           iconTheme: theme.primaryIconTheme.copyWith(color: Colors.grey),
@@ -319,25 +342,34 @@ class CommonScaffoldState extends State<CommonScaffold> {
   }
 
   Widget _buildTitle(AppBarSearchState? startState) {
-    return _isSearch
-        ? TextField(
-            focusNode: _searchFocusNode,
-            controller: _textController,
-            style: context.textTheme.titleLarge,
-            onChanged: (value) {
-              if (startState != null) {
-                startState.onSearch(value);
-              }
-            },
-            decoration: InputDecoration(hintText: appLocalizations.search),
-          )
-        : EmojiText(
-            !_isEdit
-                ? widget.title!
-                : appLocalizations.selectedCountTitle(
-                    '${_appBarState.value.editState?.editCount ?? 0}',
-                  ),
-          );
+    if (_isSearch) {
+      return TextField(
+        focusNode: _searchFocusNode,
+        controller: _textController,
+        style: context.textTheme.titleLarge,
+        onChanged: (value) {
+          if (startState != null) {
+            startState.onSearch(value);
+          }
+        },
+        decoration: InputDecoration(hintText: appLocalizations.search),
+      );
+    }
+    if (_isEdit) {
+      return EmojiText(
+        appLocalizations.selectedCountTitle(
+          '${_appBarState.value.editState?.editCount ?? 0}',
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+    return widget.titleWidget ??
+        EmojiText(
+          widget.title!,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        );
   }
 
   List<Widget> _buildActions(bool hasSearch, List<Widget> actions) {
@@ -418,7 +450,8 @@ class CommonScaffoldState extends State<CommonScaffold> {
                   return _buildAppBarWrap(
                     AppBar(
                       backgroundColor:
-                          widget.backgroundColor ?? context.colorScheme.surface,
+                          widget.backgroundColor ?? Colors.transparent,
+                      elevation: 0,
                       surfaceTintColor: Colors.transparent,
                       scrolledUnderElevation: 0,
                       centerTitle: widget.centerTitle ?? false,
@@ -492,35 +525,41 @@ class CommonScaffoldState extends State<CommonScaffold> {
             },
           ),
           Expanded(
-            child: (widget.showScrollGradient ?? true)
-                ? ScrollConfiguration(
-                    behavior: const FeatherBarScrollBehavior(),
-                    child: widget.body,
-                  )
-                : widget.body,
+            child: ScrollFeatherTheme(
+              surfaceColor: widget.backgroundColor ??
+                  Theme.of(context).colorScheme.surfaceContainer,
+              child: (widget.showScrollGradient ?? true)
+                  ? ScrollConfiguration(
+                      behavior: const FeatherBarScrollBehavior(),
+                      child: widget.body,
+                    )
+                  : widget.body,
+            ),
           ),
         ],
       ),
     );
-    return DesktopBackShortcutWrapper(
-      child: Scaffold(
-        appBar: _buildAppBar(),
-        body: body,
-        resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset ??
-            (widget.floatingActionButton != null ? false : true),
-        backgroundColor: widget.backgroundColor,
-        floatingActionButton:
-            widget.floatingActionButton ??
-            ValueListenableBuilder<Widget?>(
-              valueListenable: _floatingActionButton,
-              builder: (_, value, _) {
-                return IntrinsicWidth(
-                  child: IntrinsicHeight(
-                    child: FadeScaleBox(child: value ?? SizedBox()),
-                  ),
-                );
-              },
-            ),
+    return KeyboardInsetHold(
+      child: DesktopBackShortcutWrapper(
+        child: Scaffold(
+          appBar: _buildAppBar(),
+          body: body,
+          resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset ??
+              (widget.floatingActionButton != null ? false : true),
+          backgroundColor: widget.backgroundColor,
+          floatingActionButton:
+              widget.floatingActionButton ??
+              ValueListenableBuilder<Widget?>(
+                valueListenable: _floatingActionButton,
+                builder: (_, value, _) {
+                  return IntrinsicWidth(
+                    child: IntrinsicHeight(
+                      child: FadeScaleBox(child: value ?? SizedBox()),
+                    ),
+                  );
+                },
+              ),
+        ),
       ),
     );
   }

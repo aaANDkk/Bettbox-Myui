@@ -29,6 +29,8 @@ const int _kLargeEditableLineThresholdDesktop = 5800;
 const Duration _kFindFocusDelay = Duration(milliseconds: 500);
 const Duration _kMinBusyDuration = Duration(milliseconds: 600);
 
+final _emojiRegex = emojiRegex();
+
 class EditorPage extends ConsumerStatefulWidget {
   final String title;
   final String content;
@@ -528,7 +530,7 @@ class _EditorPageState extends ConsumerState<EditorPage> {
                               ? atomOneDarkTheme
                               : atomOneLightTheme,
                           emojiFamily: emojiFamily,
-                          emojiRegex: emojiRegex(),
+                          emojiRegex: _emojiRegex,
                           textStyle: TextStyle(
                             fontFamily: FontFamily.jetBrainsMono.value,
                             fontFamilyFallback: [
@@ -625,7 +627,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: ShapeDecoration(
           color: colorScheme.surfaceContainerHighest.withAlpha(220),
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: colorScheme.outlineVariant.withAlpha(120),
@@ -671,7 +673,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: ShapeDecoration(
               color: colorScheme.surfaceContainerHigh,
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
                   color: colorScheme.outlineVariant.withAlpha(80),
@@ -950,7 +952,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         color: isSelected
             ? colorScheme.primaryContainer
             : colorScheme.surfaceContainerHigh,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(6),
           side: BorderSide(
             color: isSelected
@@ -960,7 +962,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       child: InkWell(
-        customBorder: RoundedSuperellipseBorder(
+        customBorder: SuperellipseBorder(
           borderRadius: BorderRadius.circular(6),
         ),
         onTap: onPressed,
@@ -990,7 +992,7 @@ class FindPanel extends StatelessWidget implements PreferredSizeWidget {
       tooltip: tooltip,
       style: ButtonStyle(
         shape: WidgetStatePropertyAll(
-          RoundedSuperellipseBorder(
+          SuperellipseBorder(
             borderRadius: BorderRadius.circular(6),
           ),
         ),

@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
         return true;
       },
       child: Material(
-        color: context.colorScheme.surface,
+        color: context.colorScheme.surfaceContainer,
         child: Consumer(
           builder: (context, ref, child) {
             final state = ref.watch(navigationStateProvider);
@@ -501,6 +501,19 @@ class HomeBackScope extends ConsumerWidget {
           final navigatorState = globalState.navigatorKey.currentState;
           if (navigatorState?.userGestureInProgress == true) return;
 
+          final realContext =
+              GlobalObjectKey(currentPage).currentContext ?? context;
+          final pageNavigator = Navigator.maybeOf(realContext);
+          if (pageNavigator?.userGestureInProgress == true) return;
+          if (pageNavigator != null && pageNavigator.canPop()) {
+            pageNavigator.pop();
+            return;
+          }
+          if (navigatorState != null && navigatorState.canPop()) {
+            navigatorState.pop();
+            return;
+          }
+
           if (globalState.isAndroidTV) {
             final tvBack = onTvBack;
             if (tvBack != null && tvBack()) return;
@@ -508,10 +521,6 @@ class HomeBackScope extends ConsumerWidget {
 
           if (!isCurrentRootPage) {
             globalState.appController.toPage(PageLabel.dashboard);
-            return;
-          }
-          if (navigatorState != null && navigatorState.canPop()) {
-            navigatorState.pop();
             return;
           }
           await globalState.appController.handleBackOrExit();

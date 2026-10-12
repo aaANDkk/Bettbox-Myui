@@ -130,7 +130,7 @@ class _IpDetailDialogState extends State<_IpDetailDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),

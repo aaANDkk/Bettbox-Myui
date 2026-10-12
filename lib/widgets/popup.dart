@@ -203,6 +203,7 @@ class OverflowAwareLayoutDelegate extends SingleChildLayoutDelegate {
 
 class CommonPopupMenu extends StatelessWidget {
   final List<PopupMenuItemData> items;
+  final Widget? footer;
   final double minWidth;
   final double minItemVerticalPadding;
   final double fontSize;
@@ -210,6 +211,7 @@ class CommonPopupMenu extends StatelessWidget {
   const CommonPopupMenu({
     super.key,
     required this.items,
+    this.footer,
     this.minWidth = 200,
     this.minItemVerticalPadding = 16,
     this.fontSize = 15,
@@ -228,8 +230,13 @@ class CommonPopupMenu extends StatelessWidget {
     return InkWell(
       onTap: onPressed != null
           ? () {
+              final route = ModalRoute.of(context);
               Navigator.of(context).pop();
-              onPressed();
+              if (route == null) {
+                onPressed();
+                return;
+              }
+              route.completed.then((_) => onPressed());
             }
           : null,
       child: Container(
@@ -245,7 +252,7 @@ class CommonPopupMenu extends StatelessWidget {
           children: [
             if (item.icon != null) ...[
               Icon(item.icon, size: fontSize + 4, color: color),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
             ],
             Flexible(
               child: Text(
@@ -264,14 +271,22 @@ class CommonPopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = context.colorScheme.brightness == Brightness.light;
     return IntrinsicHeight(
       child: IntrinsicWidth(
         child: Card(
-          elevation: 12,
-          color: context.colorScheme.surfaceContainer,
+          elevation: 8,
+          color: isLight
+              ? context.colorScheme.surfaceContainerLowest
+              : context.colorScheme.surfaceContainerHighest,
           clipBehavior: Clip.antiAlias,
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(25),
+            side: BorderSide(
+              color: context.colorScheme.outlineVariant.withValues(
+                alpha: isLight ? 0.45 : 0.25,
+              ),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -279,7 +294,11 @@ class CommonPopupMenu extends StatelessWidget {
             children: [
               for (final item in items.asMap().entries) ...[
                 _popupMenuItem(context, item: item.value, index: item.key),
-                if (item.value != items.last) Divider(height: 0),
+                if (item.value != items.last) const Divider(height: 0),
+              ],
+              if (footer case final footer?) ...[
+                const Divider(height: 0),
+                footer,
               ],
             ],
           ),

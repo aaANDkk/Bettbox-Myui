@@ -24,7 +24,7 @@ class ConnectionsView extends ConsumerStatefulWidget {
 }
 
 class _ConnectionsViewState extends ConsumerState<ConnectionsView>
-    with WidgetsBindingObserver, WindowListener {
+    with WidgetsBindingObserver, WindowListener, RouteMotionHoldMixin {
   late final ScrollController _scrollController;
   Timer? _timer;
   ProviderSubscription? _pageLabelSubscription;
@@ -143,7 +143,11 @@ class _ConnectionsViewState extends ConsumerState<ConnectionsView>
       return item.copyWith(uploadSpeed: 0, downloadSpeed: 0);
     }).toList();
     if (hasChanges) {
-      ref.read(connectionsProvider.notifier).state = newConnections;
+      updateWhenRouteSettled(() {
+        if (mounted) {
+          ref.read(connectionsProvider.notifier).state = newConnections;
+        }
+      });
     }
   }
 

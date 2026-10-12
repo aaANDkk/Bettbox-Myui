@@ -17,7 +17,7 @@ class RequestsView extends ConsumerStatefulWidget {
 }
 
 class _RequestsViewState extends ConsumerState<RequestsView>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, RouteMotionHoldMixin {
   late final ScrollController _scrollController;
 
   @override
@@ -46,7 +46,11 @@ class _RequestsViewState extends ConsumerState<RequestsView>
         .read(requestsProvider)
         .list
         .where((item) => item.start.isAfter(newest));
-    ref.read(requestsProvider.notifier).setRequests([...history, ...pending]);
+    updateWhenRouteSettled(() {
+      if (mounted) {
+        ref.read(requestsProvider.notifier).setRequests([...history, ...pending]);
+      }
+    });
   }
 
   @override

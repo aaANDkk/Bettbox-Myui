@@ -42,3 +42,6 @@ export 'sidebar_toggle_icon.dart';
 export 'sidebar.dart';
 export 'theme_palette_warmer.dart';
 export 'current_profile_dialog.dart';
+export 'deferred_push.dart';
+export 'route_motion_hold.dart';
+export 'keyboard_inset_hold.dart';

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:math';
 
+import 'package:bett_box/common/superellipse.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -380,8 +381,8 @@ class _CommonTabBarState<T extends Object> extends State<CommonTabBar<T>>
         clipBehavior: Clip.antiAlias,
         padding: widget.padding.resolve(Directionality.of(context)),
         decoration: ShapeDecoration(
-          shape: const RoundedSuperellipseBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
+          shape: const SuperellipseBorder(
+            borderRadius: BorderRadius.all(Radius.circular(22)),
           ),
           color: widget.backgroundColor,
         ),
@@ -1113,7 +1114,7 @@ class _RenderSegmentedControl<T extends Object> extends RenderBox
 
   void _paintThumb(PaintingContext context, Offset offset, Rect thumbRect) {
     final rect = thumbRect.shift(offset);
-    final path = RoundedSuperellipseBorder(
+    final path = SuperellipseBorder(
       borderRadius: BorderRadius.all(thumbRadius),
     ).getOuterPath(rect);
 

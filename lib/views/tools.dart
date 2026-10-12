@@ -1425,7 +1425,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
                 bottom:
                     (globalState.isAndroidTV ? 80.0 : 20.0) +
                     (isMobileView ? getFloatingBottomBarReserveHeight(context) : 0),
-                top: 8,
+                top: 12,
               ),
             ),
     );

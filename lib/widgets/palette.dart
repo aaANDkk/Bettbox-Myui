@@ -33,7 +33,7 @@ class _SuperellipseClipper extends CustomClipper<Path> {
 
   @override
   Path getClip(Size size) {
-    return RoundedSuperellipseBorder(
+    return SuperellipseBorder(
       borderRadius: borderRadius,
     ).getOuterPath(Offset.zero & size);
   }
@@ -235,7 +235,7 @@ class _PaletteState extends State<Palette> {
               ),
               const SizedBox(height: 14),
               Material(
-                shape: RoundedSuperellipseBorder(
+                shape: SuperellipseBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: _panelBorderSide(theme.colorScheme),
                 ),
@@ -255,7 +255,7 @@ class _PaletteState extends State<Palette> {
                           height: 24,
                           decoration: ShapeDecoration(
                             color: currentColor,
-                            shape: RoundedSuperellipseBorder(
+                            shape: SuperellipseBorder(
                               borderRadius: BorderRadius.circular(6),
                               side: BorderSide(
                                 color: Colors.white.withValues(alpha: 0.35),
@@ -399,7 +399,7 @@ class _GradientTrackShape extends SliderTrackShape {
       valueRect.right + _thumbRadius,
       valueRect.bottom,
     );
-    final path = RoundedSuperellipseBorder(
+    final path = SuperellipseBorder(
       borderRadius: BorderRadius.circular(rect.height / 2),
     ).getOuterPath(rect);
     final canvas = context.canvas;
@@ -480,7 +480,7 @@ class _ToneStrip extends StatelessWidget {
       padding: const EdgeInsets.all(_toneStripBorder),
       decoration: ShapeDecoration(
         color: colorScheme.surfaceContainer,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
           side: _panelBorderSide(colorScheme),
         ),
@@ -546,7 +546,7 @@ class _ToneCellState extends State<_ToneCell> {
                 padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
                 child: DecoratedBox(
                   decoration: ShapeDecoration(
-                    shape: RoundedSuperellipseBorder(
+                    shape: SuperellipseBorder(
                       borderRadius: BorderRadius.circular(1000),
                       side: BorderSide(
                         color: foregroundColor.withValues(
@@ -612,8 +612,8 @@ class _ColorSchemePreview extends StatelessWidget {
       padding: const EdgeInsets.all(_previewInset),
       decoration: ShapeDecoration(
         color: colorScheme.surfaceContainer,
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(20),
+        shape: SuperellipseBorder(
+          borderRadius: BorderRadius.circular(22),
           side: _panelBorderSide(colorScheme),
         ),
       ),

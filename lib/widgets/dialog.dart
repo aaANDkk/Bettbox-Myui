@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui' show FontVariation;
 
+import 'package:bett_box/common/superellipse.dart';
 import 'package:bett_box/providers/app.dart';
 import 'package:bett_box/widgets/pop_scope.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,7 @@ class CommonDialog extends ConsumerWidget {
             },
       child: AlertDialog(
         clipBehavior: Clip.antiAlias,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(35),
         ),
         title: titleTrailing == null
@@ -106,7 +107,7 @@ class CommonModal extends ConsumerWidget {
         height: size.height * 0.85,
         child: Material(
           type: MaterialType.transparency,
-          shape: RoundedSuperellipseBorder(
+          shape: SuperellipseBorder(
             borderRadius: BorderRadius.circular(35),
           ),
           clipBehavior: Clip.antiAlias,

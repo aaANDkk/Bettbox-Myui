@@ -44,7 +44,7 @@ class AboutView extends StatelessWidget {
             title: 'Github Releases',
             icon: FluentIcons.star_add_24_regular,
             onTap: () =>
-                globalState.openUrl('https://github.com/$repository'),
+                globalState.openUrl('https://github.com/$repository/releases'),
           ),
           right: _LinkGridTile(
             title: appLocalizations.checkUpdate,
@@ -383,7 +383,7 @@ class _ContributorDialog extends StatelessWidget {
               ),
               decoration: ShapeDecoration(
                 color: fabBgColor,
-                shape: RoundedSuperellipseBorder(
+                shape: SuperellipseBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 shadows: [

@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 
 import '../state.dart';
 
-final _firstEmojiRegex = emojiRegex();
+final _emojiRegex = emojiRegex();
 final _firstEmojiCache = <String, String>{};
 final _stripEmojiCache = <String, String>{};
 
 String getFirstEmoji(String text) {
   return _firstEmojiCache[text] ??=
-      _firstEmojiRegex.firstMatch(text)?.group(0) ?? '';
+      _emojiRegex.firstMatch(text)?.group(0) ?? '';
 }
 
 String removeLeadingEmoji(String text) {
@@ -20,10 +20,10 @@ String removeLeadingEmoji(String text) {
 
 String _removeLeadingEmoji(String text) {
   var value = text;
-  var match = _firstEmojiRegex.matchAsPrefix(value);
+  var match = _emojiRegex.matchAsPrefix(value);
   while (match != null) {
     value = value.substring(match.end).trimLeft();
-    match = _firstEmojiRegex.matchAsPrefix(value);
+    match = _emojiRegex.matchAsPrefix(value);
   }
   return value;
 }
@@ -73,6 +73,7 @@ class TooltipText extends StatelessWidget {
 class EmojiText extends StatelessWidget {
   final String text;
   final TextStyle? style;
+  final StrutStyle? strutStyle;
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;
@@ -83,6 +84,7 @@ class EmojiText extends StatelessWidget {
     this.maxLines,
     this.overflow,
     this.style,
+    this.strutStyle,
     this.textAlign,
   });
 
@@ -91,7 +93,7 @@ class EmojiText extends StatelessWidget {
     TextStyle defaultStyle,
   ) {
     final List<TextSpan> spans = [];
-    final matches = emojiRegex().allMatches(text);
+    final matches = _emojiRegex.allMatches(text);
     final effectiveStyle = defaultStyle.merge(style);
 
     int lastMatchEnd = 0;
@@ -141,6 +143,7 @@ class EmojiText extends StatelessWidget {
             children: _buildTextSpans(text, defaultStyle),
           ),
           textAlign: textAlign ?? TextAlign.start,
+          strutStyle: strutStyle,
           maxLines: maxLines,
           overflow: overflow ?? TextOverflow.clip,
         );
@@ -184,7 +187,7 @@ class EmojiTextEditingController extends TextEditingController {
       );
     }
 
-    final matches = emojiRegex().allMatches(text);
+    final matches = _emojiRegex.allMatches(text);
     if (matches.isEmpty) {
       return super.buildTextSpan(
         context: context,

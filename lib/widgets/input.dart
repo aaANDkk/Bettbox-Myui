@@ -42,6 +42,9 @@ class OptionsDialog<T> extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
+                customBorder: const SuperellipseBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
                 onTap: () {
                   Navigator.of(context).pop(option);
                 },
@@ -59,7 +62,12 @@ class OptionsDialog<T> extends StatelessWidget {
                       Expanded(
                         child: EmojiText(
                           textBuilder(option),
-                          style: context.textTheme.bodyMedium,
+                          style: value == option
+                              ? context.textTheme.bodyMedium?.copyWith(
+                                  color: context.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                )
+                              : context.textTheme.bodyMedium,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
@@ -155,14 +163,15 @@ class _InputDialogState extends State<InputDialog> {
   void initState() {
     super.initState();
     textController = EmojiTextEditingController(text: value);
-    if (widget.delayedFocus) {
+    if (widget.autofocus || widget.delayedFocus) {
       _focusNode = FocusNode();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            _focusNode?.requestFocus();
-          }
-        });
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        // Focus only once the route settled: the soft keyboard's first bind must
+        // not land inside the enter transition.
+        await waitRouteSettled(context);
+        if (!mounted) return;
+        _focusNode?.requestFocus();
       });
     }
   }
@@ -215,7 +224,7 @@ class _InputDialogState extends State<InputDialog> {
           runSpacing: 16,
           children: [
             TextFormField(
-              autofocus: widget.autofocus && !widget.delayedFocus,
+              autofocus: false,
               focusNode: _focusNode,
               obscureText: widget.obscureText ?? false,
               keyboardType: widget.keyboardType ??
@@ -719,7 +728,7 @@ class SuperellipseInputBorder extends OutlineInputBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return RoundedSuperellipseBorder(
+    return SuperellipseBorder(
       borderRadius: borderRadius,
       side: borderSide,
     ).getInnerPath(rect, textDirection: textDirection);
@@ -727,7 +736,7 @@ class SuperellipseInputBorder extends OutlineInputBorder {
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return RoundedSuperellipseBorder(
+    return SuperellipseBorder(
       borderRadius: borderRadius,
       side: borderSide,
     ).getOuterPath(rect, textDirection: textDirection);
@@ -751,7 +760,7 @@ class SuperellipseInputBorder extends OutlineInputBorder {
       ..strokeWidth = borderSide.width
       ..style = PaintingStyle.stroke;
 
-    final border = RoundedSuperellipseBorder(
+    final border = SuperellipseBorder(
       borderRadius: borderRadius,
       side: borderSide,
     );

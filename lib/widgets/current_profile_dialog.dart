@@ -169,7 +169,7 @@ class _CurrentProfileDialogState extends ConsumerState<CurrentProfileDialog> {
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: ShapeDecoration(
             color: context.colorScheme.primary.withValues(alpha: 0.08),
-            shape: RoundedSuperellipseBorder(
+            shape: SuperellipseBorder(
               borderRadius: BorderRadius.circular(10),
               side: BorderSide(
                 color: context.colorScheme.primary.withValues(alpha: 0.25),
@@ -249,6 +249,10 @@ class _ProfilePanel extends StatelessWidget {
 
   Widget _titleRow(BuildContext context, String name, String subtitle) {
     final labelStyle = context.textTheme.labelMedium?.toLight;
+    final titleStyle = context.textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.bold,
+      fontVariations: const [FontVariation('wght', 700)],
+    );
     return SizedBox(
       height: globalState.measure.titleMediumHeight,
       child: Center(
@@ -256,24 +260,23 @@ class _ProfilePanel extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
-              child: EmojiText(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontVariations: const [FontVariation('wght', 700)],
+              child: Transform.translate(
+                offset: const Offset(0, 1),
+                child: EmojiText(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: titleStyle,
+                  strutStyle: StrutStyle.fromTextStyle(
+                    titleStyle!,
+                    forceStrutHeight: true,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 6),
-            Text('·', style: labelStyle),
-            const SizedBox(width: 6),
-            Text(
-              subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: labelStyle,
+            const SizedBox(width: 8),
+            Flexible(
+              child: CommonInfoCapsule(subtitle, style: labelStyle),
             ),
           ],
         ),
@@ -330,8 +333,8 @@ class _ProfilePanel extends StatelessWidget {
         color: context.colorScheme.surfaceContainerHighest.withValues(
           alpha: 0.45,
         ),
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(20),
+        shape: SuperellipseBorder(
+          borderRadius: BorderRadius.circular(22),
           side: BorderSide(
             color: context.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
