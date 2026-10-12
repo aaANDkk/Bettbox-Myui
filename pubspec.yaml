@@ -1,7 +1,7 @@
 name: bett_box
 description: A multi-platform proxy client based on Mihomo, simple and easy to use, open-source and ad-free.
 publish_to: 'none'
-version: 1.19.4+2026100101
+version: 1.19.5+2026101201
 environment:
   sdk: '>=3.9.0 <4.0.0'
 
@@ -74,6 +74,9 @@ dependencies:
     path: plugins/flutter_qjs
 dependency_overrides:
   flutter_rust_bridge: 2.12.0
+  # Superellipse tab pill in the floating bottom bar.
+  google_nav_bar:
+    path: packages/google_nav_bar
   # Fix compile failure: https://github.com/leanflutter/hotkey_manager/pull/66
   hotkey_manager_linux:
     git:
