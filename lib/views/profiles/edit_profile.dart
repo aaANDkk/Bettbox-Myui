@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' show FontVariation;
 
 import 'package:bett_box/clash/clash.dart';
@@ -13,6 +15,7 @@ import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EditProfileView extends StatefulWidget {
   final Profile profile;
@@ -35,6 +38,8 @@ class EditProfileViewState extends State<EditProfileView> {
   late TextEditingController urlController;
   late TextEditingController autoUpdateDurationController;
   late bool autoUpdate;
+  late bool useScriptOverride;
+  late String? scriptId;
   late TextEditingController ageSecretKeyController;
   FocusNode? urlFocusNode;
   bool _obscureAgeSecretKey = true;
@@ -51,6 +56,8 @@ class EditProfileViewState extends State<EditProfileView> {
     labelController = EmojiTextEditingController(text: widget.profile.label);
     urlController = TextEditingController(text: widget.profile.url);
     autoUpdate = widget.isNew ? false : widget.profile.autoUpdate;
+    useScriptOverride = widget.profile.useScriptOverride;
+    scriptId = widget.profile.scriptId;
     autoUpdateDurationController = TextEditingController(
       text: widget.profile.autoUpdateDuration.inMinutes.toString(),
     );
@@ -59,12 +66,13 @@ class EditProfileViewState extends State<EditProfileView> {
     );
     if (widget.isNew) {
       urlFocusNode = FocusNode();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            urlFocusNode?.requestFocus();
-          }
-        });
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        // Same reason as the dialog input: keep the keyboard's first bind out
+        // of the enter transition.
+        await waitRouteSettled(context);
+        if (!mounted) return;
+        urlFocusNode?.requestFocus();
       });
     }
     appPath.getProfilePath(widget.profile.id).then((path) async {
@@ -86,7 +94,7 @@ class EditProfileViewState extends State<EditProfileView> {
     if (!_formKey.currentState!.validate()) return;
     final appController = globalState.appController;
     Profile profile = this.profile.copyWith(
-      url: urlController.text,
+      url: urlController.text.trim(),
       label: labelController.text.trim().isEmpty
           ? null
           : labelController.text.trim(),
@@ -94,6 +102,8 @@ class EditProfileViewState extends State<EditProfileView> {
           ? null
           : ageSecretKeyController.text.trim(),
       autoUpdate: autoUpdate,
+      useScriptOverride: useScriptOverride,
+      scriptId: scriptId,
       autoUpdateDuration: Duration(
         minutes: int.parse(autoUpdateDurationController.text),
       ),
@@ -141,19 +151,26 @@ class EditProfileViewState extends State<EditProfileView> {
           }
           return;
         }
-      } else if (!hasUpdate) {
-        appController.setProfileAndAutoApply(profile);
       } else {
-        try {
-          await Future.delayed(commonDuration);
-          await appController.updateProfile(profile);
-        } on Object catch (e) {
-          await globalState.showMessage(
-            title: appLocalizations.tip,
-            message: TextSpan(
-              text: '${profile.label ?? profile.id}: ${e.formatError}',
-            ),
-            cancelable: false,
+        appController.setProfileAndAutoApply(profile);
+        if (hasUpdate && profile.type == ProfileType.url) {
+          appController.setProfileUpdating(profile.id, true);
+          unawaited(
+            () async {
+              try {
+                await Future.delayed(commonDuration);
+                await appController.updateProfile(profile);
+              } on Object catch (e) {
+                appController.setProfileUpdating(profile.id, false);
+                await globalState.showMessage(
+                  title: appLocalizations.tip,
+                  message: TextSpan(
+                    text: '${profile.label ?? profile.id}: ${e.formatError}',
+                  ),
+                  cancelable: false,
+                );
+              }
+            }(),
           );
         }
       }

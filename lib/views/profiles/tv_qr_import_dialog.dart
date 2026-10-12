@@ -228,7 +228,7 @@ class _TvQrImportDialogState extends State<TvQrImportDialog> {
     final hasNetwork = _ip != null && _ip!.isNotEmpty;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: SuperellipseBorder(borderRadius: BorderRadius.circular(22)),
       backgroundColor: context.colorScheme.surfaceContainerHigh,
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
       child: ConstrainedBox(
@@ -586,7 +586,7 @@ body {
   border: 1px solid var(--border);
   color: var(--text);
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: 22px;
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;

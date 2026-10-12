@@ -7,22 +7,12 @@ import 'package:bett_box/models/models.dart';
 import 'package:bett_box/pages/editor.dart';
 import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
-import 'package:bett_box/widgets/card.dart';
-import 'package:bett_box/widgets/dialog.dart';
-import 'package:bett_box/widgets/icon.dart';
-import 'package:bett_box/widgets/input.dart';
-import 'package:bett_box/widgets/list.dart';
-import 'package:bett_box/widgets/null_status.dart';
-import 'package:bett_box/widgets/pop_scope.dart';
-import 'package:bett_box/widgets/popup.dart';
-import 'package:bett_box/widgets/scaffold.dart';
-import 'package:bett_box/widgets/scroll.dart';
-import 'package:bett_box/widgets/sheet.dart';
-import 'package:bett_box/widgets/text.dart';
+import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 bool _isExtractingCustomOptions = false;
 const Duration _kMinLoadingDuration = Duration(seconds: 1);
@@ -147,7 +137,9 @@ class ScriptsView extends ConsumerStatefulWidget {
 }
 
 class _ScriptsViewState extends ConsumerState<ScriptsView> {
-  Future<void> _handleDelScript(String label) async {
+  final Set<String> _updatingScriptIds = {};
+
+  Future<void> _handleDelScript(Script script) async {
     final res = await globalState.showMessage(
       message: TextSpan(
         text: appLocalizations.deleteTip(appLocalizations.script),
@@ -156,17 +148,135 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     if (res != true) {
       return;
     }
-    ref.read(scriptStateProvider.notifier).del(label);
+    ref.read(scriptStateProvider.notifier).del(script.label);
+    final profiles = ref.read(profilesProvider);
+    final currentProfileId = ref.read(currentProfileIdProvider);
+    bool shouldReapply = false;
+    for (final p in profiles) {
+      if (p.scriptId == script.id) {
+        ref.read(profilesProvider.notifier).updateProfile(
+          p.id,
+          (item) => item.copyWith(scriptId: null),
+        );
+        if (p.id == currentProfileId) {
+          shouldReapply = true;
+        }
+      }
+    }
+    if (shouldReapply) {
+      await globalState.appController.applyProfile(silence: true);
+    }
+  }
+
+  Future<void> _handleSelectProfileScript(
+    Profile profile,
+    List<Script> scripts,
+  ) async {
+    final currentVal =
+        (profile.useScriptOverride && profile.scriptId != null)
+            ? profile.scriptId!
+            : '__none__';
+
+    final options = [
+      '__none__',
+      ...scripts.map((s) => s.id),
+    ];
+
+    final selected = await globalState.showCommonDialog<String>(
+      child: OptionsDialog<String>(
+        title: '${profile.label ?? profile.id} - ${appLocalizations.script}',
+        options: options,
+        value: currentVal,
+        textBuilder: (val) {
+          if (val == '__none__') {
+            return appLocalizations.none;
+          }
+          final match = scripts.where((s) => s.id == val).firstOrNull;
+          return match?.label ?? val;
+        },
+      ),
+    );
+
+    if (selected == null || selected == currentVal) return;
+
+    final currentProfileId = ref.read(currentProfileIdProvider);
+    final willUseScript = selected != '__none__';
+    final targetScriptId = willUseScript ? selected : null;
+
+    ref.read(profilesProvider.notifier).updateProfile(
+      profile.id,
+      (p) => p.copyWith(
+        useScriptOverride: willUseScript,
+        scriptId: targetScriptId,
+      ),
+    );
+
+    if (profile.id == currentProfileId) {
+      await globalState.appController.applyProfile(silence: true);
+    }
   }
 
   Future<void> _handleSyncScript(String id) async {
-    await globalState.appController.safeRun(
-      silence: false,
-      () async {
-        await ref.read(scriptStateProvider.notifier).syncScript(id);
-        globalState.showNotifier(appLocalizations.success);
-      },
-    );
+    if (_updatingScriptIds.contains(id)) return;
+    setState(() {
+      _updatingScriptIds.add(id);
+    });
+    try {
+      await globalState.appController.safeRun(
+        silence: false,
+        () async {
+          await ref.read(scriptStateProvider.notifier).syncScript(id);
+          globalState.showNotifier(appLocalizations.success);
+        },
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _updatingScriptIds.remove(id);
+        });
+      }
+    }
+  }
+
+  Future<void> _handleSyncAllScripts() async {
+    final scripts = ref.read(scriptStateProvider).scripts;
+    final urlScripts =
+        scripts.where((s) => s.url != null && s.url!.isNotEmpty).toList();
+    if (urlScripts.isEmpty) {
+      return;
+    }
+    setState(() {
+      for (final s in urlScripts) {
+        _updatingScriptIds.add(s.id);
+      }
+    });
+    final messages = <String>[];
+    final updateScripts = urlScripts.map<Future>((script) async {
+      try {
+        await ref.read(scriptStateProvider.notifier).syncScript(script.id);
+      } on Object catch (e) {
+        messages.add('${script.label}: ${e.formatError}\n');
+      } finally {
+        if (mounted) {
+          setState(() {
+            _updatingScriptIds.remove(script.id);
+          });
+        }
+      }
+    });
+    await Future.wait(updateScripts);
+    if (!mounted) return;
+    if (messages.isNotEmpty) {
+      globalState.showMessage(
+        title: appLocalizations.tip,
+        message: TextSpan(
+          children: [for (final message in messages) TextSpan(text: message)],
+        ),
+        cancelable: false,
+      );
+    } else {
+      globalState.showNotifier(appLocalizations.success);
+    }
   }
 
   Future<void> _handleCustomOptions(Script script) async {
@@ -194,114 +304,211 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     }
   }
 
-  void _handleShowScriptSettings() {
-    showSheet(
-      context: context,
-      builder: (_, type) {
-        return _ScriptSettingsSheet(type: type);
-      },
-    );
-  }
-
   Widget _buildContent() {
     return Consumer(
-      builder: (_, ref, _) {
-        final vm2 = ref.watch(
-          scriptStateProvider.select(
-            (state) => VM2(a: state.currentId, b: state.scripts),
-          ),
+      builder: (context, ref, _) {
+        final scripts = ref.watch(
+          scriptStateProvider.select((state) => state.scripts),
         );
-        final currentId = vm2.a;
-        final scripts = vm2.b;
-        if (scripts.isEmpty) {
-          return NullStatus(
-            label: appLocalizations.nullTip(appLocalizations.script),
-            illustration: NullStatusIllustration.scripts,
-          );
-        }
-        return CommonScrollBar(
-          controller: null,
-          child: ListView.builder(
-            padding: kMaterialListPadding.copyWith(bottom: 16 + 64),
-            itemCount: scripts.length,
-            itemBuilder: (_, index) {
-              final script = scripts[index];
-              final isSelected = script.id == currentId;
-              return Container(
-                padding: kTabLabelPadding,
-                margin: EdgeInsets.symmetric(vertical: 6),
-                child: CommonCard(
-                  type: CommonCardType.filled,
-                  radius: 20,
-                  child: ListItem(
-                    padding: const EdgeInsets.only(left: 12, right: 12),
-                    title: EmojiText(script.label),
-                    leading: Switch(
-                      value: isSelected,
-                      onChanged: (value) {
-                        if (value) {
-                          ref.read(scriptStateProvider.notifier).setId(script.id);
-                        } else if (isSelected) {
-                          ref.read(scriptStateProvider.notifier).setId(script.id);
-                        }
-                      },
-                    ),
-                    trailing: CommonPopupBox(
-                      targetBuilder: (open) {
-                        return IconButton(
-                          onPressed: () {
-                            open();
-                          },
-                          tooltip: appLocalizations.more,
-                          icon: Icon(FluentIcons.more_vertical_24_regular),
-                        );
-                      },
-                      popup: CommonPopupMenu(
-                        items: [
-                          PopupMenuItemData(
-                            icon: FluentIcons.edit_24_regular,
-                            label: appLocalizations.edit,
-                            onPressed: () {
-                              _handleToEditor(script: script);
-                            },
-                          ),
-                          if (script.isCompatibleWithBettbox)
-                            PopupMenuItemData(
-                              icon: FluentIcons.options_24_regular,
-                              label: appLocalizations.custom,
-                              onPressed: () {
-                                _handleCustomOptions(script);
-                              },
-                            ),
-                          if (script.url != null && script.url!.isNotEmpty)
-                            PopupMenuItemData(
-                              icon: FluentIcons.arrow_sync_24_regular,
-                              label: appLocalizations.sync,
-                              onPressed: () {
-                                _handleSyncScript(script.id);
-                              },
-                            ),
-                          PopupMenuItemData(
-                            icon: FluentIcons.document_copy_24_regular,
-                            label: appLocalizations.exportFile,
-                            onPressed: () {
-                              _handleExportFile(script);
-                            },
-                          ),
-                          PopupMenuItemData(
-                            icon: FluentIcons.delete_24_regular,
-                            label: appLocalizations.delete,
-                            onPressed: () {
-                              _handleDelScript(script.label);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+        final profiles = ref.watch(profilesProvider);
+
+        final scriptItems = scripts.isEmpty
+            ? [
+                ListItem(
+                  title: Text(
+                    appLocalizations.nullTip(appLocalizations.script),
+                    style: context.textTheme.bodyMedium?.toLight,
                   ),
                 ),
-              );
-            },
+              ]
+              : scripts.map((script) {
+                  final isUpdating = _updatingScriptIds.contains(script.id);
+                  final hasRemote = script.url?.isNotEmpty ?? false;
+                  final hasCustom = script.isCompatibleWithBettbox;
+                  return ListItem(
+                    padding: const EdgeInsets.only(left: 16, right: 4),
+                    onTap: isUpdating
+                        ? null
+                        : () {
+                            _handleToEditor(script: script);
+                          },
+                    title: Row(
+                      children: [
+                        Flexible(
+                          child: Transform.translate(
+                            offset: const Offset(0, 1),
+                            child: EmojiText(
+                              script.label,
+                              style: context.textTheme.titleMedium,
+                              strutStyle: StrutStyle.fromTextStyle(
+                                context.textTheme.titleMedium!,
+                                forceStrutHeight: true,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        if (hasRemote) ...[
+                          const SizedBox(width: 8),
+                          CommonInfoCapsule(
+                            appLocalizations.remote,
+                            leading: Icon(
+                              FluentIcons.arrow_sync_24_regular,
+                              size: 11,
+                              color: context.colorScheme.primary,
+                            ),
+                            style: context.textTheme.labelMedium,
+                          ),
+                        ],
+                        if (hasCustom) ...[
+                          const SizedBox(width: 8),
+                          CommonInfoCapsule(
+                            appLocalizations.custom,
+                            leading: Icon(
+                              FluentIcons.options_24_regular,
+                              size: 11,
+                              color: context.colorScheme.primary,
+                            ),
+                            style: context.textTheme.labelMedium,
+                          ),
+                        ],
+                      ],
+                    ),
+                    trailing: SizedBox(
+                      height: 36,
+                      width: 36,
+                      child: FadeThroughBox(
+                        child: isUpdating
+                            ? Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: SpinKitFadingCircle(
+                                  color: context.colorScheme.primary,
+                                  size: 24,
+                                ),
+                              )
+                            : CommonPopupBox(
+                                targetBuilder: (open) {
+                                  return IconButton(
+                                    onPressed: open,
+                                    tooltip: appLocalizations.more,
+                                    icon: const Icon(
+                                      FluentIcons.more_vertical_24_regular,
+                                      size: 20,
+                                    ),
+                                  );
+                                },
+                                popup: CommonPopupMenu(
+                                  items: [
+                                    PopupMenuItemData(
+                                      icon: FluentIcons.edit_24_regular,
+                                      label: appLocalizations.edit,
+                                      onPressed: () {
+                                        _handleToEditor(script: script);
+                                      },
+                                    ),
+                                    if (script.isCompatibleWithBettbox)
+                                      PopupMenuItemData(
+                                        icon: FluentIcons.options_24_regular,
+                                        label: appLocalizations.custom,
+                                        onPressed: () {
+                                          _handleCustomOptions(script);
+                                        },
+                                      ),
+                                    if (script.url != null &&
+                                        script.url!.isNotEmpty)
+                                      PopupMenuItemData(
+                                        icon: FluentIcons.arrow_sync_24_regular,
+                                        label: appLocalizations.sync,
+                                        onPressed: () {
+                                          _handleSyncScript(script.id);
+                                        },
+                                      ),
+                                    PopupMenuItemData(
+                                      icon:
+                                          FluentIcons.document_copy_24_regular,
+                                      label: appLocalizations.exportFile,
+                                      onPressed: () {
+                                        _handleExportFile(script);
+                                      },
+                                    ),
+                                    PopupMenuItemData(
+                                      icon: FluentIcons.delete_24_regular,
+                                      label: appLocalizations.delete,
+                                      onPressed: () {
+                                        _handleDelScript(script);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                      ),
+                    ),
+                  );
+                }).toList();
+
+        final profileItems = profiles.isEmpty
+            ? [
+                ListItem(
+                  title: Text(
+                    appLocalizations.nullProfileDesc,
+                    style: context.textTheme.bodyMedium?.toLight,
+                  ),
+                ),
+              ]
+            : profiles.map((profile) {
+                final script = scripts
+                    .where((s) => s.id == profile.scriptId)
+                    .firstOrNull;
+                final hasScript = profile.useScriptOverride && script != null;
+                final scriptLabel =
+                    hasScript ? script.label : appLocalizations.none;
+
+                return ListItem(
+                  onTap: () {
+                    _handleSelectProfileScript(profile, scripts);
+                  },
+                  title: EmojiText(profile.label ?? profile.id),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 160),
+                        child: EmojiText(
+                          scriptLabel,
+                          style: context.textTheme.bodyMedium?.toLight,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        FluentIcons.chevron_up_down_24_regular,
+                        size: 16,
+                        color: context.colorScheme.outline.withValues(
+                          alpha: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList();
+
+        return CommonScrollBar(
+          controller: null,
+          child: ListView(
+            padding: const EdgeInsets.only(top: 12, bottom: 80),
+            children: [
+              SectionContainer(
+                title: appLocalizations.myScripts,
+                isFirst: true,
+                items: scriptItems,
+              ),
+              SectionContainer(
+                title: appLocalizations.myProfiles,
+                items: profileItems,
+              ),
+            ],
           ),
         );
       },
@@ -486,68 +693,15 @@ class _ScriptsViewState extends ConsumerState<ScriptsView> {
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: _buildFAB(),
-      actions: [
-        IconButton(
-          onPressed: _handleShowScriptSettings,
-          tooltip: appLocalizations.settings,
-          icon: const Icon(FluentIcons.settings_24_regular),
-        ),
-      ],
       body: _buildContent(),
       title: appLocalizations.script,
-    );
-  }
-}
-
-class _ScriptSettingsSheet extends ConsumerWidget {
-  final SheetType type;
-
-  const _ScriptSettingsSheet({
-    required this.type,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profiles = ref.watch(profilesProvider);
-    final currentProfileId = ref.watch(currentProfileIdProvider);
-    return AdaptiveSheetScaffold(
-      type: type,
-      body: profiles.isEmpty
-          ? NullStatus(
-              label: appLocalizations.nullProfileDesc,
-              illustration: NullStatusIllustration.profile,
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              itemCount: profiles.length,
-              itemBuilder: (_, index) {
-                final profile = profiles[index];
-                final isCurrentProfile = profile.id == currentProfileId;
-                return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: CommonCard(
-                    type: CommonCardType.filled,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.only(left: 16, right: 16),
-                      title: EmojiText(profile.label ?? profile.id),
-                      trailing: Switch(
-                        value: profile.useScriptOverride,
-                        onChanged: (value) async {
-                          ref.read(profilesProvider.notifier).updateProfile(
-                            profile.id,
-                            (p) => p.copyWith(useScriptOverride: value),
-                          );
-                          if (isCurrentProfile) {
-                            await globalState.appController.applyProfile(silence: true);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-      title: appLocalizations.useGlobalScriptOverride,
+      actions: [
+        IconButton(
+          onPressed: _handleSyncAllScripts,
+          icon: const Icon(FluentIcons.arrow_sync_24_regular),
+          tooltip: appLocalizations.syncAll,
+        ),
+      ],
     );
   }
 }

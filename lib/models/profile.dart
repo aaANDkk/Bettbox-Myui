@@ -9,6 +9,8 @@ import 'package:bett_box/enum/enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'clash_config.dart';
+import 'common.dart';
+import 'config.dart';
 
 part 'generated/profile.freezed.dart';
 part 'generated/profile.g.dart';
@@ -83,6 +85,7 @@ abstract class Profile with _$Profile {
     @Default(false)
     bool isUpdating,
     @Default(true) bool useScriptOverride,
+    String? scriptId,
     String? ageSecretKey,
     @JsonKey(name: 'group-switches') @Default({}) Map<String, bool> groupSwitches,
   }) = _Profile;
@@ -90,14 +93,27 @@ abstract class Profile with _$Profile {
   factory Profile.fromJson(Map<String, Object?> json) =>
       _$ProfileFromJson(json);
 
-  factory Profile.normal({String? label, String url = '', String? ageSecretKey}) {
+  factory Profile.normal({String? label, String url = '', String? ageSecretKey, String? scriptId}) {
     return Profile(
       label: label,
       url: url,
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       autoUpdateDuration: defaultUpdateDuration,
       ageSecretKey: ageSecretKey,
+      scriptId: scriptId,
     );
+  }
+}
+
+extension ProfileScriptExt on Profile {
+  Script? getEffectiveScript(ScriptProps scriptProps) {
+    if (!useScriptOverride) return null;
+    if (scriptId != null && scriptId!.isNotEmpty) {
+      for (final script in scriptProps.scripts) {
+        if (script.id == scriptId) return script;
+      }
+    }
+    return null;
   }
 }
 

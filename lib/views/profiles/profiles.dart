@@ -8,7 +8,6 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/views/profiles/edit_profile.dart';
 import 'package:bett_box/views/profiles/override_profile.dart';
-import 'package:bett_box/views/profiles/scripts.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,28 +61,6 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         },
         icon: const Icon(FluentIcons.arrow_sync_24_regular),
         tooltip: appLocalizations.syncAll,
-      ),
-      IconButton(
-        onPressed: () {
-          showExtend(
-            context,
-            builder: (_, type) {
-              return const ScriptsView();
-            },
-          );
-        },
-        tooltip: appLocalizations.script,
-        icon: Consumer(
-          builder: (_, ref, _) {
-            final isScriptMode = ref.watch(
-              scriptStateProvider.select((state) => state.realId != null),
-            );
-            return Icon(
-              FluentIcons.javascript_24_regular,
-              color: isScriptMode ? context.colorScheme.primary : null,
-            );
-          },
-        ),
       ),
       IconButton(
         onPressed: () {
@@ -179,7 +156,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
                         : 0),
               ),
               child: Grid(
-                mainAxisSpacing: 16,
+                mainAxisSpacing: profilesSelectorState.columns <= 1 ? 8 : 16,
                 crossAxisSpacing: 16,
                 crossAxisCount: columns,
                 children: [
@@ -317,25 +294,27 @@ class ProfileItem extends StatelessWidget {
     return Row(
       children: [
         Flexible(
-          child: EmojiText(
-            profile.label ?? profile.id,
-            style: context.textTheme.titleMedium,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          child: Transform.translate(
+            offset: const Offset(0, 1),
+            child: EmojiText(
+              profile.label ?? profile.id,
+              style: context.textTheme.titleMedium,
+              strutStyle: StrutStyle.fromTextStyle(
+                context.textTheme.titleMedium!,
+                forceStrutHeight: true,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
         if (subtitleText != null && subtitleText.isNotEmpty) ...[
-          const SizedBox(width: 6),
-          Text(
-            '·',
-            style: context.textTheme.labelMedium?.toLight,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            subtitleText,
-            style: context.textTheme.labelMedium?.toLight,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(width: 8),
+          Flexible(
+            child: CommonInfoCapsule(
+              subtitleText,
+              style: context.textTheme.labelMedium,
+            ),
           ),
         ],
       ],
@@ -525,6 +504,9 @@ class ProfileItem extends StatelessWidget {
           children: [
             for (final item in items)
               ListTile(
+                shape: SuperellipseBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 leading: item.icon != null ? Icon(item.icon) : null,
                 title: Text(item.label),
                 onTap: () {
