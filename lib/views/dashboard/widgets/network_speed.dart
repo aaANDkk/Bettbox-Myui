@@ -83,13 +83,23 @@ class NetworkSpeed extends ConsumerWidget {
           ValueListenableBuilder<int>(
             valueListenable: dashboardRefreshManager.tick1s,
             builder: (_, _, _) {
-              final traffics = ref.read(trafficsProvider).list;
-              final speedText = _getLastTraffic(traffics).toSpeedText();
-              return Text(
-                speedText,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: color,
-                ),
+              final traffic = _getLastTraffic(ref.read(trafficsProvider).list);
+              final style = context.textTheme.bodySmall?.copyWith(color: color);
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(FluentIcons.arrow_up_24_filled, size: 14, color: color),
+                  const SizedBox(width: 3),
+                  Text('${traffic.up}/s', style: style),
+                  const SizedBox(width: 8),
+                  Icon(
+                    FluentIcons.arrow_down_24_filled,
+                    size: 14,
+                    color: color,
+                  ),
+                  const SizedBox(width: 3),
+                  Text('${traffic.down}/s', style: style),
+                ],
               );
             },
           ),

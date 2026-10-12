@@ -95,7 +95,7 @@ class _FcmStatusState extends State<FcmStatus> {
                 padding: baseInfoEdgeInsets.copyWith(bottom: 0),
                 info: const Info(
                   label: 'FCM',
-                  iconData: FluentIcons.cloud_24_regular,
+                  iconData: FluentIcons.fluent_24_regular,
                 ),
               ),
               Container(

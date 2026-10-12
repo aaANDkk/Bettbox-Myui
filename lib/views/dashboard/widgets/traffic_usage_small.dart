@@ -38,10 +38,14 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
     globalState.showCommonDialog<void>(
       child: CommonDialog(
         title: appLocalizations.trafficUsage,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              shape: SuperellipseBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               leading: const Icon(FluentIcons.arrow_circle_up_24_regular),
               title: Text(appLocalizations.upload),
               trailing: OptionRadioIcon(selected: _showUpload),
@@ -51,6 +55,9 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
               },
             ),
             ListTile(
+              shape: SuperellipseBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               leading: const Icon(FluentIcons.arrow_circle_down_24_regular),
               title: Text(appLocalizations.download),
               trailing: OptionRadioIcon(selected: !_showUpload),
@@ -157,7 +164,7 @@ class _TrafficUsageSmallState extends ConsumerState<TrafficUsageSmall> {
                   padding: EdgeInsets.only(
                     left: 4,
                     top: _donutEdge,
-                    right: _donutEdge,
+                    right: 16.ap + 25.ap - _donutSize / 2,
                     bottom: _donutEdge,
                   ),
                   child: SizedBox(

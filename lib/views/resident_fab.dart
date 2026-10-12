@@ -52,17 +52,24 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
   @override
   void initState() {
     super.initState();
+    _groupName =
+        ref.read(proxiesTabControllerStateProvider.select((state) => state.b)) ??
+        '';
     delayTestCoordinator.addListener(_handleTestingChanged);
     _handleTestingChanged();
   }
 
-  void _handleTestingChanged() {
-    if (!mounted) return;
+  void _updateTestingAnimation() {
     if (delayTestCoordinator.isTestingGroup(_groupName)) {
       _testScaleController.forward();
     } else {
       _testScaleController.reverse();
     }
+  }
+
+  void _handleTestingChanged() {
+    if (!mounted) return;
+    _updateTestingAnimation();
     setState(() {});
   }
 
@@ -90,11 +97,8 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
     final proxiesType = ref.watch(
       proxiesStyleSettingProvider.select((state) => state.type),
     );
-    final showCardStartButton = ref.watch(
-      appSettingProvider.select((state) => state.showCardStartButton),
-    );
     final residentPage = switch (effectivePage) {
-      PageLabel.dashboard => showCardStartButton ? null : PageLabel.dashboard,
+      PageLabel.dashboard => null,
       PageLabel.profiles => PageLabel.profiles,
       PageLabel.proxies => proxiesType == ProxiesType.tab
           ? PageLabel.proxies
@@ -102,9 +106,13 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
       _ => null,
     };
     final visible = residentPage != null;
-    _groupName =
+    final currentGroupName =
         ref.watch(proxiesTabControllerStateProvider.select((state) => state.b)) ??
         '';
+    if (_groupName != currentGroupName) {
+      _groupName = currentGroupName;
+      _updateTestingAnimation();
+    }
     final proxyTestAction = ref.watch(residentProxyTestProvider);
 
     if (_lastVisible != visible) {
@@ -174,6 +182,7 @@ class _ResidentFabState extends ConsumerState<ResidentFab>
           onPressed: showAddProfileExtend,
         );
       case PageLabel.proxies:
+        _updateTestingAnimation();
         return _FabContent(
           page: page,
           icon: FluentIcons.flash_24_filled,

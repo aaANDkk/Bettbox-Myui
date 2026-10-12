@@ -52,7 +52,9 @@ class AccessControlSwitch extends ConsumerWidget {
                   flex: 1,
                   child: TooltipText(
                     text: Text(
-                      appLocalizations.switchLabel,
+                      enabled
+                          ? appLocalizations.enabled
+                          : appLocalizations.disabled,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(

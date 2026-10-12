@@ -63,16 +63,49 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
     BuildContext context, {
     bool isItemTesting = false,
     required bool colorfulIcons,
+    required int count,
   }) {
     final isTesting = isItemTesting ||
         (isLoading &&
             (result == null || result.status == MediaUnlockStatus.testing));
     final status = isTesting
         ? MediaUnlockStatus.testing
-        : (result?.status ?? (isLoading ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown));
+        : (result?.status ??
+            (isLoading ? MediaUnlockStatus.testing : MediaUnlockStatus.unknown));
     final color = status.statusColor(context.colorScheme);
 
-    final double iconSize = 16.ap;
+    final double iconSize;
+    final double textFontSize;
+    final double dotSize;
+    final double iconSpacing;
+    final double borderRadius;
+
+    if (count == 1) {
+      iconSize = 20.ap;
+      textFontSize = 13.5.ap;
+      dotSize = 8.ap;
+      iconSpacing = 9.ap;
+      borderRadius = 11.ap;
+    } else if (count == 2) {
+      iconSize = 18.5.ap;
+      textFontSize = 13.ap;
+      dotSize = 7.5.ap;
+      iconSpacing = 8.ap;
+      borderRadius = 11.ap;
+    } else if (count == 3) {
+      iconSize = 17.5.ap;
+      textFontSize = 12.5.ap;
+      dotSize = 7.ap;
+      iconSpacing = 7.ap;
+      borderRadius = 10.ap;
+    } else {
+      iconSize = 16.ap;
+      textFontSize = 11.5.ap;
+      dotSize = 6.5.ap;
+      iconSpacing = 7.ap;
+      borderRadius = 10.ap;
+    }
+
     final Widget icon;
     if (platform.isMonochrome) {
       icon = SvgPicture.asset(
@@ -104,57 +137,105 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
       );
     }
 
-    return SizedBox(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final rowBg = isDark
+        ? Color.alphaBlend(
+            context.colorScheme.onSurface.withValues(alpha: 0.10),
+            context.colorScheme.surfaceContainerHighest,
+          )
+        : context.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.65,
+          );
+    final rowBorder = isDark
+        ? BorderSide(
+            color: context.colorScheme.outlineVariant.withValues(alpha: 0.35),
+            width: 0.8,
+          )
+        : BorderSide.none;
+
+    return DecoratedBox(
       key: ValueKey(platform),
-      height: 24.ap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 20.ap,
-            height: 20.ap,
-            child: Center(child: themedPlatformIcon(context, platform, icon)),
-          ),
-          SizedBox(width: 8.ap),
-          Expanded(
-            child: Text(
-              platform.defaultName,
-              style: context.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                fontSize: 12.ap,
-                color: context.colorScheme.onSurface,
+      decoration: ShapeDecoration(
+        color: rowBg,
+        shape: SuperellipseBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          side: rowBorder,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.ap),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 20.ap,
+              height: 20.ap,
+              child: Center(
+                child: themedPlatformIcon(context, platform, icon),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          SizedBox(width: 8.ap),
-          SizedBox(
-            width: 24.ap,
-            height: 24.ap,
-            child: Center(
-              child: status == MediaUnlockStatus.testing
-                  ? RepaintBoundary(
-                      child: SizedBox(
-                        width: 10.ap,
-                        height: 10.ap,
-                        child: SpinKitFadingCircle(
-                          color: context.colorScheme.primary,
-                          size: 10.ap,
+            SizedBox(width: iconSpacing),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    platform.defaultName,
+                    style: context.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: textFontSize,
+                      color: context.colorScheme.onSurface,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (count <= 2) ...[
+                    SizedBox(height: 2.ap),
+                    Text(
+                      result?.latency != null
+                          ? '${result!.latency}ms'
+                          : (isTesting ? '...' : '-'),
+                      style: context.textTheme.bodySmall?.copyWith(
+                        fontSize: (textFontSize - 2.ap).clamp(9.5.ap, 11.5.ap),
+                        fontWeight: FontWeight.w500,
+                        color: context.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.8,
                         ),
                       ),
-                    )
-                  : Container(
-                      width: 7.ap,
-                      height: 7.ap,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                      ),
                     ),
+                  ],
+                ],
+              ),
             ),
-          ),
-        ],
+            SizedBox(width: 6.ap),
+            SizedBox(
+              width: 16.ap,
+              height: 16.ap,
+              child: Center(
+                child: isTesting
+                    ? RepaintBoundary(
+                        child: SizedBox(
+                          width: dotSize + 3.ap,
+                          height: dotSize + 3.ap,
+                          child: SpinKitFadingCircle(
+                            color: context.colorScheme.primary,
+                            size: dotSize + 3.ap,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: dotSize,
+                        height: dotSize,
+                        decoration: ShapeDecoration(
+                          color: color,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,6 +272,12 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
 
           final isWidgetLoading =
               displayedPlatforms.any(state.testingPlatforms.contains);
+
+          final int count = displayedPlatforms.length;
+          final double gap = count == 4
+              ? 6.ap
+              : (count == 3 ? 8.ap : (count == 2 ? 10.ap : 0.0));
+
           final card = CommonCard(
             onPressed: () {
               showExtend(
@@ -202,69 +289,65 @@ class _MediaUnlockSmallState extends ConsumerState<MediaUnlockSmall> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: FluentIcons.link_24_regular,
+                    iconData: IconsExt.cowork,
                   ),
                   actions: [
-                    SizedBox(
-                      width: 24.ap,
-                      height: 24.ap,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: isWidgetLoading
-                            ? null
-                            : () => mediaUnlockState.checkPlatforms(
-                                  displayedPlatforms,
-                                  force: true,
-                                ),
-                        icon: isWidgetLoading
-                            ? RepaintBoundary(
-                                child: SizedBox(
-                                  width: 16.ap,
-                                  height: 16.ap,
-                                  child: SpinKitFadingCircle(
-                                    color: context.colorScheme.primary,
-                                    size: 16.ap,
+                    Transform.translate(
+                      offset: Offset(2.ap, 0),
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: isWidgetLoading
+                              ? null
+                              : () => mediaUnlockState.checkPlatforms(
+                                    displayedPlatforms,
+                                    force: true,
                                   ),
+                          icon: isWidgetLoading
+                              ? RepaintBoundary(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: SpinKitFadingCircle(
+                                      color: context.colorScheme.primary,
+                                      size: 20,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  FluentIcons.arrow_sync_24_regular,
+                                  color: context.colorScheme.onSurfaceVariant,
                                 ),
-                              )
-                            : Icon(
-                                FluentIcons.arrow_sync_24_regular,
-                                size: 18.ap,
-                                color: context.colorScheme.onSurfaceVariant,
-                              ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 4.ap),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: context.colorScheme.outlineVariant.withValues(
-                      alpha: 0.2,
-                    ),
-                  ),
-                ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.ap, 2.ap, 16.ap, 8.ap),
+                    padding: EdgeInsets.fromLTRB(16.ap, 10.ap, 16.ap, 16.ap),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (final p in displayedPlatforms)
-                          _buildPlatformRow(
-                            p,
-                            state.results[p],
-                            state.isLoading,
-                            context,
-                            isItemTesting:
-                                state.testingPlatforms.contains(p),
-                            colorfulIcons: colorfulIcons,
+                        for (int i = 0; i < count; i++) ...[
+                          if (i > 0) SizedBox(height: gap),
+                          Expanded(
+                            child: _buildPlatformRow(
+                              displayedPlatforms[i],
+                              state.results[displayedPlatforms[i]],
+                              state.isLoading,
+                              context,
+                              isItemTesting: state.testingPlatforms
+                                  .contains(displayedPlatforms[i]),
+                              colorfulIcons: colorfulIcons,
+                              count: count,
+                            ),
                           ),
+                        ],
                       ],
                     ),
                   ),

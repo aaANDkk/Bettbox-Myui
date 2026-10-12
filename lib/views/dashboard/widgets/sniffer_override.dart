@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-class SnifferOverride extends StatelessWidget {
+class SnifferOverride extends ConsumerWidget {
   const SnifferOverride({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final override = ref.watch(overrideSnifferProvider);
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -38,7 +40,9 @@ class SnifferOverride extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.override,
+                    override
+                        ? appLocalizations.overridden
+                        : appLocalizations.notOverridden,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -49,16 +53,11 @@ class SnifferOverride extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                  builder: (_, ref, _) {
-                    final override = ref.watch(overrideSnifferProvider);
-                    return Switch(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: override,
-                      onChanged: (value) {
-                        ref.read(overrideSnifferProvider.notifier).value = value;
-                      },
-                    );
+                child: Switch(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: override,
+                  onChanged: (value) {
+                    ref.read(overrideSnifferProvider.notifier).value = value;
                   },
                 ),
               ),

@@ -199,7 +199,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(20),
         ),
       ),
@@ -291,7 +291,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -353,7 +353,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -467,7 +467,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
             color: context.colorScheme.surfaceContainerHighest.withValues(
               alpha: 0.5,
             ),
-            shape: RoundedSuperellipseBorder(
+            shape: SuperellipseBorder(
               borderRadius: BorderRadius.circular(10),
               side: BorderSide(
                 color: context.colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -494,7 +494,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: ShapeDecoration(
               color: context.colorScheme.primaryContainer,
-              shape: RoundedSuperellipseBorder(
+              shape: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -515,7 +515,7 @@ class _CoreStatusDialogState extends State<CoreStatusDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),

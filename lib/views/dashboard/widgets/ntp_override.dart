@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-class NtpOverride extends StatelessWidget {
+class NtpOverride extends ConsumerWidget {
   const NtpOverride({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final override = ref.watch(overrideNtpProvider);
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -38,7 +40,9 @@ class NtpOverride extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.switchLabel,
+                    override
+                        ? appLocalizations.enabled
+                        : appLocalizations.disabled,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -49,16 +53,11 @@ class NtpOverride extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                  builder: (_, ref, _) {
-                    final override = ref.watch(overrideNtpProvider);
-                    return Switch(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: override,
-                      onChanged: (value) {
-                        ref.read(overrideNtpProvider.notifier).value = value;
-                      },
-                    );
+                child: Switch(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: override,
+                  onChanged: (value) {
+                    ref.read(overrideNtpProvider.notifier).value = value;
                   },
                 ),
               ),

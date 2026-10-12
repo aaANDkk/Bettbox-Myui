@@ -6,11 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-class TUNButton extends StatelessWidget {
+class TUNButton extends ConsumerWidget {
   const TUNButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enable = ref.watch(
+      patchClashConfigProvider.select(
+        (state) => state.tun.enable,
+      ),
+    );
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -50,7 +56,9 @@ class TUNButton extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.options,
+                    enable
+                        ? appLocalizations.enabled
+                        : appLocalizations.disabled,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -61,24 +69,14 @@ class TUNButton extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                  builder: (_, ref, _) {
-                    final enable = ref.watch(
-                      patchClashConfigProvider.select(
-                        (state) => state.tun.enable,
-                      ),
-                    );
-
-                    return Switch(
-                      value: enable,
-                      onChanged: (value) {
-                        ref
-                            .read(patchClashConfigProvider.notifier)
-                            .updateState(
-                              (state) => state.copyWith.tun(enable: value),
-                            );
-                      },
-                    );
+                child: Switch(
+                  value: enable,
+                  onChanged: (value) {
+                    ref
+                        .read(patchClashConfigProvider.notifier)
+                        .updateState(
+                          (state) => state.copyWith.tun(enable: value),
+                        );
                   },
                 ),
               ),
@@ -90,11 +88,15 @@ class TUNButton extends StatelessWidget {
   }
 }
 
-class SystemProxyButton extends StatelessWidget {
+class SystemProxyButton extends ConsumerWidget {
   const SystemProxyButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final systemProxy = ref.watch(
+      networkSettingProvider.select((state) => state.systemProxy),
+    );
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -128,7 +130,9 @@ class SystemProxyButton extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.options,
+                    systemProxy
+                        ? appLocalizations.enabled
+                        : appLocalizations.disabled,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -139,25 +143,17 @@ class SystemProxyButton extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                builder: (_, ref, _) {
-                  final systemProxy = ref.watch(
-                    networkSettingProvider.select((state) => state.systemProxy),
-                  );
-
-                  return Switch(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    value: systemProxy,
-                    onChanged: (value) {
-                      ref
-                          .read(networkSettingProvider.notifier)
-                          .updateState(
-                            (state) => state.copyWith(systemProxy: value),
-                          );
-                    },
-                  );
-                },
-              ),
+                child: Switch(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: systemProxy,
+                  onChanged: (value) {
+                    ref
+                        .read(networkSettingProvider.notifier)
+                        .updateState(
+                          (state) => state.copyWith(systemProxy: value),
+                        );
+                  },
+                ),
               ),
             ],
           ),
@@ -167,11 +163,15 @@ class SystemProxyButton extends StatelessWidget {
   }
 }
 
-class VpnButton extends StatelessWidget {
+class VpnButton extends ConsumerWidget {
   const VpnButton({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final enable = ref.watch(
+      vpnSettingProvider.select((state) => state.enable),
+    );
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -207,7 +207,9 @@ class VpnButton extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.options,
+                    enable
+                        ? appLocalizations.enabled
+                        : appLocalizations.disabled,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -218,23 +220,16 @@ class VpnButton extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                builder: (_, ref, _) {
-                  final enable = ref.watch(
-                    vpnSettingProvider.select((state) => state.enable),
-                  );
-                  return Switch(
-                    value: enable,
-                    onChanged: (value) {
-                      ref
-                          .read(vpnSettingProvider.notifier)
-                          .updateState(
-                            (state) => state.copyWith(enable: value),
-                          );
-                    },
-                  );
-                },
-              ),
+                child: Switch(
+                  value: enable,
+                  onChanged: (value) {
+                    ref
+                        .read(vpnSettingProvider.notifier)
+                        .updateState(
+                          (state) => state.copyWith(enable: value),
+                        );
+                  },
+                ),
               ),
             ],
           ),

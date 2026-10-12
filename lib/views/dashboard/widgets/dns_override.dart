@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-class DnsOverride extends StatelessWidget {
+class DnsOverride extends ConsumerWidget {
   const DnsOverride({super.key});
 
   Future<void> _handleClearCache(BuildContext context) async {
@@ -43,7 +43,9 @@ class DnsOverride extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final override = ref.watch(overrideDnsProvider);
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -75,7 +77,9 @@ class DnsOverride extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.override,
+                    override
+                        ? appLocalizations.overridden
+                        : appLocalizations.notOverridden,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -86,16 +90,11 @@ class DnsOverride extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                  builder: (_, ref, _) {
-                    final override = ref.watch(overrideDnsProvider);
-                    return Switch(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: override,
-                      onChanged: (value) {
-                        ref.read(overrideDnsProvider.notifier).value = value;
-                      },
-                    );
+                child: Switch(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: override,
+                  onChanged: (value) {
+                    ref.read(overrideDnsProvider.notifier).value = value;
                   },
                 ),
               ),

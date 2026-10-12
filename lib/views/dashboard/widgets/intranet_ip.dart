@@ -180,7 +180,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -244,7 +244,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: ShapeDecoration(
         color: context.colorScheme.surfaceContainerLow,
-        shape: RoundedSuperellipseBorder(
+        shape: SuperellipseBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -278,7 +278,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              customBorder: RoundedSuperellipseBorder(
+              customBorder: SuperellipseBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               onTap: () => _openLanSettings(context),
@@ -297,7 +297,7 @@ class _IntranetIpInfoDialogState extends ConsumerState<_IntranetIpInfoDialog> {
                             ? context.colorScheme.primaryContainer
                             : context.colorScheme.surfaceContainerHighest
                                 .withValues(alpha: 0.5),
-                        shape: RoundedSuperellipseBorder(
+                        shape: SuperellipseBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: allowLan
                               ? BorderSide.none

@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-class WakelockSwitch extends StatelessWidget {
+class WakelockSwitch extends ConsumerWidget {
   const WakelockSwitch({super.key});
 
   Future<void> _toggleWakelock(BuildContext context, bool value) async {
@@ -27,7 +27,9 @@ class WakelockSwitch extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final wakelockEnabled = ref.watch(wakelockStateProvider);
+
     return RepaintBoundary(
       child: SizedBox(
         height: getWidgetHeight(1),
@@ -63,7 +65,9 @@ class WakelockSwitch extends StatelessWidget {
                   flex: 1,
                   child: TooltipText(
                     text: Text(
-                      appLocalizations.switchLabel,
+                      wakelockEnabled
+                          ? appLocalizations.enabled
+                          : appLocalizations.disabled,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(
@@ -74,15 +78,10 @@ class WakelockSwitch extends StatelessWidget {
                 ),
                 Transform.translate(
                   offset: const Offset(0, -3),
-                  child: Consumer(
-                    builder: (_, ref, _) {
-                      final wakelockEnabled = ref.watch(wakelockStateProvider);
-                      return Switch(
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        value: wakelockEnabled,
-                        onChanged: (value) => _toggleWakelock(context, value),
-                      );
-                    },
+                  child: Switch(
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    value: wakelockEnabled,
+                    onChanged: (value) => _toggleWakelock(context, value),
                   ),
                 ),
               ],

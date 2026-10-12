@@ -6,11 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 
-class Ipv6Switch extends StatelessWidget {
+class Ipv6Switch extends ConsumerWidget {
   const Ipv6Switch({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ipv6 = ref.watch(
+      patchClashConfigProvider.select((state) => state.ipv6),
+    );
+
     return SizedBox(
       height: getWidgetHeight(1),
       child: CommonCard(
@@ -41,7 +45,9 @@ class Ipv6Switch extends StatelessWidget {
                 flex: 1,
                 child: TooltipText(
                   text: Text(
-                    appLocalizations.switchLabel,
+                    ipv6
+                        ? appLocalizations.enabled
+                        : appLocalizations.disabled,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(
@@ -52,20 +58,13 @@ class Ipv6Switch extends StatelessWidget {
               ),
               Transform.translate(
                 offset: const Offset(0, -3),
-                child: Consumer(
-                  builder: (_, ref, _) {
-                    final ipv6 = ref.watch(
-                      patchClashConfigProvider.select((state) => state.ipv6),
-                    );
-                    return Switch(
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: ipv6,
-                      onChanged: (value) {
-                        ref
-                            .read(patchClashConfigProvider.notifier)
-                            .updateState((state) => state.copyWith(ipv6: value));
-                      },
-                    );
+                child: Switch(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: ipv6,
+                  onChanged: (value) {
+                    ref
+                        .read(patchClashConfigProvider.notifier)
+                        .updateState((state) => state.copyWith(ipv6: value));
                   },
                 ),
               ),

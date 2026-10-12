@@ -257,50 +257,51 @@ class _MediaUnlockState extends ConsumerState<MediaUnlock> {
               children: [
                 InfoHeader(
                   padding: baseInfoEdgeInsets.copyWith(bottom: 0),
-                  actionsHeight: globalState.measure.titleSmallHeight,
                   info: Info(
                     label: appLocalizations.mediaUnlockShort,
-                    iconData: FluentIcons.link_24_regular,
+                    iconData: IconsExt.cowork,
                   ),
                   actions: [
-                    SizedBox(
-                      width: 24.ap,
-                      height: 24.ap,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: isWidgetLoading
-                            ? null
-                            : () => mediaUnlockState.checkPlatforms(
-                                  displayedPlatforms,
-                                  force: true,
-                                ),
-                        icon: isWidgetLoading
-                            ? RepaintBoundary(
-                                child: SizedBox(
-                                  width: 16.ap,
-                                  height: 16.ap,
-                                  child: SpinKitFadingCircle(
-                                    color: context.colorScheme.primary,
-                                    size: 16.ap,
+                    Transform.translate(
+                      offset: Offset(2.ap, 0),
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: isWidgetLoading
+                              ? null
+                              : () => mediaUnlockState.checkPlatforms(
+                                    displayedPlatforms,
+                                    force: true,
                                   ),
+                          icon: isWidgetLoading
+                              ? RepaintBoundary(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: SpinKitFadingCircle(
+                                      color: context.colorScheme.primary,
+                                      size: 20,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  FluentIcons.arrow_sync_24_regular,
+                                  color: context.colorScheme.onSurfaceVariant,
                                 ),
-                              )
-                            : Icon(
-                                FluentIcons.arrow_sync_24_regular,
-                                size: 18.ap,
-                                color: context.colorScheme.onSurfaceVariant,
-                              ),
+                        ),
                       ),
                     ),
                   ],
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(16.ap, 8.ap, 16.ap, 4.ap),
-                  child: Divider(
-                    height: 1,
-                    thickness: 1,
+                  child: Container(
+                    height: 1.0,
                     color: context.colorScheme.outlineVariant.withValues(
-                      alpha: 0.2,
+                      alpha: 0.6,
                     ),
                   ),
                 ),

@@ -54,6 +54,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   final GlobalKey<_DashboardStartSwitchState> _startSwitchKey = GlobalKey();
   final _isEditNotifier = ValueNotifier<bool>(false);
   final _addedWidgetsNotifier = ValueNotifier<List<GridItem>>([]);
+  bool _textStackWarmed = false;
 
   @override
   void initState() {
@@ -66,6 +67,29 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   void _requestStartSwitchFocus() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startSwitchKey.currentState?.requestFocus();
+    });
+  }
+
+  /// Lays out the bundled text families once off the first frames, so the first
+  /// text field opened after a cold start does not pay for loading them. The
+  /// emoji families are named directly: as a fallback they are only consulted
+  /// for glyphs the primary family lacks, so they would stay unloaded.
+  void _warmUpTextStackOnce() {
+    if (_textStackWarmed) return;
+    _textStackWarmed = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      const styles = <TextStyle>[
+        TextStyle(fontFamily: 'JetBrainsMono'),
+        TextStyle(fontFamily: 'OpenMoji'),
+        TextStyle(fontFamily: 'Twemoji'),
+      ];
+      for (final style in styles) {
+        final painter = TextPainter(
+          text: TextSpan(text: 'Warm 表情😀✨', style: style),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        painter.dispose();
+      }
     });
   }
 
@@ -187,6 +211,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       final dashboardWidgets = children
           .map((item) => DashboardWidget.getDashboardWidget(item))
           .toList();
+      if (!dashboardWidgets.contains(DashboardWidget.networkDetection)) {
+        dashboardWidgets.insert(0, DashboardWidget.networkDetection);
+      }
       ref
           .read(appSettingProvider.notifier)
           .updateState(
@@ -205,13 +232,12 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    _warmUpTextStackOnce();
     final dashboardState = ref.watch(dashboardStateProvider);
     final columns = max(4 * ((dashboardState.viewWidth / 320).ceil()), 8);
     final spacing = 16.ap;
-    final showCardStartButton = ref.watch(
-      appSettingProvider.select((state) => state.showCardStartButton),
-    );
     final isMobileView = ref.watch(isMobileViewProvider);
+    final customTitle = ref.watch(customDashboardTitleProvider);
     final children = [
       ...dashboardState.dashboardWidgets
           .where(
@@ -224,7 +250,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           .where(
             (item) =>
                 !children.contains(item.widget) &&
-                (showCardStartButton || item != DashboardWidget.startButton) &&
+                item != DashboardWidget.startButton &&
+                item != DashboardWidget.memoryInfo &&
+                item != DashboardWidget.networkDetection &&
                 item.platforms.contains(SupportPlatform.currentPlatform),
           )
           .map((item) => item.widget)
@@ -232,11 +260,10 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     });
     return CommonScaffold(
       resizeToAvoidBottomInset: false,
-      title:
-          ref.watch(customDashboardTitleProvider) ?? '⚡️ Bettbox',
+      title: customTitle ?? currentGreeting(),
+      titleWidget: customTitle == null ? const _GreetingTitle() : null,
       actions: _buildActions(),
-      floatingActionButton:
-          (isMobileView || showCardStartButton) ? null : const StartFab(),
+      floatingActionButton: null,
       body: Align(
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
@@ -294,6 +321,37 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _GreetingTitle extends StatelessWidget {
+  const _GreetingTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<int>(
+      valueListenable: dashboardRefreshManager.tick1s,
+      builder: (_, _, _) {
+        final greeting = currentGreeting();
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          // Keep both children flush left so the title never shifts sideways.
+          layoutBuilder: (currentChild, previousChildren) => Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          ),
+          child: EmojiText(
+            greeting,
+            key: ValueKey(greeting),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      },
     );
   }
 }
@@ -410,6 +468,7 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
   void initState() {
     super.initState();
     _controller = EmojiTextEditingController(text: widget.initialValue);
+    _validate(widget.initialValue);
   }
 
   @override
@@ -419,12 +478,8 @@ class _DashboardTitleDialogState extends State<_DashboardTitleDialog> {
   }
 
   void _validate(String value) {
-    int len = 0;
-    for (int i = 0; i < value.length; i++) {
-      len += value.codeUnitAt(i) > 127 ? 2 : 1;
-    }
     setState(() {
-      if (len > 20) {
+      if (value.characters.length > 80) {
         _errorText = appLocalizations.titleTooLong;
       } else {
         _errorText = null;
