@@ -509,6 +509,7 @@ class AppController {
       notifier.updateProfile(
         newProfile.id,
         (current) => current.copyWith(
+          url: newProfile.url,
           label: newProfile.label,
           subscriptionInfo: newProfile.subscriptionInfo,
           lastUpdateDate: newProfile.lastUpdateDate,

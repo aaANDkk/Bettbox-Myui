@@ -42,7 +42,6 @@ class EmojiManager {
           orElse: () => EmojiStyle.openMoji,
         );
         emojiStyleNotifier.value = style;
-        commonPrint.log('EmojiManager: initialized with ${style.label}');
       }
     } catch (e, stack) {
       commonPrint.log('EmojiManager.init failed: $e\n$stack');
@@ -81,7 +80,6 @@ License URL: https://creativecommons.org/licenses/by/4.0/
     try {
       final prefs = await preferences.sharedPreferencesCompleter.future;
       await prefs?.setString(_prefKeyEmojiStyle, style.name);
-      commonPrint.log('EmojiManager: switched to ${style.label}');
     } catch (e, stack) {
       commonPrint.log('EmojiManager.setStyle failed: $e\n$stack');
     }

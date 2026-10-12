@@ -317,7 +317,9 @@ enum DashboardWidget {
   trafficUsageSmall(
     GridItem(crossAxisCellCount: 4, child: TrafficUsageSmall()),
   ),
-  networkDetection(GridItem(crossAxisCellCount: 4, child: NetworkDetection())),
+  networkDetection(
+    GridItem(crossAxisCellCount: 8, isDeletable: false, child: NetworkDetection()),
+  ),
   tunButton(
     GridItem(crossAxisCellCount: 4, child: TUNButton()),
     platforms: desktopPlatforms,
@@ -331,7 +333,10 @@ enum DashboardWidget {
     platforms: desktopPlatforms,
   ),
   intranetIp(GridItem(crossAxisCellCount: 4, child: IntranetIP())),
-  memoryInfo(GridItem(crossAxisCellCount: 4, child: MemoryInfo())),
+  memoryInfo(
+    GridItem(crossAxisCellCount: 4, child: MemoryInfo()),
+    platforms: [],
+  ),
   connectionsCount(GridItem(crossAxisCellCount: 4, child: ConnectionsCount())),
   ipv6Switch(GridItem(crossAxisCellCount: 4, child: Ipv6Switch())),
   accessControlSwitch(
@@ -355,8 +360,10 @@ enum DashboardWidget {
   mediaUnlock(GridItem(crossAxisCellCount: 8, child: MediaUnlock())),
   mediaUnlockSmall(GridItem(crossAxisCellCount: 4, child: MediaUnlockSmall())),
   currentProfile(GridItem(crossAxisCellCount: 4, child: CurrentProfile())),
+  clockLarge(GridItem(crossAxisCellCount: 8, child: ClockCardLarge())),
   startButton(
     GridItem(crossAxisCellCount: 4, isDeletable: false, child: StartButton()),
+    platforms: [],
   );
 
   final GridItem widget;

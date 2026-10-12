@@ -160,11 +160,31 @@ class AppLocalizations {
     );
   }
 
-  /// `Global override script config`
+  /// `Modify profile override scripts`
   String get scriptDesc {
     return Intl.message(
-      'Global override script config',
+      'Modify profile override scripts',
       name: 'scriptDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage`
+  String get myScripts {
+    return Intl.message(
+      'Manage',
+      name: 'myScripts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Binding`
+  String get myProfiles {
+    return Intl.message(
+      'Binding',
+      name: 'myProfiles',
       desc: '',
       args: [],
     );
@@ -4516,6 +4536,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Hide Current IP`
+  String get hideCurrentIp {
+    return Intl.message(
+      'Hide Current IP',
+      name: 'hideCurrentIp',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show Current IP`
+  String get showCurrentIp {
+    return Intl.message(
+      'Show Current IP',
+      name: 'showCurrentIp',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Refresh IP`
   String get manualRefreshIp {
     return Intl.message(
@@ -5526,6 +5566,46 @@ class AppLocalizations {
     return Intl.message(
       'Use Global Script Override',
       name: 'useGlobalScriptOverride',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Profile Script Settings`
+  String get profileScriptSettings {
+    return Intl.message(
+      'Profile Script Settings',
+      name: 'profileScriptSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Assign to Profiles`
+  String get assignToProfiles {
+    return Intl.message(
+      'Assign to Profiles',
+      name: 'assignToProfiles',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Follow Global Default`
+  String get followGlobal {
+    return Intl.message(
+      'Follow Global Default',
+      name: 'followGlobal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Do not use script`
+  String get noScriptAssigned {
+    return Intl.message(
+      'Do not use script',
+      name: 'noScriptAssigned',
       desc: '',
       args: [],
     );
@@ -6664,6 +6744,206 @@ class AppLocalizations {
     return Intl.message(
       'Open Gateway',
       name: 'openRouterAdmin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clock (Medium)`
+  String get clockMedium {
+    return Intl.message(
+      'Clock (Medium)',
+      name: 'clockMedium',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clock (Large)`
+  String get clockLarge {
+    return Intl.message(
+      'Clock (Large)',
+      name: 'clockLarge',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom Text`
+  String get customCardText {
+    return Intl.message(
+      'Custom Text',
+      name: 'customCardText',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter custom text`
+  String get customCardTextHint {
+    return Intl.message(
+      'Please enter custom text',
+      name: 'customCardTextHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change Image`
+  String get changeImage {
+    return Intl.message(
+      'Change Image',
+      name: 'changeImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore Default Image`
+  String get restoreDefaultImage {
+    return Intl.message(
+      'Restore Default Image',
+      name: 'restoreDefaultImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tap to edit text, long press to change image`
+  String get clockWidgetDefaultText {
+    return Intl.message(
+      'Tap to edit text, long press to change image',
+      name: 'clockWidgetDefaultText',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clock`
+  String get clock {
+    return Intl.message(
+      'Clock',
+      name: 'clock',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Author`
+  String get clockCardAuthor {
+    return Intl.message(
+      'Author',
+      name: 'clockCardAuthor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter author name`
+  String get clockCardAuthorHint {
+    return Intl.message(
+      'Enter author name',
+      name: 'clockCardAuthorHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Card Image`
+  String get clockCardImage {
+    return Intl.message(
+      'Card Image',
+      name: 'clockCardImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `一緒に頑張ろう`
+  String get clockCardDefaultText {
+    return Intl.message(
+      '一緒に頑張ろう',
+      name: 'clockCardDefaultText',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `古河渚`
+  String get clockCardDefaultAuthor {
+    return Intl.message(
+      '古河渚',
+      name: 'clockCardDefaultAuthor',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Custom image set`
+  String get customImageSelected {
+    return Intl.message(
+      'Custom image set',
+      name: 'customImageSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Default background`
+  String get defaultImage {
+    return Intl.message(
+      'Default background',
+      name: 'defaultImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Overridden`
+  String get overridden {
+    return Intl.message(
+      'Overridden',
+      name: 'overridden',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not Overridden`
+  String get notOverridden {
+    return Intl.message(
+      'Not Overridden',
+      name: 'notOverridden',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Running`
+  String get coreRunning {
+    return Intl.message(
+      'Running',
+      name: 'coreRunning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paused`
+  String get coreStopped {
+    return Intl.message(
+      'Paused',
+      name: 'coreStopped',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restarting`
+  String get coreRestarting {
+    return Intl.message(
+      'Restarting',
+      name: 'coreRestarting',
       desc: '',
       args: [],
     );

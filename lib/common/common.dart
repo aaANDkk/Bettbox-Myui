@@ -37,6 +37,7 @@ export 'render.dart';
 export 'request.dart';
 export 'scroll.dart';
 export 'string.dart';
+export 'superellipse.dart';
 export 'system.dart';
 export 'task.dart';
 export 'text.dart';

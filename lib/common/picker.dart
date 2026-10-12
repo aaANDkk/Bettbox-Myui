@@ -38,6 +38,19 @@ class Picker {
     return files != null && files.isNotEmpty ? files.first : null;
   }
 
+  Future<String?> pickImage() async {
+    if (system.isAndroid) {
+      final xFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+      return xFile?.path;
+    } else {
+      final filePickerResult = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+        allowMultiple: false,
+      );
+      return filePickerResult?.files.firstOrNull?.path;
+    }
+  }
+
   Future<String?> saveFile(
     String fileName,
     Uint8List bytes, {

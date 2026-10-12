@@ -9,6 +9,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:window_ext/window_ext.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -417,9 +418,11 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
+      color: headerSurfaceColor(context),
       shape: Border(
-        bottom: BorderSide(color: context.colorScheme.outlineVariant),
+        bottom: BorderSide(color: panelDividerColor(context)),
       ),
       child: SizedBox(
         height: kHeaderHeight,
@@ -428,21 +431,44 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
           children: [
             Positioned.fill(
               child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
                 onPanStart: (_) {
                   windowManager.startDragging();
                 },
                 onDoubleTap: () {
                   _updateMaximized();
                 },
-                child: Container(
-                  color: context.colorScheme.secondary.opacity15,
-                  alignment: Alignment.centerLeft,
-                ),
               ),
             ),
             if (system.isMacOS)
               const Text(appName)
             else ...[
+              Positioned(
+                left: 12,
+                top: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        isDark
+                            ? 'assets/images/splash_icon_dark.svg'
+                            : 'assets/images/splash_icon_light.svg',
+                        width: 20,
+                        height: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      SvgPicture.asset(
+                        isDark
+                            ? 'assets/images/Bettbbox_text_dark.svg'
+                            : 'assets/images/Bettbbox_text_light.svg',
+                        height: 11,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               Positioned(right: 0, child: _buildActions()),
             ],
           ],

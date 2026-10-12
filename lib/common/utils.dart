@@ -20,11 +20,14 @@ enum IpCategory {
 }
 
 class Utils {
-  Color? getDelayColor(int? delay) {
+  Color? getDelayColor(int? delay, [ColorScheme? colorScheme]) {
+    if (colorScheme != null) {
+      return colorScheme.delayColor(delay);
+    }
     if (delay == null) return null;
     if (delay < 0) return Colors.red;
     if (delay < 600) return Colors.green;
-    return const Color(0xFFC57F0A);
+    return Colors.orange;
   }
 
   String countryCodeToEmoji(String countryCode) {
@@ -806,25 +809,40 @@ class Utils {
   }
 
   int compareVersions(String version1, String version2) {
-    List<String> v1 = version1.split('+')[0].split('.');
-    List<String> v2 = version2.split('+')[0].split('.');
-    int major1 = int.parse(v1[0]);
-    int major2 = int.parse(v2[0]);
+    int parseSeg(String? seg) {
+      if (seg == null || seg.isEmpty) return 0;
+      final digits = seg.split(RegExp(r'[^\d]')).firstOrNull ?? '';
+      return int.tryParse(digits) ?? 0;
+    }
+
+    final v1 = version1.split('+')[0].split('.');
+    final v2 = version2.split('+')[0].split('.');
+    final major1 = parseSeg(v1.elementAtOrNull(0));
+    final major2 = parseSeg(v2.elementAtOrNull(0));
     if (major1 != major2) {
       return major1.compareTo(major2);
     }
-    int minor1 = v1.length > 1 ? int.parse(v1[1]) : 0;
-    int minor2 = v2.length > 1 ? int.parse(v2[1]) : 0;
+    final minor1 = parseSeg(v1.elementAtOrNull(1));
+    final minor2 = parseSeg(v2.elementAtOrNull(1));
     if (minor1 != minor2) {
       return minor1.compareTo(minor2);
     }
-    int patch1 = v1.length > 2 ? int.parse(v1[2]) : 0;
-    int patch2 = v2.length > 2 ? int.parse(v2[2]) : 0;
+    final patch1 = parseSeg(v1.elementAtOrNull(2));
+    final patch2 = parseSeg(v2.elementAtOrNull(2));
     if (patch1 != patch2) {
       return patch1.compareTo(patch2);
     }
-    int build1 = version1.contains('+') ? int.parse(version1.split('+')[1]) : 0;
-    int build2 = version2.contains('+') ? int.parse(version2.split('+')[1]) : 0;
+    final isPre1 = version1.contains('-') || version1.contains('pre');
+    final isPre2 = version2.contains('-') || version2.contains('pre');
+    if (isPre1 != isPre2) {
+      return isPre1 ? -1 : 1;
+    }
+    final build1 = version1.contains('+')
+        ? int.tryParse(version1.split('+')[1]) ?? 0
+        : 0;
+    final build2 = version2.contains('+')
+        ? int.tryParse(version2.split('+')[1]) ?? 0
+        : 0;
     return build1.compareTo(build2);
   }
 
@@ -1300,3 +1318,13 @@ class Utils {
 }
 
 final utils = Utils();
+
+/// English greeting used as the dashboard's default title.
+String currentGreeting([DateTime? now]) {
+  final hour = (now ?? DateTime.now()).hour;
+  if (hour >= 6 && hour < 12) return '𝐆𝐨𝐨𝐝 𝐦𝐨𝐫𝐧𝐢𝐧𝐠 🌞';
+  if (hour >= 12 && hour < 18) return '𝐆𝐨𝐨𝐝 𝐚𝐟𝐭𝐞𝐫𝐧𝐨𝐨𝐧 🌞';
+  if (hour >= 18 && hour < 22) return '𝐆𝐨𝐨𝐝 𝐞𝐯𝐞𝐧𝐢𝐧𝐠 ✨';
+  if (hour >= 22) return '𝐆𝐨𝐨𝐝 𝐧𝐢𝐠𝐡𝐭 ✨';
+  return '𝐁𝐞𝐝 𝐭𝐢𝐦𝐞 ✨';
+}

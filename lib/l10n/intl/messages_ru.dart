@@ -670,6 +670,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Режим отображения",
     ),
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage("Скрыть IP"),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage("Скрыть текущий IP"),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage("Показать текущий IP"),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP/CIDR"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage("Включить поддержку IPv6"),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage(
@@ -1166,8 +1168,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "saveTip": MessageLookupByLibrary.simpleMessage("Сохранить изменения?"),
     "script": MessageLookupByLibrary.simpleMessage("Скрипт"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "Настройка глобального скрипта переопределения",
+      "Изменить скрипты переопределения профиля",
     ),
+    "myScripts": MessageLookupByLibrary.simpleMessage("Управление"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("Привязка"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
       "Другие настройки",
     ),
@@ -1407,6 +1411,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "Глобальное переопределение",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage(
+      "Настройки скриптов профиля",
+    ),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage(
+      "Назначить профилям",
+    ),
+    "followGlobal": MessageLookupByLibrary.simpleMessage(
+      "По умолчанию",
+    ),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage(
+      "Не использовать скрипт",
+    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Использовать hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "Использовать системные hosts",
@@ -1586,5 +1602,39 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "Доступная локальная сеть не найдена, проверьте Wi-Fi",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("Часы (Средняя)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("Часы (Большая)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage(
+      "Пользовательский текст",
+    ),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage("Введите текст"),
+    "changeImage": MessageLookupByLibrary.simpleMessage("Сменить изображение"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage(
+      "Восстановить по умолчанию",
+    ),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "Нажмите для текста, удерживайте для фото",
+    ),
+    "clock": MessageLookupByLibrary.simpleMessage("Часы"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("Автор"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage(
+      "Введите имя автора",
+    ),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage(
+      "Изображение карточки",
+    ),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage(
+      "一緒に頑張ろう",
+    ),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage(
+      "Пользовательское изображение",
+    ),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("Фон по умолчанию"),
+    "overridden": MessageLookupByLibrary.simpleMessage("Переопределено"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("Не переопределено"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("Работает"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("Остановлен"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("Перезапуск"),
   };
 }

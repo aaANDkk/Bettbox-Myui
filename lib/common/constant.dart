@@ -48,7 +48,9 @@ const customSidebarIconKey = 'custom_sidebar_icon';
 const customDashboardTitleKey = 'custom_dashboard_title';
 const wakelockEnabledKey = 'wakelock_enabled';
 const trafficUsageShowUploadKey = 'traffic_usage_show_upload';
+const ipPrivacyProtectionKey = 'ip_privacy_protection';
 const double dialogCommonWidth = 300;
+const double optionRadius = 14.0;
 const repository = 'aaANDkk/Bettbox-Myui';
 const ipInfoToken = String.fromEnvironment('IPINFO_TOKEN', defaultValue: '');
 const defaultExternalController = '127.0.0.1:9090';
@@ -76,8 +78,8 @@ double getFloatingBottomBarFABReserveHeight(BuildContext context) {
 Decoration getCommonFabDecoration(BuildContext context) {
   final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
   return ShapeDecoration(
-    shape: RoundedSuperellipseBorder(
-      borderRadius: BorderRadius.circular(20),
+    shape: SuperellipseBorder(
+      borderRadius: BorderRadius.circular(18),
     ),
     shadows: [
       BoxShadow(
@@ -127,6 +129,18 @@ class CommonFilters {
     sigmaY: blurSigma,
     tileMode: TileMode.clamp,
   );
+
+  /// Blur ramped by an entrance progress, so a barrier never pays a
+  /// full-strength backdrop blur on its first frame.
+  static ImageFilter blurAt(double t) {
+    final sigma = blurSigma * t.clamp(0.0, 1.0);
+    if (sigma <= 0) return ImageFilter.blur();
+    return ImageFilter.blur(
+      sigmaX: sigma,
+      sigmaY: sigma,
+      tileMode: TileMode.clamp,
+    );
+  }
 }
 
 final commonFilter = CommonFilters.blur;

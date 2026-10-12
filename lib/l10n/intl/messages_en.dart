@@ -641,6 +641,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage(
       "Hide IP Display",
     ),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "Hide Current IP",
+    ),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "Show Current IP",
+    ),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP/CIDR"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "Enable IPv6 traffic routing",
@@ -1125,8 +1131,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "script": MessageLookupByLibrary.simpleMessage("Script"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "Global override script config",
+      "Modify profile override scripts",
     ),
+    "myScripts": MessageLookupByLibrary.simpleMessage("Manage"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("Binding"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage(
       "Other Settings",
     ),
@@ -1344,6 +1352,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "Use Global Script Override",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage(
+      "Profile Script Settings",
+    ),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage(
+      "Assign to Profiles",
+    ),
+    "followGlobal": MessageLookupByLibrary.simpleMessage(
+      "Follow Global Default",
+    ),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage(
+      "Do not use script",
+    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("Use Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage("Use System Hosts"),
     "userAuth": MessageLookupByLibrary.simpleMessage("User Authentication"),
@@ -1505,5 +1525,35 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "No available LAN detected, please check Wi-Fi",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("Clock (Medium)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("Clock (Large)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("Custom Text"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage(
+      "Please enter custom text",
+    ),
+    "changeImage": MessageLookupByLibrary.simpleMessage("Change Image"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage(
+      "Restore Default Image",
+    ),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "Tap to edit text, long press to change image",
+    ),
+    "clock": MessageLookupByLibrary.simpleMessage("Clock"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("Author"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage(
+      "Enter author name",
+    ),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage("Card Image"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage(
+      "一緒に頑張ろう",
+    ),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage("Custom image set"),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("Default background"),
+    "overridden": MessageLookupByLibrary.simpleMessage("Overridden"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("Not Overridden"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("Running"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("Paused"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("Restarting"),
   };
 }

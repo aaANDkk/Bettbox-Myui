@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 extension ColorExtension on Color {
@@ -84,7 +85,7 @@ extension ColorExtension on Color {
         .toUpperCase();
   }
 
-  Color darken([final int amount = 10]) {
+  Color darken([int amount = 10]) {
     if (amount <= 0) return this;
     if (amount > 100) return Colors.black;
     final HSLColor hsl = HSLColor.fromColor(this);
@@ -117,6 +118,112 @@ extension ColorSchemeExtension on ColorScheme {
       ? copyWith(
           surface: Colors.black,
           surfaceContainer: surfaceContainer.darken(5),
+          surfaceContainerLow: Colors.black,
         )
       : this;
+
+  Color get success => Colors.green.harmonizeWith(primary);
+
+  Color get warning => Colors.orange.harmonizeWith(primary);
+
+  Color? delayColor(int? delay) {
+    if (delay == null) return null;
+    if (delay < 0) return error;
+    if (delay < 600) return success;
+    return warning;
+  }
 }
+
+/// Hairline used for structural separations (window header, side bar) and for
+/// the dividers inside cards, so every line in the app shares one token that
+/// follows the theme's neutral variant and the current brightness.
+Color panelDividerColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  return colorScheme.outlineVariant.withValues(
+    alpha: colorScheme.brightness == Brightness.light ? 0.6 : 0.45,
+  );
+}
+
+/// Idle surface of selectable option cards (theme mode, pickers, …): must
+/// differ from both the page and [commonCardColor], otherwise the unselected
+/// options read as ordinary cards.
+Color optionCardColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return colorScheme.surfaceContainerHigh;
+  }
+  return colorScheme.surfaceContainerHighest;
+}
+
+/// Selected-item tint matching the floating nav bar's tab background.
+Color navSelectedColor(ColorScheme colorScheme, {bool hovered = false}) {
+  if (hovered) {
+    return Color.alphaBlend(
+      colorScheme.onSecondaryContainer.withValues(alpha: 0.08),
+      colorScheme.secondaryContainer,
+    );
+  }
+  return colorScheme.secondaryContainer;
+}
+
+// Lifts every channel by a few units, saturating at white.
+Color _liftColor(Color color, [double amount = 3]) {
+  int channel(double value) {
+    return (value * 255 + amount).round().clamp(0, 255).toInt();
+  }
+
+  return Color.fromARGB(
+    255,
+    channel(color.r),
+    channel(color.g),
+    channel(color.b),
+  );
+}
+
+Color commonCardColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return _liftColor(
+      Color.lerp(
+            colorScheme.surfaceContainerLow,
+            colorScheme.surfaceContainerLowest,
+            0.72,
+          ) ??
+          colorScheme.surfaceContainerLow,
+    );
+  }
+  return colorScheme.surfaceContainerHigh;
+}
+
+// The side bar and the window header stay on the plain 60% blend on purpose:
+// only the cards (and the widgets built from them) carry the extra lift.
+Color sidebarSurfaceColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return Color.lerp(
+          colorScheme.surfaceContainerLow,
+          colorScheme.surfaceContainerLowest,
+          0.60,
+        ) ??
+        colorScheme.surfaceContainerLow;
+  }
+  return colorScheme.surfaceContainerHigh;
+}
+
+Color headerSurfaceColor(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
+  if (colorScheme.brightness == Brightness.light) {
+    return Color.lerp(
+          colorScheme.surface,
+          colorScheme.surfaceContainerLowest,
+          0.60,
+        ) ??
+        colorScheme.surface;
+  }
+  return colorScheme.surfaceContainerHighest;
+}
+
+
+
+
+

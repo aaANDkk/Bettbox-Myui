@@ -47,7 +47,6 @@ class FontManager {
       final fontPath = await _existingFontPath;
 
       if (fontPath == null) {
-        commonPrint.log('FontManager: no custom font file found');
         _customFontName = null;
         fontFamilyNotifier.value = null;
         return false;
@@ -126,9 +125,6 @@ class FontManager {
         _customFontName = displayName;
       }
       fontFamilyNotifier.value = familyName;
-      commonPrint.log(
-        'FontManager: custom font loaded ($familyName) from $filePath (variable: $_isVariableFont, baseWeight: $_fontBaseWeight)',
-      );
       return true;
     } catch (e, stack) {
       commonPrint.log('FontManager.loadFont failed: $e\n$stack');

@@ -255,11 +255,10 @@ class AppSidebarContainer extends ConsumerWidget {
     required BuildContext context,
     required Widget child,
   }) {
-    final colorScheme = context.colorScheme;
     return Material(
-      color: colorScheme.surfaceContainer,
+      color: sidebarSurfaceColor(context),
       shape: BorderDirectional(
-        end: BorderSide(color: colorScheme.outlineVariant),
+        end: BorderSide(color: panelDividerColor(context)),
       ),
       child: child,
     );

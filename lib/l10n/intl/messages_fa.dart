@@ -641,6 +641,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipPrivacyProtection": MessageLookupByLibrary.simpleMessage(
       "پنهان‌سازی IP",
     ),
+    "hideCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "پنهان کردن IP فعلی",
+    ),
+    "showCurrentIp": MessageLookupByLibrary.simpleMessage(
+      "نمایش IP فعلی",
+    ),
     "ipcidr": MessageLookupByLibrary.simpleMessage("IP / ماسک"),
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "دریافت ترافیک IPv6 فعال باشد",
@@ -1155,8 +1161,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "script": MessageLookupByLibrary.simpleMessage("اسکریپت"),
     "scriptDesc": MessageLookupByLibrary.simpleMessage(
-      "تنظیمات اسکریپت اورراید سراسری",
+      "ویرایش اسکریپت‌های بازنویسی پروفایل",
     ),
+    "myScripts": MessageLookupByLibrary.simpleMessage("مدیریت"),
+    "myProfiles": MessageLookupByLibrary.simpleMessage("پیوند"),
     "scriptOtherOptions": MessageLookupByLibrary.simpleMessage("تنظیمات دیگر"),
     "search": MessageLookupByLibrary.simpleMessage("جستجو"),
     "seconds": MessageLookupByLibrary.simpleMessage("ثانیه"),
@@ -1382,6 +1390,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "useGlobalScriptOverride": MessageLookupByLibrary.simpleMessage(
       "استفاده از اسکریپت اورراید سراسری",
     ),
+    "profileScriptSettings": MessageLookupByLibrary.simpleMessage(
+      "تنظیمات اسکریپت نمایه",
+    ),
+    "assignToProfiles": MessageLookupByLibrary.simpleMessage(
+      "اختصاص به نمایه‌ها",
+    ),
+    "followGlobal": MessageLookupByLibrary.simpleMessage(
+      "پیروی از پیش‌فرض سراسری",
+    ),
+    "noScriptAssigned": MessageLookupByLibrary.simpleMessage(
+      "عدم استفاده از اسکریپت",
+    ),
     "useHosts": MessageLookupByLibrary.simpleMessage("استفاده از Hosts"),
     "useSystemHosts": MessageLookupByLibrary.simpleMessage(
       "استفاده از Hosts سیستم",
@@ -1543,5 +1563,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "tvScanNoNetwork": MessageLookupByLibrary.simpleMessage(
       "شبکه محلی در دسترس یافت نشد، لطفاً Wi-Fi را بررسی کنید",
     ),
+    "clockMedium": MessageLookupByLibrary.simpleMessage("کارت ساعت (متوسط)"),
+    "clockLarge": MessageLookupByLibrary.simpleMessage("کارت ساعت (بزرگ)"),
+    "customCardText": MessageLookupByLibrary.simpleMessage("متن سفارشی"),
+    "customCardTextHint": MessageLookupByLibrary.simpleMessage(
+      "لطفاً متن سفارشی را وارد کنید",
+    ),
+    "changeImage": MessageLookupByLibrary.simpleMessage("تغییر تصویر"),
+    "restoreDefaultImage": MessageLookupByLibrary.simpleMessage(
+      "بازیابی تصویر پیش‌فرض",
+    ),
+    "clockWidgetDefaultText": MessageLookupByLibrary.simpleMessage(
+      "برای ویرایش متن ضربه بزنید، برای تغییر تصویر نگه دارید",
+    ),
+    "clock": MessageLookupByLibrary.simpleMessage("ساعت"),
+    "clockCardAuthor": MessageLookupByLibrary.simpleMessage("نویسنده"),
+    "clockCardAuthorHint": MessageLookupByLibrary.simpleMessage(
+      "نام نویسنده را وارد کنید",
+    ),
+    "clockCardImage": MessageLookupByLibrary.simpleMessage("تصویر کارت"),
+    "clockCardDefaultText": MessageLookupByLibrary.simpleMessage("一緒に頑張ろう"),
+    "clockCardDefaultAuthor": MessageLookupByLibrary.simpleMessage("古河渚"),
+    "customImageSelected": MessageLookupByLibrary.simpleMessage("تصویر سفارشی تنظیم شد"),
+    "defaultImage": MessageLookupByLibrary.simpleMessage("پس‌زمینه پیش‌فرض"),
+    "overridden": MessageLookupByLibrary.simpleMessage("بازنویسی شده"),
+    "notOverridden": MessageLookupByLibrary.simpleMessage("بازنویسی نشده"),
+    "coreRunning": MessageLookupByLibrary.simpleMessage("در حال اجرا"),
+    "coreStopped": MessageLookupByLibrary.simpleMessage("متوقف شده"),
+    "coreRestarting": MessageLookupByLibrary.simpleMessage("در حال راه‌اندازی مجدد"),
   };
 }

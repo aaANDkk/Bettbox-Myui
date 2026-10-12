@@ -1,6 +1,7 @@
 import 'package:bett_box/enum/enum.dart';
 import 'package:bett_box/models/app.dart';
 import 'package:bett_box/state.dart';
+import 'package:bett_box/widgets/deferred_push.dart';
 import 'package:flutter/material.dart';
 
 class BaseNavigator {
@@ -20,7 +21,7 @@ class BaseNavigator {
       );
     }
     return await Navigator.of(context).push<T>(
-      MaterialPageRoute<T>(
+      CommonMobileRoute<T>(
         builder: (context) => child,
         maintainState: maintainState,
         allowSnapshotting: false,
@@ -29,7 +30,17 @@ class BaseNavigator {
   }
 }
 
-class CommonDesktopRoute<T> extends PageRoute<T> {
+class CommonMobileRoute<T> extends MaterialPageRoute<T>
+    with DeferredPushRouteMixin<T> {
+  CommonMobileRoute({
+    required super.builder,
+    super.maintainState,
+    super.allowSnapshotting,
+  });
+}
+
+class CommonDesktopRoute<T> extends PageRoute<T>
+    with DeferredPushRouteMixin<T> {
   final Widget Function(BuildContext context) builder;
 
   CommonDesktopRoute({

@@ -152,6 +152,16 @@ class Preferences {
     await preferences?.setBool(trafficUsageShowUploadKey, value);
   }
 
+  Future<bool> getIpPrivacyProtection() async {
+    final preferences = await sharedPreferencesCompleter.future;
+    return preferences?.getBool(ipPrivacyProtectionKey) ?? false;
+  }
+
+  Future<void> setIpPrivacyProtection(bool value) async {
+    final preferences = await sharedPreferencesCompleter.future;
+    await preferences?.setBool(ipPrivacyProtectionKey, value);
+  }
+
   Future<void> clearClashConfig() async {
     final preferences = await sharedPreferencesCompleter.future;
     preferences?.remove(clashConfigKey);

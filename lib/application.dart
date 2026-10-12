@@ -14,6 +14,7 @@ import 'package:bett_box/providers/providers.dart';
 import 'package:bett_box/state.dart';
 import 'package:bett_box/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'controller.dart';
 import 'pages/pages.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+
+/// Status / navigation bar style for the given theme [brightness].
+///
+/// Transparent app bars are estimated as dark by [AppBar], which would force
+/// white status bar icons on light themes.
+SystemUiOverlayStyle _systemUiOverlayStyle(Brightness brightness) {
+  final iconBrightness = brightness == Brightness.light
+      ? Brightness.dark
+      : Brightness.light;
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: iconBrightness,
+    statusBarBrightness: brightness,
+    systemStatusBarContrastEnforced: false,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: iconBrightness,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
+  );
+}
 
 class Application extends ConsumerStatefulWidget {
   const Application({super.key});
@@ -266,17 +287,20 @@ class ApplicationState extends ConsumerState<Application>
               theme: ThemeData(
                 useMaterial3: true,
                 pageTransitionsTheme: _pageTransitionsTheme,
+                scaffoldBackgroundColor: _getAppColorScheme(
+                  brightness: Brightness.light,
+                  primaryColor: themeProps.primaryColor,
+                ).surfaceContainer,
                 colorScheme: _getAppColorScheme(
                   brightness: Brightness.light,
                   primaryColor: themeProps.primaryColor,
                 ),
                 appBarTheme: AppBarTheme(
-                  backgroundColor: _getAppColorScheme(
-                    brightness: Brightness.light,
-                    primaryColor: themeProps.primaryColor,
-                  ).surface,
-                  surfaceTintColor: Colors.transparent,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
                   scrolledUnderElevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  systemOverlayStyle: _systemUiOverlayStyle(Brightness.light),
                 ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
@@ -286,8 +310,8 @@ class ApplicationState extends ConsumerState<Application>
                       const Icon(FluentIcons.dismiss_24_regular),
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(20),
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
@@ -298,12 +322,17 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 dialogTheme: DialogThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.circular(35),
                   ),
                 ),
+                listTileTheme: const ListTileThemeData(
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
                 bottomSheetTheme: const BottomSheetThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(35),
                     ),
@@ -311,15 +340,15 @@ class ApplicationState extends ConsumerState<Application>
                   clipBehavior: Clip.antiAlias,
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(22)),
                   ),
                 ),
                 dropdownMenuTheme: const DropdownMenuThemeData(
                   menuStyle: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      SuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -327,8 +356,8 @@ class ApplicationState extends ConsumerState<Application>
                 menuTheme: const MenuThemeData(
                   style: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      SuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -366,8 +395,8 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 chipTheme: ChipThemeData(
-                  shape: const RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  shape: const SuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(optionRadius)),
                   ),
                   side: BorderSide(
                     color: _getAppColorScheme(
@@ -391,17 +420,20 @@ class ApplicationState extends ConsumerState<Application>
               darkTheme: ThemeData(
                 useMaterial3: true,
                 pageTransitionsTheme: _pageTransitionsTheme,
+                scaffoldBackgroundColor: _getAppColorScheme(
+                  brightness: Brightness.dark,
+                  primaryColor: themeProps.primaryColor,
+                ).toPureBlack(themeProps.pureBlack).surfaceContainer,
                 colorScheme: _getAppColorScheme(
                   brightness: Brightness.dark,
                   primaryColor: themeProps.primaryColor,
                 ).toPureBlack(themeProps.pureBlack),
                 appBarTheme: AppBarTheme(
-                  backgroundColor: _getAppColorScheme(
-                    brightness: Brightness.dark,
-                    primaryColor: themeProps.primaryColor,
-                  ).toPureBlack(themeProps.pureBlack).surface,
-                  surfaceTintColor: Colors.transparent,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
                   scrolledUnderElevation: 0,
+                  surfaceTintColor: Colors.transparent,
+                  systemOverlayStyle: _systemUiOverlayStyle(Brightness.dark),
                 ),
                 fontFamily: fontFamily,
                 actionIconTheme: ActionIconThemeData(
@@ -411,8 +443,8 @@ class ApplicationState extends ConsumerState<Application>
                       const Icon(FluentIcons.dismiss_24_regular),
                 ),
                 floatingActionButtonTheme: FloatingActionButtonThemeData(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(20),
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   elevation: 3,
                   hoverElevation: 5,
@@ -423,12 +455,17 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 dialogTheme: DialogThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.circular(35),
                   ),
                 ),
+                listTileTheme: const ListTileThemeData(
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
                 bottomSheetTheme: const BottomSheetThemeData(
-                  shape: RoundedSuperellipseBorder(
+                  shape: SuperellipseBorder(
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(35),
                     ),
@@ -436,15 +473,15 @@ class ApplicationState extends ConsumerState<Application>
                   clipBehavior: Clip.antiAlias,
                 ),
                 popupMenuTheme: const PopupMenuThemeData(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  shape: SuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(22)),
                   ),
                 ),
                 dropdownMenuTheme: const DropdownMenuThemeData(
                   menuStyle: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      SuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -452,8 +489,8 @@ class ApplicationState extends ConsumerState<Application>
                 menuTheme: const MenuThemeData(
                   style: MenuStyle(
                     shape: WidgetStatePropertyAll<OutlinedBorder>(
-                      RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      SuperellipseBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(22)),
                       ),
                     ),
                   ),
@@ -499,8 +536,8 @@ class ApplicationState extends ConsumerState<Application>
                   ),
                 ),
                 chipTheme: ChipThemeData(
-                  shape: const RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  shape: const SuperellipseBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(optionRadius)),
                   ),
                   side: BorderSide(
                     color:

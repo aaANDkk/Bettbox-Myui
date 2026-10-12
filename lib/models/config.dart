@@ -48,22 +48,24 @@ const defaultAccessControl = AccessControl();
 final defaultThemeProps = ThemeProps(primaryColor: defaultPrimaryColor);
 
 const List<DashboardWidget> defaultDashboardWidgets = [
-  DashboardWidget.mediaUnlock,
+  DashboardWidget.networkDetection,
+  DashboardWidget.clockLarge,
+  DashboardWidget.mediaUnlockSmall,
   DashboardWidget.networkSpeedSmall,
   DashboardWidget.trafficUsageSmall,
   DashboardWidget.outboundMode,
-  DashboardWidget.networkDetection,
   DashboardWidget.currentProfile,
   DashboardWidget.scriptOverride,
   DashboardWidget.accessControlSwitch,
 ];
 
 const List<DashboardWidget> defaultAndroidDashboardWidgets = [
-  DashboardWidget.mediaUnlock,
+  DashboardWidget.networkDetection,
+  DashboardWidget.clockLarge,
+  DashboardWidget.mediaUnlockSmall,
   DashboardWidget.networkSpeedSmall,
   DashboardWidget.trafficUsageSmall,
   DashboardWidget.outboundMode,
-  DashboardWidget.networkDetection,
   DashboardWidget.currentProfile,
   DashboardWidget.scriptOverride,
   DashboardWidget.accessControlSwitch,
@@ -74,7 +76,8 @@ List<DashboardWidget> dashboardWidgetsSafeFromJson(
 ) {
   try {
     return dashboardWidgets
-            ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
+            ?.map((e) => $enumDecodeNullable(_$DashboardWidgetEnumMap, e))
+            .whereType<DashboardWidget>()
             .toList() ??
         (system.isAndroid
             ? defaultAndroidDashboardWidgets
@@ -91,7 +94,8 @@ List<DashboardWidget> mobileDashboardWidgetsSafeFromJson(
 ) {
   try {
     return dashboardWidgets
-            ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
+            ?.map((e) => $enumDecodeNullable(_$DashboardWidgetEnumMap, e))
+            .whereType<DashboardWidget>()
             .toList() ??
         defaultAndroidDashboardWidgets;
   } catch (_) {
@@ -104,7 +108,8 @@ List<DashboardWidget> desktopDashboardWidgetsSafeFromJson(
 ) {
   try {
     return dashboardWidgets
-            ?.map((e) => $enumDecode(_$DashboardWidgetEnumMap, e))
+            ?.map((e) => $enumDecodeNullable(_$DashboardWidgetEnumMap, e))
+            .whereType<DashboardWidget>()
             .toList() ??
         defaultDashboardWidgets;
   } catch (_) {
@@ -181,7 +186,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(true) bool closeConnections,
     @Default(defaultTestUrl) String testUrl,
     @Default(false) bool showStartSwitch,
-    @Default(false) bool showCardStartButton,
+    @Default(true) bool showCardStartButton,
     @Default(true) bool enableNavBarHapticFeedback,
     @Default(true) bool autoCheckUpdate,
     @Default(false) bool showLabel,
