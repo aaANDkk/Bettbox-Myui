@@ -317,14 +317,12 @@ class ProfileItem extends StatelessWidget {
           ),
         ),
         if (subtitleText != null && subtitleText.isNotEmpty) ...[
-          const SizedBox(width: 6),
-          Text('·', style: context.textTheme.labelMedium?.toLight),
-          const SizedBox(width: 6),
-          Text(
-            subtitleText,
-            style: context.textTheme.labelMedium?.toLight,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(width: 8),
+          Flexible(
+            child: CommonInfoCapsule(
+              subtitleText,
+              style: context.textTheme.labelMedium,
+            ),
           ),
         ],
       ],

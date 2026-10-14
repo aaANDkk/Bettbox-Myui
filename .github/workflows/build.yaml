@@ -1,14 +1,17 @@
 name: build
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
+      - '1.19.5-test'
+      - '*test*'
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
-  IS_PRERELEASE: ${{ contains(github.ref_name, 'pre') }}
-  SHOULD_RELEASE: ${{ !contains(github.ref, '-') || contains(github.ref_name, 'pre') }}
+  IS_PRERELEASE: ${{ contains(github.ref_name, 'pre') || contains(github.ref_name, 'test') }}
+  SHOULD_RELEASE: true
   GRADLE_OPTS: -Dorg.gradle.vfs.watch=false
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SENTRY_BACKEND: none
@@ -19,7 +22,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: read
+      contents: write
       actions: write
     strategy:
       fail-fast: false
@@ -28,41 +31,9 @@ jobs:
           - platform: android
             os: ubuntu-24.04
             arch: arm64
-          - platform: android
-            os: ubuntu-24.04
-            arch: amd64
-          - platform: android
-            os: ubuntu-24.04
-            arch: arm
-          - platform: android
-            os: ubuntu-24.04
-            arch: universal
           - platform: windows
             os: windows-2022
             arch: amd64
-          - platform: windows
-            os: windows-11-arm
-            arch: arm64
-          - platform: windows
-            os: windows-2022
-            arch: amd64
-            compatible: true
-          - platform: macos
-            os: macos-15
-            arch: arm64
-          - platform: macos
-            os: macos-15
-            arch: amd64
-          - platform: linux
-            os: ubuntu-22.04
-            arch: amd64
-          - platform: linux
-            os: ubuntu-24.04-arm
-            arch: arm64
-          - platform: linux
-            os: ubuntu-22.04
-            arch: amd64
-            compatible: true
 
     steps:
       - name: Checkout
@@ -70,6 +41,17 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+
+      - name: Free disk space (Android)
+        if: matrix.platform == 'android'
+        shell: bash
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/swift
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /tmp/* || true
+          sudo apt-get clean
+          df -h -B1G | grep -E 'Filesystem|/dev/root|overlay|/'
 
       - name: Setup Rust (Windows)
         if: matrix.platform == 'windows'
@@ -100,10 +82,17 @@ jobs:
       - name: Setup Keystore (Android)
         if: matrix.platform == 'android'
         run: |
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
-          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
+          if [ -n "${{ secrets.KEYSTORE }}" ]; then
+            echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
+            echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/local.properties
+            echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/local.properties
+            echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/local.properties
+          elif [ -f "android/app/keystore.jks" ]; then
+            echo "Using persistent release keystore from repository."
+            echo "keyAlias=bettbox" >> android/local.properties
+            echo "storePassword=bettboxpassword" >> android/local.properties
+            echo "keyPassword=bettboxpassword" >> android/local.properties
+          fi
           
       - name: Setup Java (Android)
         if: matrix.platform == 'android'
@@ -118,7 +107,7 @@ jobs:
         shell: bash
         run: |
           NDK_VERSION="28.2.13676358"
-          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}" >/dev/null 2>&1 || true
+          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --install "ndk;${NDK_VERSION}" "ndk;27.0.12077973" >/dev/null 2>&1 || true
           echo "ANDROID_NDK=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
 
       - name: Configure Cargo for Android
@@ -149,10 +138,6 @@ jobs:
           go-version: ${{ matrix.compatible == true && '1.24.x' || '1.26.x' }}
           cache-dependency-path: core/go.sum
 
-      - name: Select Xcode (macOS)
-        if: matrix.platform == 'macos'
-        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -181,9 +166,12 @@ jobs:
         shell: bash
         run: |
           cd core
+          export GOPROXY="https://proxy.golang.org,https://goproxy.io,direct"
           SING_TUN_VERSION=$(grep -E 'github\.com/metacubex/sing-tun\s+v[^[:space:]]+' go.mod | awk '{print $2}')
           echo "Detected sing-tun version: ${SING_TUN_VERSION}"
-          go mod download github.com/metacubex/sing-tun@${SING_TUN_VERSION}
+          for i in {1..5}; do
+            go mod download github.com/metacubex/sing-tun@${SING_TUN_VERSION} && break || (echo "Retry $i..." && sleep 3)
+          done
           MOD_CACHE=$(go env GOMODCACHE | tr '\\' '/')
           FILE="${MOD_CACHE}/github.com/metacubex/sing-tun@${SING_TUN_VERSION}/tun_windows.go"
           echo "Patching ${FILE}"
@@ -195,7 +183,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           flutter pub get
-          dart run build_runner build
+          dart run build_runner build -d
           dart setup.dart ${{ matrix.platform }} --arch ${{ matrix.arch }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }} ${{ matrix.compatible == true && '--compatible' || '' }}
 
       - name: Install SignPath (Windows)
@@ -239,7 +227,7 @@ jobs:
         shell: bash
         run: |
           flutter pub get
-          dart run build_runner build
+          dart run build_runner build -d
           dart setup.dart windows --arch ${{ matrix.arch }} --out core-only ${{ matrix.compatible == true && '--compatible' || '' }}
 
       - name: Upload Unsigned Core
@@ -251,13 +239,6 @@ jobs:
           path: libclash/windows/BettboxCore.exe
           if-no-files-found: error
           retention-days: 1
-
-      - name: Wait for Unsigned Core
-        if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .github/scripts/wait-artifact.sh '${{ steps.upload-core.outputs.artifact-id }}'
 
       - name: Sign Core (Windows)
         if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
@@ -290,13 +271,6 @@ jobs:
           path: libclash/windows/BettboxHelperService.exe
           if-no-files-found: error
           retention-days: 1
-
-      - name: Wait for Unsigned HelperService
-        if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .github/scripts/wait-artifact.sh '${{ steps.upload-helper.outputs.artifact-id }}'
 
       - name: Sign HelperService (Windows)
         if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
@@ -349,13 +323,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Wait for Unsigned Bettbox
-        if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .github/scripts/wait-artifact.sh '${{ steps.upload-bettbox.outputs.artifact-id }}'
-
       - name: Sign Bettbox (Windows)
         if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
         uses: signpath/github-action-submit-signing-request@v2
@@ -395,13 +362,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Wait for Unsigned Installer
-        if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .github/scripts/wait-artifact.sh '${{ steps.upload-installer.outputs.artifact-id }}'
-
       - name: Sign Installer (Windows)
         if: matrix.platform == 'windows' && env.SIGNPATH_API_TOKEN != ''
         uses: signpath/github-action-submit-signing-request@v2
@@ -432,96 +392,107 @@ jobs:
         if: matrix.platform == 'linux' && matrix.compatible != true
         shell: bash
         run: |
-          echo "=== Verifying BettboxCore permissions in DEB package ==="
+          echo "=== Verifying BettboxCore setuid in DEB package ==="
           if ls dist/Bettbox-*.deb 1>/dev/null 2>&1; then
-            DEB_FILE=$(ls dist/Bettbox-*.deb | head -n 1)
-            DEB_PERMS=$(dpkg-deb -c "$DEB_FILE" | grep BettboxCore || true)
+            DEB_PERMS=$(dpkg-deb -c dist/Bettbox-*.deb | grep BettboxCore || true)
             echo "$DEB_PERMS"
             if echo "$DEB_PERMS" | grep -q 'rws'; then
               echo "OK: BettboxCore in DEB has setuid bit"
             else
-              echo "OK: BettboxCore in DEB has standard permissions (permissions will be configured by postinst on install)"
-              rm -rf /tmp/bettbox-deb-control
-              dpkg-deb -e "$DEB_FILE" /tmp/bettbox-deb-control
-              POSTINST=$(cat /tmp/bettbox-deb-control/postinst 2>/dev/null || true)
+              echo "WARNING: BettboxCore in DEB is missing setuid bit (will be set by postinst on install)"
+              POSTINST=$(dpkg-deb -e dist/Bettbox-*.deb /tmp/bettbox-deb-control && cat /tmp/bettbox-deb-control/postinst || true)
               if ! echo "$POSTINST" | grep -q '/usr/share/Bettbox/BettboxCore'; then
                 echo "ERROR: postinst script does not set permissions on /usr/share/Bettbox/BettboxCore"
                 exit 1
               fi
             fi
           fi
-          echo "=== Verifying BettboxCore permissions in RPM package ==="
+          echo "=== Verifying BettboxCore setuid in RPM package ==="
           if ls dist/Bettbox-*.rpm 1>/dev/null 2>&1; then
-            RPM_FILE=$(ls dist/Bettbox-*.rpm | head -n 1)
-            RPM_PERMS=$(rpm -qplv "$RPM_FILE" | grep BettboxCore || true)
+            RPM_PERMS=$(rpm -qplv dist/Bettbox-*.rpm | grep BettboxCore || true)
             echo "$RPM_PERMS"
-            if echo "$RPM_PERMS" | grep -q 'rws'; then
-              echo "OK: BettboxCore in RPM has setuid bit"
-            else
-              echo "OK: BettboxCore in RPM has standard permissions (permissions will be configured by %post on install)"
-              RPM_POST=$(rpm -qp --scripts "$RPM_FILE" 2>/dev/null || true)
-              if ! echo "$RPM_POST" | grep -q 'BettboxCore'; then
-                echo "ERROR: %post script does not set permissions on BettboxCore"
-                exit 1
-              fi
+            if ! echo "$RPM_PERMS" | grep -q 'rws'; then
+              echo "ERROR: BettboxCore in RPM is missing setuid bit"
+              exit 1
             fi
           fi
 
       - name: Upload Artifacts (macOS & Android)
         if: matrix.platform != 'linux' && matrix.platform != 'windows'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}
           path: ./dist/*
           archive: false
           overwrite: true
+          retention-days: 3
 
       - name: Upload Windows Installer Artifact
         if: matrix.platform == 'windows'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-installer
           path: ./dist/*.exe
           archive: false
           overwrite: true
+          retention-days: 3
 
       - name: Upload Windows Portable Artifact
         if: matrix.platform == 'windows' && matrix.compatible == true && matrix.arch == 'amd64'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-portable
           path: ./dist/*.zip
           archive: false
           overwrite: true
+          retention-days: 3
 
       - name: Upload DEB Artifact
         if: matrix.platform == 'linux'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-deb
           path: ./dist/*.deb
           archive: false
           overwrite: true
+          retention-days: 3
 
       - name: Upload AppImage Artifact
         if: matrix.platform == 'linux' && matrix.arch == 'amd64'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-AppImage
           path: ./dist/*.AppImage
           archive: false
           overwrite: true
+          retention-days: 3
 
       - name: Upload RPM Artifact
         if: matrix.platform == 'linux' && matrix.arch == 'amd64'
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: Bettbox-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.compatible == true && '-compatible' || '' }}-rpm
           path: ./dist/*.rpm
           archive: false
           overwrite: true
+          retention-days: 3
+
+      - name: Release to GitHub (Direct Upload)
+        if: env.SHOULD_RELEASE == 'true'
+        uses: softprops/action-gh-release@v3.0.0
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: ./dist/*
+          prerelease: ${{ env.IS_PRERELEASE == 'true' }}
 
   upload:
+    if: false
     permissions: write-all
     needs: [ build ]
     runs-on: ubuntu-latest
@@ -541,16 +512,17 @@ jobs:
 
       - name: Generate release.md
         run: |
-          printf '%s\n' "- Fixes and improvements" "- Recommended version update" > release.md
-
-      - name: Patch release.md
-        run: |
-          version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
-          base_version=$(echo "$version" | sed 's/-pre[0-9]*//')
-          if [ "${{ env.IS_PRERELEASE }}" == "true" ]; then
-            sed -e "s|BASE_VERSION|$base_version|g" -e "s|VERSION|$version|g" ./.github/release_template_pre.md >> release.md
+          PREV_TAG=$(git describe --tags --abbrev=0 "${{ github.ref_name }}^" 2>/dev/null || true)
+          if [ -n "$PREV_TAG" ]; then
+            echo "## 更新内容 / What's Changed" > release.md
+            echo "" >> release.md
+            git log "${PREV_TAG}..${{ github.ref_name }}" --pretty=format:"* %s (%h)" --no-merges >> release.md || true
+            echo "" >> release.md
           else
-            sed -e "s|BASE_VERSION|$base_version|g" -e "s|VERSION|$version|g" ./.github/release_template.md >> release.md
+            echo "## 更新内容 / What's Changed" > release.md
+            echo "" >> release.md
+            printf '%s\n' "* Fixes and improvements" "* Recommended version update" >> release.md
+            echo "" >> release.md
           fi
 
       - name: Release
@@ -560,3 +532,4 @@ jobs:
           files: ./dist/*
           body_path: './release.md'
           prerelease: ${{ env.IS_PRERELEASE == 'true' }}
+          generate_release_notes: true
